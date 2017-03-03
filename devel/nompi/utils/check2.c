@@ -17,23 +17,21 @@
 #include <math.h>
 #include "utils.h"
 
-
 int main(void)
 {
-   int n;
-   double x;
-   
-   printf("\n");
-   printf("Test of the program fdigits()\n");
-   printf("-----------------------------\n\n");
+  int n;
+  double x;
 
-   while (1)
-   {
-      printf("x = ");
-      scanf("%lf",&x);
-      n=fdigits(x);
-      printf("    %.*f\n\n",n,x);
-   }
-   
-   exit(0);
+  printf("\n");
+  printf("Test of the program fdigits()\n");
+  printf("-----------------------------\n\n");
+
+  while (1) {
+    printf("x = ");
+    scanf("%lf", &x);
+    n = fdigits(x);
+    printf("    %.*f\n\n", n, x);
+  }
+
+  exit(0);
 }

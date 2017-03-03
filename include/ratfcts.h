@@ -15,20 +15,20 @@
 
 typedef struct
 {
-   int np;
-   double A,delta;
-   double *mu,*rmu;
-   double *nu,*rnu;
+  int np;
+  double A, delta;
+  double *mu, *rmu;
+  double *nu, *rnu;
 } ratfct_t;
 
 /* ELLIPTIC_C */
 extern double ellipticK(double rk);
-extern void sncndn(double u,double rk,double *sn,double *cn,double *dn);
+extern void sncndn(double u, double rk, double *sn, double *cn, double *dn);
 
 /* RATFCTS_C */
 extern ratfct_t ratfct(int *irat);
 
 /* ZOLOTAREV_C */
-extern void zolotarev(int n,double eps,double *A,double *ar,double *delta);
+extern void zolotarev(int n, double eps, double *A, double *ar, double *delta);
 
 #endif

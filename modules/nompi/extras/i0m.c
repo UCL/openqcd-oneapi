@@ -19,8 +19,8 @@
 * Notes:
 *
 * The Bessel function is calculated by evaluating the integral
-* 
-*   exp(-x)*I_0(x)=int_0^Pi (dt/Pi)*exp(-x*(1-cos(t))) 
+*
+*   exp(-x)*I_0(x)=int_0^Pi (dt/Pi)*exp(-x*(1-cos(t)))
 *
 * using Chebyshev polynomials
 *
@@ -35,50 +35,44 @@
 #include "utils.h"
 #include "extras.h"
 
-static double pi,xs;
-
+static double pi, xs;
 
 static double maxt(double x)
 {
-   double r;
+  double r;
 
-   pi=4.0*atan(1.0);
-   
-   if (x<1.0)
-      return pi;
+  pi = 4.0 * atan(1.0);
 
-   r=1.0-(0.5*log(2.0*pi*x)-log(DBL_EPSILON))/x;
+  if (x < 1.0)
+    return pi;
 
-   if (r>=1.0)
-      return 0.0;
-   else if (r<=-1.0)
-      return pi;
-   else 
-      return acos(r);
+  r = 1.0 - (0.5 * log(2.0 * pi * x) - log(DBL_EPSILON)) / x;
+
+  if (r >= 1.0)
+    return 0.0;
+  else if (r <= -1.0)
+    return pi;
+  else
+    return acos(r);
 }
 
-
-static double f(double t)
-{
-   return exp(-xs*(1.0-cos(t)));
-}
-
+static double f(double t) { return exp(-xs * (1.0 - cos(t))); }
 
 double i0m(double x)
 {
-   double a,b;
-   
-   if (x==0.0)
-      return 1.0;
+  double a, b;
 
-   error(x<0.0,1,"i0m [i0.c]","The argument x must be non-negative");
+  if (x == 0.0)
+    return 1.0;
 
-   a=0.0;
-   b=maxt(x);
-   xs=x;
+  error(x < 0.0, 1, "i0m [i0.c]", "The argument x must be non-negative");
 
-   if (b==0.0)
-      return (1.0/sqrt(2.0*pi*x))*(1.0+1.0/(8.0*x));
+  a = 0.0;
+  b = maxt(x);
+  xs = x;
 
-   return cheby_int(a,b,f,512,10.0*DBL_EPSILON)/pi;
+  if (b == 0.0)
+    return (1.0 / sqrt(2.0 * pi * x)) * (1.0 + 1.0 / (8.0 * x));
+
+  return cheby_int(a, b, f, 512, 10.0 * DBL_EPSILON) / pi;
 }

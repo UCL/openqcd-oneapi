@@ -99,601 +99,523 @@
 #include "lattice.h"
 #include "global.h"
 
-#define N0 (NPROC0*L0)
+#define N0 (NPROC0 * L0)
 
 typedef union
 {
-   su3_dble u;
-   double r[18];
+  su3_dble u;
+  double r[18];
 } umat_t;
 
-static int init0=0,nlks,*lks;
-static int init1=0,npts,*pts;
-static int init2=0;
-static const su3_dble ud0={{0.0}};
-static const spinor s0={{{0.0f}}};
-static const spinor_dble sd0={{{0.0}}};
+static int init0 = 0, nlks, *lks;
+static int init1 = 0, npts, *pts;
+static int init2 = 0;
+static const su3_dble ud0 = {{0.0}};
+static const spinor s0 = {{{0.0f}}};
+static const spinor_dble sd0 = {{{0.0}}};
 static su3_dble ubnd[2][3];
-
 
 static void alloc_lks(void)
 {
-   int ix,t,*lk;
+  int ix, t, *lk;
 
-   error(iup[0][0]==0,1,"alloc_lks [bcnds.c]","Geometry arrays are not set");
+  error(iup[0][0] == 0, 1, "alloc_lks [bcnds.c]",
+        "Geometry arrays are not set");
 
-   if ((cpr[0]==0)||(cpr[0]==(NPROC0-1)))
-   {
-      if (NPROC0>1)
-         nlks=(L1*L2*L3)/2;
-      else
-         nlks=L1*L2*L3;
+  if ((cpr[0] == 0) || (cpr[0] == (NPROC0 - 1))) {
+    if (NPROC0 > 1)
+      nlks = (L1 * L2 * L3) / 2;
+    else
+      nlks = L1 * L2 * L3;
 
-      lks=malloc(nlks*sizeof(*lks));
+    lks = malloc(nlks * sizeof(*lks));
 
-      if (lks!=NULL)
-      {
-         lk=lks;
+    if (lks != NULL) {
+      lk = lks;
 
-         for (ix=(VOLUME/2);ix<VOLUME;ix++)
-         {
-            t=global_time(ix);
+      for (ix = (VOLUME / 2); ix < VOLUME; ix++) {
+        t = global_time(ix);
 
-            if (t==0)
-            {
-               (*lk)=8*(ix-(VOLUME/2))+1;
-               lk+=1;
-            }
-            else if (t==(N0-1))
-            {
-               (*lk)=8*(ix-(VOLUME/2));
-               lk+=1;
-            }
-         }
+        if (t == 0) {
+          (*lk) = 8 * (ix - (VOLUME / 2)) + 1;
+          lk += 1;
+        } else if (t == (N0 - 1)) {
+          (*lk) = 8 * (ix - (VOLUME / 2));
+          lk += 1;
+        }
       }
-   }
-   else
-   {
-      nlks=0;
-      lks=NULL;
-   }
+    }
+  } else {
+    nlks = 0;
+    lks = NULL;
+  }
 
-   error((nlks>0)&&(lks==NULL),1,"alloc_lks [bcnds.c]",
-         "Unable to allocate index array");
-   init0=1;
+  error((nlks > 0) && (lks == NULL), 1, "alloc_lks [bcnds.c]",
+        "Unable to allocate index array");
+  init0 = 1;
 }
-
 
 static void alloc_pts(void)
 {
-   int bc,ix,t,*pt;
+  int bc, ix, t, *pt;
 
-   error(iup[0][0]==0,1,"alloc_pts [bcnds.c]","Geometry arrays are not set");
-   bc=bc_type();
+  error(iup[0][0] == 0, 1, "alloc_pts [bcnds.c]",
+        "Geometry arrays are not set");
+  bc = bc_type();
 
-   if (((cpr[0]==0)&&(bc!=3))||((cpr[0]==(NPROC0-1))&&(bc==0)))
-   {
-      if ((NPROC0==1)&&(bc==0))
-         npts=2*L1*L2*L3;
-      else
-         npts=L1*L2*L3;
+  if (((cpr[0] == 0) && (bc != 3)) || ((cpr[0] == (NPROC0 - 1)) && (bc == 0))) {
+    if ((NPROC0 == 1) && (bc == 0))
+      npts = 2 * L1 * L2 * L3;
+    else
+      npts = L1 * L2 * L3;
 
-      pts=malloc(npts*sizeof(*pts));
+    pts = malloc(npts * sizeof(*pts));
 
-      if (pts!=NULL)
-      {
-         pt=pts;
+    if (pts != NULL) {
+      pt = pts;
 
-         for (ix=0;ix<VOLUME;ix++)
-         {
-            t=global_time(ix);
+      for (ix = 0; ix < VOLUME; ix++) {
+        t = global_time(ix);
 
-            if ((t==0)||((t==(N0-1))&&(bc==0)))
-            {
-               (*pt)=ix;
-               pt+=1;
-            }
-         }
+        if ((t == 0) || ((t == (N0 - 1)) && (bc == 0))) {
+          (*pt) = ix;
+          pt += 1;
+        }
       }
-   }
-   else
-   {
-      npts=0;
-      pts=NULL;
-   }
+    }
+  } else {
+    npts = 0;
+    pts = NULL;
+  }
 
-   error((npts>0)&&(pts==NULL),1,"alloc_pts [bcnds.c]",
-         "Unable to allocate index array");
-   init1=1;
+  error((npts > 0) && (pts == NULL), 1, "alloc_pts [bcnds.c]",
+        "Unable to allocate index array");
+  init1 = 1;
 }
-
 
 int *bnd_lks(int *n)
 {
-   if (init0==0)
-      alloc_lks();
+  if (init0 == 0)
+    alloc_lks();
 
-   (*n)=nlks;
+  (*n) = nlks;
 
-   return lks;
+  return lks;
 }
-
 
 int *bnd_pts(int *n)
 {
-   if (init1==0)
-      alloc_pts();
+  if (init1 == 0)
+    alloc_pts();
 
-   (*n)=npts;
+  (*n) = npts;
 
-   return pts;
+  return pts;
 }
-
 
 static int is_zero(su3_dble *u)
 {
-   int i,it;
-   umat_t *um;
+  int i, it;
+  umat_t *um;
 
-   um=(umat_t*)(u);
-   it=1;
+  um = (umat_t *)(u);
+  it = 1;
 
-   for (i=0;i<18;i++)
-      it&=((*um).r[i]==0.0);
+  for (i = 0; i < 18; i++)
+    it &= ((*um).r[i] == 0.0);
 
-   return it;
+  return it;
 }
 
-
-static int is_equal(double tol,su3_dble *u,su3_dble *v)
+static int is_equal(double tol, su3_dble *u, su3_dble *v)
 {
-   int i,it;
-   umat_t *um,*vm;
+  int i, it;
+  umat_t *um, *vm;
 
-   um=(umat_t*)(u);
-   vm=(umat_t*)(v);
-   it=1;
+  um = (umat_t *)(u);
+  vm = (umat_t *)(v);
+  it = 1;
 
-   for (i=0;i<18;i++)
-      it&=(fabs((*um).r[i]-(*vm).r[i])<=tol);
+  for (i = 0; i < 18; i++)
+    it &= (fabs((*um).r[i] - (*vm).r[i]) <= tol);
 
-   return it;
+  return it;
 }
-
 
 static int check_zero(int bc)
 {
-   int it,ix,t,ifc;
-   su3_dble *u;
+  int it, ix, t, ifc;
+  su3_dble *u;
 
-   it=1;
-   u=udfld();
+  it = 1;
+  u = udfld();
 
-   for (ix=(VOLUME/2);ix<VOLUME;ix++)
-   {
-      t=global_time(ix);
+  for (ix = (VOLUME / 2); ix < VOLUME; ix++) {
+    t = global_time(ix);
 
-      if ((bc==0)&&(t==0))
-      {
-         it&=(0x1^is_zero(u));
-         u+=1;
-         it&=is_zero(u);
-         u+=1;
-      }
-      else if ((bc==0)&&(t==(N0-1)))
-      {
-         it&=is_zero(u);
-         u+=1;
-         it&=(0x1^is_zero(u));
-         u+=1;
-      }
-      else
-      {
-         it&=(0x1^is_zero(u));
-         u+=1;
-         it&=(0x1^is_zero(u));
-         u+=1;
-      }
+    if ((bc == 0) && (t == 0)) {
+      it &= (0x1 ^ is_zero(u));
+      u += 1;
+      it &= is_zero(u);
+      u += 1;
+    } else if ((bc == 0) && (t == (N0 - 1))) {
+      it &= is_zero(u);
+      u += 1;
+      it &= (0x1 ^ is_zero(u));
+      u += 1;
+    } else {
+      it &= (0x1 ^ is_zero(u));
+      u += 1;
+      it &= (0x1 ^ is_zero(u));
+      u += 1;
+    }
 
-      for (ifc=2;ifc<8;ifc++)
-      {
-         it&=(0x1^is_zero(u));
-         u+=1;
-      }
-   }
+    for (ifc = 2; ifc < 8; ifc++) {
+      it &= (0x1 ^ is_zero(u));
+      u += 1;
+    }
+  }
 
-   return it;
+  return it;
 }
-
 
 static void set_ubnd(void)
 {
-   int i,k;
-   double s[3];
-   bc_parms_t bcp;
+  int i, k;
+  double s[3];
+  bc_parms_t bcp;
 
-   bcp=bc_parms();
-   s[0]=(double)(NPROC1*L1);
-   s[1]=(double)(NPROC2*L2);
-   s[2]=(double)(NPROC3*L3);
+  bcp = bc_parms();
+  s[0] = (double)(NPROC1 * L1);
+  s[1] = (double)(NPROC2 * L2);
+  s[2] = (double)(NPROC3 * L3);
 
-   for (i=0;i<2;i++)
-   {
-      for (k=0;k<3;k++)
-      {
-         ubnd[i][k]=ud0;
-         ubnd[i][k].c11.re=cos(bcp.phi[i][0]/s[k]);
-         ubnd[i][k].c11.im=sin(bcp.phi[i][0]/s[k]);
-         ubnd[i][k].c22.re=cos(bcp.phi[i][1]/s[k]);
-         ubnd[i][k].c22.im=sin(bcp.phi[i][1]/s[k]);
-         ubnd[i][k].c33.re=cos(bcp.phi[i][2]/s[k]);
-         ubnd[i][k].c33.im=sin(bcp.phi[i][2]/s[k]);
-      }
-   }
+  for (i = 0; i < 2; i++) {
+    for (k = 0; k < 3; k++) {
+      ubnd[i][k] = ud0;
+      ubnd[i][k].c11.re = cos(bcp.phi[i][0] / s[k]);
+      ubnd[i][k].c11.im = sin(bcp.phi[i][0] / s[k]);
+      ubnd[i][k].c22.re = cos(bcp.phi[i][1] / s[k]);
+      ubnd[i][k].c22.im = sin(bcp.phi[i][1] / s[k]);
+      ubnd[i][k].c33.re = cos(bcp.phi[i][2] / s[k]);
+      ubnd[i][k].c33.im = sin(bcp.phi[i][2] / s[k]);
+    }
+  }
 
-   init2=1;
+  init2 = 1;
 }
-
 
 static void open_bc(void)
 {
-   int *lk,*lkm;
-   su3_dble *ub;
+  int *lk, *lkm;
+  su3_dble *ub;
 
-   if (init0==0)
-      alloc_lks();
+  if (init0 == 0)
+    alloc_lks();
 
-   ub=udfld();
-   lk=lks;
-   lkm=lk+nlks;
+  ub = udfld();
+  lk = lks;
+  lkm = lk + nlks;
 
-   for (;lk<lkm;lk++)
-      ub[*lk]=ud0;
+  for (; lk < lkm; lk++)
+    ub[*lk] = ud0;
 
-   set_flags(UPDATED_UD);
+  set_flags(UPDATED_UD);
 }
-
 
 static void SF_bc(void)
 {
-   int k,*pt,*ptm;
-   su3_dble *ub,*u;
+  int k, *pt, *ptm;
+  su3_dble *ub, *u;
 
-   if (init1==0)
-      alloc_pts();
-   if (init2==0)
-      set_ubnd();
+  if (init1 == 0)
+    alloc_pts();
+  if (init2 == 0)
+    set_ubnd();
 
-   ub=udfld();
+  ub = udfld();
 
-   if (cpr[0]==0)
-   {
-      pt=pts+(npts/2);
-      ptm=pts+npts;
+  if (cpr[0] == 0) {
+    pt = pts + (npts / 2);
+    ptm = pts + npts;
 
-      for (;pt<ptm;pt++)
-      {
-         u=ub+8*(pt[0]-(VOLUME/2));
+    for (; pt < ptm; pt++) {
+      u = ub + 8 * (pt[0] - (VOLUME / 2));
 
-         for (k=0;k<3;k++)
-         {
-            u[2+2*k]=ubnd[0][k];
-            u[3+2*k]=ubnd[0][k];
-         }
+      for (k = 0; k < 3; k++) {
+        u[2 + 2 * k] = ubnd[0][k];
+        u[3 + 2 * k] = ubnd[0][k];
       }
-   }
+    }
+  }
 
-   if (cpr[0]==(NPROC0-1))
-   {
-      u=ub+4*VOLUME+7*(BNDRY/4);
+  if (cpr[0] == (NPROC0 - 1)) {
+    u = ub + 4 * VOLUME + 7 * (BNDRY / 4);
 
-      for (k=0;k<3;k++)
-         u[k]=ubnd[1][k];
-   }
+    for (k = 0; k < 3; k++)
+      u[k] = ubnd[1][k];
+  }
 
-   set_flags(UPDATED_UD);
+  set_flags(UPDATED_UD);
 }
-
 
 static void openSF_bc(void)
 {
-   int k;
-   su3_dble *ub,*u;
+  int k;
+  su3_dble *ub, *u;
 
-   if (init2==0)
-      set_ubnd();
+  if (init2 == 0)
+    set_ubnd();
 
-   ub=udfld();
+  ub = udfld();
 
-   if (cpr[0]==(NPROC0-1))
-   {
-      u=ub+4*VOLUME+7*(BNDRY/4);
+  if (cpr[0] == (NPROC0 - 1)) {
+    u = ub + 4 * VOLUME + 7 * (BNDRY / 4);
 
-      for (k=0;k<3;k++)
-         u[k]=ubnd[1][k];
-   }
+    for (k = 0; k < 3; k++)
+      u[k] = ubnd[1][k];
+  }
 
-   set_flags(UPDATED_UD);
+  set_flags(UPDATED_UD);
 }
-
 
 void set_bc(void)
 {
-   int bc,it;
+  int bc, it;
 
-   bc=bc_type();
+  bc = bc_type();
 
-   if (bc==0)
-      open_bc();
-   else if (bc==1)
-      SF_bc();
-   else if (bc==2)
-      openSF_bc();
+  if (bc == 0)
+    open_bc();
+  else if (bc == 1)
+    SF_bc();
+  else if (bc == 2)
+    openSF_bc();
 
-   it=check_zero(bc);
+  it = check_zero(bc);
 
-   error(it!=1,1,"set_bc [bcnds.c]",
-         "Link variables vanish on an incorrect set of links");
+  error(it != 1, 1, "set_bc [bcnds.c]",
+        "Link variables vanish on an incorrect set of links");
 }
-
 
 static int check_SF(double tol)
 {
-   int it,k,*pt,*ptm;
-   su3_dble *ub,*u;
+  int it, k, *pt, *ptm;
+  su3_dble *ub, *u;
 
-   if (init1==0)
-      alloc_pts();
-   if (init2==0)
-      set_ubnd();
+  if (init1 == 0)
+    alloc_pts();
+  if (init2 == 0)
+    set_ubnd();
 
-   it=1;
-   ub=udfld();
+  it = 1;
+  ub = udfld();
 
-   if (cpr[0]==0)
-   {
-      pt=pts+(npts/2);
-      ptm=pts+npts;
+  if (cpr[0] == 0) {
+    pt = pts + (npts / 2);
+    ptm = pts + npts;
 
-      for (;pt<ptm;pt++)
-      {
-         u=ub+8*(pt[0]-(VOLUME/2));
+    for (; pt < ptm; pt++) {
+      u = ub + 8 * (pt[0] - (VOLUME / 2));
 
-         for (k=0;k<3;k++)
-         {
-            it&=is_equal(tol,u+2+2*k,ubnd[0]+k);
-            it&=is_equal(tol,u+3+2*k,ubnd[0]+k);
-         }
+      for (k = 0; k < 3; k++) {
+        it &= is_equal(tol, u + 2 + 2 * k, ubnd[0] + k);
+        it &= is_equal(tol, u + 3 + 2 * k, ubnd[0] + k);
       }
-   }
+    }
+  }
 
-   if (cpr[0]==(NPROC0-1))
-   {
-      u=ub+4*VOLUME+7*(BNDRY/4);
+  if (cpr[0] == (NPROC0 - 1)) {
+    u = ub + 4 * VOLUME + 7 * (BNDRY / 4);
 
-      for (k=0;k<3;k++)
-         it&=is_equal(tol,u+k,ubnd[1]+k);
-   }
+    for (k = 0; k < 3; k++)
+      it &= is_equal(tol, u + k, ubnd[1] + k);
+  }
 
-   return it;
+  return it;
 }
-
 
 static int check_openSF(double tol)
 {
-   int it,k;
-   su3_dble *ub,*u;
+  int it, k;
+  su3_dble *ub, *u;
 
-   if (init2==0)
-      set_ubnd();
+  if (init2 == 0)
+    set_ubnd();
 
-   it=1;
-   ub=udfld();
+  it = 1;
+  ub = udfld();
 
-   if (cpr[0]==(NPROC0-1))
-   {
-      u=ub+4*VOLUME+7*(BNDRY/4);
+  if (cpr[0] == (NPROC0 - 1)) {
+    u = ub + 4 * VOLUME + 7 * (BNDRY / 4);
 
-      for (k=0;k<3;k++)
-         it&=is_equal(tol,u+k,ubnd[1]+k);
-   }
+    for (k = 0; k < 3; k++)
+      it &= is_equal(tol, u + k, ubnd[1] + k);
+  }
 
-   return it;
+  return it;
 }
-
 
 int check_bc(double tol)
 {
-   int bc,it,is;
-   double dprms[1];
+  int bc, it, is;
+  double dprms[1];
 
-   if (NPROC>1)
-   {
-      dprms[0]=tol;
-      MPI_Bcast(dprms,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-      error(dprms[0]!=tol,1,"check_bc [bcnds.c]","Parameter is not global");
-   }
+  if (NPROC > 1) {
+    dprms[0] = tol;
+    MPI_Bcast(dprms, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    error(dprms[0] != tol, 1, "check_bc [bcnds.c]", "Parameter is not global");
+  }
 
-   bc=bc_type();
-   it=check_zero(bc);
+  bc = bc_type();
+  it = check_zero(bc);
 
-   if (bc==1)
-      it&=check_SF(tol);
-   else if (bc==2)
-      it&=check_openSF(tol);
+  if (bc == 1)
+    it &= check_SF(tol);
+  else if (bc == 2)
+    it &= check_openSF(tol);
 
-   if (NPROC>1)
-   {
-      is=it;
-      MPI_Allreduce(&is,&it,1,MPI_INT,MPI_MIN,MPI_COMM_WORLD);
-   }
+  if (NPROC > 1) {
+    is = it;
+    MPI_Allreduce(&is, &it, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
+  }
 
-   return it;
+  return it;
 }
-
 
 static int sdet(su3_dble *u)
 {
-   double r;
-   complex_dble z;
+  double r;
+  complex_dble z;
 
-   z.re=
-      (*u).c22.re*(*u).c33.re-(*u).c22.im*(*u).c33.im-
-      (*u).c32.re*(*u).c23.re+(*u).c32.im*(*u).c23.im;
+  z.re = (*u).c22.re * (*u).c33.re - (*u).c22.im * (*u).c33.im -
+         (*u).c32.re * (*u).c23.re + (*u).c32.im * (*u).c23.im;
 
-   z.im=
-      (*u).c22.re*(*u).c33.im+(*u).c22.im*(*u).c33.re-
-      (*u).c32.re*(*u).c23.im-(*u).c32.im*(*u).c23.re;
+  z.im = (*u).c22.re * (*u).c33.im + (*u).c22.im * (*u).c33.re -
+         (*u).c32.re * (*u).c23.im - (*u).c32.im * (*u).c23.re;
 
-   r=(*u).c11.re*z.re-(*u).c11.im*z.im;
+  r = (*u).c11.re * z.re - (*u).c11.im * z.im;
 
-   z.re=
-      (*u).c32.re*(*u).c13.re-(*u).c32.im*(*u).c13.im-
-      (*u).c12.re*(*u).c33.re+(*u).c12.im*(*u).c33.im;
+  z.re = (*u).c32.re * (*u).c13.re - (*u).c32.im * (*u).c13.im -
+         (*u).c12.re * (*u).c33.re + (*u).c12.im * (*u).c33.im;
 
-   z.im=
-      (*u).c32.re*(*u).c13.im+(*u).c32.im*(*u).c13.re-
-      (*u).c12.re*(*u).c33.im-(*u).c12.im*(*u).c33.re;
+  z.im = (*u).c32.re * (*u).c13.im + (*u).c32.im * (*u).c13.re -
+         (*u).c12.re * (*u).c33.im - (*u).c12.im * (*u).c33.re;
 
-   r+=((*u).c21.re*z.re-(*u).c21.im*z.im);
+  r += ((*u).c21.re * z.re - (*u).c21.im * z.im);
 
-   z.re=
-      (*u).c12.re*(*u).c23.re-(*u).c12.im*(*u).c23.im-
-      (*u).c22.re*(*u).c13.re+(*u).c22.im*(*u).c13.im;
+  z.re = (*u).c12.re * (*u).c23.re - (*u).c12.im * (*u).c23.im -
+         (*u).c22.re * (*u).c13.re + (*u).c22.im * (*u).c13.im;
 
-   z.im=
-      (*u).c12.re*(*u).c23.im+(*u).c12.im*(*u).c23.re-
-      (*u).c22.re*(*u).c13.im-(*u).c22.im*(*u).c13.re;
+  z.im = (*u).c12.re * (*u).c23.im + (*u).c12.im * (*u).c23.re -
+         (*u).c22.re * (*u).c13.im - (*u).c22.im * (*u).c13.re;
 
-   r+=((*u).c31.re*z.re-(*u).c31.im*z.im);
+  r += ((*u).c31.re * z.re - (*u).c31.im * z.im);
 
-   if (r>=0.0)
-      return 1;
-   else
-      return -1;
+  if (r >= 0.0)
+    return 1;
+  else
+    return -1;
 }
-
 
 int chs_ubnd(int ibc)
 {
-   int iprms[1],i,ich,ichs;
-   int *lk,*lkm;
-   su3_dble *ub;
-   umat_t *um;
+  int iprms[1], i, ich, ichs;
+  int *lk, *lkm;
+  su3_dble *ub;
+  umat_t *um;
 
-   if (bc_type()==3)
-   {
-      if (NPROC>1)
-      {
-         iprms[0]=ibc;
-         MPI_Bcast(iprms,1,MPI_INT,0,MPI_COMM_WORLD);
-         error(iprms[0]!=ibc,1,"chs_ubnd [bcnds.c]",
-               "Parameter is not global");
+  if (bc_type() == 3) {
+    if (NPROC > 1) {
+      iprms[0] = ibc;
+      MPI_Bcast(iprms, 1, MPI_INT, 0, MPI_COMM_WORLD);
+      error(iprms[0] != ibc, 1, "chs_ubnd [bcnds.c]",
+            "Parameter is not global");
+    }
+
+    if (init0 == 0)
+      alloc_lks();
+
+    if (ibc >= 0)
+      ibc = 1;
+    else
+      ibc = -1;
+
+    ub = udfld();
+    ich = 0;
+
+    if (nlks > 0) {
+      lk = lks;
+
+      if (sdet(ub + (*lk)) != ibc) {
+        ich = 1;
+        lkm = lk + nlks;
+
+        for (; lk < lkm; lk++) {
+          um = (umat_t *)(ub + (*lk));
+
+          for (i = 0; i < 18; i++)
+            (*um).r[i] = -(*um).r[i];
+        }
       }
+    }
 
-      if (init0==0)
-         alloc_lks();
+    MPI_Allreduce(&ich, &ichs, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
 
-      if (ibc>=0)
-         ibc=1;
-      else
-         ibc=-1;
+    if (ichs == 1)
+      set_flags(UPDATED_UD);
 
-      ub=udfld();
-      ich=0;
-
-      if (nlks>0)
-      {
-         lk=lks;
-
-         if (sdet(ub+(*lk))!=ibc)
-         {
-            ich=1;
-            lkm=lk+nlks;
-
-            for (;lk<lkm;lk++)
-            {
-               um=(umat_t*)(ub+(*lk));
-
-               for (i=0;i<18;i++)
-                  (*um).r[i]=-(*um).r[i];
-            }
-         }
-      }
-
-      MPI_Allreduce(&ich,&ichs,1,MPI_INT,MPI_MAX,MPI_COMM_WORLD);
-
-      if (ichs==1)
-         set_flags(UPDATED_UD);
-
-      return ichs;
-   }
-   else
-      return 0;
+    return ichs;
+  } else
+    return 0;
 }
 
-
-void bnd_s2zero(ptset_t set,spinor *s)
+void bnd_s2zero(ptset_t set, spinor *s)
 {
-   int *pt,*pm;
+  int *pt, *pm;
 
-   if (init1==0)
-      alloc_pts();
+  if (init1 == 0)
+    alloc_pts();
 
-   if (npts>0)
-   {
-      if (set==ALL_PTS)
-      {
-         pt=pts;
-         pm=pts+npts;
-      }
-      else if (set==EVEN_PTS)
-      {
-         pt=pts;
-         pm=pts+npts/2;
-      }
-      else if (set==ODD_PTS)
-      {
-         pt=pts+npts/2;
-         pm=pts+npts;
-      }
-      else
-         return;
+  if (npts > 0) {
+    if (set == ALL_PTS) {
+      pt = pts;
+      pm = pts + npts;
+    } else if (set == EVEN_PTS) {
+      pt = pts;
+      pm = pts + npts / 2;
+    } else if (set == ODD_PTS) {
+      pt = pts + npts / 2;
+      pm = pts + npts;
+    } else
+      return;
 
-      for (;pt<pm;pt++)
-         s[*pt]=s0;
-   }
+    for (; pt < pm; pt++)
+      s[*pt] = s0;
+  }
 }
 
-
-void bnd_sd2zero(ptset_t set,spinor_dble *sd)
+void bnd_sd2zero(ptset_t set, spinor_dble *sd)
 {
-   int *pt,*pm;
+  int *pt, *pm;
 
-   if (init1==0)
-      alloc_pts();
+  if (init1 == 0)
+    alloc_pts();
 
-   if (npts>0)
-   {
-      if (set==ALL_PTS)
-      {
-         pt=pts;
-         pm=pts+npts;
-      }
-      else if (set==EVEN_PTS)
-      {
-         pt=pts;
-         pm=pts+npts/2;
-      }
-      else if (set==ODD_PTS)
-      {
-         pt=pts+npts/2;
-         pm=pts+npts;
-      }
-      else
-         return;
+  if (npts > 0) {
+    if (set == ALL_PTS) {
+      pt = pts;
+      pm = pts + npts;
+    } else if (set == EVEN_PTS) {
+      pt = pts;
+      pm = pts + npts / 2;
+    } else if (set == ODD_PTS) {
+      pt = pts + npts / 2;
+      pm = pts + npts;
+    } else
+      return;
 
-      for (;pt<pm;pt++)
-         sd[*pt]=sd0;
-   }
+    for (; pt < pm; pt++)
+      sd[*pt] = sd0;
+  }
 }

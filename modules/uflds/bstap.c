@@ -20,11 +20,11 @@
 *   void set_bstap(void)
 *     Computes the boundary staples and copies them to the neighbouring
 *     MPI processes (see doc/gauge_actions.pdf).
-*     
+*
 * Notes:
 *
 * The boundary staple field has size 3*BNDRY and is logically divided into
-* face segments. For the face with index ifc, the associated segment is 
+* face segments. For the face with index ifc, the associated segment is
 * at offset ofs[ifc] from the base address, where
 *
 *   ofs[0]=0
@@ -43,7 +43,7 @@
 * at the boundaries of the lattice to zero.
 *
 * All these programs act globally and must be called on all MPI processes
-* simultaneously. 
+* simultaneously.
 *
 *******************************************************************************/
 
@@ -61,225 +61,197 @@
 #include "uflds.h"
 #include "global.h"
 
-static const int plns[6][2]={{0,1},{0,2},{0,3},{2,3},{3,1},{1,2}};
-static int bc,np,nfc[8],ofs[8],hofs[8],tags[8],nmu[8];
-static const su3_dble ud0={{0.0}};
+static const int plns[6][2] = {{0, 1}, {0, 2}, {0, 3}, {2, 3}, {3, 1}, {1, 2}};
+static int bc, np, nfc[8], ofs[8], hofs[8], tags[8], nmu[8];
+static const su3_dble ud0 = {{0.0}};
 static su3_dble wd ALIGNED16;
-static su3_dble *hdb=NULL;
-
+static su3_dble *hdb = NULL;
 
 static void set_ofs(void)
 {
-   int ifc;
+  int ifc;
 
-   bc=bc_type();
-   np=(cpr[0]+cpr[1]+cpr[2]+cpr[3])&0x1;
-   
-   nfc[0]=FACE0/2;
-   nfc[1]=FACE0/2;
-   nfc[2]=FACE1/2;
-   nfc[3]=FACE1/2;   
-   nfc[4]=FACE2/2;
-   nfc[5]=FACE2/2;
-   nfc[6]=FACE3/2;
-   nfc[7]=FACE3/2;   
+  bc = bc_type();
+  np = (cpr[0] + cpr[1] + cpr[2] + cpr[3]) & 0x1;
 
-   ofs[0]=0;
-   ofs[1]=ofs[0]+(FACE0/2);
-   ofs[2]=ofs[1]+(FACE0/2);
-   ofs[3]=ofs[2]+(FACE1/2);
-   ofs[4]=ofs[3]+(FACE1/2);
-   ofs[5]=ofs[4]+(FACE2/2);
-   ofs[6]=ofs[5]+(FACE2/2);
-   ofs[7]=ofs[6]+(FACE3/2);   
-   
-   hofs[0]=0;
-   hofs[1]=hofs[0]+3*FACE0;
-   hofs[2]=hofs[1]+3*FACE0;
-   hofs[3]=hofs[2]+3*FACE1;
-   hofs[4]=hofs[3]+3*FACE1;
-   hofs[5]=hofs[4]+3*FACE2;
-   hofs[6]=hofs[5]+3*FACE2;
-   hofs[7]=hofs[6]+3*FACE3;
+  nfc[0] = FACE0 / 2;
+  nfc[1] = FACE0 / 2;
+  nfc[2] = FACE1 / 2;
+  nfc[3] = FACE1 / 2;
+  nfc[4] = FACE2 / 2;
+  nfc[5] = FACE2 / 2;
+  nfc[6] = FACE3 / 2;
+  nfc[7] = FACE3 / 2;
 
-   for (ifc=0;ifc<8;ifc++)
-   {
-      nmu[ifc]=cpr[ifc/2]&0x1;
-      tags[ifc]=mpi_permanent_tag();
-   }
+  ofs[0] = 0;
+  ofs[1] = ofs[0] + (FACE0 / 2);
+  ofs[2] = ofs[1] + (FACE0 / 2);
+  ofs[3] = ofs[2] + (FACE1 / 2);
+  ofs[4] = ofs[3] + (FACE1 / 2);
+  ofs[5] = ofs[4] + (FACE2 / 2);
+  ofs[6] = ofs[5] + (FACE2 / 2);
+  ofs[7] = ofs[6] + (FACE3 / 2);
+
+  hofs[0] = 0;
+  hofs[1] = hofs[0] + 3 * FACE0;
+  hofs[2] = hofs[1] + 3 * FACE0;
+  hofs[3] = hofs[2] + 3 * FACE1;
+  hofs[4] = hofs[3] + 3 * FACE1;
+  hofs[5] = hofs[4] + 3 * FACE2;
+  hofs[6] = hofs[5] + 3 * FACE2;
+  hofs[7] = hofs[6] + 3 * FACE3;
+
+  for (ifc = 0; ifc < 8; ifc++) {
+    nmu[ifc] = cpr[ifc / 2] & 0x1;
+    tags[ifc] = mpi_permanent_tag();
+  }
 }
-
 
 static void alloc_hdb(void)
 {
-   int ifc,n,ib;
-   su3_dble unity;
+  int ifc, n, ib;
+  su3_dble unity;
 
-   error(iup[0][0]==0,1,"alloc_hdb [bstap.c]",
-         "Geometry arrays are not set");
-   
-   set_ofs();
-   n=0;
+  error(iup[0][0] == 0, 1, "alloc_hdb [bstap.c]",
+        "Geometry arrays are not set");
 
-   for (ifc=0;ifc<8;ifc+=2)
-   {
-      if (n<nfc[ifc])
-         n=nfc[ifc];
-   }
+  set_ofs();
+  n = 0;
 
-   n=3*(BNDRY+2*n);
-   hdb=amalloc(n*sizeof(*hdb),ALIGN);
-   error(hdb==NULL,1,"alloc_hdb [bstap.c]",
-         "Unable to allocate the boundary staple field");
+  for (ifc = 0; ifc < 8; ifc += 2) {
+    if (n < nfc[ifc])
+      n = nfc[ifc];
+  }
 
-   unity=ud0;
-   unity.c11.re=1.0;
-   unity.c22.re=1.0;
-   unity.c33.re=1.0;
+  n = 3 * (BNDRY + 2 * n);
+  hdb = amalloc(n * sizeof(*hdb), ALIGN);
+  error(hdb == NULL, 1, "alloc_hdb [bstap.c]",
+        "Unable to allocate the boundary staple field");
 
-   for (ib=0;ib<n;ib++)
-      hdb[ib]=unity;
+  unity = ud0;
+  unity.c11.re = 1.0;
+  unity.c22.re = 1.0;
+  unity.c33.re = 1.0;
+
+  for (ib = 0; ib < n; ib++)
+    hdb[ib] = unity;
 }
-
 
 su3_dble *bstap(void)
 {
-   if ((NPROC>1)&&(hdb==NULL))
-      alloc_hdb();
+  if ((NPROC > 1) && (hdb == NULL))
+    alloc_hdb();
 
-   return hdb;
+  return hdb;
 }
 
-
-static void get_ofs(int mu,int nu,int ix,int *ip)
+static void get_ofs(int mu, int nu, int ix, int *ip)
 {
-   int n,is;
+  int n, is;
 
-   for (n=0;n<6;n++)
-   {
-      if (((plns[n][0]==mu)&&(plns[n][1]==nu))||
-          ((plns[n][0]==nu)&&(plns[n][1]==mu)))
-      {
-         plaq_uidx(n,ix,ip);
+  for (n = 0; n < 6; n++) {
+    if (((plns[n][0] == mu) && (plns[n][1] == nu)) ||
+        ((plns[n][0] == nu) && (plns[n][1] == mu))) {
+      plaq_uidx(n, ix, ip);
 
-         if (mu==plns[n][0])
-         {
-            is=ip[0];
-            ip[0]=ip[2];
-            ip[2]=is;
+      if (mu == plns[n][0]) {
+        is = ip[0];
+        ip[0] = ip[2];
+        ip[2] = is;
 
-            is=ip[1];
-            ip[1]=ip[3];
-            ip[3]=is;
-         }
-
-         return;
+        is = ip[1];
+        ip[1] = ip[3];
+        ip[3] = is;
       }
-   }
+
+      return;
+    }
+  }
 }
 
-  
 static void get_staples(int ifc)
 {
-   int ib,ix,mu,nu,k,ip[4];
-   su3_dble *udb,*sbuf;
+  int ib, ix, mu, nu, k, ip[4];
+  su3_dble *udb, *sbuf;
 
-   udb=udfld();
-   sbuf=hdb+3*BNDRY;
-   mu=ifc/2;
+  udb = udfld();
+  sbuf = hdb + 3 * BNDRY;
+  mu = ifc / 2;
 
-   for (ib=0;ib<(2*nfc[ifc]);ib++)
-   {
-      if (ib<(nfc[ifc]))
-         ix=map[ofs[ifc]+ib];
-      else
-         ix=map[(BNDRY/2)+ofs[ifc]+ib-nfc[ifc]];
+  for (ib = 0; ib < (2 * nfc[ifc]); ib++) {
+    if (ib < (nfc[ifc]))
+      ix = map[ofs[ifc] + ib];
+    else
+      ix = map[(BNDRY / 2) + ofs[ifc] + ib - nfc[ifc]];
 
-      for (k=0;k<3;k++)
-      {
-         nu=k+(k>=mu);
-         get_ofs(mu,nu,ix,ip);
+    for (k = 0; k < 3; k++) {
+      nu = k + (k >= mu);
+      get_ofs(mu, nu, ix, ip);
 
-         if (ifc&0x1)
-         {
-            if ((mu>0)||(cpr[0]>0)||(bc==3))
-            {
-               su3xsu3dag(udb+ip[3],udb+ip[1],&wd);
-               su3xsu3(udb+ip[2],&wd,sbuf);
-            }
-         }
-         else
-         {
-            if ((mu>0)||(cpr[0]<(NPROC0-1))||(bc==3))
-            {            
-               su3xsu3(udb+ip[0],udb+ip[1],&wd);
-               su3dagxsu3(udb+ip[2],&wd,sbuf);
-            }
-         }
-         
-         sbuf+=1;
+      if (ifc & 0x1) {
+        if ((mu > 0) || (cpr[0] > 0) || (bc == 3)) {
+          su3xsu3dag(udb + ip[3], udb + ip[1], &wd);
+          su3xsu3(udb + ip[2], &wd, sbuf);
+        }
+      } else {
+        if ((mu > 0) || (cpr[0] < (NPROC0 - 1)) || (bc == 3)) {
+          su3xsu3(udb + ip[0], udb + ip[1], &wd);
+          su3dagxsu3(udb + ip[2], &wd, sbuf);
+        }
       }
-   }
+
+      sbuf += 1;
+    }
+  }
 }
 
-
-static void send_staples(int ifc,int tag)
+static void send_staples(int ifc, int tag)
 {
-   int saddr,raddr,nbf,ib;
-   su3_dble *sbuf,*rbuf;
-   MPI_Status stat;
+  int saddr, raddr, nbf, ib;
+  su3_dble *sbuf, *rbuf;
+  MPI_Status stat;
 
-   saddr=npr[ifc^0x1];
-   raddr=saddr;
-   sbuf=hdb+3*BNDRY;
-   rbuf=hdb+hofs[ifc^0x1];
-   nbf=108*nfc[ifc];
+  saddr = npr[ifc ^ 0x1];
+  raddr = saddr;
+  sbuf = hdb + 3 * BNDRY;
+  rbuf = hdb + hofs[ifc ^ 0x1];
+  nbf = 108 * nfc[ifc];
 
-   if ((ifc>1)||(bc==3)||
-       ((ifc==1)&&(cpr[0]>0))||((ifc==0)&&(cpr[0]<(NPROC0-1))))
-   {
-      if (np==0)
-      {
-         MPI_Send(sbuf,nbf,MPI_DOUBLE,saddr,tag,MPI_COMM_WORLD);
-         MPI_Recv(rbuf,nbf,MPI_DOUBLE,raddr,tag,MPI_COMM_WORLD,&stat);
-      }
-      else
-      {
-         MPI_Recv(rbuf,nbf,MPI_DOUBLE,raddr,tag,MPI_COMM_WORLD,&stat);
-         MPI_Send(sbuf,nbf,MPI_DOUBLE,saddr,tag,MPI_COMM_WORLD);
-      }
-   }
-   else
-   {
-      for (ib=0;ib<(3*FACE0);ib++)
-         rbuf[ib]=ud0;
-   }
+  if ((ifc > 1) || (bc == 3) || ((ifc == 1) && (cpr[0] > 0)) ||
+      ((ifc == 0) && (cpr[0] < (NPROC0 - 1)))) {
+    if (np == 0) {
+      MPI_Send(sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
+      MPI_Recv(rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD, &stat);
+    } else {
+      MPI_Recv(rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD, &stat);
+      MPI_Send(sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
+    }
+  } else {
+    for (ib = 0; ib < (3 * FACE0); ib++)
+      rbuf[ib] = ud0;
+  }
 }
-
 
 void set_bstap(void)
 {
-   int ifc,sfc;
+  int ifc, sfc;
 
-   if (query_flags(UDBUF_UP2DATE)!=1)
-      copy_bnd_ud();
+  if (query_flags(UDBUF_UP2DATE) != 1)
+    copy_bnd_ud();
 
-   if (NPROC>1)
-   {
-      if (hdb==NULL)
-         alloc_hdb();
+  if (NPROC > 1) {
+    if (hdb == NULL)
+      alloc_hdb();
 
-      for (ifc=0;ifc<8;ifc++)
-      {
-         sfc=ifc^nmu[ifc];
+    for (ifc = 0; ifc < 8; ifc++) {
+      sfc = ifc ^ nmu[ifc];
 
-         if (nfc[sfc]>0)
-         {
-            get_staples(sfc);
-            send_staples(sfc,tags[ifc]);
-         }
+      if (nfc[sfc] > 0) {
+        get_staples(sfc);
+        send_staples(sfc, tags[ifc]);
       }
-   }
+    }
+  }
 
-   set_flags(SET_BSTAP);
+  set_flags(SET_BSTAP);
 }

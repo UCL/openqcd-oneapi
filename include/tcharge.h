@@ -18,8 +18,8 @@
 #endif
 
 /* FTCOM_C */
-extern void copy_bnd_ft(int n,u3_alg_dble *ft);
-extern void add_bnd_ft(int n,u3_alg_dble *ft);
+extern void copy_bnd_ft(int n, u3_alg_dble *ft);
+extern void add_bnd_ft(int n, u3_alg_dble *ft);
 
 /* FTENSOR_C */
 extern u3_alg_dble **ftensor(void);

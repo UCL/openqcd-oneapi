@@ -1,0 +1,38 @@
+# My own clang-format, how I prefer to format my own code
+
+# Which style to base the configuration on
+BasedOnStyle: 'LLVM'
+
+# Target language
+Language: 'Cpp'
+
+# Which language standard to use
+Standard : 'Auto'
+
+# Break the line after the template <...> statement
+AlwaysBreakTemplateDeclarations : 'true'
+
+# How to break lines before braces, setting it to custom allows me to specify it
+# for individual cases
+BreakBeforeBraces : 'Custom'
+
+# Control individual brace wrapping cases
+BraceWrapping: {
+  AfterClass: 'true'
+  AfterControlStatement: 'false'
+  AfterEnum : 'true'
+  AfterFunction : 'true'
+  AfterNamespace : 'false'
+  AfterStruct : 'true'
+  AfterUnion : 'true'
+  BeforeCatch : 'false'
+  BeforeElse : 'false'
+  IndentBraces : 'false'
+}
+
+# If the constructor initializers don’t fit on a line, put each initializer on
+# its own line.
+ConstructorInitializerAllOnOneLineOrOnePerLine : 'true'
+
+# If true, clang-format will sort #includes.
+SortIncludes: 'false'

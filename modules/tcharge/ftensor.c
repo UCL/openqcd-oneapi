@@ -67,153 +67,140 @@
 #include "tcharge.h"
 #include "global.h"
 
-#define N0 (NPROC0*L0)
+#define N0 (NPROC0 * L0)
 
-static u3_alg_dble **fts=NULL,**ft,X;
-static su3_dble w1,w2 ALIGNED16;
+static u3_alg_dble **fts = NULL, **ft, X;
+static su3_dble w1, w2 ALIGNED16;
 static ftidx_t *idx;
-
 
 static void alloc_fts(void)
 {
-   int n,nbf;
-   u3_alg_dble **pp,*p;
+  int n, nbf;
+  u3_alg_dble **pp, *p;
 
-   error_root(sizeof(u3_alg_dble)!=(9*sizeof(double)),1,
-              "alloc_fts [ftensor.c]",
-              "The u3_alg_dble structures are not properly packed");
+  error_root(sizeof(u3_alg_dble) != (9 * sizeof(double)), 1,
+             "alloc_fts [ftensor.c]",
+             "The u3_alg_dble structures are not properly packed");
 
-   idx=ftidx();
-   nbf=0;
+  idx = ftidx();
+  nbf = 0;
 
-   for (n=0;n<6;n++)
-      nbf+=idx[n].nft[0]+idx[n].nft[1];
+  for (n = 0; n < 6; n++)
+    nbf += idx[n].nft[0] + idx[n].nft[1];
 
-   pp=malloc(12*sizeof(*pp));
-   p=amalloc((6*VOLUME+nbf)*sizeof(*p),ALIGN);
-   error((pp==NULL)||(p==NULL),1,"alloc_fts [ftensor.c]",
-         "Unable to allocate field tensor arrays");
+  pp = malloc(12 * sizeof(*pp));
+  p = amalloc((6 * VOLUME + nbf) * sizeof(*p), ALIGN);
+  error((pp == NULL) || (p == NULL), 1, "alloc_fts [ftensor.c]",
+        "Unable to allocate field tensor arrays");
 
-   fts=pp;
-   ft=pp+6;
+  fts = pp;
+  ft = pp + 6;
 
-   for (n=0;n<6;n++)
-   {
-      (*pp)=p;
-      pp+=1;
-      p+=VOLUME+idx[n].nft[0]+idx[n].nft[1];
-   }
+  for (n = 0; n < 6; n++) {
+    (*pp) = p;
+    pp += 1;
+    p += VOLUME + idx[n].nft[0] + idx[n].nft[1];
+  }
 }
-
 
 static void add_X2ft(u3_alg_dble *f)
 {
-   double r;
+  double r;
 
-   r=0.125;
-   (*f).c1+=r*X.c1;
-   (*f).c2+=r*X.c2;
-   (*f).c3+=r*X.c3;
-   (*f).c4+=r*X.c4;
-   (*f).c5+=r*X.c5;
-   (*f).c6+=r*X.c6;
-   (*f).c7+=r*X.c7;
-   (*f).c8+=r*X.c8;
-   (*f).c9+=r*X.c9;
+  r = 0.125;
+  (*f).c1 += r * X.c1;
+  (*f).c2 += r * X.c2;
+  (*f).c3 += r * X.c3;
+  (*f).c4 += r * X.c4;
+  (*f).c5 += r * X.c5;
+  (*f).c6 += r * X.c6;
+  (*f).c7 += r * X.c7;
+  (*f).c8 += r * X.c8;
+  (*f).c9 += r * X.c9;
 }
-
 
 static void build_fts(void)
 {
-   int bc,n,ix,t,ip[4],ipf[4];
-   int tmx;
-   su3_dble *ub;
-   u3_alg_dble *ftn;
+  int bc, n, ix, t, ip[4], ipf[4];
+  int tmx;
+  su3_dble *ub;
+  u3_alg_dble *ftn;
 
-   bc=bc_type();
-   ub=udfld();
+  bc = bc_type();
+  ub = udfld();
 
-   for (n=0;n<6;n++)
-   {
-      ftn=fts[n];
-      set_ualg2zero(VOLUME+idx[n].nft[0]+idx[n].nft[1],ftn);
-      tmx=N0;
-      if (bc==0)
-         tmx-=1;
-      if (n<3)
-         tmx-=1;
+  for (n = 0; n < 6; n++) {
+    ftn = fts[n];
+    set_ualg2zero(VOLUME + idx[n].nft[0] + idx[n].nft[1], ftn);
+    tmx = N0;
+    if (bc == 0)
+      tmx -= 1;
+    if (n < 3)
+      tmx -= 1;
 
-      for (ix=0;ix<VOLUME;ix++)
-      {
-         t=global_time(ix);
-         plaq_uidx(n,ix,ip);
-         plaq_ftidx(n,ix,ipf);
+    for (ix = 0; ix < VOLUME; ix++) {
+      t = global_time(ix);
+      plaq_uidx(n, ix, ip);
+      plaq_ftidx(n, ix, ipf);
 
-         if (((t>0)&&(t<tmx))||(bc==3))
-         {
-            su3xsu3(ub+ip[0],ub+ip[1],&w1);
-            su3dagxsu3dag(ub+ip[3],ub+ip[2],&w2);
-            prod2u3alg(&w1,&w2,&X);
-            add_X2ft(ftn+ipf[0]);
-            prod2u3alg(&w2,&w1,&X);
-            add_X2ft(ftn+ipf[3]);
+      if (((t > 0) && (t < tmx)) || (bc == 3)) {
+        su3xsu3(ub + ip[0], ub + ip[1], &w1);
+        su3dagxsu3dag(ub + ip[3], ub + ip[2], &w2);
+        prod2u3alg(&w1, &w2, &X);
+        add_X2ft(ftn + ipf[0]);
+        prod2u3alg(&w2, &w1, &X);
+        add_X2ft(ftn + ipf[3]);
 
-            su3dagxsu3(ub+ip[2],ub+ip[0],&w1);
-            su3xsu3dag(ub+ip[1],ub+ip[3],&w2);
-            prod2u3alg(&w1,&w2,&X);
-            add_X2ft(ftn+ipf[2]);
-            prod2u3alg(&w2,&w1,&X);
-            add_X2ft(ftn+ipf[1]);
-         }
-         else if ((t==0)&&(n<3))
-         {
-            su3xsu3(ub+ip[0],ub+ip[1],&w1);
-            su3dagxsu3dag(ub+ip[3],ub+ip[2],&w2);
-            prod2u3alg(&w2,&w1,&X);
-            add_X2ft(ftn+ipf[3]);
+        su3dagxsu3(ub + ip[2], ub + ip[0], &w1);
+        su3xsu3dag(ub + ip[1], ub + ip[3], &w2);
+        prod2u3alg(&w1, &w2, &X);
+        add_X2ft(ftn + ipf[2]);
+        prod2u3alg(&w2, &w1, &X);
+        add_X2ft(ftn + ipf[1]);
+      } else if ((t == 0) && (n < 3)) {
+        su3xsu3(ub + ip[0], ub + ip[1], &w1);
+        su3dagxsu3dag(ub + ip[3], ub + ip[2], &w2);
+        prod2u3alg(&w2, &w1, &X);
+        add_X2ft(ftn + ipf[3]);
 
-            su3dagxsu3(ub+ip[2],ub+ip[0],&w1);
-            su3xsu3dag(ub+ip[1],ub+ip[3],&w2);
-            prod2u3alg(&w2,&w1,&X);
-            add_X2ft(ftn+ipf[1]);
-         }
-         else if ((t==tmx)&&(n<3))
-         {
-            su3xsu3(ub+ip[0],ub+ip[1],&w1);
-            su3dagxsu3dag(ub+ip[3],ub+ip[2],&w2);
-            prod2u3alg(&w1,&w2,&X);
-            add_X2ft(ftn+ipf[0]);
+        su3dagxsu3(ub + ip[2], ub + ip[0], &w1);
+        su3xsu3dag(ub + ip[1], ub + ip[3], &w2);
+        prod2u3alg(&w2, &w1, &X);
+        add_X2ft(ftn + ipf[1]);
+      } else if ((t == tmx) && (n < 3)) {
+        su3xsu3(ub + ip[0], ub + ip[1], &w1);
+        su3dagxsu3dag(ub + ip[3], ub + ip[2], &w2);
+        prod2u3alg(&w1, &w2, &X);
+        add_X2ft(ftn + ipf[0]);
 
-            su3dagxsu3(ub+ip[2],ub+ip[0],&w1);
-            su3xsu3dag(ub+ip[1],ub+ip[3],&w2);
-            prod2u3alg(&w1,&w2,&X);
-            add_X2ft(ftn+ipf[2]);
-         }
+        su3dagxsu3(ub + ip[2], ub + ip[0], &w1);
+        su3xsu3dag(ub + ip[1], ub + ip[3], &w2);
+        prod2u3alg(&w1, &w2, &X);
+        add_X2ft(ftn + ipf[2]);
       }
+    }
 
-      add_bnd_ft(n,ftn);
-   }
+    add_bnd_ft(n, ftn);
+  }
 }
-
 
 u3_alg_dble **ftensor(void)
 {
-   int n;
+  int n;
 
-   if (query_flags(FTS_UP2DATE)!=1)
-   {
-      if (fts==NULL)
-         alloc_fts();
+  if (query_flags(FTS_UP2DATE) != 1) {
+    if (fts == NULL)
+      alloc_fts();
 
-      if (query_flags(UDBUF_UP2DATE)!=1)
-         copy_bnd_ud();
+    if (query_flags(UDBUF_UP2DATE) != 1)
+      copy_bnd_ud();
 
-      build_fts();
-      set_flags(COMPUTED_FTS);
-   }
+    build_fts();
+    set_flags(COMPUTED_FTS);
+  }
 
-   for (n=0;n<6;n++)
-      ft[n]=fts[n];
+  for (n = 0; n < 6; n++)
+    ft[n] = fts[n];
 
-   return ft;
+  return ft;
 }

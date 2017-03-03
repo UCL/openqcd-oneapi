@@ -83,44 +83,39 @@
 #include "forces.h"
 #include "global.h"
 
-static int iop=0;
+static int iop = 0;
 
-
-static void Dop_dble(double mu,spinor_dble *s,spinor_dble *r)
+static void Dop_dble(double mu, spinor_dble *s, spinor_dble *r)
 {
-   if (iop==0)
-      Dwhat_dble(mu,s,r);
-   else
-      Dwhat_dble(-mu,s,r);
+  if (iop == 0)
+    Dwhat_dble(mu, s, r);
+  else
+    Dwhat_dble(-mu, s, r);
 
-   mulg5_dble(VOLUME/2,r);
-   iop^=0x1;
+  mulg5_dble(VOLUME / 2, r);
+  iop ^= 0x1;
 }
 
-
-void tmcgm(int nmx,double *res,int nmu,double *mu,
-           spinor_dble *eta,spinor_dble **psi,int *status)
+void tmcgm(int nmx, double *res, int nmu, double *mu, spinor_dble *eta,
+           spinor_dble **psi, int *status)
 {
-   int ifail,k;
-   spinor_dble **wsd;
+  int ifail, k;
+  spinor_dble **wsd;
 
-   ifail=sw_term(ODD_PTS);
+  ifail = sw_term(ODD_PTS);
 
-   if (ifail)
-   {
-      status[0]=-2;
+  if (ifail) {
+    status[0] = -2;
 
-      for (k=0;k<nmu;k++)
-         set_sd2zero(VOLUME/2,psi[k]);
-   }
-   else
-   {
-      if (nmu==1)
-         wsd=reserve_wsd(5);
-      else
-         wsd=reserve_wsd(3+nmu);
+    for (k = 0; k < nmu; k++)
+      set_sd2zero(VOLUME / 2, psi[k]);
+  } else {
+    if (nmu == 1)
+      wsd = reserve_wsd(5);
+    else
+      wsd = reserve_wsd(3 + nmu);
 
-      mscg(VOLUME/2,1,nmu,mu,Dop_dble,wsd,nmx,res,eta,psi,status);
-      release_wsd();
-   }
+    mscg(VOLUME / 2, 1, nmu, mu, Dop_dble, wsd, nmx, res, eta, psi, status);
+    release_wsd();
+  }
 }

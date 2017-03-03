@@ -73,129 +73,114 @@
 #include "mdflds.h"
 #include "global.h"
 
-static const su3_alg_dble md0={0.0};
-static mdflds_t *mdfs=NULL;
-
+static const su3_alg_dble md0 = {0.0};
+static mdflds_t *mdfs = NULL;
 
 static void alloc_mdflds(void)
 {
-   int npf,ipf;
-   su3_alg_dble *mom;
-   spinor_dble **pp,*p;
-   hmc_parms_t hmc;
+  int npf, ipf;
+  su3_alg_dble *mom;
+  spinor_dble **pp, *p;
+  hmc_parms_t hmc;
 
-   error_root(sizeof(su3_alg_dble)!=(8*sizeof(double)),1,
-              "alloc_mdflds [mdflds.c]",
-              "The su3_alg_dble structures are not properly packed");
+  error_root(sizeof(su3_alg_dble) != (8 * sizeof(double)), 1,
+             "alloc_mdflds [mdflds.c]",
+             "The su3_alg_dble structures are not properly packed");
 
-   error(iup[0][0]==0,1,"alloc_mdflds [mdflds.c]",
-         "The geometry arrays are not set");
+  error(iup[0][0] == 0, 1, "alloc_mdflds [mdflds.c]",
+        "The geometry arrays are not set");
 
-   mdfs=malloc(sizeof(*mdfs));
-   mom=amalloc((8*VOLUME+7*(BNDRY/4))*sizeof(*mom),ALIGN);
-   error((mdfs==NULL)||(mom==NULL),1,"alloc_mdflds [mdflds.c]",
-         "Unable to allocate momentum and force fields");
+  mdfs = malloc(sizeof(*mdfs));
+  mom = amalloc((8 * VOLUME + 7 * (BNDRY / 4)) * sizeof(*mom), ALIGN);
+  error((mdfs == NULL) || (mom == NULL), 1, "alloc_mdflds [mdflds.c]",
+        "Unable to allocate momentum and force fields");
 
-   set_alg2zero(8*VOLUME+7*(BNDRY/4),mom);
-   (*mdfs).mom=mom;
-   (*mdfs).frc=mom+4*VOLUME;
+  set_alg2zero(8 * VOLUME + 7 * (BNDRY / 4), mom);
+  (*mdfs).mom = mom;
+  (*mdfs).frc = mom + 4 * VOLUME;
 
-   hmc=hmc_parms();
-   npf=hmc.npf;
+  hmc = hmc_parms();
+  npf = hmc.npf;
 
-   if (npf>0)
-   {
-      pp=malloc(npf*sizeof(*pp));
-      p=amalloc(npf*NSPIN*sizeof(*p),ALIGN);
-      error((pp==NULL)||(p==NULL),1,"alloc_mdflds [mdflds.c]",
-            "Unable to allocate pseudo-fermion fields");
-      set_sd2zero(npf*NSPIN,p);
+  if (npf > 0) {
+    pp = malloc(npf * sizeof(*pp));
+    p = amalloc(npf * NSPIN * sizeof(*p), ALIGN);
+    error((pp == NULL) || (p == NULL), 1, "alloc_mdflds [mdflds.c]",
+          "Unable to allocate pseudo-fermion fields");
+    set_sd2zero(npf * NSPIN, p);
 
-      for (ipf=0;ipf<npf;ipf++)
-      {
-         pp[ipf]=p;
-         p+=NSPIN;
-      }
+    for (ipf = 0; ipf < npf; ipf++) {
+      pp[ipf] = p;
+      p += NSPIN;
+    }
 
-      (*mdfs).npf=npf;
-      (*mdfs).pf=pp;
-   }
-   else
-   {
-      (*mdfs).npf=0;
-      (*mdfs).pf=NULL;
-   }
+    (*mdfs).npf = npf;
+    (*mdfs).pf = pp;
+  } else {
+    (*mdfs).npf = 0;
+    (*mdfs).pf = NULL;
+  }
 }
-
 
 mdflds_t *mdflds(void)
 {
-   if (mdfs==NULL)
-      alloc_mdflds();
+  if (mdfs == NULL)
+    alloc_mdflds();
 
-   return mdfs;
+  return mdfs;
 }
-
 
 void set_frc2zero(void)
 {
-   if (mdfs==NULL)
-      alloc_mdflds();
-   else
-      set_alg2zero(4*VOLUME+7*(BNDRY/4),(*mdfs).frc);
+  if (mdfs == NULL)
+    alloc_mdflds();
+  else
+    set_alg2zero(4 * VOLUME + 7 * (BNDRY / 4), (*mdfs).frc);
 }
-
 
 void bnd_mom2zero(void)
 {
-   int bc,ifc;
-   int nlks,*lks,*lkm,npts,*pts,*ptm;
-   su3_alg_dble *mom,*m;
+  int bc, ifc;
+  int nlks, *lks, *lkm, npts, *pts, *ptm;
+  su3_alg_dble *mom, *m;
 
-   bc=bc_type();
+  bc = bc_type();
 
-   if ((bc==0)||(bc==1))
-   {
-      if (mdfs==NULL)
-         alloc_mdflds();
-      mom=(*mdfs).mom;
+  if ((bc == 0) || (bc == 1)) {
+    if (mdfs == NULL)
+      alloc_mdflds();
+    mom = (*mdfs).mom;
 
-      if (bc==0)
-      {
-         lks=bnd_lks(&nlks);
-         lkm=lks+nlks;
+    if (bc == 0) {
+      lks = bnd_lks(&nlks);
+      lkm = lks + nlks;
 
-         for (;lks<lkm;lks++)
-            mom[*lks]=md0;
+      for (; lks < lkm; lks++)
+        mom[*lks] = md0;
+    } else if (bc == 1) {
+      pts = bnd_pts(&npts);
+      ptm = pts + npts;
+      pts += (npts / 2);
+
+      for (; pts < ptm; pts++) {
+        m = mom + 8 * (pts[0] - (VOLUME / 2));
+
+        for (ifc = 2; ifc < 8; ifc++)
+          m[ifc] = md0;
       }
-      else if (bc==1)
-      {
-         pts=bnd_pts(&npts);
-         ptm=pts+npts;
-         pts+=(npts/2);
-
-         for (;pts<ptm;pts++)
-         {
-            m=mom+8*(pts[0]-(VOLUME/2));
-
-            for (ifc=2;ifc<8;ifc++)
-               m[ifc]=md0;
-         }
-      }
-   }
+    }
+  }
 }
-
 
 void random_mom(void)
 {
-   if (mdfs==NULL)
-      alloc_mdflds();
-   random_alg(4*VOLUME,(*mdfs).mom);
-   bnd_mom2zero();
+  if (mdfs == NULL)
+    alloc_mdflds();
+  random_alg(4 * VOLUME, (*mdfs).mom);
+  bnd_mom2zero();
 }
-
 
 double momentum_action(int icom)
 {
-   return 0.5*norm_square_alg(4*VOLUME,icom,(*mdfs).mom);
+  return 0.5 * norm_square_alg(4 * VOLUME, icom, (*mdfs).mom);
 }

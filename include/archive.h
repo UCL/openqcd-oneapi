@@ -30,9 +30,9 @@ extern void export_mfld(char *out);
 extern void import_mfld(char *in);
 
 /* SARCHIVE_C */
-extern void write_sfld(char *out,spinor_dble *sd);
-extern void read_sfld(char *in,spinor_dble *sd);
-extern void export_sfld(char *out,spinor_dble *sd);
-extern void import_sfld(char *in,spinor_dble *sd);
+extern void write_sfld(char *out, spinor_dble *sd);
+extern void read_sfld(char *in, spinor_dble *sd);
+extern void export_sfld(char *out, spinor_dble *sd);
+extern void import_sfld(char *in, spinor_dble *sd);
 
 #endif

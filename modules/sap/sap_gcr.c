@@ -100,128 +100,112 @@
 static double mud;
 static sap_parms_t spr;
 
+static void Dop(spinor_dble *s, spinor_dble *r) { Dw_dble(mud, s, r); }
 
-static void Dop(spinor_dble *s,spinor_dble *r)
+static void Mop(int k, spinor *rho, spinor *phi, spinor *chi)
 {
-   Dw_dble(mud,s,r);
+  int n;
+
+  set_s2zero(VOLUME, phi);
+  assign_s2s(VOLUME, rho, chi);
+
+  for (n = 0; n < spr.ncy; n++)
+    sap((float)(mud), spr.isolv, spr.nmr, phi, chi);
+
+  diff_s2s(VOLUME, rho, chi);
 }
 
-
-static void Mop(int k,spinor *rho,spinor *phi,spinor *chi)
+double sap_gcr(int nkv, int nmx, double res, double mu, spinor_dble *eta,
+               spinor_dble *psi, int *status)
 {
-   int n;
+  int nb, isw, ifail;
+  int swde, swdo, swu, swe, swo;
+  double rho, rho0, fact;
+  spinor **ws;
+  spinor_dble **rsd, **wsd;
 
-   set_s2zero(VOLUME,phi);
-   assign_s2s(VOLUME,rho,chi);
+  spr = sap_parms();
+  error_root(spr.ncy == 0, 1, "sap_gcr [sap_gcr.c]",
+             "SAP parameters are not set");
 
-   for (n=0;n<spr.ncy;n++)
-      sap((float)(mud),spr.isolv,spr.nmr,phi,chi);
+  blk_list(SAP_BLOCKS, &nb, &isw);
 
-   diff_s2s(VOLUME,rho,chi);
-}
+  if (nb == 0)
+    alloc_bgr(SAP_BLOCKS);
 
+  if (query_grid_flags(SAP_BLOCKS, UBGR_MATCH_UD) != 1)
+    assign_ud2ubgr(SAP_BLOCKS);
 
-double sap_gcr(int nkv,int nmx,double res,double mu,
-               spinor_dble *eta,spinor_dble *psi,int *status)
-{
-   int nb,isw,ifail;
-   int swde,swdo,swu,swe,swo;
-   double rho,rho0,fact;
-   spinor **ws;
-   spinor_dble **rsd,**wsd;
+  if (query_flags(SWD_UP2DATE) != 1)
+    sw_term(NO_PTS);
 
-   spr=sap_parms();
-   error_root(spr.ncy==0,1,"sap_gcr [sap_gcr.c]","SAP parameters are not set");
+  swde = query_flags(SWD_E_INVERTED);
+  swdo = query_flags(SWD_O_INVERTED);
 
-   blk_list(SAP_BLOCKS,&nb,&isw);
+  swu = query_grid_flags(SAP_BLOCKS, SW_UP2DATE);
+  swe = query_grid_flags(SAP_BLOCKS, SW_E_INVERTED);
+  swo = query_grid_flags(SAP_BLOCKS, SW_O_INVERTED);
+  ifail = 0;
 
-   if (nb==0)
-      alloc_bgr(SAP_BLOCKS);
-
-   if (query_grid_flags(SAP_BLOCKS,UBGR_MATCH_UD)!=1)
-      assign_ud2ubgr(SAP_BLOCKS);
-
-   if (query_flags(SWD_UP2DATE)!=1)
+  if (spr.isolv == 0) {
+    if ((swde == 1) || (swdo == 1))
       sw_term(NO_PTS);
 
-   swde=query_flags(SWD_E_INVERTED);
-   swdo=query_flags(SWD_O_INVERTED);
+    if ((swu != 1) || (swe == 1) || (swo == 1))
+      assign_swd2swbgr(SAP_BLOCKS, NO_PTS);
+  } else if (spr.isolv == 1) {
+    if ((swde != 1) && (swdo == 1)) {
+      if ((swu != 1) || (swe == 1) || (swo != 1))
+        assign_swd2swbgr(SAP_BLOCKS, NO_PTS);
 
-   swu=query_grid_flags(SAP_BLOCKS,SW_UP2DATE);
-   swe=query_grid_flags(SAP_BLOCKS,SW_E_INVERTED);
-   swo=query_grid_flags(SAP_BLOCKS,SW_O_INVERTED);
-   ifail=0;
+      sw_term(NO_PTS);
+    } else {
+      if ((swde == 1) || (swdo == 1))
+        sw_term(NO_PTS);
 
-   if (spr.isolv==0)
-   {
-      if ((swde==1)||(swdo==1))
-         sw_term(NO_PTS);
+      if ((swu != 1) || (swe == 1) || (swo != 1))
+        ifail = assign_swd2swbgr(SAP_BLOCKS, ODD_PTS);
+    }
+  } else
+    error_root(1, 1, "sap_gcr [sap_gcr.c]", "Unknown block solver");
 
-      if ((swu!=1)||(swe==1)||(swo==1))
-         assign_swd2swbgr(SAP_BLOCKS,NO_PTS);
-   }
-   else if (spr.isolv==1)
-   {
-      if ((swde!=1)&&(swdo==1))
-      {
-         if ((swu!=1)||(swe==1)||(swo!=1))
-            assign_swd2swbgr(SAP_BLOCKS,NO_PTS);
+  rho0 = sqrt(norm_square_dble(VOLUME, 1, eta));
+  rho = rho0;
+  status[0] = 0;
 
-         sw_term(NO_PTS);
-      }
-      else
-      {
-         if ((swde==1)||(swdo==1))
-            sw_term(NO_PTS);
+  if (ifail)
+    status[0] = -2;
+  else {
+    ws = reserve_ws(2 * nkv + 1);
+    wsd = reserve_wsd(1);
+    rsd = reserve_wsd(1);
 
-         if ((swu!=1)||(swe==1)||(swo!=1))
-            ifail=assign_swd2swbgr(SAP_BLOCKS,ODD_PTS);
-      }
-   }
-   else
-      error_root(1,1,"sap_gcr [sap_gcr.c]","Unknown block solver");
+    mud = mu;
+    fact = rho0 / sqrt((double)(VOLUME) * (double)(24 * NPROC));
 
-   rho0=sqrt(norm_square_dble(VOLUME,1,eta));
-   rho=rho0;
-   status[0]=0;
+    if (fact != 0.0) {
+      assign_sd2sd(VOLUME, eta, rsd[0]);
+      scale_dble(VOLUME, 1.0 / fact, rsd[0]);
 
-   if (ifail)
-      status[0]=-2;
-   else
-   {
-      ws=reserve_ws(2*nkv+1);
-      wsd=reserve_wsd(1);
-      rsd=reserve_wsd(1);
+      rho = fgcr(VOLUME, 1, Dop, Mop, ws, wsd, nkv, nmx, res, rsd[0], psi,
+                 status);
 
-      mud=mu;
-      fact=rho0/sqrt((double)(VOLUME)*(double)(24*NPROC));
+      scale_dble(VOLUME, fact, psi);
+      rho *= fact;
+    } else {
+      rho = 0.0;
+      set_sd2zero(VOLUME, psi);
+    }
 
-      if (fact!=0.0)
-      {
-         assign_sd2sd(VOLUME,eta,rsd[0]);
-         scale_dble(VOLUME,1.0/fact,rsd[0]);
+    release_wsd();
+    release_wsd();
+    release_ws();
+  }
 
-         rho=fgcr(VOLUME,1,Dop,Mop,ws,wsd,nkv,nmx,res,rsd[0],psi,status);
+  if (status[0] < -1) {
+    rho = rho0;
+    set_sd2zero(VOLUME, psi);
+  }
 
-         scale_dble(VOLUME,fact,psi);
-         rho*=fact;
-      }
-      else
-      {
-         rho=0.0;
-         set_sd2zero(VOLUME,psi);
-      }
-
-      release_wsd();
-      release_wsd();
-      release_ws();
-   }
-
-   if (status[0]<-1)
-   {
-      rho=rho0;
-      set_sd2zero(VOLUME,psi);
-   }
-
-   return rho;
+  return rho;
 }

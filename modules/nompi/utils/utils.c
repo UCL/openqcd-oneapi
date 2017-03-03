@@ -21,7 +21,7 @@
 *     address (the return value) that is an integer multiple of 2^p
 *
 *   void afree(void *addr)
-*     Frees the aligned memory area at address "addr" that was 
+*     Frees the aligned memory area at address "addr" that was
 *     previously allocated using amalloc
 *
 *   void error(int test,int no,char *name,char *format,...)
@@ -53,163 +53,144 @@
 
 struct addr_t
 {
-   char *addr;
-   char *true_addr;
-   struct addr_t *last,*next;
+  char *addr;
+  char *true_addr;
+  struct addr_t *last, *next;
 };
 
-static struct addr_t *rpos=NULL;
+static struct addr_t *rpos = NULL;
 
-
-int safe_mod(int x,int y)
+int safe_mod(int x, int y)
 {
-   if (x>=0)
-      return(x%y);
-   else
-      return((y-(abs(x)%y))%y);
+  if (x >= 0)
+    return (x % y);
+  else
+    return ((y - (abs(x) % y)) % y);
 }
 
-
-void *amalloc(size_t size,int p)
+void *amalloc(size_t size, int p)
 {
-   int shift;
-   char *true_addr,*addr;
-   unsigned long mask;
-   struct addr_t *new,*rnxt;
+  int shift;
+  char *true_addr, *addr;
+  unsigned long mask;
+  struct addr_t *new, *rnxt;
 
-   if ((size<=0)||(p<0))
-      return(NULL);
+  if ((size <= 0) || (p < 0))
+    return (NULL);
 
-   shift=1<<p;
-   mask=(unsigned long)(shift-1);
+  shift = 1 << p;
+  mask = (unsigned long)(shift - 1);
 
-   true_addr=malloc(size+shift);
-   new=malloc(sizeof(*new));
-   
-   if ((true_addr==NULL)||(new==NULL))
-   {
-      free(true_addr);
-      free(new);
-      return NULL;
-   }
+  true_addr = malloc(size + shift);
+  new = malloc(sizeof(*new));
 
-   addr=(char*)(((unsigned long)(true_addr+shift))&(~mask));
-   (*new).addr=addr;
-   (*new).true_addr=true_addr;
+  if ((true_addr == NULL) || (new == NULL)) {
+    free(true_addr);
+    free(new);
+    return NULL;
+  }
 
-   if (rpos!=NULL)
-   {
-      rnxt=(*rpos).next;
+  addr = (char *)(((unsigned long)(true_addr + shift)) & (~mask));
+  (*new).addr = addr;
+  (*new).true_addr = true_addr;
 
-      (*new).next=rnxt;
-      (*rpos).next=new;
-      (*rnxt).last=new;
-      (*new).last=rpos;
-   }
-   else
-   {
-      (*new).next=new;
-      (*new).last=new;
-   }
+  if (rpos != NULL) {
+    rnxt = (*rpos).next;
 
-   rpos=new;
-                   
-   return (void*)(addr);
+    (*new).next = rnxt;
+    (*rpos).next = new;
+    (*rnxt).last = new;
+    (*new).last = rpos;
+  } else {
+    (*new).next = new;
+    (*new).last = new;
+  }
+
+  rpos = new;
+
+  return (void *)(addr);
 }
-
 
 void afree(void *addr)
 {
-   struct addr_t *p,*pn,*pl;
+  struct addr_t *p, *pn, *pl;
 
-   if (rpos!=NULL)
-   {   
-      p=rpos;
+  if (rpos != NULL) {
+    p = rpos;
 
-      for (;;)
-      {
-         if ((*p).addr==addr)
-         {
-            pn=(*p).next;
-            pl=(*p).last;
-            
-            if (pn!=p)
-            {
-               (*pl).next=pn;
-               (*pn).last=pl;
-               rpos=pl;
-            }
-            else
-               rpos=NULL;
+    for (;;) {
+      if ((*p).addr == addr) {
+        pn = (*p).next;
+        pl = (*p).last;
 
-            free((*p).true_addr);
-            free(p);            
-            return;
-         }
+        if (pn != p) {
+          (*pl).next = pn;
+          (*pn).last = pl;
+          rpos = pl;
+        } else
+          rpos = NULL;
 
-         p=(*p).next;
-         if (p==rpos)
-            return;
+        free((*p).true_addr);
+        free(p);
+        return;
       }
-   }
+
+      p = (*p).next;
+      if (p == rpos)
+        return;
+    }
+  }
 }
 
-
-void error(int test,int no,char *name,char *format,...)
+void error(int test, int no, char *name, char *format, ...)
 {
-   va_list args;
-   
-   if (test!=0)
-   {
-      printf("\nError in %s:\n",name);
-      va_start(args,format);
-      vprintf(format,args);      
-      va_end(args);
-      printf("\nProgram aborted\n\n");
-      exit(no);
-   }
+  va_list args;
+
+  if (test != 0) {
+    printf("\nError in %s:\n", name);
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+    printf("\nProgram aborted\n\n");
+    exit(no);
+  }
 }
 
-
-void error_root(int test,int no,char *name,char *format,...)
+void error_root(int test, int no, char *name, char *format, ...)
 {
-   va_list args;
-   
-   if (test!=0)
-   {
-      printf("\nError in %s:\n",name);
-      va_start(args,format);
-      vprintf(format,args);      
-      va_end(args);
-      printf("\nProgram aborted\n\n");
-      exit(no);
-   }
+  va_list args;
+
+  if (test != 0) {
+    printf("\nError in %s:\n", name);
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+    printf("\nProgram aborted\n\n");
+    exit(no);
+  }
 }
 
-
-int error_loc(int test,int no,char *name,char *format,...)
+int error_loc(int test, int no, char *name, char *format, ...)
 {
-   va_list args;
-   
-   if (test!=0)
-   {
-      printf("\nError in %s:\n",name);
-      va_start(args,format);
-      vprintf(format,args);      
-      va_end(args);
-      printf("\nProgram aborted\n\n");
-      exit(no);
-   }
+  va_list args;
 
-   return test;
+  if (test != 0) {
+    printf("\nError in %s:\n", name);
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+    printf("\nProgram aborted\n\n");
+    exit(no);
+  }
+
+  return test;
 }
 
-
-void message(char *format,...)
+void message(char *format, ...)
 {
-   va_list args;
+  va_list args;
 
-   va_start(args,format);
-   vprintf(format,args);      
-   va_end(args);
+  va_start(args, format);
+  vprintf(format, args);
+  va_end(args);
 }

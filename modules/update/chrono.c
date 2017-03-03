@@ -26,11 +26,11 @@
 *     Advances the molecular-dynamics time by dt.
 *
 *   void add_chrono(int icr,spinor_dble *psi)
-*     Adds the solution psi obtained at the current molecular-dynamics 
-*     time to the stack number icr of previously calculated solutions. 
+*     Adds the solution psi obtained at the current molecular-dynamics
+*     time to the stack number icr of previously calculated solutions.
 *
 *   int get_chrono(int icr,spinor_dble *psi)
-*     Extrapolates the solutions stored in the stack number icr to the  
+*     Extrapolates the solutions stored in the stack number icr to the
 *     current molecular-dynamics time. The program returns 0 and leaves
 *     psi unchanged if the stack does not contain any previous solutions.
 *     Otherwise the program assigns the extrapolated solution to psi and
@@ -85,282 +85,238 @@
 
 typedef struct
 {
-   int ncr;
-   int isd,nsd;
-   double *ta;
-   spinor_dble **sd;
+  int ncr;
+  int isd, nsd;
+  double *ta;
+  spinor_dble **sd;
 } stack_t;
 
-static int nst=0;
-static double mdt=0.0;
-static stack_t *st=NULL;
-
+static int nst = 0;
+static double mdt = 0.0;
+static stack_t *st = NULL;
 
 static void init_stacks(void)
 {
-   int ncr,icr,k;
-   double *ta;
-   spinor_dble **sd;
+  int ncr, icr, k;
+  double *ta;
+  spinor_dble **sd;
 
-   for (icr=0;icr<nst;icr++)
-   {
-      st[icr].isd=0;
-      st[icr].nsd=0;
-      
-      ncr=st[icr].ncr;
-      ta=st[icr].ta;
-      sd=st[icr].sd;
+  for (icr = 0; icr < nst; icr++) {
+    st[icr].isd = 0;
+    st[icr].nsd = 0;
 
-      for (k=0;k<ncr;k++)
-      {
-         ta[k]=0.0;
-         set_sd2zero(VOLUME,sd[k]);
-      }
-   }
+    ncr = st[icr].ncr;
+    ta = st[icr].ta;
+    sd = st[icr].sd;
+
+    for (k = 0; k < ncr; k++) {
+      ta[k] = 0.0;
+      set_sd2zero(VOLUME, sd[k]);
+    }
+  }
 }
-
 
 static void free_stacks(void)
 {
-   if (nst>0)
-   {
-      free(st[1].ta);
-      afree(st[1].sd[0]);
-      free(st[1].sd);
-      free(st);
-      
-      nst=0;
-      st=NULL;
-   }
-}
+  if (nst > 0) {
+    free(st[1].ta);
+    afree(st[1].sd[0]);
+    free(st[1].sd);
+    free(st);
 
+    nst = 0;
+    st = NULL;
+  }
+}
 
 static void alloc_stacks(void)
 {
-   int i,j,k;
-   hmc_parms_t hmc;
-   mdint_parms_t mdp;
-   force_parms_t fp;
+  int i, j, k;
+  hmc_parms_t hmc;
+  mdint_parms_t mdp;
+  force_parms_t fp;
 
-   hmc=hmc_parms();
-   
-   for (i=0;i<hmc.nlv;i++)
-   {
-      mdp=mdint_parms(i);
+  hmc = hmc_parms();
 
-      for (j=0;j<mdp.nfr;j++)
-      {
-         fp=force_parms(mdp.ifr[j]);
+  for (i = 0; i < hmc.nlv; i++) {
+    mdp = mdint_parms(i);
 
-         for (k=0;k<4;k++)
-         {
-            if (fp.icr[k]>nst)
-               nst=fp.icr[k];
-         }
+    for (j = 0; j < mdp.nfr; j++) {
+      fp = force_parms(mdp.ifr[j]);
+
+      for (k = 0; k < 4; k++) {
+        if (fp.icr[k] > nst)
+          nst = fp.icr[k];
       }
-   }  
+    }
+  }
 
-   if (nst>0)
-   {
-      nst+=1;
-      st=malloc(nst*sizeof(*st));
-      error(st==NULL,1,"alloc_stacks [chrono.c]",
-            "Unable to allocate stack structures");
+  if (nst > 0) {
+    nst += 1;
+    st = malloc(nst * sizeof(*st));
+    error(st == NULL, 1, "alloc_stacks [chrono.c]",
+          "Unable to allocate stack structures");
 
-      for (i=0;i<nst;i++)
-      {
-         st[i].ncr=0;
-         st[i].ta=NULL;
-         st[i].sd=NULL;
+    for (i = 0; i < nst; i++) {
+      st[i].ncr = 0;
+      st[i].ta = NULL;
+      st[i].sd = NULL;
+    }
+
+    for (i = 0; i < hmc.nlv; i++) {
+      mdp = mdint_parms(i);
+
+      for (j = 0; j < mdp.nfr; j++) {
+        fp = force_parms(mdp.ifr[j]);
+
+        for (k = 0; k < 4; k++)
+          st[fp.icr[k]].ncr = fp.ncr[k];
       }
-      
-      for (i=0;i<hmc.nlv;i++)
-      {
-         mdp=mdint_parms(i);
-
-         for (j=0;j<mdp.nfr;j++)
-         {
-            fp=force_parms(mdp.ifr[j]);
-
-            for (k=0;k<4;k++)
-               st[fp.icr[k]].ncr=fp.ncr[k];
-         }
-      }
-   }
+    }
+  }
 }
-
 
 void setup_chrono(void)
 {
-   int ncr,icr,k;
-   double *ta;
-   spinor_dble **sd,*s;
-   
-   free_stacks();
-   alloc_stacks();
+  int ncr, icr, k;
+  double *ta;
+  spinor_dble **sd, *s;
 
-   if (nst>0)
-   {
-      ncr=0;
+  free_stacks();
+  alloc_stacks();
 
-      for (icr=0;icr<nst;icr++)
-         ncr+=st[icr].ncr;
+  if (nst > 0) {
+    ncr = 0;
 
-      if (ncr>0)
-      {
-         ta=malloc(ncr*sizeof(*ta));
-         sd=malloc(ncr*sizeof(*sd));
-         s=amalloc(ncr*VOLUME*sizeof(*s),ALIGN);
+    for (icr = 0; icr < nst; icr++)
+      ncr += st[icr].ncr;
 
-         error((ta==NULL)||(sd==NULL)||(s==NULL),1,"alloc_stacks [chrono.c]",
-               "Unable to allocate field stacks");
+    if (ncr > 0) {
+      ta = malloc(ncr * sizeof(*ta));
+      sd = malloc(ncr * sizeof(*sd));
+      s = amalloc(ncr * VOLUME * sizeof(*s), ALIGN);
+
+      error((ta == NULL) || (sd == NULL) || (s == NULL), 1,
+            "alloc_stacks [chrono.c]", "Unable to allocate field stacks");
+    } else {
+      ta = NULL;
+      sd = NULL;
+      s = NULL;
+    }
+
+    for (icr = 1; icr < nst; icr++) {
+      ncr = st[icr].ncr;
+
+      if (ncr > 0) {
+        st[icr].ta = ta;
+        st[icr].sd = sd;
+
+        for (k = 0; k < ncr; k++) {
+          sd[k] = s;
+          s += VOLUME;
+        }
+
+        ta += ncr;
+        sd += ncr;
       }
-      else
-      {
-         ta=NULL;
-         sd=NULL;
-         s=NULL;
-      }
+    }
 
-      for (icr=1;icr<nst;icr++)
-      {
-         ncr=st[icr].ncr;
+    init_stacks();
+  }
 
-         if (ncr>0)
-         {
-            st[icr].ta=ta;
-            st[icr].sd=sd;
-            
-            for (k=0;k<ncr;k++)
-            {
-               sd[k]=s;
-               s+=VOLUME;
-            }
-
-            ta+=ncr;
-            sd+=ncr;
-         }
-      }
-      
-      init_stacks();
-   }
-
-   mdt=0.0;
+  mdt = 0.0;
 }
 
+double mdtime(void) { return mdt; }
 
-double mdtime(void)
+void step_mdtime(double dt) { mdt += dt; }
+
+void add_chrono(int icr, spinor_dble *psi)
 {
-   return mdt;
+  int ncr, isd, jsd, nsd;
+
+  if ((icr > 0) && (icr < nst)) {
+    ncr = st[icr].ncr;
+    isd = st[icr].isd;
+    nsd = st[icr].nsd;
+
+    if (nsd == ncr) {
+      st[icr].ta[isd] = mdt;
+      assign_sd2sd(VOLUME, psi, st[icr].sd[isd]);
+
+      isd += 1;
+      if (isd == ncr)
+        isd = 0;
+      st[icr].isd = isd;
+    } else {
+      jsd = isd + nsd;
+      if (jsd >= ncr)
+        jsd -= ncr;
+
+      st[icr].ta[jsd] = mdt;
+      assign_sd2sd(VOLUME, psi, st[icr].sd[jsd]);
+      st[icr].nsd += 1;
+    }
+  } else
+    error_loc(1, 1, "add_chrono [chrono.c]", "Unknown field stack");
 }
 
-
-void step_mdtime(double dt)
+int get_chrono(int icr, spinor_dble *psi)
 {
-   mdt+=dt;
-}
+  int ncr, nsd, isd;
+  int k, l, ksd, lsd;
+  double *ta, c;
+  spinor_dble **sd;
 
+  if ((icr > 0) && (icr < nst)) {
+    nsd = st[icr].nsd;
 
-void add_chrono(int icr,spinor_dble *psi)
-{
-   int ncr,isd,jsd,nsd;
-   
-   if ((icr>0)&&(icr<nst))
-   {
-      ncr=st[icr].ncr;
-      isd=st[icr].isd;
-      nsd=st[icr].nsd;
-
-      if (nsd==ncr)
-      {
-         st[icr].ta[isd]=mdt;
-         assign_sd2sd(VOLUME,psi,st[icr].sd[isd]);
-
-         isd+=1;
-         if (isd==ncr)
-            isd=0;
-         st[icr].isd=isd;
-      }
-      else
-      {         
-         jsd=isd+nsd;
-         if (jsd>=ncr)
-            jsd-=ncr;
-         
-         st[icr].ta[jsd]=mdt;
-         assign_sd2sd(VOLUME,psi,st[icr].sd[jsd]);
-         st[icr].nsd+=1;
-      }
-   }
-   else
-      error_loc(1,1,"add_chrono [chrono.c]","Unknown field stack");
-}
-
-
-int get_chrono(int icr,spinor_dble *psi)
-{
-   int ncr,nsd,isd;
-   int k,l,ksd,lsd;
-   double *ta,c;
-   spinor_dble **sd;
-
-   if ((icr>0)&&(icr<nst))
-   {
-      nsd=st[icr].nsd;
-
-      if (nsd==0)
-         return 0;
-
-      ncr=st[icr].ncr;      
-      isd=st[icr].isd;
-      ta=st[icr].ta;
-      sd=st[icr].sd;
-
-      set_sd2zero(VOLUME,psi);
-
-      for (k=0;k<nsd;k++)
-      {
-         ksd=isd+k;
-         if (ksd>=ncr)
-            ksd-=ncr;
-         c=1.0;
-
-         for (l=0;l<nsd;l++)
-         {
-            if (l!=k)
-            {
-               lsd=isd+l;
-               if (lsd>=ncr)
-                  lsd-=ncr;
-
-               c*=((mdt-ta[lsd])/(ta[ksd]-ta[lsd]));
-            }
-         }
-
-         mulr_spinor_add_dble(VOLUME,psi,sd[ksd],c);
-      }
-
-      return 1;
-   }
-   else if (icr==0)
+    if (nsd == 0)
       return 0;
-   else
-   {
-      error_loc(1,1,"get_chrono [chrono.c]","Unknown field stack");
-      return 0;
-   }
-}
 
+    ncr = st[icr].ncr;
+    isd = st[icr].isd;
+    ta = st[icr].ta;
+    sd = st[icr].sd;
+
+    set_sd2zero(VOLUME, psi);
+
+    for (k = 0; k < nsd; k++) {
+      ksd = isd + k;
+      if (ksd >= ncr)
+        ksd -= ncr;
+      c = 1.0;
+
+      for (l = 0; l < nsd; l++) {
+        if (l != k) {
+          lsd = isd + l;
+          if (lsd >= ncr)
+            lsd -= ncr;
+
+          c *= ((mdt - ta[lsd]) / (ta[ksd] - ta[lsd]));
+        }
+      }
+
+      mulr_spinor_add_dble(VOLUME, psi, sd[ksd], c);
+    }
+
+    return 1;
+  } else if (icr == 0)
+    return 0;
+  else {
+    error_loc(1, 1, "get_chrono [chrono.c]", "Unknown field stack");
+    return 0;
+  }
+}
 
 void reset_chrono(void)
 {
-   int icr;
+  int icr;
 
-   for (icr=0;icr<nst;icr++)
-   {
-      st[icr].isd=0;
-      st[icr].nsd=0;
-   }
+  for (icr = 0; icr < nst; icr++) {
+    st[icr].isd = 0;
+    st[icr].nsd = 0;
+  }
 
-   mdt=0.0;
+  mdt = 0.0;
 }

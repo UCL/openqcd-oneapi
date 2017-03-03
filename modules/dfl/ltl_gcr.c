@@ -83,202 +83,182 @@
 #include "dfl.h"
 #include "global.h"
 
-static int Ns=0,nv,nvh;
+static int Ns = 0, nv, nvh;
 static double rvol;
 static complex **vs;
-static complex_dble **vds,*awd,*cs1,*cs2;
-
+static complex_dble **vds, *awd, *cs1, *cs2;
 
 static void set_constants(void)
 {
-   dfl_parms_t dfl;
-   dfl_grid_t grd;
+  dfl_parms_t dfl;
+  dfl_grid_t grd;
 
-   dfl=dfl_parms();
-   grd=dfl_geometry();
+  dfl = dfl_parms();
+  grd = dfl_geometry();
 
-   Ns=dfl.Ns;
-   nv=Ns*grd.nb;
-   nvh=nv/2;
-   rvol=1.0/sqrt((double)(nv)*(double)(NPROC));
+  Ns = dfl.Ns;
+  nv = Ns * grd.nb;
+  nvh = nv / 2;
+  rvol = 1.0 / sqrt((double)(nv) * (double)(NPROC));
 
-   vs=vflds();
-   vds=vdflds();
-   awd=ltl_matrix();
+  vs = vflds();
+  vds = vdflds();
+  awd = ltl_matrix();
 
-   cs1=amalloc(2*Ns*sizeof(*cs1),ALIGN);
-   error(cs1==NULL,1,"set_constants [ltl_gcr.c]",
-         "Unable to allocate auxiliary arrays");
-   cs2=cs1+Ns;
+  cs1 = amalloc(2 * Ns * sizeof(*cs1), ALIGN);
+  error(cs1 == NULL, 1, "set_constants [ltl_gcr.c]",
+        "Unable to allocate auxiliary arrays");
+  cs2 = cs1 + Ns;
 }
 
-
-static void sum_vprod(int n,complex_dble *z,complex_dble *w)
+static void sum_vprod(int n, complex_dble *z, complex_dble *w)
 {
-   int k;
+  int k;
 
-   if (NPROC>1)
-   {
-      MPI_Reduce(z,w,2*n,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-      MPI_Bcast(w,2*n,MPI_DOUBLE,0,MPI_COMM_WORLD);
-   }
-   else
-   {
-      for (k=0;k<n;k++)
-      {
-         w[k].re=z[k].re;
-         w[k].im=z[k].im;
-      }
-   }
+  if (NPROC > 1) {
+    MPI_Reduce(z, w, 2 * n, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Bcast(w, 2 * n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  } else {
+    for (k = 0; k < n; k++) {
+      w[k].re = z[k].re;
+      w[k].im = z[k].im;
+    }
+  }
 }
 
-
-static void Lvd(complex_dble *v,complex_dble *w)
+static void Lvd(complex_dble *v, complex_dble *w)
 {
-   int i;
-   complex_dble z;
+  int i;
+  complex_dble z;
 
-   for (i=0;i<Ns;i++)
-      cs1[i]=vprod_dble(nvh,0,vds[i],v);
+  for (i = 0; i < Ns; i++)
+    cs1[i] = vprod_dble(nvh, 0, vds[i], v);
 
-   sum_vprod(Ns,cs1,cs2);
-   cmat_vec_dble(Ns,awd,cs2,cs1);
-   set_vd2zero(nvh,w);
+  sum_vprod(Ns, cs1, cs2);
+  cmat_vec_dble(Ns, awd, cs2, cs1);
+  set_vd2zero(nvh, w);
 
-   for (i=0;i<Ns;i++)
-   {
-      mulc_vadd_dble(nvh,w,vds[i],cs1[i]);
-      z.re=-cs1[i].re;
-      z.im=-cs1[i].im;
-      mulc_vadd_dble(nvh,v,vds[i]+nvh,z);
-   }
+  for (i = 0; i < Ns; i++) {
+    mulc_vadd_dble(nvh, w, vds[i], cs1[i]);
+    z.re = -cs1[i].re;
+    z.im = -cs1[i].im;
+    mulc_vadd_dble(nvh, v, vds[i] + nvh, z);
+  }
 }
 
-
-static void RLvd(complex_dble *v,complex_dble *w)
+static void RLvd(complex_dble *v, complex_dble *w)
 {
-   int i;
-   complex_dble z;
+  int i;
+  complex_dble z;
 
-   for (i=0;i<Ns;i++)
-      cs1[i]=vprod_dble(nvh,0,vds[i],w);
+  for (i = 0; i < Ns; i++)
+    cs1[i] = vprod_dble(nvh, 0, vds[i], w);
 
-   sum_vprod(Ns,cs1,cs2);
-   cmat_vec_dble(Ns,awd,cs2,cs1);
+  sum_vprod(Ns, cs1, cs2);
+  cmat_vec_dble(Ns, awd, cs2, cs1);
 
-   for (i=0;i<Ns;i++)
-   {
-      z.re=-cs1[i].re;
-      z.im=-cs1[i].im;
-      mulc_vadd_dble(nvh,v,vds[i],z);
-      mulc_vadd_dble(nvh,w,vds[i]+nvh,z);
-   }
+  for (i = 0; i < Ns; i++) {
+    z.re = -cs1[i].re;
+    z.im = -cs1[i].im;
+    mulc_vadd_dble(nvh, v, vds[i], z);
+    mulc_vadd_dble(nvh, w, vds[i] + nvh, z);
+  }
 }
-
 
 static void Lv(complex *v)
 {
-   int i;
-   complex z;
+  int i;
+  complex z;
 
-   for (i=0;i<Ns;i++)
-   {
-      z=vprod(nvh,0,vs[i],v);
-      cs1[i].re=(double)(z.re);
-      cs1[i].im=(double)(z.im);
-   }
+  for (i = 0; i < Ns; i++) {
+    z = vprod(nvh, 0, vs[i], v);
+    cs1[i].re = (double)(z.re);
+    cs1[i].im = (double)(z.im);
+  }
 
-   sum_vprod(Ns,cs1,cs2);
-   cmat_vec_dble(Ns,awd,cs2,cs1);
+  sum_vprod(Ns, cs1, cs2);
+  cmat_vec_dble(Ns, awd, cs2, cs1);
 
-   for (i=0;i<Ns;i++)
-   {
-      z.re=(float)(-cs1[i].re);
-      z.im=(float)(-cs1[i].im);
-      mulc_vadd(nvh,v,vs[i]+nvh,z);
-   }
+  for (i = 0; i < Ns; i++) {
+    z.re = (float)(-cs1[i].re);
+    z.im = (float)(-cs1[i].im);
+    mulc_vadd(nvh, v, vs[i] + nvh, z);
+  }
 }
 
-
-static void Mop(int k,complex *rho,complex *phi,complex *chi)
+static void Mop(int k, complex *rho, complex *phi, complex *chi)
 {
-   assign_v2v(nvh,rho,phi);
-   Awhat(phi,chi);
-   Lv(chi);
+  assign_v2v(nvh, rho, phi);
+  Awhat(phi, chi);
+  Lv(chi);
 }
 
-
-static void Dop(complex_dble *v,complex_dble *w)
+static void Dop(complex_dble *v, complex_dble *w)
 {
-   Awhat_dble(v,w);
-   RLvd(v,w);
+  Awhat_dble(v, w);
+  RLvd(v, w);
 }
 
-
-double ltl_gcr(int nkv,int nmx,double res,double mu,
-               complex_dble *eta,complex_dble *psi,int *status)
+double ltl_gcr(int nkv, int nmx, double res, double mu, complex_dble *eta,
+               complex_dble *psi, int *status)
 {
-   int ifail;
-   double rho,rho0,fact;
-   complex **wv;
-   complex_dble **wvd,z;
+  int ifail;
+  double rho, rho0, fact;
+  complex **wv;
+  complex_dble **wvd, z;
 
-   if (Ns==0)
-      set_constants();
+  if (Ns == 0)
+    set_constants();
 
-   status[0]=0;
-   rho0=sqrt(vnorm_square_dble(nv,1,eta));
-   rho=rho0;
-   ifail=set_Awhat(mu);
+  status[0] = 0;
+  rho0 = sqrt(vnorm_square_dble(nv, 1, eta));
+  rho = rho0;
+  ifail = set_Awhat(mu);
 
-   if (ifail)
-      status[0]=-2;
-   else
-   {
-      wv=reserve_wv(2*nkv+1);
-      wvd=reserve_wvd(3);
+  if (ifail)
+    status[0] = -2;
+  else {
+    wv = reserve_wv(2 * nkv + 1);
+    wvd = reserve_wvd(3);
 
-      assign_vd2vd(nvh,eta,wvd[0]);
-      Awooinv_dble(eta,wvd[0]);
-      Aweo_dble(wvd[0],wvd[0]);
-      Aweeinv_dble(wvd[0],wvd[1]);
-      fact=rvol*rho0;
+    assign_vd2vd(nvh, eta, wvd[0]);
+    Awooinv_dble(eta, wvd[0]);
+    Aweo_dble(wvd[0], wvd[0]);
+    Aweeinv_dble(wvd[0], wvd[1]);
+    fact = rvol * rho0;
 
-      if (fact!=0.0)
-      {
-         vscale_dble(nvh,1.0/fact,wvd[1]);
-         Lvd(wvd[1],wvd[2]);
+    if (fact != 0.0) {
+      vscale_dble(nvh, 1.0 / fact, wvd[1]);
+      Lvd(wvd[1], wvd[2]);
 
-         rho=fgcr4vd(nvh,1,Dop,Mop,wv,wvd,nkv,nmx,res,wvd[1],psi,status);
+      rho = fgcr4vd(nvh, 1, Dop, Mop, wv, wvd, nkv, nmx, res, wvd[1], psi,
+                    status);
 
-         z.re=1.0;
-         z.im=0.0;
-         mulc_vadd_dble(nvh,psi,wvd[2],z);
-         vscale_dble(nvh,fact,psi);
-         rho*=fact;
-      }
-      else
-      {
-         rho=0.0;
-         set_vd2zero(nv,psi);
-      }
+      z.re = 1.0;
+      z.im = 0.0;
+      mulc_vadd_dble(nvh, psi, wvd[2], z);
+      vscale_dble(nvh, fact, psi);
+      rho *= fact;
+    } else {
+      rho = 0.0;
+      set_vd2zero(nv, psi);
+    }
 
-      Awoe_dble(psi,wvd[0]);
-      assign_vd2vd(nvh,eta+nvh,wvd[1]+nvh);
-      z.re=-1.0;
-      z.im=0.0;
-      mulc_vadd_dble(nvh,wvd[1]+nvh,wvd[0]+nvh,z);
-      Awooinv_dble(wvd[1],psi);
+    Awoe_dble(psi, wvd[0]);
+    assign_vd2vd(nvh, eta + nvh, wvd[1] + nvh);
+    z.re = -1.0;
+    z.im = 0.0;
+    mulc_vadd_dble(nvh, wvd[1] + nvh, wvd[0] + nvh, z);
+    Awooinv_dble(wvd[1], psi);
 
-      release_wvd();
-      release_wv();
-   }
+    release_wvd();
+    release_wv();
+  }
 
-   if (status[0]<-1)
-   {
-      rho=rho0;
-      set_vd2zero(nv,psi);
-   }
+  if (status[0] < -1) {
+    rho = rho0;
+    set_vd2zero(nv, psi);
+  }
 
-   return rho;
+  return rho;
 }

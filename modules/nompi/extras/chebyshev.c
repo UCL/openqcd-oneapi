@@ -14,8 +14,8 @@
 *
 *   int cheby_fit(double a,double b,double (*f)(double x),
 *                                   int nmax,double eps,double c[])
-*     Computes the coefficients c[0],...,c[n], with n<=nmax being the 
-*     value returned by the program and eps the desired absolute precision 
+*     Computes the coefficients c[0],...,c[n], with n<=nmax being the
+*     value returned by the program and eps the desired absolute precision
 *     of the approximation
 *
 *   double cheby_val(double a,double b,int n,double c[],double x)
@@ -56,321 +56,288 @@
 #include "extras.h"
 
 static int max_degree;
-static double *alist,*clist,*flist;
-
+static double *alist, *clist, *flist;
 
 static void allocate_arrays(int nmax)
 {
-   for (max_degree=16;max_degree<=nmax;)
-      max_degree*=2;
+  for (max_degree = 16; max_degree <= nmax;)
+    max_degree *= 2;
 
-   alist=malloc((max_degree+1)*sizeof(double));
-   clist=malloc((max_degree*2)*sizeof(double));
-   flist=malloc((max_degree+1)*sizeof(double));
+  alist = malloc((max_degree + 1) * sizeof(double));
+  clist = malloc((max_degree * 2) * sizeof(double));
+  flist = malloc((max_degree + 1) * sizeof(double));
 }
-
 
 static void free_arrays(void)
 {
-   free(alist);
-   free(clist);
-   free(flist);
+  free(alist);
+  free(clist);
+  free(flist);
 }
-
 
 static void update_clist(int n)
 {
-   int k,kmin,kmax,dk;
-   double pi,x,dx;
+  int k, kmin, kmax, dk;
+  double pi, x, dx;
 
-   pi=4.0*atan(1.0);
-   dx=pi/(double)(max_degree);
+  pi = 4.0 * atan(1.0);
+  dx = pi / (double)(max_degree);
 
-   kmin=0;
-   kmax=2*max_degree;
-   dk=max_degree/n;
-   
-   if (n>32)
-   {
-      kmin=dk;
-      dk*=2;
-   }
-   
-   for (k=kmin;k<kmax;k+=dk)
-   {
-      x=(double)(k)*dx;
-      clist[k]=cos(x);
-   }
-}  
+  kmin = 0;
+  kmax = 2 * max_degree;
+  dk = max_degree / n;
 
+  if (n > 32) {
+    kmin = dk;
+    dk *= 2;
+  }
 
-static void update_flist(int n,double a,double b,double (*f)(double x))
-{
-   int k,kmin,kmax,dk;
-   double x;
-
-   kmin=0;
-   kmax=max_degree;
-   dk=max_degree/n;
-
-   if (n>32)
-   {
-      kmin=dk;
-      kmax-=dk;
-      dk*=2;
-   }
-
-   for (k=kmin;k<=kmax;k+=dk)
-   {
-      x=0.5*(a+b-(a-b)*clist[k]);
-      flist[k]=(*f)(x);
-   }
+  for (k = kmin; k < kmax; k += dk) {
+    x = (double)(k)*dx;
+    clist[k] = cos(x);
+  }
 }
 
+static void update_flist(int n, double a, double b, double (*f)(double x))
+{
+  int k, kmin, kmax, dk;
+  double x;
+
+  kmin = 0;
+  kmax = max_degree;
+  dk = max_degree / n;
+
+  if (n > 32) {
+    kmin = dk;
+    kmax -= dk;
+    dk *= 2;
+  }
+
+  for (k = kmin; k <= kmax; k += dk) {
+    x = 0.5 * (a + b - (a - b) * clist[k]);
+    flist[k] = (*f)(x);
+  }
+}
 
 static void compute_alist(int n)
 {
-   int i,k,dk;
-   double sum,r;
-   
-   dk=max_degree/n;
-   r=2.0/(double)n;
+  int i, k, dk;
+  double sum, r;
 
-   for (i=0;i<=n;++i)
-   {
-      sum=0.5*(flist[0]+flist[max_degree]);
-      if (i%2==1)
-         sum-=flist[max_degree];
+  dk = max_degree / n;
+  r = 2.0 / (double)n;
 
-      for (k=dk;k<max_degree;k+=dk)
-         sum+=flist[k]*clist[(i*k)%(2*max_degree)];
+  for (i = 0; i <= n; ++i) {
+    sum = 0.5 * (flist[0] + flist[max_degree]);
+    if (i % 2 == 1)
+      sum -= flist[max_degree];
 
-      alist[i]=r*sum;
-   }
+    for (k = dk; k < max_degree; k += dk)
+      sum += flist[k] * clist[(i * k) % (2 * max_degree)];
+
+    alist[i] = r * sum;
+  }
 }
 
-
-static void compute_blist(int n,double a,double b)
+static void compute_blist(int n, double a, double b)
 {
-   int i,k,dk;
-   double sum,r;
-   
-   dk=max_degree/n;
-   r=2.0/(double)n;
+  int i, k, dk;
+  double sum, r;
 
-   for (i=0;i<=n;++i)
-   {
-      if (i%2==0)
-      {
-         sum=0.5*(flist[0]+flist[max_degree]);
+  dk = max_degree / n;
+  r = 2.0 / (double)n;
 
-         for (k=dk;k<max_degree;k+=dk)
-            sum+=flist[k]*clist[(i*k)%(2*max_degree)];
+  for (i = 0; i <= n; ++i) {
+    if (i % 2 == 0) {
+      sum = 0.5 * (flist[0] + flist[max_degree]);
 
-         alist[i]=(a-b)*r*sum/(double)(i*i-1);
-      }
-      else
-      {
-         alist[i]=0.0;
-      }
-   }
+      for (k = dk; k < max_degree; k += dk)
+        sum += flist[k] * clist[(i * k) % (2 * max_degree)];
 
-   alist[0]*=0.5;
+      alist[i] = (a - b) * r * sum / (double)(i * i - 1);
+    } else {
+      alist[i] = 0.0;
+    }
+  }
+
+  alist[0] *= 0.5;
 }
-
 
 static int test_convergence(int n)
 {
-   int i,k,kmax;
-   double m[4],a;
+  int i, k, kmax;
+  double m[4], a;
 
-   kmax=n/4;
+  kmax = n / 4;
 
-   for (i=0;i<4;++i)
-   {
-      m[i]=0.0;
-      
-      for (k=0;k<kmax;++k)
-      {
-         a=fabs(alist[i*kmax+k]);
-         if (a>m[i])
-            m[i]=a;
-      }
-   }
+  for (i = 0; i < 4; ++i) {
+    m[i] = 0.0;
 
-   if ((m[0]>=1.0e2*m[1])&&(m[0]>=1.0e4*m[2])&&(m[0]>=1.0e6*m[3]))   
-      return(0);
+    for (k = 0; k < kmax; ++k) {
+      a = fabs(alist[i * kmax + k]);
+      if (a > m[i])
+        m[i] = a;
+    }
+  }
 
-   return(1);
+  if ((m[0] >= 1.0e2 * m[1]) && (m[0] >= 1.0e4 * m[2]) &&
+      (m[0] >= 1.0e6 * m[3]))
+    return (0);
+
+  return (1);
 }
-
 
 static double abs_error(int n)
 {
-   int k,kmin;
-   double err;
+  int k, kmin;
+  double err;
 
-   kmin=n/2+1;
-   err=0.0;
+  kmin = n / 2 + 1;
+  err = 0.0;
 
-   for (k=0;k<kmin;++k)
-      err+=fabs(alist[k]);
-   err*=(DBL_EPSILON);
-   
-   for (k=kmin;k<n;++k)
-      err+=fabs(alist[k]);
+  for (k = 0; k < kmin; ++k)
+    err += fabs(alist[k]);
+  err *= (DBL_EPSILON);
 
-   return(2.0*err);
+  for (k = kmin; k < n; ++k)
+    err += fabs(alist[k]);
+
+  return (2.0 * err);
 }
 
-
-static int economize(int n,double eps,double err,double c[])
+static int economize(int n, double eps, double err, double c[])
 {
-   int k;
-   double r;
+  int k;
+  double r;
 
-   r=err;
+  r = err;
 
-   for (k=n;k>=1;--k)
-   {
-      r+=fabs(c[k]);
-      if (r>=eps)
-         break;
-   }
+  for (k = n; k >= 1; --k) {
+    r += fabs(c[k]);
+    if (r >= eps)
+      break;
+  }
 
-   return(k);
+  return (k);
 }
 
-
-int cheby_fit(double a,double b,double (*f)(double x),
-              int nmax,double eps,double c[])
+int cheby_fit(double a, double b, double (*f)(double x), int nmax, double eps,
+              double c[])
 {
-   int n,k,itest;
-   double err;
-   
-   if ((a>=b)||(nmax<16)||(eps<=0.0))
-   {
-      printf("Error in cheby_fit\n");
-      printf("Arguments out of range\n");
-      printf("Program aborted\n\n");
-      exit(0);
-   }
+  int n, k, itest;
+  double err;
 
-   itest=1;
-   err=eps;
-   allocate_arrays(nmax);
+  if ((a >= b) || (nmax < 16) || (eps <= 0.0)) {
+    printf("Error in cheby_fit\n");
+    printf("Arguments out of range\n");
+    printf("Program aborted\n\n");
+    exit(0);
+  }
 
-   for (n=32;n<=max_degree;n*=2)
-   {
-      update_clist(n);
-      update_flist(n,a,b,f);
-      compute_alist(n);
+  itest = 1;
+  err = eps;
+  allocate_arrays(nmax);
 
-      itest=test_convergence(n);
-      err=abs_error(n);
+  for (n = 32; n <= max_degree; n *= 2) {
+    update_clist(n);
+    update_flist(n, a, b, f);
+    compute_alist(n);
 
-      if ((itest==0)&&(err<eps))
-      {
-         n/=2;
-         c[0]=0.5*alist[0];
-         for (k=1;k<=n;++k)
-            c[k]=alist[k];
-         break;
-      }
-   }   
+    itest = test_convergence(n);
+    err = abs_error(n);
 
-   free_arrays();
+    if ((itest == 0) && (err < eps)) {
+      n /= 2;
+      c[0] = 0.5 * alist[0];
+      for (k = 1; k <= n; ++k)
+        c[k] = alist[k];
+      break;
+    }
+  }
 
-   if ((itest!=0)||(err>=eps))
-   {
-      printf("Error in cheby_fit\n");
-      printf("Specified accuracy has not been reached\n");
-      printf("Program aborted\n\n");
-      exit(0);
-   }
+  free_arrays();
 
-   n=economize(n,eps,err,c); 
-   return(n);
+  if ((itest != 0) || (err >= eps)) {
+    printf("Error in cheby_fit\n");
+    printf("Specified accuracy has not been reached\n");
+    printf("Program aborted\n\n");
+    exit(0);
+  }
+
+  n = economize(n, eps, err, c);
+  return (n);
 }
 
-
-double cheby_val(double a,double b,int n,double c[],double x)
+double cheby_val(double a, double b, int n, double c[], double x)
 {
-   int k;
-   double u,v,w,z;
+  int k;
+  double u, v, w, z;
 
-   if ((n<0)||(a>=b)||(x>b)||(x<a))
-   {
-      printf("Error in cheby_val\n");
-      printf("Arguments out of range\n");
-      printf("Program aborted\n\n");
-      exit(0);
-   }
+  if ((n < 0) || (a >= b) || (x > b) || (x < a)) {
+    printf("Error in cheby_val\n");
+    printf("Arguments out of range\n");
+    printf("Program aborted\n\n");
+    exit(0);
+  }
 
-   if (n==0)
-      return(c[0]);
+  if (n == 0)
+    return (c[0]);
 
-   z=2.0*(a+b-2.0*x)/(a-b);
-   u=c[n];
-   v=c[n-1];
+  z = 2.0 * (a + b - 2.0 * x) / (a - b);
+  u = c[n];
+  v = c[n - 1];
 
-   for (k=n-2;k>=0;--k)
-   {
-      w=z*u+v;
-      v=c[k]-u;
-      u=w;
-   }
+  for (k = n - 2; k >= 0; --k) {
+    w = z * u + v;
+    v = c[k] - u;
+    u = w;
+  }
 
-   return(0.5*z*u+v);
+  return (0.5 * z * u + v);
 }
 
-
-double cheby_int(double a,double b,double (*f)(double x),
-                 int nmax,double eps)
+double cheby_int(double a, double b, double (*f)(double x), int nmax,
+                 double eps)
 {
-   int n,k,itest;
-   double err,sum;
-   
-   if ((a>=b)||(nmax<16)||(eps<=0.0))
-   {
-      printf("Error in cheby_int\n");
-      printf("Arguments out of range\n");
-      printf("Program aborted\n\n");
-      exit(0);
-   }
+  int n, k, itest;
+  double err, sum;
 
-   itest=1;
-   err=eps;
-   sum=0.0;
-   allocate_arrays(nmax);
+  if ((a >= b) || (nmax < 16) || (eps <= 0.0)) {
+    printf("Error in cheby_int\n");
+    printf("Arguments out of range\n");
+    printf("Program aborted\n\n");
+    exit(0);
+  }
 
-   for (n=32;n<=max_degree;n*=2)
-   {
-      update_clist(n);
-      update_flist(n,a,b,f);
-      compute_blist(n,a,b);
+  itest = 1;
+  err = eps;
+  sum = 0.0;
+  allocate_arrays(nmax);
 
-      itest=test_convergence(n);
-      err=abs_error(n);
+  for (n = 32; n <= max_degree; n *= 2) {
+    update_clist(n);
+    update_flist(n, a, b, f);
+    compute_blist(n, a, b);
 
-      if ((itest==0)&&(err<eps))
-      {
-         n/=2;
-         for (k=n;k>=0;k-=2)
-            sum+=alist[k];
-         break;
-      }
-   }   
+    itest = test_convergence(n);
+    err = abs_error(n);
 
-   free_arrays();
+    if ((itest == 0) && (err < eps)) {
+      n /= 2;
+      for (k = n; k >= 0; k -= 2)
+        sum += alist[k];
+      break;
+    }
+  }
 
-   if ((itest!=0)||(err>=eps))
-   {
-      printf("Error in cheby_int\n");
-      printf("Specified accuracy has not been reached\n");
-      printf("Program aborted\n\n");
-      exit(0);
-   }
+  free_arrays();
 
-   return(sum);
+  if ((itest != 0) || (err >= eps)) {
+    printf("Error in cheby_int\n");
+    printf("Specified accuracy has not been reached\n");
+    printf("Program aborted\n\n");
+    exit(0);
+  }
+
+  return (sum);
 }

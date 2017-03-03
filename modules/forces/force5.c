@@ -118,103 +118,96 @@
 #include "forces.h"
 #include "global.h"
 
-
-double setpf5(double mu0,double mu1,int ipf,int isp,int icom,int *status)
+double setpf5(double mu0, double mu1, int ipf, int isp, int icom, int *status)
 {
-   double act;
-   complex_dble z;
-   spinor_dble **wsd,**rsd;
-   spinor_dble *phi,*psi,*chi;
-   mdflds_t *mdfs;
-   solver_parms_t sp;
-   sap_parms_t sap;
-   tm_parms_t tm;
+  double act;
+  complex_dble z;
+  spinor_dble **wsd, **rsd;
+  spinor_dble *phi, *psi, *chi;
+  mdflds_t *mdfs;
+  solver_parms_t sp;
+  sap_parms_t sap;
+  tm_parms_t tm;
 
-   tm=tm_parms();
-   if (tm.eoflg!=1)
-      set_tm_parms(1);
+  tm = tm_parms();
+  if (tm.eoflg != 1)
+    set_tm_parms(1);
 
-   mdfs=mdflds();
-   phi=(*mdfs).pf[ipf];
-   wsd=reserve_wsd(1);
-   psi=wsd[0];
+  mdfs = mdflds();
+  phi = (*mdfs).pf[ipf];
+  wsd = reserve_wsd(1);
+  psi = wsd[0];
 
-   random_sd(VOLUME/2,phi,1.0);
-   set_sd2zero(VOLUME/2,phi+(VOLUME/2));
-   bnd_sd2zero(EVEN_PTS,phi);
-   sp=solver_parms(isp);
+  random_sd(VOLUME / 2, phi, 1.0);
+  set_sd2zero(VOLUME / 2, phi + (VOLUME / 2));
+  bnd_sd2zero(EVEN_PTS, phi);
+  sp = solver_parms(isp);
 
-   if (sp.solver==CGNE)
-   {
-      tmcgeo(sp.nmx,sp.res,mu1,phi,psi,status);
+  if (sp.solver == CGNE) {
+    tmcgeo(sp.nmx, sp.res, mu1, phi, psi, status);
 
-      error_root(status[0]<0,1,"setpf5 [force5.c]","CGNE solver failed "
-                 "(mu = %.4e, parameter set no %d, status = %d)",
-                 mu1,isp,status[0]);
+    error_root(status[0] < 0, 1, "setpf5 [force5.c]",
+               "CGNE solver failed "
+               "(mu = %.4e, parameter set no %d, status = %d)",
+               mu1, isp, status[0]);
 
-      rsd=reserve_wsd(1);
-      chi=rsd[0];
-      assign_sd2sd(VOLUME/2,psi,chi);
-      Dwhat_dble(-mu1,chi,psi);
-      mulg5_dble(VOLUME/2,psi);
-      release_wsd();
-   }
-   else if (sp.solver==SAP_GCR)
-   {
-      sap=sap_parms();
-      set_sap_parms(sap.bs,sp.isolv,sp.nmr,sp.ncy);
+    rsd = reserve_wsd(1);
+    chi = rsd[0];
+    assign_sd2sd(VOLUME / 2, psi, chi);
+    Dwhat_dble(-mu1, chi, psi);
+    mulg5_dble(VOLUME / 2, psi);
+    release_wsd();
+  } else if (sp.solver == SAP_GCR) {
+    sap = sap_parms();
+    set_sap_parms(sap.bs, sp.isolv, sp.nmr, sp.ncy);
 
-      mulg5_dble(VOLUME/2,phi);
-      sap_gcr(sp.nkv,sp.nmx,sp.res,mu1,phi,psi,status);
-      mulg5_dble(VOLUME/2,phi);
+    mulg5_dble(VOLUME / 2, phi);
+    sap_gcr(sp.nkv, sp.nmx, sp.res, mu1, phi, psi, status);
+    mulg5_dble(VOLUME / 2, phi);
 
-      error_root(status[0]<0,1,"setpf5 [force5.c]","SAP_GCR solver failed "
-                 "(mu = %.4e, parameter set no %d, status = %d)",
-                 mu1,isp,status[0]);
-   }
-   else if (sp.solver==DFL_SAP_GCR)
-   {
-      sap=sap_parms();
-      set_sap_parms(sap.bs,sp.isolv,sp.nmr,sp.ncy);
+    error_root(status[0] < 0, 1, "setpf5 [force5.c]",
+               "SAP_GCR solver failed "
+               "(mu = %.4e, parameter set no %d, status = %d)",
+               mu1, isp, status[0]);
+  } else if (sp.solver == DFL_SAP_GCR) {
+    sap = sap_parms();
+    set_sap_parms(sap.bs, sp.isolv, sp.nmr, sp.ncy);
 
-      mulg5_dble(VOLUME/2,phi);
-      dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res,mu1,phi,psi,status);
-      mulg5_dble(VOLUME/2,phi);
+    mulg5_dble(VOLUME / 2, phi);
+    dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, mu1, phi, psi, status);
+    mulg5_dble(VOLUME / 2, phi);
 
-      error_root((status[0]<0)||(status[1]<0),1,"setpf5 [force5.c]",
-                 "DFL_SAP_GCR solver failed (mu = %.4e, parameter set "
-                 "no %d, status = %d,%d,%d)",mu1,isp,
-                 status[0],status[1],status[2]);
-   }
-   else
-      error_root(1,1,"setpf5 [force5.c]","Unknown solver");
+    error_root((status[0] < 0) || (status[1] < 0), 1, "setpf5 [force5.c]",
+               "DFL_SAP_GCR solver failed (mu = %.4e, parameter set "
+               "no %d, status = %d,%d,%d)",
+               mu1, isp, status[0], status[1], status[2]);
+  } else
+    error_root(1, 1, "setpf5 [force5.c]", "Unknown solver");
 
-   z.re=0.0;
-   z.im=mu0-mu1;
-   mulc_spinor_add_dble(VOLUME/2,phi,psi,z);
-   act=(mu1*mu1-mu0*mu0)*norm_square_dble(VOLUME/2,icom,psi);
-   release_wsd();
+  z.re = 0.0;
+  z.im = mu0 - mu1;
+  mulc_spinor_add_dble(VOLUME / 2, phi, psi, z);
+  act = (mu1 * mu1 - mu0 * mu0) * norm_square_dble(VOLUME / 2, icom, psi);
+  release_wsd();
 
-   return act;
+  return act;
 }
 
-
-void force5(double mu0,double mu1,int ipf,int isp,int icr,
-            double c,int *status)
+void force5(double mu0, double mu1, int ipf, int isp, int icr, double c,
+            int *status)
 {
-   double dmu2;
+  double dmu2;
 
-   dmu2=mu1*mu1-mu0*mu0;
-   force4(mu0,ipf,0,isp,icr,dmu2*c,status);
+  dmu2 = mu1 * mu1 - mu0 * mu0;
+  force4(mu0, ipf, 0, isp, icr, dmu2 * c, status);
 }
 
-
-double action5(double mu0,double mu1,int ipf,int isp,int icom,int *status)
+double action5(double mu0, double mu1, int ipf, int isp, int icom, int *status)
 {
-   double dmu2,act;
+  double dmu2, act;
 
-   dmu2=mu1*mu1-mu0*mu0;
-   act=dmu2*action4(mu0,ipf,0,isp,icom,status);
+  dmu2 = mu1 * mu1 - mu0 * mu0;
+  act = dmu2 * action4(mu0, ipf, 0, isp, icom, status);
 
-   return act;
+  return act;
 }

@@ -19,9 +19,9 @@
 
 typedef struct
 {
-   int npf;
-   su3_alg_dble *mom,*frc;
-   spinor_dble **pf;
+  int npf;
+  su3_alg_dble *mom, *frc;
+  spinor_dble **pf;
 } mdflds_t;
 
 /* FCOM_C */

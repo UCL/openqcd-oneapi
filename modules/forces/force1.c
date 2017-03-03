@@ -106,365 +106,320 @@
 #include "forces.h"
 #include "global.h"
 
-
-double setpf1(double mu,int ipf,int icom)
+double setpf1(double mu, int ipf, int icom)
 {
-   double act;
-   spinor_dble **wsd,*phi;
-   mdflds_t *mdfs;
-   tm_parms_t tm;
+  double act;
+  spinor_dble **wsd, *phi;
+  mdflds_t *mdfs;
+  tm_parms_t tm;
 
-   tm=tm_parms();
-   if (tm.eoflg==1)
-      set_tm_parms(0);
+  tm = tm_parms();
+  if (tm.eoflg == 1)
+    set_tm_parms(0);
 
-   wsd=reserve_wsd(1);
-   random_sd(VOLUME,wsd[0],1.0);
-   bnd_sd2zero(ALL_PTS,wsd[0]);
-   act=norm_square_dble(VOLUME,icom,wsd[0]);
+  wsd = reserve_wsd(1);
+  random_sd(VOLUME, wsd[0], 1.0);
+  bnd_sd2zero(ALL_PTS, wsd[0]);
+  act = norm_square_dble(VOLUME, icom, wsd[0]);
 
-   sw_term(NO_PTS);
+  sw_term(NO_PTS);
 
-   mdfs=mdflds();
-   phi=(*mdfs).pf[ipf];
-   Dw_dble(mu,wsd[0],phi);
-   mulg5_dble(VOLUME,phi);
-   release_wsd();
+  mdfs = mdflds();
+  phi = (*mdfs).pf[ipf];
+  Dw_dble(mu, wsd[0], phi);
+  mulg5_dble(VOLUME, phi);
+  release_wsd();
 
-   return act;
+  return act;
 }
 
-
-void force1(double mu,int ipf,int isp,int icr,double c,int *status)
+void force1(double mu, int ipf, int isp, int icr, double c, int *status)
 {
-   int l;
-   double res0,res1;
-   spinor_dble *phi,*chi,*psi,**wsd;
-   spinor_dble *rho,*eta,**rsd;
-   mdflds_t *mdfs;
-   solver_parms_t sp;
-   sap_parms_t sap;
-   tm_parms_t tm;
+  int l;
+  double res0, res1;
+  spinor_dble *phi, *chi, *psi, **wsd;
+  spinor_dble *rho, *eta, **rsd;
+  mdflds_t *mdfs;
+  solver_parms_t sp;
+  sap_parms_t sap;
+  tm_parms_t tm;
 
-   tm=tm_parms();
-   if (tm.eoflg==1)
-      set_tm_parms(0);
+  tm = tm_parms();
+  if (tm.eoflg == 1)
+    set_tm_parms(0);
 
-   mdfs=mdflds();
-   sp=solver_parms(isp);
-   sw_term(NO_PTS);
+  mdfs = mdflds();
+  sp = solver_parms(isp);
+  sw_term(NO_PTS);
 
-   wsd=reserve_wsd(2);
-   phi=(*mdfs).pf[ipf];
-   psi=wsd[0];
-   chi=wsd[1];
+  wsd = reserve_wsd(2);
+  phi = (*mdfs).pf[ipf];
+  psi = wsd[0];
+  chi = wsd[1];
 
-   if (sp.solver==CGNE)
-   {
-      if (get_chrono(icr,chi))
-      {
-         rsd=reserve_wsd(1);
-         rho=rsd[0];
+  if (sp.solver == CGNE) {
+    if (get_chrono(icr, chi)) {
+      rsd = reserve_wsd(1);
+      rho = rsd[0];
 
-         Dw_dble(-mu,chi,psi);
-         mulg5_dble(VOLUME,psi);
-         Dw_dble(mu,psi,rho);
-         mulg5_dble(VOLUME,rho);
-         mulr_spinor_add_dble(VOLUME,rho,phi,-1.0);
+      Dw_dble(-mu, chi, psi);
+      mulg5_dble(VOLUME, psi);
+      Dw_dble(mu, psi, rho);
+      mulg5_dble(VOLUME, rho);
+      mulr_spinor_add_dble(VOLUME, rho, phi, -1.0);
 
-         res0=norm_square_dble(VOLUME,1,phi);
-         res1=norm_square_dble(VOLUME,1,rho);
-         res1=sqrt(res1/res0);
+      res0 = norm_square_dble(VOLUME, 1, phi);
+      res1 = norm_square_dble(VOLUME, 1, rho);
+      res1 = sqrt(res1 / res0);
 
-         if (res1<1.0)
-         {
-            if (res1>sp.res)
-            {
-               tmcg(sp.nmx,sp.res/res1,mu,rho,psi,status);
-               mulr_spinor_add_dble(VOLUME,chi,psi,-1.0);
-            }
-            else
-               status[0]=0;
-         }
-         else
-            tmcg(sp.nmx,sp.res,mu,phi,chi,status);
+      if (res1 < 1.0) {
+        if (res1 > sp.res) {
+          tmcg(sp.nmx, sp.res / res1, mu, rho, psi, status);
+          mulr_spinor_add_dble(VOLUME, chi, psi, -1.0);
+        } else
+          status[0] = 0;
+      } else
+        tmcg(sp.nmx, sp.res, mu, phi, chi, status);
 
-         release_wsd();
-      }
-      else
-         tmcg(sp.nmx,sp.res,mu,phi,chi,status);
-
-      error_root(status[0]<0,1,"force1 [force1.c]",
-                 "CGNE solver failed (mu = %.4e, parameter set no %d, "
-                 "status = %d)",mu,isp,status[0]);
-      if (icr)
-         add_chrono(icr,chi);
-      Dw_dble(-mu,chi,psi);
-      mulg5_dble(VOLUME,psi);
-   }
-   else if (sp.solver==SAP_GCR)
-   {
-      sap=sap_parms();
-      set_sap_parms(sap.bs,sp.isolv,sp.nmr,sp.ncy);
-
-      if (get_chrono(icr,chi))
-      {
-         rsd=reserve_wsd(2);
-         rho=rsd[0];
-         eta=rsd[1];
-
-         Dw_dble(-mu,chi,psi);
-         mulg5_dble(VOLUME,psi);
-         Dw_dble(mu,psi,rho);
-         mulg5_dble(VOLUME,rho);
-         mulr_spinor_add_dble(VOLUME,rho,phi,-1.0);
-
-         res0=norm_square_dble(VOLUME,1,phi);
-         res1=norm_square_dble(VOLUME,1,rho);
-         res1=sqrt(res1/res0);
-
-         if (res1<1.0)
-         {
-            if (res1>sp.res)
-            {
-               mulg5_dble(VOLUME,rho);
-               sap_gcr(sp.nkv,sp.nmx,sp.res/res1,mu,rho,eta,status);
-               mulr_spinor_add_dble(VOLUME,psi,eta,-1.0);
-
-               res0=norm_square_dble(VOLUME,1,psi);
-               res1=norm_square_dble(VOLUME,1,eta);
-               res1=sqrt(res1/res0);
-
-               if (res1<1.0)
-               {
-                  if (res1>sp.res)
-                  {
-                     mulg5_dble(VOLUME,eta);
-                     sap_gcr(sp.nkv,sp.nmx,sp.res/res1,-mu,eta,rho,status+1);
-                     mulr_spinor_add_dble(VOLUME,chi,rho,-1.0);
-                  }
-                  else
-                     status[1]=0;
-               }
-               else
-               {
-                  mulg5_dble(VOLUME,psi);
-                  sap_gcr(sp.nkv,sp.nmx,sp.res,-mu,psi,chi,status+1);
-                  mulg5_dble(VOLUME,psi);
-               }
-            }
-            else
-            {
-               status[0]=0;
-               status[1]=0;
-            }
-         }
-         else
-         {
-            mulg5_dble(VOLUME,phi);
-            sap_gcr(sp.nkv,sp.nmx,sp.res,mu,phi,psi,status);
-            mulg5_dble(VOLUME,phi);
-            mulg5_dble(VOLUME,psi);
-            sap_gcr(sp.nkv,sp.nmx,sp.res,-mu,psi,chi,status+1);
-            mulg5_dble(VOLUME,psi);
-         }
-
-         release_wsd();
-      }
-      else
-      {
-         mulg5_dble(VOLUME,phi);
-         sap_gcr(sp.nkv,sp.nmx,sp.res,mu,phi,psi,status);
-         mulg5_dble(VOLUME,phi);
-         mulg5_dble(VOLUME,psi);
-         sap_gcr(sp.nkv,sp.nmx,sp.res,-mu,psi,chi,status+1);
-         mulg5_dble(VOLUME,psi);
-      }
-
-      error_root((status[0]<0)||(status[1]<0),1,"force1 [force1.c]",
-                 "SAP_GCR solver failed (mu = %.4e, parameter set no %d, "
-                 "status = %d;%d)",mu,isp,status[0],status[1]);
-      if (icr)
-         add_chrono(icr,chi);
-   }
-   else if (sp.solver==DFL_SAP_GCR)
-   {
-      sap=sap_parms();
-      set_sap_parms(sap.bs,sp.isolv,sp.nmr,sp.ncy);
-
-      if (get_chrono(icr,chi))
-      {
-         rsd=reserve_wsd(2);
-         rho=rsd[0];
-         eta=rsd[1];
-
-         Dw_dble(-mu,chi,psi);
-         mulg5_dble(VOLUME,psi);
-         Dw_dble(mu,psi,rho);
-         mulg5_dble(VOLUME,rho);
-         mulr_spinor_add_dble(VOLUME,rho,phi,-1.0);
-
-         res0=norm_square_dble(VOLUME,1,phi);
-         res1=norm_square_dble(VOLUME,1,rho);
-         res1=sqrt(res1/res0);
-
-         if (res1<1.0)
-         {
-            if (res1>sp.res)
-            {
-               mulg5_dble(VOLUME,rho);
-               dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res/res1,mu,rho,eta,status);
-               mulr_spinor_add_dble(VOLUME,psi,eta,-1.0);
-
-               res0=norm_square_dble(VOLUME,1,psi);
-               res1=norm_square_dble(VOLUME,1,eta);
-               res1=sqrt(res1/res0);
-
-               if (res1<1.0)
-               {
-                  if (res1>sp.res)
-                  {
-                     mulg5_dble(VOLUME,eta);
-                     dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res/res1,-mu,eta,rho,
-                                  status+3);
-                     mulr_spinor_add_dble(VOLUME,chi,rho,-1.0);
-                  }
-                  else
-                  {
-                     for (l=3;l<6;l++)
-                        status[l]=0;
-                  }
-               }
-               else
-               {
-                  mulg5_dble(VOLUME,psi);
-                  dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res,-mu,psi,chi,status+3);
-                  mulg5_dble(VOLUME,psi);
-               }
-            }
-            else
-            {
-               for (l=0;l<6;l++)
-                  status[l]=0;
-            }
-         }
-         else
-         {
-            mulg5_dble(VOLUME,phi);
-            dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res,mu,phi,psi,status);
-            mulg5_dble(VOLUME,phi);
-            mulg5_dble(VOLUME,psi);
-            dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res,-mu,psi,chi,status+3);
-            mulg5_dble(VOLUME,psi);
-         }
-
-         release_wsd();
-      }
-      else
-      {
-         mulg5_dble(VOLUME,phi);
-         dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res,mu,phi,psi,status);
-         mulg5_dble(VOLUME,phi);
-         mulg5_dble(VOLUME,psi);
-         dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res,-mu,psi,chi,status+3);
-         mulg5_dble(VOLUME,psi);
-      }
-
-      error_root((status[0]<0)||(status[1]<0)||(status[3]<0)||(status[4]<0),1,
-                 "force1 [force1.c]","DFL_SAP_GCR solver failed "
-                 "(mu = %.4e, parameter set no %d, status = %d,%d,%d;%d,%d,%d)",
-                 mu,isp,status[0],status[1],status[2],
-                 status[3],status[4],status[5]);
-
-      if (icr)
-         add_chrono(icr,chi);
-   }
-   else
-      error_root(1,1,"force1 [force1.c]","Unknown solver");
-
-   set_xt2zero();
-   add_prod2xt(1.0,chi,psi);
-   sw_frc(c);
-
-   set_xv2zero();
-   add_prod2xv(1.0,chi,psi);
-   hop_frc(c);
-
-   release_wsd();
-}
-
-
-double action1(double mu,int ipf,int isp,int icom,int *status)
-{
-   double act;
-   spinor_dble *phi,*psi,**wsd,**rsd;
-   mdflds_t *mdfs;
-   solver_parms_t sp;
-   sap_parms_t sap;
-   tm_parms_t tm;
-
-   tm=tm_parms();
-   if (tm.eoflg==1)
-      set_tm_parms(0);
-
-   mdfs=mdflds();
-   sp=solver_parms(isp);
-
-   wsd=reserve_wsd(1);
-   psi=wsd[0];
-   phi=(*mdfs).pf[ipf];
-
-   if (sp.solver==CGNE)
-   {
-      tmcg(sp.nmx,sp.res,mu,phi,psi,status);
-
-      error_root(status[0]<0,1,"action1 [force1.c]",
-                 "CGNE solver failed (mu = %.4e, parameter set no %d, "
-                 "status = %d)",mu,isp,status[0]);
-
-      rsd=reserve_wsd(1);
-      Dw_dble(-mu,psi,rsd[0]);
-      act=norm_square_dble(VOLUME,icom,rsd[0]);
       release_wsd();
-   }
-   else if (sp.solver==SAP_GCR)
-   {
-      sap=sap_parms();
-      set_sap_parms(sap.bs,sp.isolv,sp.nmr,sp.ncy);
+    } else
+      tmcg(sp.nmx, sp.res, mu, phi, chi, status);
 
-      mulg5_dble(VOLUME,phi);
-      sap_gcr(sp.nkv,sp.nmx,sp.res,mu,phi,psi,status);
-      mulg5_dble(VOLUME,phi);
+    error_root(status[0] < 0, 1, "force1 [force1.c]",
+               "CGNE solver failed (mu = %.4e, parameter set no %d, "
+               "status = %d)",
+               mu, isp, status[0]);
+    if (icr)
+      add_chrono(icr, chi);
+    Dw_dble(-mu, chi, psi);
+    mulg5_dble(VOLUME, psi);
+  } else if (sp.solver == SAP_GCR) {
+    sap = sap_parms();
+    set_sap_parms(sap.bs, sp.isolv, sp.nmr, sp.ncy);
 
-      error_root(status[0]<0,1,"action1 [force1.c]",
-                 "SAP_GCR solver failed (mu = %.4e, parameter set no %d, "
-                 "status = %d)",mu,isp,status[0]);
+    if (get_chrono(icr, chi)) {
+      rsd = reserve_wsd(2);
+      rho = rsd[0];
+      eta = rsd[1];
 
-      act=norm_square_dble(VOLUME,icom,psi);
-   }
-   else if (sp.solver==DFL_SAP_GCR)
-   {
-      sap=sap_parms();
-      set_sap_parms(sap.bs,sp.isolv,sp.nmr,sp.ncy);
+      Dw_dble(-mu, chi, psi);
+      mulg5_dble(VOLUME, psi);
+      Dw_dble(mu, psi, rho);
+      mulg5_dble(VOLUME, rho);
+      mulr_spinor_add_dble(VOLUME, rho, phi, -1.0);
 
-      mulg5_dble(VOLUME,phi);
-      dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res,mu,phi,psi,status);
-      mulg5_dble(VOLUME,phi);
+      res0 = norm_square_dble(VOLUME, 1, phi);
+      res1 = norm_square_dble(VOLUME, 1, rho);
+      res1 = sqrt(res1 / res0);
 
-      error_root((status[0]<0)||(status[1]<0),1,
-                 "action1 [force1.c]","DFL_SAP_GCR solver failed "
-                 "(mu = %.4e, parameter set no %d, status = %d,%d,%d)",
-                 mu,isp,status[0],status[1],status[2]);
+      if (res1 < 1.0) {
+        if (res1 > sp.res) {
+          mulg5_dble(VOLUME, rho);
+          sap_gcr(sp.nkv, sp.nmx, sp.res / res1, mu, rho, eta, status);
+          mulr_spinor_add_dble(VOLUME, psi, eta, -1.0);
 
-      act=norm_square_dble(VOLUME,icom,psi);
-   }
-   else
-   {
-      error_root(1,1,"action1 [force1.c]","Unknown solver");
-      act=0.0;
-   }
+          res0 = norm_square_dble(VOLUME, 1, psi);
+          res1 = norm_square_dble(VOLUME, 1, eta);
+          res1 = sqrt(res1 / res0);
 
-   release_wsd();
+          if (res1 < 1.0) {
+            if (res1 > sp.res) {
+              mulg5_dble(VOLUME, eta);
+              sap_gcr(sp.nkv, sp.nmx, sp.res / res1, -mu, eta, rho, status + 1);
+              mulr_spinor_add_dble(VOLUME, chi, rho, -1.0);
+            } else
+              status[1] = 0;
+          } else {
+            mulg5_dble(VOLUME, psi);
+            sap_gcr(sp.nkv, sp.nmx, sp.res, -mu, psi, chi, status + 1);
+            mulg5_dble(VOLUME, psi);
+          }
+        } else {
+          status[0] = 0;
+          status[1] = 0;
+        }
+      } else {
+        mulg5_dble(VOLUME, phi);
+        sap_gcr(sp.nkv, sp.nmx, sp.res, mu, phi, psi, status);
+        mulg5_dble(VOLUME, phi);
+        mulg5_dble(VOLUME, psi);
+        sap_gcr(sp.nkv, sp.nmx, sp.res, -mu, psi, chi, status + 1);
+        mulg5_dble(VOLUME, psi);
+      }
 
-   return act;
+      release_wsd();
+    } else {
+      mulg5_dble(VOLUME, phi);
+      sap_gcr(sp.nkv, sp.nmx, sp.res, mu, phi, psi, status);
+      mulg5_dble(VOLUME, phi);
+      mulg5_dble(VOLUME, psi);
+      sap_gcr(sp.nkv, sp.nmx, sp.res, -mu, psi, chi, status + 1);
+      mulg5_dble(VOLUME, psi);
+    }
+
+    error_root((status[0] < 0) || (status[1] < 0), 1, "force1 [force1.c]",
+               "SAP_GCR solver failed (mu = %.4e, parameter set no %d, "
+               "status = %d;%d)",
+               mu, isp, status[0], status[1]);
+    if (icr)
+      add_chrono(icr, chi);
+  } else if (sp.solver == DFL_SAP_GCR) {
+    sap = sap_parms();
+    set_sap_parms(sap.bs, sp.isolv, sp.nmr, sp.ncy);
+
+    if (get_chrono(icr, chi)) {
+      rsd = reserve_wsd(2);
+      rho = rsd[0];
+      eta = rsd[1];
+
+      Dw_dble(-mu, chi, psi);
+      mulg5_dble(VOLUME, psi);
+      Dw_dble(mu, psi, rho);
+      mulg5_dble(VOLUME, rho);
+      mulr_spinor_add_dble(VOLUME, rho, phi, -1.0);
+
+      res0 = norm_square_dble(VOLUME, 1, phi);
+      res1 = norm_square_dble(VOLUME, 1, rho);
+      res1 = sqrt(res1 / res0);
+
+      if (res1 < 1.0) {
+        if (res1 > sp.res) {
+          mulg5_dble(VOLUME, rho);
+          dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res / res1, mu, rho, eta, status);
+          mulr_spinor_add_dble(VOLUME, psi, eta, -1.0);
+
+          res0 = norm_square_dble(VOLUME, 1, psi);
+          res1 = norm_square_dble(VOLUME, 1, eta);
+          res1 = sqrt(res1 / res0);
+
+          if (res1 < 1.0) {
+            if (res1 > sp.res) {
+              mulg5_dble(VOLUME, eta);
+              dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res / res1, -mu, eta, rho,
+                           status + 3);
+              mulr_spinor_add_dble(VOLUME, chi, rho, -1.0);
+            } else {
+              for (l = 3; l < 6; l++)
+                status[l] = 0;
+            }
+          } else {
+            mulg5_dble(VOLUME, psi);
+            dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, -mu, psi, chi, status + 3);
+            mulg5_dble(VOLUME, psi);
+          }
+        } else {
+          for (l = 0; l < 6; l++)
+            status[l] = 0;
+        }
+      } else {
+        mulg5_dble(VOLUME, phi);
+        dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, mu, phi, psi, status);
+        mulg5_dble(VOLUME, phi);
+        mulg5_dble(VOLUME, psi);
+        dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, -mu, psi, chi, status + 3);
+        mulg5_dble(VOLUME, psi);
+      }
+
+      release_wsd();
+    } else {
+      mulg5_dble(VOLUME, phi);
+      dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, mu, phi, psi, status);
+      mulg5_dble(VOLUME, phi);
+      mulg5_dble(VOLUME, psi);
+      dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, -mu, psi, chi, status + 3);
+      mulg5_dble(VOLUME, psi);
+    }
+
+    error_root((status[0] < 0) || (status[1] < 0) || (status[3] < 0) ||
+                   (status[4] < 0),
+               1, "force1 [force1.c]",
+               "DFL_SAP_GCR solver failed "
+               "(mu = %.4e, parameter set no %d, status = %d,%d,%d;%d,%d,%d)",
+               mu, isp, status[0], status[1], status[2], status[3], status[4],
+               status[5]);
+
+    if (icr)
+      add_chrono(icr, chi);
+  } else
+    error_root(1, 1, "force1 [force1.c]", "Unknown solver");
+
+  set_xt2zero();
+  add_prod2xt(1.0, chi, psi);
+  sw_frc(c);
+
+  set_xv2zero();
+  add_prod2xv(1.0, chi, psi);
+  hop_frc(c);
+
+  release_wsd();
+}
+
+double action1(double mu, int ipf, int isp, int icom, int *status)
+{
+  double act;
+  spinor_dble *phi, *psi, **wsd, **rsd;
+  mdflds_t *mdfs;
+  solver_parms_t sp;
+  sap_parms_t sap;
+  tm_parms_t tm;
+
+  tm = tm_parms();
+  if (tm.eoflg == 1)
+    set_tm_parms(0);
+
+  mdfs = mdflds();
+  sp = solver_parms(isp);
+
+  wsd = reserve_wsd(1);
+  psi = wsd[0];
+  phi = (*mdfs).pf[ipf];
+
+  if (sp.solver == CGNE) {
+    tmcg(sp.nmx, sp.res, mu, phi, psi, status);
+
+    error_root(status[0] < 0, 1, "action1 [force1.c]",
+               "CGNE solver failed (mu = %.4e, parameter set no %d, "
+               "status = %d)",
+               mu, isp, status[0]);
+
+    rsd = reserve_wsd(1);
+    Dw_dble(-mu, psi, rsd[0]);
+    act = norm_square_dble(VOLUME, icom, rsd[0]);
+    release_wsd();
+  } else if (sp.solver == SAP_GCR) {
+    sap = sap_parms();
+    set_sap_parms(sap.bs, sp.isolv, sp.nmr, sp.ncy);
+
+    mulg5_dble(VOLUME, phi);
+    sap_gcr(sp.nkv, sp.nmx, sp.res, mu, phi, psi, status);
+    mulg5_dble(VOLUME, phi);
+
+    error_root(status[0] < 0, 1, "action1 [force1.c]",
+               "SAP_GCR solver failed (mu = %.4e, parameter set no %d, "
+               "status = %d)",
+               mu, isp, status[0]);
+
+    act = norm_square_dble(VOLUME, icom, psi);
+  } else if (sp.solver == DFL_SAP_GCR) {
+    sap = sap_parms();
+    set_sap_parms(sap.bs, sp.isolv, sp.nmr, sp.ncy);
+
+    mulg5_dble(VOLUME, phi);
+    dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, mu, phi, psi, status);
+    mulg5_dble(VOLUME, phi);
+
+    error_root((status[0] < 0) || (status[1] < 0), 1, "action1 [force1.c]",
+               "DFL_SAP_GCR solver failed "
+               "(mu = %.4e, parameter set no %d, status = %d,%d,%d)",
+               mu, isp, status[0], status[1], status[2]);
+
+    act = norm_square_dble(VOLUME, icom, psi);
+  } else {
+    error_root(1, 1, "action1 [force1.c]", "Unknown solver");
+    act = 0.0;
+  }
+
+  release_wsd();
+
+  return act;
 }

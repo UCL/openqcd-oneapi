@@ -92,252 +92,235 @@
 #include "update.h"
 #include "global.h"
 
-
-static void check_parms(double mu1,double mu2,int isp)
+static void check_parms(double mu1, double mu2, int isp)
 {
-   int iprms[1];
-   double dprms[2];
+  int iprms[1];
+  double dprms[2];
 
-   if (NPROC>1)
-   {
-      iprms[0]=isp;
-      dprms[0]=mu1;
-      dprms[1]=mu2;
+  if (NPROC > 1) {
+    iprms[0] = isp;
+    dprms[0] = mu1;
+    dprms[1] = mu2;
 
-      MPI_Bcast(iprms,1,MPI_INT,0,MPI_COMM_WORLD);
-      MPI_Bcast(dprms,2,MPI_DOUBLE,0,MPI_COMM_WORLD);
+    MPI_Bcast(iprms, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(dprms, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-      error((iprms[0]!=isp)||(dprms[0]!=mu1)||(dprms[1]!=mu2),1,
-            "check_parms [rwtmeo.c]","Parameters are not global");
-   }
+    error((iprms[0] != isp) || (dprms[0] != mu1) || (dprms[1] != mu2), 1,
+          "check_parms [rwtmeo.c]", "Parameters are not global");
+  }
 
-   error_root((mu1<0.0)||(mu2<=mu1),1,"check_parms [rwtmeo.c]",
-              "Twisted masses mu1,mu2 are out of range");
+  error_root((mu1 < 0.0) || (mu2 <= mu1), 1, "check_parms [rwtmeo.c]",
+             "Twisted masses mu1,mu2 are out of range");
 }
-
 
 static double set_eta(spinor_dble *eta)
 {
-   random_sd(VOLUME/2,eta,1.0);
-   set_sd2zero(VOLUME/2,eta+(VOLUME/2));
-   bnd_sd2zero(EVEN_PTS,eta);
+  random_sd(VOLUME / 2, eta, 1.0);
+  set_sd2zero(VOLUME / 2, eta + (VOLUME / 2));
+  bnd_sd2zero(EVEN_PTS, eta);
 
-   return norm_square_dble(VOLUME/2,1,eta);
+  return norm_square_dble(VOLUME / 2, 1, eta);
 }
 
-
-double rwtm1eo(double mu1,double mu2,int isp,double *sqn,int *status)
+double rwtm1eo(double mu1, double mu2, int isp, double *sqn, int *status)
 {
-   double lnr;
-   spinor_dble *eta,*phi,**wsd;
-   solver_parms_t sp;
-   sap_parms_t sap;
-   tm_parms_t tm;
+  double lnr;
+  spinor_dble *eta, *phi, **wsd;
+  solver_parms_t sp;
+  sap_parms_t sap;
+  tm_parms_t tm;
 
-   tm=tm_parms();
-   if (tm.eoflg!=1)
-      set_tm_parms(1);
+  tm = tm_parms();
+  if (tm.eoflg != 1)
+    set_tm_parms(1);
 
-   check_parms(mu1,mu2,isp);
-   wsd=reserve_wsd(2);
-   eta=wsd[0];
-   phi=wsd[1];
-   (*sqn)=set_eta(eta);
-   sp=solver_parms(isp);
+  check_parms(mu1, mu2, isp);
+  wsd = reserve_wsd(2);
+  eta = wsd[0];
+  phi = wsd[1];
+  (*sqn) = set_eta(eta);
+  sp = solver_parms(isp);
 
-   if (sp.solver==CGNE)
-   {
-      tmcgeo(sp.nmx,sp.res,mu1,eta,phi,status);
+  if (sp.solver == CGNE) {
+    tmcgeo(sp.nmx, sp.res, mu1, eta, phi, status);
 
-      error_root(status[0]<0,1,"rwtm1eo [rwtmeo.c]",
-                 "CGNE solver failed (mu = %.2e, parameter set no %d, "
-                 "status = %d)",mu1,isp,status[0]);
+    error_root(status[0] < 0, 1, "rwtm1eo [rwtmeo.c]",
+               "CGNE solver failed (mu = %.2e, parameter set no %d, "
+               "status = %d)",
+               mu1, isp, status[0]);
 
-      lnr=spinor_prod_re_dble(VOLUME/2,1,eta,phi);
-   }
-   else if (sp.solver==SAP_GCR)
-   {
-      sap=sap_parms();
-      set_sap_parms(sap.bs,sp.isolv,sp.nmr,sp.ncy);
-      mulg5_dble(VOLUME/2,eta);
-      sap_gcr(sp.nkv,sp.nmx,sp.res,mu1,eta,phi,status);
+    lnr = spinor_prod_re_dble(VOLUME / 2, 1, eta, phi);
+  } else if (sp.solver == SAP_GCR) {
+    sap = sap_parms();
+    set_sap_parms(sap.bs, sp.isolv, sp.nmr, sp.ncy);
+    mulg5_dble(VOLUME / 2, eta);
+    sap_gcr(sp.nkv, sp.nmx, sp.res, mu1, eta, phi, status);
 
-      error_root(status[0]<0,1,"rwtm1eo [rwtmeo.c]",
-                 "SAP_GCR solver failed (mu = %.2e, parameter set no %d, "
-                 "status = %d)",mu1,isp,status[0]);
+    error_root(status[0] < 0, 1, "rwtm1eo [rwtmeo.c]",
+               "SAP_GCR solver failed (mu = %.2e, parameter set no %d, "
+               "status = %d)",
+               mu1, isp, status[0]);
 
-      lnr=norm_square_dble(VOLUME/2,1,phi);
-   }
-   else if (sp.solver==DFL_SAP_GCR)
-   {
-      sap=sap_parms();
-      set_sap_parms(sap.bs,sp.isolv,sp.nmr,sp.ncy);
-      mulg5_dble(VOLUME/2,eta);
-      dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res,mu1,eta,phi,status);
+    lnr = norm_square_dble(VOLUME / 2, 1, phi);
+  } else if (sp.solver == DFL_SAP_GCR) {
+    sap = sap_parms();
+    set_sap_parms(sap.bs, sp.isolv, sp.nmr, sp.ncy);
+    mulg5_dble(VOLUME / 2, eta);
+    dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, mu1, eta, phi, status);
 
-      error_root((status[0]<0)||(status[1]<0),1,
-                 "rwtm1eo [rwtmeo.c]","DFL_SAP_GCR solver failed "
-                 "(mu = %.2e, parameter set no %d, status = (%d,%d,%d))",
-                 mu1,isp,status[0],status[1],status[2]);
-      status[2]=(status[2]!=0);
+    error_root((status[0] < 0) || (status[1] < 0), 1, "rwtm1eo [rwtmeo.c]",
+               "DFL_SAP_GCR solver failed "
+               "(mu = %.2e, parameter set no %d, status = (%d,%d,%d))",
+               mu1, isp, status[0], status[1], status[2]);
+    status[2] = (status[2] != 0);
 
-      lnr=norm_square_dble(VOLUME/2,1,phi);
-   }
-   else
-   {
-      lnr=0.0;
-      error_root(1,1,"rwtm1eo [rwtmeo.c]","Unknown solver");
-   }
+    lnr = norm_square_dble(VOLUME / 2, 1, phi);
+  } else {
+    lnr = 0.0;
+    error_root(1, 1, "rwtm1eo [rwtmeo.c]", "Unknown solver");
+  }
 
-   release_wsd();
+  release_wsd();
 
-   return (mu2*mu2-mu1*mu1)*lnr;
+  return (mu2 * mu2 - mu1 * mu1) * lnr;
 }
 
-
-double rwtm2eo(double mu1,double mu2,int isp,double *sqn,int *status)
+double rwtm2eo(double mu1, double mu2, int isp, double *sqn, int *status)
 {
-   int stat[3];
-   double lnr1,lnr2;
-   spinor_dble *eta,*phi,**wsd;
-   solver_parms_t sp;
-   sap_parms_t sap;
-   tm_parms_t tm;
+  int stat[3];
+  double lnr1, lnr2;
+  spinor_dble *eta, *phi, **wsd;
+  solver_parms_t sp;
+  sap_parms_t sap;
+  tm_parms_t tm;
 
-   tm=tm_parms();
-   if (tm.eoflg!=1)
-      set_tm_parms(1);
+  tm = tm_parms();
+  if (tm.eoflg != 1)
+    set_tm_parms(1);
 
-   check_parms(mu1,mu2,isp);
-   wsd=reserve_wsd(2);
-   eta=wsd[0];
-   phi=wsd[1];
-   (*sqn)=set_eta(eta);
-   sp=solver_parms(isp);
+  check_parms(mu1, mu2, isp);
+  wsd = reserve_wsd(2);
+  eta = wsd[0];
+  phi = wsd[1];
+  (*sqn) = set_eta(eta);
+  sp = solver_parms(isp);
 
-   if (sp.solver==CGNE)
-   {
-      tmcgeo(sp.nmx,sp.res,mu1,eta,phi,status);
+  if (sp.solver == CGNE) {
+    tmcgeo(sp.nmx, sp.res, mu1, eta, phi, status);
 
-      error_root(status[0]<0,1,"rwtm2eo [rwtmeo.c]",
-                 "CGNE solver failed (mu = %.2e, parameter set no %d, "
-                 "status = %d)",mu1,isp,status[0]);
+    error_root(status[0] < 0, 1, "rwtm2eo [rwtmeo.c]",
+               "CGNE solver failed (mu = %.2e, parameter set no %d, "
+               "status = %d)",
+               mu1, isp, status[0]);
 
-      tmcgeo(sp.nmx,sp.res,sqrt(2.0)*mu2,eta,eta,stat);
+    tmcgeo(sp.nmx, sp.res, sqrt(2.0) * mu2, eta, eta, stat);
 
-      error_root(stat[0]<0,1,"rwtm2eo [rwtmeo.c]",
-                 "CGNE solver failed (mu = %.2e, parameter set no %d, "
-                 "status = %d)",sqrt(2.0)*mu2,isp,stat[0]);
-      status[0]=(status[0]+stat[0]+1)/2;
+    error_root(stat[0] < 0, 1, "rwtm2eo [rwtmeo.c]",
+               "CGNE solver failed (mu = %.2e, parameter set no %d, "
+               "status = %d)",
+               sqrt(2.0) * mu2, isp, stat[0]);
+    status[0] = (status[0] + stat[0] + 1) / 2;
 
-      if (mu1>0.0)
-         lnr1=norm_square_dble(VOLUME/2,1,phi);
-      else
-         lnr1=0.0;
+    if (mu1 > 0.0)
+      lnr1 = norm_square_dble(VOLUME / 2, 1, phi);
+    else
+      lnr1 = 0.0;
 
-      lnr2=spinor_prod_re_dble(VOLUME/2,1,eta,phi);
-   }
-   else if (sp.solver==SAP_GCR)
-   {
-      sap=sap_parms();
-      set_sap_parms(sap.bs,sp.isolv,sp.nmr,sp.ncy);
-      mulg5_dble(VOLUME/2,eta);
-      sap_gcr(sp.nkv,sp.nmx,sp.res,mu1,eta,phi,status);
+    lnr2 = spinor_prod_re_dble(VOLUME / 2, 1, eta, phi);
+  } else if (sp.solver == SAP_GCR) {
+    sap = sap_parms();
+    set_sap_parms(sap.bs, sp.isolv, sp.nmr, sp.ncy);
+    mulg5_dble(VOLUME / 2, eta);
+    sap_gcr(sp.nkv, sp.nmx, sp.res, mu1, eta, phi, status);
 
-      error_root(status[0]<0,1,"rwtm2eo [rwtmeo.c]",
+    error_root(status[0] < 0, 1, "rwtm2eo [rwtmeo.c]",
+               "SAP_GCR solver failed (mu = %.2e, parameter set no %d, "
+               "status = %d)",
+               mu1, isp, status[0]);
+
+    mulg5_dble(VOLUME / 2, phi);
+    set_sd2zero(VOLUME / 2, phi + (VOLUME / 2));
+    sap_gcr(sp.nkv, sp.nmx, sp.res, sqrt(2.0) * mu2, phi, eta, stat);
+
+    error_root(stat[0] < 0, 2, "rwtm2eo [rwtmeo.c]",
+               "SAP_GCR solver failed (mu = %.2e, parameter set no %d, "
+               "status = %d)",
+               sqrt(2.0) * mu2, isp, stat[0]);
+    status[0] += stat[0];
+
+    if (mu1 > 0.0) {
+      sap_gcr(sp.nkv, sp.nmx, sp.res, mu1, phi, phi, stat);
+
+      error_root(stat[0] < 0, 3, "rwtm2eo [rwtmeo.c]",
                  "SAP_GCR solver failed (mu = %.2e, parameter set no %d, "
-                 "status = %d)",mu1,isp,status[0]);
+                 "status = %d)",
+                 mu1, isp, stat[0]);
+      status[0] = (status[0] + stat[0] + 1) / 3;
 
-      mulg5_dble(VOLUME/2,phi);
-      set_sd2zero(VOLUME/2,phi+(VOLUME/2));
-      sap_gcr(sp.nkv,sp.nmx,sp.res,sqrt(2.0)*mu2,phi,eta,stat);
+      lnr1 = norm_square_dble(VOLUME / 2, 1, phi);
+    } else {
+      status[0] = (status[0] + 1) / 2;
+      lnr1 = 0.0;
+    }
 
-      error_root(stat[0]<0,2,"rwtm2eo [rwtmeo.c]",
-                 "SAP_GCR solver failed (mu = %.2e, parameter set no %d, "
-                 "status = %d)",sqrt(2.0)*mu2,isp,stat[0]);
-      status[0]+=stat[0];
+    lnr2 = norm_square_dble(VOLUME / 2, 1, eta);
+  } else if (sp.solver == DFL_SAP_GCR) {
+    sap = sap_parms();
+    set_sap_parms(sap.bs, sp.isolv, sp.nmr, sp.ncy);
 
-      if (mu1>0.0)
-      {
-         sap_gcr(sp.nkv,sp.nmx,sp.res,mu1,phi,phi,stat);
+    mulg5_dble(VOLUME / 2, eta);
+    dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, mu1, eta, phi, status);
 
-         error_root(stat[0]<0,3,"rwtm2eo [rwtmeo.c]",
-                    "SAP_GCR solver failed (mu = %.2e, parameter set no %d, "
-                    "status = %d)",mu1,isp,stat[0]);
-         status[0]=(status[0]+stat[0]+1)/3;
+    error_root((status[0] < 0) || (status[1] < 0), 1, "rwtm2eo [rwtmeo.c]",
+               "DFL_SAP_GCR solver failed "
+               "(mu = %.2e, parameter set no %d, status = (%d,%d,%d))",
+               mu1, isp, status[0], status[1], status[2]);
+    status[2] = (status[2] != 0);
 
-         lnr1=norm_square_dble(VOLUME/2,1,phi);
-      }
-      else
-      {
-         status[0]=(status[0]+1)/2;
-         lnr1=0.0;
-      }
+    mulg5_dble(VOLUME / 2, phi);
+    set_sd2zero(VOLUME / 2, phi + (VOLUME / 2));
 
-      lnr2=norm_square_dble(VOLUME/2,1,eta);
-   }
-   else if (sp.solver==DFL_SAP_GCR)
-   {
-      sap=sap_parms();
-      set_sap_parms(sap.bs,sp.isolv,sp.nmr,sp.ncy);
+    dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, sqrt(2.0) * mu2, phi, eta, stat);
 
-      mulg5_dble(VOLUME/2,eta);
-      dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res,mu1,eta,phi,status);
+    error_root((stat[0] < 0) || (stat[1] < 0), 2, "rwtm2eo [rwtmeo.c]",
+               "DFL_SAP_GCR solver failed "
+               "(mu = %.2e, parameter set no %d, status = (%d,%d,%d)",
+               sqrt(2.0) * mu2, isp, stat[0], stat[1], stat[2]);
+    status[0] += stat[0];
+    status[1] += stat[1];
+    status[2] += (stat[2] != 0);
 
-      error_root((status[0]<0)||(status[1]<0),1,
-                 "rwtm2eo [rwtmeo.c]","DFL_SAP_GCR solver failed "
-                 "(mu = %.2e, parameter set no %d, status = (%d,%d,%d))",
-                 mu1,isp,status[0],status[1],status[2]);
-      status[2]=(status[2]!=0);
+    if (mu1 > 0.0) {
+      dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, mu1, phi, phi, stat);
 
-      mulg5_dble(VOLUME/2,phi);
-      set_sd2zero(VOLUME/2,phi+(VOLUME/2));
-
-      dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res,sqrt(2.0)*mu2,phi,eta,stat);
-
-      error_root((stat[0]<0)||(stat[1]<0),2,
-                 "rwtm2eo [rwtmeo.c]","DFL_SAP_GCR solver failed "
+      error_root((stat[0] < 0) || (stat[1] < 0), 3, "rwtm2eo [rwtmeo.c]",
+                 "DFL_SAP_GCR solver failed "
                  "(mu = %.2e, parameter set no %d, status = (%d,%d,%d)",
-                 sqrt(2.0)*mu2,isp,stat[0],stat[1],stat[2]);
-      status[0]+=stat[0];
-      status[1]+=stat[1];
-      status[2]+=(stat[2]!=0);
+                 mu1, isp, stat[0], stat[1], stat[2]);
 
-      if (mu1>0.0)
-      {
-         dfl_sap_gcr2(sp.nkv,sp.nmx,sp.res,mu1,phi,phi,stat);
+      status[0] = (status[0] + stat[0] + 1) / 3;
+      status[1] = (status[1] + stat[1] + 1) / 3;
+      status[2] += (stat[2] != 0);
 
-         error_root((stat[0]<0)||(stat[1]<0),3,
-                    "rwtm2eo [rwtmeo.c]","DFL_SAP_GCR solver failed "
-                    "(mu = %.2e, parameter set no %d, status = (%d,%d,%d)",
-                    mu1,isp,stat[0],stat[1],stat[2]);
+      lnr1 = norm_square_dble(VOLUME / 2, 1, phi);
+    } else {
+      status[0] = (status[0] + 1) / 2;
+      status[1] = (status[1] + 1) / 2;
+      lnr1 = 0.0;
+    }
 
-         status[0]=(status[0]+stat[0]+1)/3;
-         status[1]=(status[1]+stat[1]+1)/3;
-         status[2]+=(stat[2]!=0);
+    lnr2 = norm_square_dble(VOLUME / 2, 1, eta);
+  } else {
+    lnr1 = 0.0;
+    lnr2 = 0.0;
+    error_root(1, 1, "rwtm2eo [rwtmeo.c]", "Unknown solver");
+  }
 
-         lnr1=norm_square_dble(VOLUME/2,1,phi);
-      }
-      else
-      {
-         status[0]=(status[0]+1)/2;
-         status[1]=(status[1]+1)/2;
-         lnr1=0.0;
-      }
+  release_wsd();
 
-      lnr2=norm_square_dble(VOLUME/2,1,eta);
-   }
-   else
-   {
-      lnr1=0.0;
-      lnr2=0.0;
-      error_root(1,1,"rwtm2eo [rwtmeo.c]","Unknown solver");
-   }
+  mu1 = mu1 * mu1;
+  mu2 = mu2 * mu2;
 
-   release_wsd();
-
-   mu1=mu1*mu1;
-   mu2=mu2*mu2;
-
-   return ((mu2-mu1)/(2.0*mu2-mu1))*(mu1*(mu2-mu1)*lnr1+2.0*mu2*mu2*lnr2);
+  return ((mu2 - mu1) / (2.0 * mu2 - mu1)) *
+         (mu1 * (mu2 - mu1) * lnr1 + 2.0 * mu2 * mu2 * lnr2);
 }

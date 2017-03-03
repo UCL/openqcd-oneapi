@@ -98,257 +98,231 @@
 #include "linsolv.h"
 #include "global.h"
 
-#define PRECISION_LIMIT ((double)(100.0f*FLT_EPSILON))
+#define PRECISION_LIMIT ((double)(100.0f * FLT_EPSILON))
 
-static int nkm=0;
+static int nkm = 0;
 static float *b;
-static complex *a,*c;
+static complex *a, *c;
 static double rn;
-static complex **phi,**chi,*rho;
-static complex_dble *wrk,*cs1,*cs2;
-
+static complex **phi, **chi, *rho;
+static complex_dble *wrk, *cs1, *cs2;
 
 static int alloc_arrays(int nkv)
 {
-   if (nkm>0)
-   {
-      afree(a);
-      afree(b);
-      afree(cs1);
-   }
+  if (nkm > 0) {
+    afree(a);
+    afree(b);
+    afree(cs1);
+  }
 
-   a=amalloc(nkv*(nkv+1)*sizeof(*a),ALIGN);
-   b=amalloc(nkv*sizeof(*b),ALIGN);
-   cs1=amalloc(2*(nkv+2)*sizeof(*cs1),ALIGN);
+  a = amalloc(nkv * (nkv + 1) * sizeof(*a), ALIGN);
+  b = amalloc(nkv * sizeof(*b), ALIGN);
+  cs1 = amalloc(2 * (nkv + 2) * sizeof(*cs1), ALIGN);
 
-   if ((a==NULL)||(b==NULL)||(cs1==NULL))
-      return 1;
+  if ((a == NULL) || (b == NULL) || (cs1 == NULL))
+    return 1;
 
-   c=a+nkv*nkv;
-   cs2=cs1+nkv+2;
-   nkm=nkv;
+  c = a + nkv * nkv;
+  cs2 = cs1 + nkv + 2;
+  nkm = nkv;
 
-   return 0;
+  return 0;
 }
 
-
-static void gcr_init(int vol,int icom,int nkv,complex **wv,complex_dble **wvd,
-                     complex_dble *eta,complex_dble *psi)
+static void gcr_init(int vol, int icom, int nkv, complex **wv,
+                     complex_dble **wvd, complex_dble *eta, complex_dble *psi)
 {
-   phi=wv;
-   rho=wv[nkv];
-   chi=wv+nkv+1;
-   wrk=wvd[0];
+  phi = wv;
+  rho = wv[nkv];
+  chi = wv + nkv + 1;
+  wrk = wvd[0];
 
-   set_vd2zero(vol,psi);
-   assign_vd2v(vol,eta,rho);
+  set_vd2zero(vol, psi);
+  assign_vd2v(vol, eta, rho);
 
-   rn=(double)(vnorm_square(vol,icom,rho));
-   rn=sqrt(rn);
+  rn = (double)(vnorm_square(vol, icom, rho));
+  rn = sqrt(rn);
 }
 
-
-static void sum_vprod(int icom,int n)
+static void sum_vprod(int icom, int n)
 {
-   int i;
+  int i;
 
-   if ((icom==1)&&(NPROC>1))
-   {
-      MPI_Reduce((double*)(cs1),(double*)(cs2),2*n,MPI_DOUBLE,
-                 MPI_SUM,0,MPI_COMM_WORLD);
-      MPI_Bcast((double*)(cs2),2*n,MPI_DOUBLE,0,MPI_COMM_WORLD);
-   }
-   else
-   {
-      for (i=0;i<n;i++)
-      {
-         cs2[i].re=cs1[i].re;
-         cs2[i].im=cs1[i].im;
-      }
-   }
+  if ((icom == 1) && (NPROC > 1)) {
+    MPI_Reduce((double *)(cs1), (double *)(cs2), 2 * n, MPI_DOUBLE, MPI_SUM, 0,
+               MPI_COMM_WORLD);
+    MPI_Bcast((double *)(cs2), 2 * n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  } else {
+    for (i = 0; i < n; i++) {
+      cs2[i].re = cs1[i].re;
+      cs2[i].im = cs1[i].im;
+    }
+  }
 }
 
-
-static void gcr_step(int vol,int icom,int k,int nkv,
-                     void (*Mop)(int k,complex *rho,complex *phi,complex *chi))
+static void gcr_step(int vol, int icom, int k, int nkv,
+                     void (*Mop)(int k, complex *rho, complex *phi,
+                                 complex *chi))
 {
-   int l;
-   float r;
-   complex z;
+  int l;
+  float r;
+  complex z;
 
-   (*Mop)(k,rho,phi[k],chi[k]);
+  (*Mop)(k, rho, phi[k], chi[k]);
 
-   for (l=0;l<k;l++)
-   {
-      z=vprod(vol,0,chi[l],chi[k]);
-      cs1[l].re=(double)(z.re);
-      cs1[l].im=(double)(z.im);
-   }
+  for (l = 0; l < k; l++) {
+    z = vprod(vol, 0, chi[l], chi[k]);
+    cs1[l].re = (double)(z.re);
+    cs1[l].im = (double)(z.im);
+  }
 
-   sum_vprod(icom,k);
+  sum_vprod(icom, k);
 
-   for (l=0;l<k;l++)
-   {
-      a[nkv*l+k].re=(float)(cs2[l].re);
-      a[nkv*l+k].im=(float)(cs2[l].im);
-      z.re=-a[nkv*l+k].re;
-      z.im=-a[nkv*l+k].im;
-      mulc_vadd(vol,chi[k],chi[l],z);
-   }
+  for (l = 0; l < k; l++) {
+    a[nkv * l + k].re = (float)(cs2[l].re);
+    a[nkv * l + k].im = (float)(cs2[l].im);
+    z.re = -a[nkv * l + k].re;
+    z.im = -a[nkv * l + k].im;
+    mulc_vadd(vol, chi[k], chi[l], z);
+  }
 
-   r=vnorm_square(vol,0,chi[k]);
-   cs1[0].re=(double)(r);
-   cs1[0].im=0.0;
-   z=vprod(vol,0,chi[k],rho);
-   cs1[1].re=(double)(z.re);
-   cs1[1].im=(double)(z.im);
-   sum_vprod(icom,2);
+  r = vnorm_square(vol, 0, chi[k]);
+  cs1[0].re = (double)(r);
+  cs1[0].im = 0.0;
+  z = vprod(vol, 0, chi[k], rho);
+  cs1[1].re = (double)(z.re);
+  cs1[1].im = (double)(z.im);
+  sum_vprod(icom, 2);
 
-   b[k]=(float)(sqrt(cs2[0].re));
+  b[k] = (float)(sqrt(cs2[0].re));
 
-   if (b[k]==0.0f)
-      return;
+  if (b[k] == 0.0f)
+    return;
 
-   r=1.0f/b[k];
-   vscale(vol,r,chi[k]);
-   c[k].re=r*(float)(cs2[1].re);
-   c[k].im=r*(float)(cs2[1].im);
-   z.re=-c[k].re;
-   z.im=-c[k].im;
-   mulc_vadd(vol,rho,chi[k],z);
+  r = 1.0f / b[k];
+  vscale(vol, r, chi[k]);
+  c[k].re = r * (float)(cs2[1].re);
+  c[k].im = r * (float)(cs2[1].im);
+  z.re = -c[k].re;
+  z.im = -c[k].im;
+  mulc_vadd(vol, rho, chi[k], z);
 
-   rn=(double)(vnorm_square(vol,icom,rho));
-   rn=sqrt(rn);
+  rn = (double)(vnorm_square(vol, icom, rho));
+  rn = sqrt(rn);
 }
 
-
-static void update_psi(int vol,int icom,int k,int nkv,
-                       complex_dble *eta,complex_dble *psi,
-                       void (*Dop)(complex_dble *v,complex_dble *w))
+static void update_psi(int vol, int icom, int k, int nkv, complex_dble *eta,
+                       complex_dble *psi,
+                       void (*Dop)(complex_dble *v, complex_dble *w))
 {
-   int l,i;
-   float r;
-   complex z;
+  int l, i;
+  float r;
+  complex z;
 
-   for (l=k;l>=0;l--)
-   {
-      z.re=c[l].re;
-      z.im=c[l].im;
+  for (l = k; l >= 0; l--) {
+    z.re = c[l].re;
+    z.im = c[l].im;
 
-      for (i=(l+1);i<=k;i++)
-      {
-         z.re-=(a[l*nkv+i].re*c[i].re-a[l*nkv+i].im*c[i].im);
-         z.im-=(a[l*nkv+i].re*c[i].im+a[l*nkv+i].im*c[i].re);
-      }
+    for (i = (l + 1); i <= k; i++) {
+      z.re -= (a[l * nkv + i].re * c[i].re - a[l * nkv + i].im * c[i].im);
+      z.im -= (a[l * nkv + i].re * c[i].im + a[l * nkv + i].im * c[i].re);
+    }
 
-      r=1.0f/b[l];
-      c[l].re=z.re*r;
-      c[l].im=z.im*r;
-   }
+    r = 1.0f / b[l];
+    c[l].re = z.re * r;
+    c[l].im = z.im * r;
+  }
 
-   set_v2zero(vol,rho);
+  set_v2zero(vol, rho);
 
-   for (l=k;l>=0;l--)
-      mulc_vadd(vol,rho,phi[l],c[l]);
+  for (l = k; l >= 0; l--)
+    mulc_vadd(vol, rho, phi[l], c[l]);
 
-   add_v2vd(vol,rho,psi);
-   (*Dop)(psi,wrk);
-   diff_vd2v(vol,eta,wrk,rho);
+  add_v2vd(vol, rho, psi);
+  (*Dop)(psi, wrk);
+  diff_vd2v(vol, eta, wrk, rho);
 
-   rn=(double)(vnorm_square(vol,icom,rho));
-   rn=sqrt(rn);
+  rn = (double)(vnorm_square(vol, icom, rho));
+  rn = sqrt(rn);
 }
 
-
-double fgcr4vd(int vol,int icom,
-               void (*Dop)(complex_dble *v,complex_dble *w),
-               void (*Mop)(int k,complex *eta,complex *psi,complex *chi),
-               complex **wv,complex_dble **wvd,int nkv,int nmx,double res,
-               complex_dble *eta,complex_dble *psi,int *status)
+double fgcr4vd(int vol, int icom, void (*Dop)(complex_dble *v, complex_dble *w),
+               void (*Mop)(int k, complex *eta, complex *psi, complex *chi),
+               complex **wv, complex_dble **wvd, int nkv, int nmx, double res,
+               complex_dble *eta, complex_dble *psi, int *status)
 {
-   int ie,k,iprms[3];
-   double rn_old,tol,dprms[1];
+  int ie, k, iprms[3];
+  double rn_old, tol, dprms[1];
 
-   if ((icom==1)&&(NPROC>1))
-   {
-      iprms[0]=vol;
-      iprms[1]=nkv;
-      iprms[2]=nmx;
-      dprms[0]=res;
+  if ((icom == 1) && (NPROC > 1)) {
+    iprms[0] = vol;
+    iprms[1] = nkv;
+    iprms[2] = nmx;
+    dprms[0] = res;
 
-      MPI_Bcast(iprms,3,MPI_INT,0,MPI_COMM_WORLD);
-      MPI_Bcast(dprms,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+    MPI_Bcast(iprms, 3, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(dprms, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-      error((iprms[0]!=vol)||(iprms[1]!=nkv)||(iprms[2]!=nmx)||
-            (dprms[0]!=res),1,"fgcr4vd [fgcr4vd.c]",
-            "Parameters are not global");
+    error((iprms[0] != vol) || (iprms[1] != nkv) || (iprms[2] != nmx) ||
+              (dprms[0] != res),
+          1, "fgcr4vd [fgcr4vd.c]", "Parameters are not global");
 
-      error_root((vol<=0)||(nkv<1)||(nmx<1)||(res<=DBL_EPSILON),1,
-                 "fgcr4vd [fgcr4vd.c]",
-                 "Improper choice of vol,nkv,nmx or res");
+    error_root((vol <= 0) || (nkv < 1) || (nmx < 1) || (res <= DBL_EPSILON), 1,
+               "fgcr4vd [fgcr4vd.c]", "Improper choice of vol,nkv,nmx or res");
 
-      if (nkv>nkm)
-      {
-         ie=alloc_arrays(nkv);
-         error(ie,1,"fgcr4vd [fgcr4vd.c]",
-               "Unable to allocate auxiliary arrays");
+    if (nkv > nkm) {
+      ie = alloc_arrays(nkv);
+      error(ie, 1, "fgcr4vd [fgcr4vd.c]",
+            "Unable to allocate auxiliary arrays");
+    }
+  } else {
+    if ((vol <= 0) || (nkv < 1) || (nmx < 1) || (res <= DBL_EPSILON)) {
+      error_loc(1, 1, "fgcr4vd [fgcrvvd.c]",
+                "Improper choice of vol,nkv,nmx or res");
+      (*status) = 0;
+      return 1.0;
+    }
+
+    if (nkv > nkm) {
+      ie = alloc_arrays(nkv);
+
+      if (ie) {
+        error_loc(1, 1, "fgcr4vd [fgcr4vd.c]",
+                  "Unable to allocate auxiliary arrays");
+        (*status) = 0;
+        return 1.0;
       }
-   }
-   else
-   {
-      if ((vol<=0)||(nkv<1)||(nmx<1)||(res<=DBL_EPSILON))
-      {
-         error_loc(1,1,"fgcr4vd [fgcrvvd.c]",
-                   "Improper choice of vol,nkv,nmx or res");
-         (*status)=0;
-         return 1.0;
-      }
+    }
+  }
 
-      if (nkv>nkm)
-      {
-         ie=alloc_arrays(nkv);
+  gcr_init(vol, icom, nkv, wv, wvd, eta, psi);
+  tol = res * rn;
+  (*status) = 0;
 
-         if (ie)
-         {
-            error_loc(1,1,"fgcr4vd [fgcr4vd.c]",
-                      "Unable to allocate auxiliary arrays");
-            (*status)=0;
-            return 1.0;
-         }
-      }
-   }
-
-   gcr_init(vol,icom,nkv,wv,wvd,eta,psi);
-   tol=res*rn;
-   (*status)=0;
-
-   while (rn>tol)
-   {
+  while (rn > tol) {
 #ifdef FGCR4VD_DBG
-      message("[fgcr4vd]: rn_old = %.2e\n",rn);
+    message("[fgcr4vd]: rn_old = %.2e\n", rn);
 #endif
-      rn_old=rn;
+    rn_old = rn;
 
-      for (k=0;;k++)
-      {
-         gcr_step(vol,icom,k,nkv,Mop);
-         (*status)+=1;
+    for (k = 0;; k++) {
+      gcr_step(vol, icom, k, nkv, Mop);
+      (*status) += 1;
 #ifdef FGCR4VD_DBG
-         message("[fgcr4vd]: k = %d, rn = %.2e\n",k,rn);
+      message("[fgcr4vd]: k = %d, rn = %.2e\n", k, rn);
 #endif
-         if ((rn<=tol)||(rn<(PRECISION_LIMIT*rn_old))||
-             ((k+1)==nkv)||((*status)==nmx))
-            break;
-      }
+      if ((rn <= tol) || (rn < (PRECISION_LIMIT * rn_old)) ||
+          ((k + 1) == nkv) || ((*status) == nmx))
+        break;
+    }
 
-      update_psi(vol,icom,k,nkv,eta,psi,Dop);
+    update_psi(vol, icom, k, nkv, eta, psi, Dop);
 
-      if (((*status)==nmx)&&(rn>tol))
-      {
-         (*status)=-1;
-         return rn;
-      }
-   }
+    if (((*status) == nmx) && (rn > tol)) {
+      (*status) = -1;
+      return rn;
+    }
+  }
 
-   return rn;
+  return rn;
 }

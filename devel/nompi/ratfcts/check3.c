@@ -20,103 +20,97 @@
 #include "utils.h"
 #include "ratfcts.h"
 
-static int ns=0;
-static double As,*ars;
-
+static int ns = 0;
+static double As, *ars;
 
 static void alloc_ars(int n)
 {
-   if (n<=ns)
-      return;
+  if (n <= ns)
+    return;
 
-   if (ns!=0)
-      afree(ars);
+  if (ns != 0)
+    afree(ars);
 
-   ars=amalloc(2*n*sizeof(double),3);
+  ars = amalloc(2 * n * sizeof(double), 3);
 
-   error(ars==NULL,1,"alloc_ars [check3.c]",
-         "Unable to allocate coefficient array");
+  error(ars == NULL, 1, "alloc_ars [check3.c]",
+        "Unable to allocate coefficient array");
 
-   ns=n;
+  ns = n;
 }
 
-
-static double Zolo(int n,double y)
+static double Zolo(int n, double y)
 {
-   int r;
-   double p;
+  int r;
+  double p;
 
-   p=1.0;
+  p = 1.0;
 
-   for (r=0;r<n;r++)
-      p*=((y+ars[2*r])/(y+ars[2*r+1]));
+  for (r = 0; r < n; r++)
+    p *= ((y + ars[2 * r]) / (y + ars[2 * r + 1]));
 
-   return As*p;
+  return As * p;
 }
-
 
 int main(void)
 {
-   int n,r,ir;
-   double a,b;
-   double eps,delta;
-   double y,dev,dmax;
-   
-   printf("\n");
-   printf("Zolotarev rational approximation to the function f(x)=1/|x|\n");
-   printf("-----------------------------------------------------------\n\n");
+  int n, r, ir;
+  double a, b;
+  double eps, delta;
+  double y, dev, dmax;
 
-   rlxd_init(1,1234);   
+  printf("\n");
+  printf("Zolotarev rational approximation to the function f(x)=1/|x|\n");
+  printf("-----------------------------------------------------------\n\n");
 
-   for (;;)
-   {
-      printf("Range [a,b] of |x| = ");
+  rlxd_init(1, 1234);
 
-      ir=scanf("[");
-      ir+=scanf("%lf",&a);
-      ir+=scanf(",");
-      ir+=scanf("%lf",&b);
-      ir+=scanf("]");
+  for (;;) {
+    printf("Range [a,b] of |x| = ");
 
-      printf("Degree n = ");
-      ir+=scanf("%d",&n);
+    ir = scanf("[");
+    ir += scanf("%lf", &a);
+    ir += scanf(",");
+    ir += scanf("%lf", &b);
+    ir += scanf("]");
 
-      error(ir!=3,1,"main [check3.c]","Read error or invalid input data");
-      error((a<=0.0)||(b<=a)||(n<1),1,"main [check3.c]",
-            "Improper range or degree");
+    printf("Degree n = ");
+    ir += scanf("%d", &n);
 
-      eps=a/b;
-      eps=eps*eps;
+    error(ir != 3, 1, "main [check3.c]", "Read error or invalid input data");
+    error((a <= 0.0) || (b <= a) || (n < 1), 1, "main [check3.c]",
+          "Improper range or degree");
 
-      alloc_ars(n);
-      zolotarev(n,eps,&As,ars,&delta);
+    eps = a / b;
+    eps = eps * eps;
 
-      dmax=0.0;
+    alloc_ars(n);
+    zolotarev(n, eps, &As, ars, &delta);
 
-      for (r=0;r<100;r++)
-      {
-         ranlxd(&y,1);
-         y=eps+(1.0-eps)*y;
+    dmax = 0.0;
 
-         dev=fabs(1.0-sqrt(y)*Zolo(n,y));
+    for (r = 0; r < 100; r++) {
+      ranlxd(&y, 1);
+      y = eps + (1.0 - eps) * y;
 
-         if (dev>dmax)
-            dmax=dev;
-      }
+      dev = fabs(1.0 - sqrt(y) * Zolo(n, y));
 
-      printf("Relative error delta = %.1e (measured: %.1e)\n",delta,dmax);
-      printf("Amplitude A: %.1e\n",As);
-      printf("Coefficients a_r:     Numerator     Denominator\n");
-      b=b*b;
+      if (dev > dmax)
+        dmax = dev;
+    }
 
-      for (r=0;r<(2*n);r+=2)
-      {
-         printf("                      %.3e      %.3e\n",
-                ars[r]*b,ars[r+1]*b);
-      }
-      
-      printf("\n\n");
-   }
-   
-   exit(0);
+    printf("Relative error delta = %.1e (measured: %.1e)\n", delta, dmax);
+    printf("Amplitude A: %.1e\n", As);
+    printf("Coefficients a_r:     Numerator     Denominator\n");
+    b = b * b;
+
+    for (r = 0; r < (2 * n); r += 2) {
+      printf("                      %.3e      %.3e\n", ars[r] * b,
+             ars[r + 1] * b);
+    }
+
+    printf("\n\n");
+  }
+
+  exit(0);
 }

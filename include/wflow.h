@@ -13,8 +13,8 @@
 #define WFLOW_H
 
 /* WFLOW_C */
-extern void fwd_euler(int n,double eps);
-extern void fwd_rk2(int n,double eps);
-extern void fwd_rk3(int n,double eps);
+extern void fwd_euler(int n, double eps);
+extern void fwd_rk2(int n, double eps);
+extern void fwd_rk3(int n, double eps);
 
 #endif

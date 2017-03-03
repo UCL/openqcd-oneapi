@@ -97,204 +97,183 @@
 #include "linsolv.h"
 #include "global.h"
 
-#define PRECISION_LIMIT ((double)(100.0f*FLT_EPSILON))
+#define PRECISION_LIMIT ((double)(100.0f * FLT_EPSILON))
 
-static int nkm=0;
+static int nkm = 0;
 static float *b;
-static complex *a,*c;
+static complex *a, *c;
 static double rn;
-static spinor **phi,**chi,*rho;
+static spinor **phi, **chi, *rho;
 static spinor_dble *wrk;
-
 
 static int alloc_arrays(int nkv)
 {
-   if (nkm>0)
-   {
-      afree(a);
-      afree(b);
-   }
+  if (nkm > 0) {
+    afree(a);
+    afree(b);
+  }
 
-   a=amalloc(nkv*(nkv+1)*sizeof(*a),ALIGN);
-   b=amalloc(nkv*sizeof(*b),ALIGN);
+  a = amalloc(nkv * (nkv + 1) * sizeof(*a), ALIGN);
+  b = amalloc(nkv * sizeof(*b), ALIGN);
 
-   if ((a==NULL)||(b==NULL))
-      return 1;
+  if ((a == NULL) || (b == NULL))
+    return 1;
 
-   c=a+nkv*nkv;
-   nkm=nkv;
+  c = a + nkv * nkv;
+  nkm = nkv;
 
-   return 0;
+  return 0;
 }
 
-
-static void gcr_init(int vol,int icom,int nkv,spinor **ws,spinor_dble **wsd,
-                     spinor_dble *eta,spinor_dble *psi)
+static void gcr_init(int vol, int icom, int nkv, spinor **ws, spinor_dble **wsd,
+                     spinor_dble *eta, spinor_dble *psi)
 {
-   phi=ws;
-   rho=ws[nkv];
-   chi=ws+nkv+1;
-   wrk=wsd[0];
+  phi = ws;
+  rho = ws[nkv];
+  chi = ws + nkv + 1;
+  wrk = wsd[0];
 
-   set_sd2zero(vol,psi);
-   assign_sd2s(vol,eta,rho);
+  set_sd2zero(vol, psi);
+  assign_sd2s(vol, eta, rho);
 
-   rn=(double)(norm_square(vol,icom,rho));
-   rn=sqrt(rn);
+  rn = (double)(norm_square(vol, icom, rho));
+  rn = sqrt(rn);
 }
 
-
-static void gcr_step(int vol,int icom,int k,int nkv,
-                     void (*Mop)(int k,spinor *rho,spinor *phi,spinor *chi))
+static void gcr_step(int vol, int icom, int k, int nkv,
+                     void (*Mop)(int k, spinor *rho, spinor *phi, spinor *chi))
 {
-   int l;
-   complex z;
+  int l;
+  complex z;
 
-   (*Mop)(k,rho,phi[k],chi[k]);
+  (*Mop)(k, rho, phi[k], chi[k]);
 
-   for (l=0;l<k;l++)
-   {
-      a[nkv*l+k]=spinor_prod(vol,icom,chi[l],chi[k]);
-      z.re=-a[nkv*l+k].re;
-      z.im=-a[nkv*l+k].im;
-      mulc_spinor_add(vol,chi[k],chi[l],z);
-   }
+  for (l = 0; l < k; l++) {
+    a[nkv * l + k] = spinor_prod(vol, icom, chi[l], chi[k]);
+    z.re = -a[nkv * l + k].re;
+    z.im = -a[nkv * l + k].im;
+    mulc_spinor_add(vol, chi[k], chi[l], z);
+  }
 
-   b[k]=normalize(vol,icom,chi[k]);
-   c[k]=spinor_prod(vol,icom,chi[k],rho);
-   z.re=-c[k].re;
-   z.im=-c[k].im;
-   mulc_spinor_add(vol,rho,chi[k],z);
+  b[k] = normalize(vol, icom, chi[k]);
+  c[k] = spinor_prod(vol, icom, chi[k], rho);
+  z.re = -c[k].re;
+  z.im = -c[k].im;
+  mulc_spinor_add(vol, rho, chi[k], z);
 
-   rn=(double)(norm_square(vol,icom,rho));
-   rn=sqrt(rn);
+  rn = (double)(norm_square(vol, icom, rho));
+  rn = sqrt(rn);
 }
 
-
-static void update_psi(int vol,int icom,int k,int nkv,
-                       spinor_dble *eta,spinor_dble *psi,
-                       void (*Dop)(spinor_dble *s,spinor_dble *r))
+static void update_psi(int vol, int icom, int k, int nkv, spinor_dble *eta,
+                       spinor_dble *psi,
+                       void (*Dop)(spinor_dble *s, spinor_dble *r))
 {
-   int l,i;
-   float r;
-   complex z;
+  int l, i;
+  float r;
+  complex z;
 
-   for (l=k;l>=0;l--)
-   {
-      z.re=c[l].re;
-      z.im=c[l].im;
+  for (l = k; l >= 0; l--) {
+    z.re = c[l].re;
+    z.im = c[l].im;
 
-      for (i=(l+1);i<=k;i++)
-      {
-         z.re-=(a[l*nkv+i].re*c[i].re-a[l*nkv+i].im*c[i].im);
-         z.im-=(a[l*nkv+i].re*c[i].im+a[l*nkv+i].im*c[i].re);
-      }
+    for (i = (l + 1); i <= k; i++) {
+      z.re -= (a[l * nkv + i].re * c[i].re - a[l * nkv + i].im * c[i].im);
+      z.im -= (a[l * nkv + i].re * c[i].im + a[l * nkv + i].im * c[i].re);
+    }
 
-      r=1.0f/b[l];
-      c[l].re=z.re*r;
-      c[l].im=z.im*r;
-   }
+    r = 1.0f / b[l];
+    c[l].re = z.re * r;
+    c[l].im = z.im * r;
+  }
 
-   set_s2zero(vol,rho);
+  set_s2zero(vol, rho);
 
-   for (l=k;l>=0;l--)
-      mulc_spinor_add(vol,rho,phi[l],c[l]);
+  for (l = k; l >= 0; l--)
+    mulc_spinor_add(vol, rho, phi[l], c[l]);
 
-   add_s2sd(vol,rho,psi);
-   (*Dop)(psi,wrk);
-   diff_sd2s(vol,eta,wrk,rho);
+  add_s2sd(vol, rho, psi);
+  (*Dop)(psi, wrk);
+  diff_sd2s(vol, eta, wrk, rho);
 
-   rn=(double)(norm_square(vol,icom,rho));
-   rn=sqrt(rn);
+  rn = (double)(norm_square(vol, icom, rho));
+  rn = sqrt(rn);
 }
 
-
-double fgcr(int vol,int icom,
-            void (*Dop)(spinor_dble *s,spinor_dble *r),
-            void (*Mop)(int k,spinor *eta,spinor *psi,spinor *chi),
-            spinor **ws,spinor_dble **wsd,int nkv,int nmx,double res,
-            spinor_dble *eta,spinor_dble *psi,int *status)
+double fgcr(int vol, int icom, void (*Dop)(spinor_dble *s, spinor_dble *r),
+            void (*Mop)(int k, spinor *eta, spinor *psi, spinor *chi),
+            spinor **ws, spinor_dble **wsd, int nkv, int nmx, double res,
+            spinor_dble *eta, spinor_dble *psi, int *status)
 {
-   int ie,k,iprms[3];
-   double rn_old,tol,dprms[1];
+  int ie, k, iprms[3];
+  double rn_old, tol, dprms[1];
 
-   if ((icom==1)&&(NPROC>1))
-   {
-      iprms[0]=vol;
-      iprms[1]=nkv;
-      iprms[2]=nmx;
-      dprms[0]=res;
+  if ((icom == 1) && (NPROC > 1)) {
+    iprms[0] = vol;
+    iprms[1] = nkv;
+    iprms[2] = nmx;
+    dprms[0] = res;
 
-      MPI_Bcast(iprms,3,MPI_INT,0,MPI_COMM_WORLD);
-      MPI_Bcast(dprms,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+    MPI_Bcast(iprms, 3, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(dprms, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-      error((iprms[0]!=vol)||(iprms[1]!=nkv)||(iprms[2]!=nmx)||
-            (dprms[0]!=res),1,"fgcr [fgcr.c]","Parameters are not global");
+    error((iprms[0] != vol) || (iprms[1] != nkv) || (iprms[2] != nmx) ||
+              (dprms[0] != res),
+          1, "fgcr [fgcr.c]", "Parameters are not global");
 
-      error_root((vol<=0)||(nkv<1)||(nmx<1)||(res<=DBL_EPSILON),1,
-                 "fgcr [fgcr.c]","Improper choice of vol,nkv,nmx or res");
+    error_root((vol <= 0) || (nkv < 1) || (nmx < 1) || (res <= DBL_EPSILON), 1,
+               "fgcr [fgcr.c]", "Improper choice of vol,nkv,nmx or res");
 
-      if (nkv>nkm)
-      {
-         ie=alloc_arrays(nkv);
-         error(ie,1,"fgcr [fgcr.c]","Unable to allocate auxiliary arrays");
+    if (nkv > nkm) {
+      ie = alloc_arrays(nkv);
+      error(ie, 1, "fgcr [fgcr.c]", "Unable to allocate auxiliary arrays");
+    }
+  } else {
+    if ((vol <= 0) || (nkv < 1) || (nmx < 1) || (res <= DBL_EPSILON)) {
+      error_loc(1, 1, "fgcr [fgcr.c]", "Improper choice of vol,nkv,nmx or res");
+      (*status) = 0;
+      return 1.0;
+    }
+
+    if (nkv > nkm) {
+      ie = alloc_arrays(nkv);
+
+      if (ie) {
+        error_loc(1, 1, "fgcr [fgcr.c]", "Unable to allocate auxiliary arrays");
+        (*status) = 0;
+        return 1.0;
       }
-   }
-   else
-   {
-      if ((vol<=0)||(nkv<1)||(nmx<1)||(res<=DBL_EPSILON))
-      {
-         error_loc(1,1,"fgcr [fgcr.c]",
-                   "Improper choice of vol,nkv,nmx or res");
-         (*status)=0;
-         return 1.0;
-      }
+    }
+  }
 
-      if (nkv>nkm)
-      {
-         ie=alloc_arrays(nkv);
+  gcr_init(vol, icom, nkv, ws, wsd, eta, psi);
+  tol = res * rn;
+  (*status) = 0;
 
-         if (ie)
-         {
-            error_loc(1,1,"fgcr [fgcr.c]",
-                      "Unable to allocate auxiliary arrays");
-            (*status)=0;
-            return 1.0;
-         }
-      }
-   }
-
-   gcr_init(vol,icom,nkv,ws,wsd,eta,psi);
-   tol=res*rn;
-   (*status)=0;
-
-   while (rn>tol)
-   {
+  while (rn > tol) {
 #ifdef FGCR_DBG
-      message("[fgcr]: rn_old = %.2e\n",rn);
+    message("[fgcr]: rn_old = %.2e\n", rn);
 #endif
-      rn_old=rn;
+    rn_old = rn;
 
-      for (k=0;;k++)
-      {
-         gcr_step(vol,icom,k,nkv,Mop);
-         (*status)+=1;
+    for (k = 0;; k++) {
+      gcr_step(vol, icom, k, nkv, Mop);
+      (*status) += 1;
 #ifdef FGCR_DBG
-         message("[fgcr]: k = %d, rn = %.2e\n",k,rn);
+      message("[fgcr]: k = %d, rn = %.2e\n", k, rn);
 #endif
-         if ((rn<=tol)||(rn<(PRECISION_LIMIT*rn_old))||
-             ((k+1)==nkv)||((*status)==nmx))
-            break;
-      }
+      if ((rn <= tol) || (rn < (PRECISION_LIMIT * rn_old)) ||
+          ((k + 1) == nkv) || ((*status) == nmx))
+        break;
+    }
 
-      update_psi(vol,icom,k,nkv,eta,psi,Dop);
+    update_psi(vol, icom, k, nkv, eta, psi, Dop);
 
-      if (((*status)==nmx)&&(rn>tol))
-      {
-         (*status)=-1;
-         return rn;
-      }
-   }
+    if (((*status) == nmx) && (rn > tol)) {
+      (*status) = -1;
+      return rn;
+    }
+  }
 
-   return rn;
+  return rn;
 }

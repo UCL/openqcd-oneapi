@@ -98,160 +98,145 @@
 static float mus;
 static double mud;
 
-
-static void Dop(spinor *s,spinor *r)
+static void Dop(spinor *s, spinor *r)
 {
-   Dw(mus,s,r);
-   mulg5(VOLUME,r);
-   mus=-mus;
+  Dw(mus, s, r);
+  mulg5(VOLUME, r);
+  mus = -mus;
 }
 
-
-static void Dop_dble(spinor_dble *s,spinor_dble *r)
+static void Dop_dble(spinor_dble *s, spinor_dble *r)
 {
-   Dw_dble(mud,s,r);
-   mulg5_dble(VOLUME,r);
-   mud=-mud;
+  Dw_dble(mud, s, r);
+  mulg5_dble(VOLUME, r);
+  mud = -mud;
 }
 
-
-double tmcg(int nmx,double res,double mu,
-            spinor_dble *eta,spinor_dble *psi,int *status)
+double tmcg(int nmx, double res, double mu, spinor_dble *eta, spinor_dble *psi,
+            int *status)
 {
-   double rho,rho0,fact;
-   spinor **ws;
-   spinor_dble **rsd,**wsd;
-   tm_parms_t tm;
+  double rho, rho0, fact;
+  spinor **ws;
+  spinor_dble **rsd, **wsd;
+  tm_parms_t tm;
 
-   tm=tm_parms();
-   if (tm.eoflg==1)
-      set_tm_parms(0);
+  tm = tm_parms();
+  if (tm.eoflg == 1)
+    set_tm_parms(0);
 
-   if (query_flags(U_MATCH_UD)!=1)
+  if (query_flags(U_MATCH_UD) != 1)
+    assign_ud2u();
+
+  sw_term(NO_PTS);
+
+  if ((query_flags(SW_UP2DATE) != 1) || (query_flags(SW_E_INVERTED) != 0) ||
+      (query_flags(SW_O_INVERTED) != 0))
+    assign_swd2sw();
+
+  ws = reserve_ws(5);
+  wsd = reserve_wsd(2);
+  rsd = reserve_wsd(1);
+
+  mus = (float)(mu);
+  mud = mu;
+  rho0 = sqrt(norm_square_dble(VOLUME, 1, eta));
+  fact = rho0 / sqrt((double)(VOLUME) * (double)(24 * NPROC));
+
+  if (fact != 0.0) {
+    assign_sd2sd(VOLUME, eta, rsd[0]);
+    scale_dble(VOLUME, 1.0 / fact, rsd[0]);
+
+    rho =
+        cgne(VOLUME, 1, Dop, Dop_dble, ws, wsd, nmx, res, rsd[0], psi, status);
+
+    scale_dble(VOLUME, fact, psi);
+    rho *= fact;
+  } else {
+    status[0] = 0;
+    rho = 0.0;
+    set_sd2zero(VOLUME, psi);
+  }
+
+  release_wsd();
+  release_wsd();
+  release_ws();
+
+  if (status[0] < -1) {
+    rho = rho0;
+    set_sd2zero(VOLUME, psi);
+  }
+
+  return rho;
+}
+
+static void Doph(spinor *s, spinor *r)
+{
+  Dwhat(mus, s, r);
+  mulg5(VOLUME / 2, r);
+  mus = -mus;
+}
+
+static void Doph_dble(spinor_dble *s, spinor_dble *r)
+{
+  Dwhat_dble(mud, s, r);
+  mulg5_dble(VOLUME / 2, r);
+  mud = -mud;
+}
+
+double tmcgeo(int nmx, double res, double mu, spinor_dble *eta,
+              spinor_dble *psi, int *status)
+{
+  int ifail;
+  double rho, rho0, fact;
+  spinor **ws;
+  spinor_dble **rsd, **wsd;
+
+  rho0 = sqrt(norm_square_dble(VOLUME / 2, 1, eta));
+  ifail = sw_term(ODD_PTS);
+
+  if (ifail) {
+    status[0] = -2;
+    rho = rho0;
+  } else {
+    if (query_flags(U_MATCH_UD) != 1)
       assign_ud2u();
 
-   sw_term(NO_PTS);
-
-   if ((query_flags(SW_UP2DATE)!=1)||
-       (query_flags(SW_E_INVERTED)!=0)||(query_flags(SW_O_INVERTED)!=0))
+    if ((query_flags(SW_UP2DATE) != 1) || (query_flags(SW_E_INVERTED) != 0) ||
+        (query_flags(SW_O_INVERTED) != 1))
       assign_swd2sw();
 
-   ws=reserve_ws(5);
-   wsd=reserve_wsd(2);
-   rsd=reserve_wsd(1);
+    ws = reserve_ws(5);
+    wsd = reserve_wsd(2);
+    rsd = reserve_wsd(1);
 
-   mus=(float)(mu);
-   mud=mu;
-   rho0=sqrt(norm_square_dble(VOLUME,1,eta));
-   fact=rho0/sqrt((double)(VOLUME)*(double)(24*NPROC));
+    mus = (float)(mu);
+    mud = mu;
+    fact = rho0 / sqrt((double)(VOLUME / 2) * (double)(24 * NPROC));
 
-   if (fact!=0.0)
-   {
-      assign_sd2sd(VOLUME,eta,rsd[0]);
-      scale_dble(VOLUME,1.0/fact,rsd[0]);
+    if (fact != 0.0) {
+      assign_sd2sd(VOLUME / 2, eta, rsd[0]);
+      scale_dble(VOLUME / 2, 1.0 / fact, rsd[0]);
 
-      rho=cgne(VOLUME,1,Dop,Dop_dble,ws,wsd,nmx,res,rsd[0],psi,status);
+      rho = cgne(VOLUME / 2, 1, Doph, Doph_dble, ws, wsd, nmx, res, rsd[0], psi,
+                 status);
 
-      scale_dble(VOLUME,fact,psi);
-      rho*=fact;
-   }
-   else
-   {
-      status[0]=0;
-      rho=0.0;
-      set_sd2zero(VOLUME,psi);
-   }
+      scale_dble(VOLUME / 2, fact, psi);
+      rho *= fact;
+    } else {
+      status[0] = 0;
+      rho = 0.0;
+      set_sd2zero(VOLUME / 2, psi);
+    }
 
-   release_wsd();
-   release_wsd();
-   release_ws();
+    release_wsd();
+    release_wsd();
+    release_ws();
+  }
 
-   if (status[0]<-1)
-   {
-      rho=rho0;
-      set_sd2zero(VOLUME,psi);
-   }
+  if (status[0] < -1) {
+    rho = rho0;
+    set_sd2zero(VOLUME / 2, psi);
+  }
 
-   return rho;
-}
-
-
-static void Doph(spinor *s,spinor *r)
-{
-   Dwhat(mus,s,r);
-   mulg5(VOLUME/2,r);
-   mus=-mus;
-}
-
-
-static void Doph_dble(spinor_dble *s,spinor_dble *r)
-{
-   Dwhat_dble(mud,s,r);
-   mulg5_dble(VOLUME/2,r);
-   mud=-mud;
-}
-
-
-double tmcgeo(int nmx,double res,double mu,
-              spinor_dble *eta,spinor_dble *psi,int *status)
-{
-   int ifail;
-   double rho,rho0,fact;
-   spinor **ws;
-   spinor_dble **rsd,**wsd;
-
-   rho0=sqrt(norm_square_dble(VOLUME/2,1,eta));
-   ifail=sw_term(ODD_PTS);
-
-   if (ifail)
-   {
-      status[0]=-2;
-      rho=rho0;
-   }
-   else
-   {
-      if (query_flags(U_MATCH_UD)!=1)
-         assign_ud2u();
-
-      if ((query_flags(SW_UP2DATE)!=1)||
-          (query_flags(SW_E_INVERTED)!=0)||(query_flags(SW_O_INVERTED)!=1))
-         assign_swd2sw();
-
-      ws=reserve_ws(5);
-      wsd=reserve_wsd(2);
-      rsd=reserve_wsd(1);
-
-      mus=(float)(mu);
-      mud=mu;
-      fact=rho0/sqrt((double)(VOLUME/2)*(double)(24*NPROC));
-
-      if (fact!=0.0)
-      {
-         assign_sd2sd(VOLUME/2,eta,rsd[0]);
-         scale_dble(VOLUME/2,1.0/fact,rsd[0]);
-
-         rho=cgne(VOLUME/2,1,Doph,Doph_dble,ws,wsd,nmx,res,rsd[0],psi,status);
-
-         scale_dble(VOLUME/2,fact,psi);
-         rho*=fact;
-      }
-      else
-      {
-         status[0]=0;
-         rho=0.0;
-         set_sd2zero(VOLUME/2,psi);
-      }
-
-      release_wsd();
-      release_wsd();
-      release_ws();
-   }
-
-   if (status[0]<-1)
-   {
-      rho=rho0;
-      set_sd2zero(VOLUME/2,psi);
-   }
-
-   return rho;
+  return rho;
 }

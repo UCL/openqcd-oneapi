@@ -29,63 +29,61 @@
 
 static float r[NRAN];
 
-
-int main(int argc,char *argv[])
+int main(int argc, char *argv[])
 {
-   int my_rank,n,err1,err2,iw;
-   FILE *flog=NULL,*fdat=NULL;
-   
-   MPI_Init(&argc,&argv);
-   MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
-   
-   if (my_rank==0)
-   {
-      flog=freopen("check1.log","w",stdout);      
+  int my_rank, n, err1, err2, iw;
+  FILE *flog = NULL, *fdat = NULL;
 
-      printf("\n");
-      printf("Copying of .log and .dat files from process 0\n");
-      printf("---------------------------------------------\n\n");
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-      printf("%dx%dx%dx%d lattice, ",NPROC0*L0,NPROC1*L1,NPROC2*L2,NPROC3*L3);
-      printf("%dx%dx%dx%d process grid, ",NPROC0,NPROC1,NPROC2,NPROC3);
-      printf("%dx%dx%dx%d local lattice\n\n",L0,L1,L2,L3);
-   }
+  if (my_rank == 0) {
+    flog = freopen("check1.log", "w", stdout);
 
-   start_ranlux(0,1234); 
-   ranlxs(r,NRAN);
+    printf("\n");
+    printf("Copying of .log and .dat files from process 0\n");
+    printf("---------------------------------------------\n\n");
 
-   if (my_rank==0)
-   {   
-      printf("Write 10 random numbers to check1.log (in asci format)\n");
-      printf("and %d numbers to check1.dat (in binary format)\n\n",NRAN);
+    printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
+           NPROC3 * L3);
+    printf("%dx%dx%dx%d process grid, ", NPROC0, NPROC1, NPROC2, NPROC3);
+    printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
+  }
 
-      fdat=fopen("check1.dat","wb");
-      iw=fwrite(&r[0],sizeof(float),NRAN,fdat);
-      error_root(iw!=NRAN,1,"main [check1.c]","Incorrect write count");
-      fclose(fdat);
-      
-      for (n=0;n<10;n++)
-         printf("r[%d] = %.6e\n",n,r[n]);
+  start_ranlux(0, 1234);
+  ranlxs(r, NRAN);
 
-      printf("\n");
-      printf("Copy the files to check1.log~ and check1.dat~ respectively.\n");
-      printf("The copying may then be verified using the diff utility\n\n");
-      fclose(flog);
+  if (my_rank == 0) {
+    printf("Write 10 random numbers to check1.log (in asci format)\n");
+    printf("and %d numbers to check1.dat (in binary format)\n\n", NRAN);
 
-      err1=copy_file("check1.log","check1.log~");
-      err2=copy_file("check1.dat","check1.dat~");
+    fdat = fopen("check1.dat", "wb");
+    iw = fwrite(&r[0], sizeof(float), NRAN, fdat);
+    error_root(iw != NRAN, 1, "main [check1.c]", "Incorrect write count");
+    fclose(fdat);
 
-      flog=freopen("check1.log","a",stdout);
+    for (n = 0; n < 10; n++)
+      printf("r[%d] = %.6e\n", n, r[n]);
 
-      if ((err1!=0)||(err2!=0))
-         printf("Copying failed: err1 = %d, err2 = %d\n",err1,err2);
-   }
+    printf("\n");
+    printf("Copy the files to check1.log~ and check1.dat~ respectively.\n");
+    printf("The copying may then be verified using the diff utility\n\n");
+    fclose(flog);
 
-   error_chk();
+    err1 = copy_file("check1.log", "check1.log~");
+    err2 = copy_file("check1.dat", "check1.dat~");
 
-   if (my_rank==0)
-      fclose(flog);   
-   
-   MPI_Finalize();  
-   exit(0);
+    flog = freopen("check1.log", "a", stdout);
+
+    if ((err1 != 0) || (err2 != 0))
+      printf("Copying failed: err1 = %d, err2 = %d\n", err1, err2);
+  }
+
+  error_chk();
+
+  if (my_rank == 0)
+    fclose(flog);
+
+  MPI_Finalize();
+  exit(0);
 }

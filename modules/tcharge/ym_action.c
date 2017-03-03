@@ -65,167 +65,149 @@
 #include "tcharge.h"
 #include "global.h"
 
-#define N0 (NPROC0*L0)
+#define N0 (NPROC0 * L0)
 #define MAX_LEVELS 12
 #define BLK_LENGTH 8
 
 static int cnt[L0][MAX_LEVELS];
-static double smx[L0][MAX_LEVELS],asl0[N0];
+static double smx[L0][MAX_LEVELS], asl0[N0];
 static u3_alg_dble **ft;
-
 
 static double prodXX(u3_alg_dble *X)
 {
-   double sm;
+  double sm;
 
-   sm=(-2.0/3.0)*((*X).c1+(*X).c2+(*X).c3)*((*X).c1+(*X).c2+(*X).c3)+
-      2.0*((*X).c1*(*X).c1+(*X).c2*(*X).c2+(*X).c3*(*X).c3)+
-      4.0*((*X).c4*(*X).c4+(*X).c5*(*X).c5+(*X).c6*(*X).c6+
-           (*X).c7*(*X).c7+(*X).c8*(*X).c8+(*X).c9*(*X).c9);
+  sm = (-2.0 / 3.0) * ((*X).c1 + (*X).c2 + (*X).c3) *
+           ((*X).c1 + (*X).c2 + (*X).c3) +
+       2.0 * ((*X).c1 * (*X).c1 + (*X).c2 * (*X).c2 + (*X).c3 * (*X).c3) +
+       4.0 * ((*X).c4 * (*X).c4 + (*X).c5 * (*X).c5 + (*X).c6 * (*X).c6 +
+              (*X).c7 * (*X).c7 + (*X).c8 * (*X).c8 + (*X).c9 * (*X).c9);
 
-   return sm;
+  return sm;
 }
-
 
 static double density(int ix)
 {
-   double sm;
+  double sm;
 
-   sm=prodXX(ft[0]+ix)+prodXX(ft[1]+ix)+prodXX(ft[2]+ix)+
-      prodXX(ft[3]+ix)+prodXX(ft[4]+ix)+prodXX(ft[5]+ix);
+  sm = prodXX(ft[0] + ix) + prodXX(ft[1] + ix) + prodXX(ft[2] + ix) +
+       prodXX(ft[3] + ix) + prodXX(ft[4] + ix) + prodXX(ft[5] + ix);
 
-   return sm;
+  return sm;
 }
-
 
 double ym_action(void)
 {
-   int bc,tmx;
-   int n,ix,t,*cnt0;
-   double s,*smx0;
+  int bc, tmx;
+  int n, ix, t, *cnt0;
+  double s, *smx0;
 
-   ft=ftensor();
-   cnt0=cnt[0];
-   smx0=smx[0];
+  ft = ftensor();
+  cnt0 = cnt[0];
+  smx0 = smx[0];
 
-   for (n=0;n<MAX_LEVELS;n++)
-   {
-      cnt0[n]=0;
-      smx0[n]=0.0;
-   }
+  for (n = 0; n < MAX_LEVELS; n++) {
+    cnt0[n] = 0;
+    smx0[n] = 0.0;
+  }
 
-   bc=bc_type();
-   if (bc==0)
-      tmx=N0-1;
-   else
-      tmx=N0;
+  bc = bc_type();
+  if (bc == 0)
+    tmx = N0 - 1;
+  else
+    tmx = N0;
 
-   for (ix=0;ix<VOLUME;ix++)
-   {
-      t=global_time(ix);
+  for (ix = 0; ix < VOLUME; ix++) {
+    t = global_time(ix);
 
-      if (((t>0)&&(t<tmx))||(bc==3))
-      {
-         cnt0[0]+=1;
-         smx0[0]+=density(ix);
+    if (((t > 0) && (t < tmx)) || (bc == 3)) {
+      cnt0[0] += 1;
+      smx0[0] += density(ix);
 
-         for (n=1;(cnt0[n-1]>=BLK_LENGTH)&&(n<MAX_LEVELS);n++)
-         {
-            cnt0[n]+=1;
-            smx0[n]+=smx0[n-1];
+      for (n = 1; (cnt0[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
+        cnt0[n] += 1;
+        smx0[n] += smx0[n - 1];
 
-            cnt0[n-1]=0;
-            smx0[n-1]=0.0;
-         }
+        cnt0[n - 1] = 0;
+        smx0[n - 1] = 0.0;
       }
-   }
+    }
+  }
 
-   for (n=1;n<MAX_LEVELS;n++)
-      smx0[0]+=smx0[n];
+  for (n = 1; n < MAX_LEVELS; n++)
+    smx0[0] += smx0[n];
 
-   if (NPROC>1)
-   {
-      MPI_Reduce(smx0,&s,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-      MPI_Bcast(&s,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-   }
-   else
-      s=smx0[0];
+  if (NPROC > 1) {
+    MPI_Reduce(smx0, &s, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&s, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  } else
+    s = smx0[0];
 
-   return 0.5*s;
+  return 0.5 * s;
 }
-
 
 double ym_action_slices(double *asl)
 {
-   int bc,tmx;
-   int n,ix,t,t0;
-   double s;
+  int bc, tmx;
+  int n, ix, t, t0;
+  double s;
 
-   ft=ftensor();
-   bc=bc_type();
-   if (bc==0)
-      tmx=N0-1;
-   else
-      tmx=N0;
+  ft = ftensor();
+  bc = bc_type();
+  if (bc == 0)
+    tmx = N0 - 1;
+  else
+    tmx = N0;
 
-   for (t=0;t<L0;t++)
-   {
-      for (n=0;n<MAX_LEVELS;n++)
-      {
-         cnt[t][n]=0;
-         smx[t][n]=0.0;
+  for (t = 0; t < L0; t++) {
+    for (n = 0; n < MAX_LEVELS; n++) {
+      cnt[t][n] = 0;
+      smx[t][n] = 0.0;
+    }
+  }
+
+  t0 = cpr[0] * L0;
+
+  for (ix = 0; ix < VOLUME; ix++) {
+    t = global_time(ix);
+
+    if (((t > 0) && (t < tmx)) || (bc == 3)) {
+      t -= t0;
+      smx[t][0] += density(ix);
+      cnt[t][0] += 1;
+
+      for (n = 1; (cnt[t][n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
+        cnt[t][n] += 1;
+        smx[t][n] += smx[t][n - 1];
+
+        cnt[t][n - 1] = 0;
+        smx[t][n - 1] = 0.0;
       }
-   }
+    }
+  }
 
-   t0=cpr[0]*L0;
+  for (t = 0; t < N0; t++)
+    asl0[t] = 0.0;
 
-   for (ix=0;ix<VOLUME;ix++)
-   {
-      t=global_time(ix);
+  for (t = 0; t < L0; t++) {
+    for (n = 1; n < MAX_LEVELS; n++)
+      smx[t][0] += smx[t][n];
 
-      if (((t>0)&&(t<tmx))||(bc==3))
-      {
-         t-=t0;
-         smx[t][0]+=density(ix);
-         cnt[t][0]+=1;
+    asl0[t + t0] = 0.5 * smx[t][0];
+  }
 
-         for (n=1;(cnt[t][n-1]>=BLK_LENGTH)&&(n<MAX_LEVELS);n++)
-         {
-            cnt[t][n]+=1;
-            smx[t][n]+=smx[t][n-1];
+  if (NPROC > 1) {
+    MPI_Reduce(asl0, asl, N0, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Bcast(asl, N0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  } else {
+    for (t = 0; t < N0; t++)
+      asl[t] = asl0[t];
+  }
 
-            cnt[t][n-1]=0;
-            smx[t][n-1]=0.0;
-         }
-      }
-   }
+  s = 0.0;
 
-   for (t=0;t<N0;t++)
-      asl0[t]=0.0;
+  for (t = 0; t < N0; t++)
+    s += asl[t];
 
-   for (t=0;t<L0;t++)
-   {
-      for (n=1;n<MAX_LEVELS;n++)
-         smx[t][0]+=smx[t][n];
-
-      asl0[t+t0]=0.5*smx[t][0];
-   }
-
-   if (NPROC>1)
-   {
-      MPI_Reduce(asl0,asl,N0,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-      MPI_Bcast(asl,N0,MPI_DOUBLE,0,MPI_COMM_WORLD);
-   }
-   else
-   {
-      for (t=0;t<N0;t++)
-         asl[t]=asl0[t];
-   }
-
-   s=0.0;
-
-   for (t=0;t<N0;t++)
-      s+=asl[t];
-
-   return s;
+  return s;
 }

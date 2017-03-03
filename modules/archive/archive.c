@@ -99,499 +99,457 @@
 #include "archive.h"
 #include "global.h"
 
-#define N0 (NPROC0*L0)
-#define N1 (NPROC1*L1)
-#define N2 (NPROC2*L2)
-#define N3 (NPROC3*L3)
+#define N0 (NPROC0 * L0)
+#define N1 (NPROC1 * L1)
+#define N2 (NPROC2 * L2)
+#define N3 (NPROC3 * L3)
 
-static int endian,ns,nd,*state=NULL;
-static su3_dble *ubuf=NULL,*vbuf,*udb;
-
+static int endian, ns, nd, *state = NULL;
+static su3_dble *ubuf = NULL, *vbuf, *udb;
 
 static void alloc_state(void)
 {
-   int n;
+  int n;
 
-   ns=rlxs_size();
-   nd=rlxd_size();
+  ns = rlxs_size();
+  nd = rlxd_size();
 
-   if (ns<nd)
-      n=nd;
-   else
-      n=ns;
+  if (ns < nd)
+    n = nd;
+  else
+    n = ns;
 
-   state=malloc(n*sizeof(int));
-   error(state==NULL,1,"alloc_state [archive.c]",
-         "Unable to allocate auxiliary array");
+  state = malloc(n * sizeof(int));
+  error(state == NULL, 1, "alloc_state [archive.c]",
+        "Unable to allocate auxiliary array");
 }
-
 
 void write_cnfg(char *out)
 {
-   int ldat[16],iw,ie;
-   double plaq;
-   FILE *fout;
+  int ldat[16], iw, ie;
+  double plaq;
+  FILE *fout;
 
-   if (state==NULL)
-      alloc_state();
+  if (state == NULL)
+    alloc_state();
 
-   udb=udfld();
-   ie=chs_ubnd(1);
-   error_root(ie==1,1,"write_cnfg [archive.c]",
+  udb = udfld();
+  ie = chs_ubnd(1);
+  error_root(ie == 1, 1, "write_cnfg [archive.c]",
              "Attempt to write sign-flipped link variables");
-   fout=fopen(out,"wb");
-   error_loc(fout==NULL,1,"write_cnfg [archive.c]",
-             "Unable to open output file");
-   error_chk();
+  fout = fopen(out, "wb");
+  error_loc(fout == NULL, 1, "write_cnfg [archive.c]",
+            "Unable to open output file");
+  error_chk();
 
-   ldat[0]=NPROC0;
-   ldat[1]=NPROC1;
-   ldat[2]=NPROC2;
-   ldat[3]=NPROC3;
+  ldat[0] = NPROC0;
+  ldat[1] = NPROC1;
+  ldat[2] = NPROC2;
+  ldat[3] = NPROC3;
 
-   ldat[4]=L0;
-   ldat[5]=L1;
-   ldat[6]=L2;
-   ldat[7]=L3;
+  ldat[4] = L0;
+  ldat[5] = L1;
+  ldat[6] = L2;
+  ldat[7] = L3;
 
-   ldat[8]=NPROC0_BLK;
-   ldat[9]=NPROC1_BLK;
-   ldat[10]=NPROC2_BLK;
-   ldat[11]=NPROC3_BLK;
+  ldat[8] = NPROC0_BLK;
+  ldat[9] = NPROC1_BLK;
+  ldat[10] = NPROC2_BLK;
+  ldat[11] = NPROC3_BLK;
 
-   ldat[12]=cpr[0];
-   ldat[13]=cpr[1];
-   ldat[14]=cpr[2];
-   ldat[15]=cpr[3];
+  ldat[12] = cpr[0];
+  ldat[13] = cpr[1];
+  ldat[14] = cpr[2];
+  ldat[15] = cpr[3];
 
-   iw=fwrite(ldat,sizeof(int),16,fout);
-   rlxs_get(state);
-   iw+=fwrite(state,sizeof(int),ns,fout);
-   rlxd_get(state);
-   iw+=fwrite(state,sizeof(int),nd,fout);
-   plaq=plaq_sum_dble(0);
-   iw+=fwrite(&plaq,sizeof(double),1,fout);
-   iw+=fwrite(udb,sizeof(su3_dble),4*VOLUME,fout);
+  iw = fwrite(ldat, sizeof(int), 16, fout);
+  rlxs_get(state);
+  iw += fwrite(state, sizeof(int), ns, fout);
+  rlxd_get(state);
+  iw += fwrite(state, sizeof(int), nd, fout);
+  plaq = plaq_sum_dble(0);
+  iw += fwrite(&plaq, sizeof(double), 1, fout);
+  iw += fwrite(udb, sizeof(su3_dble), 4 * VOLUME, fout);
 
-   error_loc(iw!=(17+ns+nd+4*VOLUME),1,"write_cnfg [archive.c]",
-             "Incorrect write count");
-   error_chk();
-   fclose(fout);
+  error_loc(iw != (17 + ns + nd + 4 * VOLUME), 1, "write_cnfg [archive.c]",
+            "Incorrect write count");
+  error_chk();
+  fclose(fout);
 }
-
 
 void read_cnfg(char *in)
 {
-   int ldat[16],ir,ie;
-   double nplaq,plaq0,plaq1,eps;
-   FILE *fin;
+  int ldat[16], ir, ie;
+  double nplaq, plaq0, plaq1, eps;
+  FILE *fin;
 
-   if (state==NULL)
-      alloc_state();
+  if (state == NULL)
+    alloc_state();
 
-   udb=udfld();
-   fin=fopen(in,"rb");
-   error_loc(fin==NULL,1,"read_cnfg [archive.c]",
-             "Unable to open input file");
-   error_chk();
+  udb = udfld();
+  fin = fopen(in, "rb");
+  error_loc(fin == NULL, 1, "read_cnfg [archive.c]",
+            "Unable to open input file");
+  error_chk();
 
-   ir=fread(ldat,sizeof(int),16,fin);
+  ir = fread(ldat, sizeof(int), 16, fin);
 
-   ie=0;
-   ie|=((ldat[0]!=NPROC0)||(ldat[1]!=NPROC1)||
-        (ldat[2]!=NPROC2)||(ldat[3]!=NPROC3));
-   ie|=((ldat[4]!=L0)||(ldat[5]!=L1)||
-        (ldat[6]!=L2)||(ldat[7]!=L3));
-   ie|=((ldat[8]!=NPROC0_BLK)||(ldat[9]!=NPROC1_BLK)||
-        (ldat[10]!=NPROC2_BLK)||(ldat[11]!=NPROC3_BLK));
-   ie|=((ldat[12]!=cpr[0])||(ldat[13]!=cpr[1])||
-        (ldat[14]!=cpr[2])||(ldat[15]!=cpr[3]));
-   error(ie!=0,1,"read_cnfg [archive.c]","Unexpected lattice data");
+  ie = 0;
+  ie |= ((ldat[0] != NPROC0) || (ldat[1] != NPROC1) || (ldat[2] != NPROC2) ||
+         (ldat[3] != NPROC3));
+  ie |= ((ldat[4] != L0) || (ldat[5] != L1) || (ldat[6] != L2) ||
+         (ldat[7] != L3));
+  ie |= ((ldat[8] != NPROC0_BLK) || (ldat[9] != NPROC1_BLK) ||
+         (ldat[10] != NPROC2_BLK) || (ldat[11] != NPROC3_BLK));
+  ie |= ((ldat[12] != cpr[0]) || (ldat[13] != cpr[1]) || (ldat[14] != cpr[2]) ||
+         (ldat[15] != cpr[3]));
+  error(ie != 0, 1, "read_cnfg [archive.c]", "Unexpected lattice data");
 
-   ir+=fread(state,sizeof(int),ns,fin);
-   rlxs_reset(state);
-   ir+=fread(state,sizeof(int),nd,fin);
-   rlxd_reset(state);
-   ir+=fread(&plaq0,sizeof(double),1,fin);
-   ir+=fread(udb,sizeof(su3_dble),4*VOLUME,fin);
+  ir += fread(state, sizeof(int), ns, fin);
+  rlxs_reset(state);
+  ir += fread(state, sizeof(int), nd, fin);
+  rlxd_reset(state);
+  ir += fread(&plaq0, sizeof(double), 1, fin);
+  ir += fread(udb, sizeof(su3_dble), 4 * VOLUME, fin);
 
-   error_loc(ir!=(17+ns+nd+4*VOLUME),1,"read_cnfg [archive.c]",
-             "Incorrect read count");
-   error_chk();
-   fclose(fin);
+  error_loc(ir != (17 + ns + nd + 4 * VOLUME), 1, "read_cnfg [archive.c]",
+            "Incorrect read count");
+  error_chk();
+  fclose(fin);
 
-   set_flags(UPDATED_UD);
-   ie=check_bc(64.0*DBL_EPSILON);
-   error_root(ie!=1,1,"read_cnfg [archive.c]",
-              "Incompatible boundary conditions");
+  set_flags(UPDATED_UD);
+  ie = check_bc(64.0 * DBL_EPSILON);
+  error_root(ie != 1, 1, "read_cnfg [archive.c]",
+             "Incompatible boundary conditions");
 
-   ie=0;
-   nplaq=(double)(6*L0*L1)*(double)(L2*L3);
-   eps=sqrt(nplaq)*DBL_EPSILON;
-   plaq0/=nplaq;
-   plaq1=plaq_sum_dble(0)/nplaq;
-   ie|=(fabs(plaq1-plaq0)>eps);
-   set_bc();
-   plaq1=plaq_sum_dble(0)/nplaq;
-   ie|=(fabs(plaq1-plaq0)>eps);
-   error_loc(ie!=0,1,"read_cnfg [archive.c]",
-             "Incorrect average plaquette");
-   error_chk();
+  ie = 0;
+  nplaq = (double)(6 * L0 * L1) * (double)(L2 * L3);
+  eps = sqrt(nplaq) * DBL_EPSILON;
+  plaq0 /= nplaq;
+  plaq1 = plaq_sum_dble(0) / nplaq;
+  ie |= (fabs(plaq1 - plaq0) > eps);
+  set_bc();
+  plaq1 = plaq_sum_dble(0) / nplaq;
+  ie |= (fabs(plaq1 - plaq0) > eps);
+  error_loc(ie != 0, 1, "read_cnfg [archive.c]", "Incorrect average plaquette");
+  error_chk();
 }
-
 
 static void check_machine(void)
 {
-   error_root(sizeof(stdint_t)!=4,1,"check_machine [archive.c]",
-              "Size of a stdint_t integer is not 4");
-   error_root(sizeof(double)!=8,1,"check_machine [archive.c]",
-              "Size of a double is not 8");
+  error_root(sizeof(stdint_t) != 4, 1, "check_machine [archive.c]",
+             "Size of a stdint_t integer is not 4");
+  error_root(sizeof(double) != 8, 1, "check_machine [archive.c]",
+             "Size of a double is not 8");
 
-   endian=endianness();
-   error_root(endian==UNKNOWN_ENDIAN,1,"check_machine [archive.c]",
-              "Unkown endianness");
+  endian = endianness();
+  error_root(endian == UNKNOWN_ENDIAN, 1, "check_machine [archive.c]",
+             "Unkown endianness");
 }
-
 
 static void alloc_ubuf(int my_rank)
 {
-   if (my_rank==0)
-   {
-      ubuf=amalloc(4*(L3+N3)*sizeof(su3_dble),ALIGN);
-      vbuf=ubuf+4*L3;
-   }
-   else
-   {
-      ubuf=amalloc(4*L3*sizeof(su3_dble),ALIGN);
-      vbuf=NULL;
-   }
+  if (my_rank == 0) {
+    ubuf = amalloc(4 * (L3 + N3) * sizeof(su3_dble), ALIGN);
+    vbuf = ubuf + 4 * L3;
+  } else {
+    ubuf = amalloc(4 * L3 * sizeof(su3_dble), ALIGN);
+    vbuf = NULL;
+  }
 
-   error(ubuf==NULL,1,"alloc_ubuf [archive.c]",
-         "Unable to allocate auxiliary array");
+  error(ubuf == NULL, 1, "alloc_ubuf [archive.c]",
+        "Unable to allocate auxiliary array");
 }
-
 
 static void get_links(int iy)
 {
-   int y3,ifc;
-   su3_dble *u,*v;
+  int y3, ifc;
+  su3_dble *u, *v;
 
-   v=ubuf;
-   iy*=L3;
+  v = ubuf;
+  iy *= L3;
 
-   if (ipt[iy]<(VOLUME/2))
-      iy+=1;
+  if (ipt[iy] < (VOLUME / 2))
+    iy += 1;
 
-   for (y3=0;y3<L3;y3+=2)
-   {
-      u=udb+8*(ipt[iy+y3]-(VOLUME/2));
+  for (y3 = 0; y3 < L3; y3 += 2) {
+    u = udb + 8 * (ipt[iy + y3] - (VOLUME / 2));
 
-      for (ifc=0;ifc<8;ifc++)
-      {
-         v[0]=u[0];
-         v+=1;
-         u+=1;
-      }
-   }
+    for (ifc = 0; ifc < 8; ifc++) {
+      v[0] = u[0];
+      v += 1;
+      u += 1;
+    }
+  }
 }
-
 
 static void set_links(int iy)
 {
-   int y3,ifc;
-   su3_dble *u,*v;
+  int y3, ifc;
+  su3_dble *u, *v;
 
-   v=ubuf;
-   iy*=L3;
+  v = ubuf;
+  iy *= L3;
 
-   if (ipt[iy]<(VOLUME/2))
-      iy+=1;
+  if (ipt[iy] < (VOLUME / 2))
+    iy += 1;
 
-   for (y3=0;y3<L3;y3+=2)
-   {
-      u=udb+8*(ipt[iy+y3]-(VOLUME/2));
+  for (y3 = 0; y3 < L3; y3 += 2) {
+    u = udb + 8 * (ipt[iy + y3] - (VOLUME / 2));
 
-      for (ifc=0;ifc<8;ifc++)
-      {
-         u[0]=v[0];
-         v+=1;
-         u+=1;
-      }
-   }
+    for (ifc = 0; ifc < 8; ifc++) {
+      u[0] = v[0];
+      v += 1;
+      u += 1;
+    }
+  }
 }
-
 
 void export_cnfg(char *out)
 {
-   int my_rank,np[4],n,iw,ie;
-   int iwa,dmy,tag0,tag1;
-   int x0,x1,x2,x3,y0,y1,y2,ix,iy;
-   stdint_t lsize[4];
-   double nplaq,plaq;
-   MPI_Status stat;
-   FILE *fout=NULL;
+  int my_rank, np[4], n, iw, ie;
+  int iwa, dmy, tag0, tag1;
+  int x0, x1, x2, x3, y0, y1, y2, ix, iy;
+  stdint_t lsize[4];
+  double nplaq, plaq;
+  MPI_Status stat;
+  FILE *fout = NULL;
 
-   MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-   if (ubuf==NULL)
-   {
-      check_machine();
-      alloc_ubuf(my_rank);
-   }
+  if (ubuf == NULL) {
+    check_machine();
+    alloc_ubuf(my_rank);
+  }
 
-   dmy=1;
-   tag0=mpi_tag();
-   tag1=mpi_tag();
-   udb=udfld();
-   ie=chs_ubnd(1);
-   error_root(ie==1,1,"export_cnfg [archive.c]",
+  dmy = 1;
+  tag0 = mpi_tag();
+  tag1 = mpi_tag();
+  udb = udfld();
+  ie = chs_ubnd(1);
+  error_root(ie == 1, 1, "export_cnfg [archive.c]",
              "Attempt to write sign-flipped link variables");
-   nplaq=(double)(6*N0*N1)*(double)(N2*N3);
-   plaq=plaq_sum_dble(1)/nplaq;
+  nplaq = (double)(6 * N0 * N1) * (double)(N2 * N3);
+  plaq = plaq_sum_dble(1) / nplaq;
 
-   if (my_rank==0)
-   {
-      fout=fopen(out,"wb");
-      error_root(fout==NULL,1,"export_cnfg [archive.c]",
-                 "Unable to open output file");
+  if (my_rank == 0) {
+    fout = fopen(out, "wb");
+    error_root(fout == NULL, 1, "export_cnfg [archive.c]",
+               "Unable to open output file");
 
-      lsize[0]=(stdint_t)(N0);
-      lsize[1]=(stdint_t)(N1);
-      lsize[2]=(stdint_t)(N2);
-      lsize[3]=(stdint_t)(N3);
+    lsize[0] = (stdint_t)(N0);
+    lsize[1] = (stdint_t)(N1);
+    lsize[2] = (stdint_t)(N2);
+    lsize[3] = (stdint_t)(N3);
 
-      if (endian==BIG_ENDIAN)
-      {
-         bswap_int(4,lsize);
-         bswap_double(1,&plaq);
+    if (endian == BIG_ENDIAN) {
+      bswap_int(4, lsize);
+      bswap_double(1, &plaq);
+    }
+
+    iw = fwrite(lsize, sizeof(stdint_t), 4, fout);
+    iw += fwrite(&plaq, sizeof(double), 1, fout);
+
+    error_root(iw != 5, 1, "export_cnfg [archive.c]", "Incorrect write count");
+  }
+
+  iwa = 0;
+
+  for (ix = 0; ix < (N0 * N1 * N2); ix++) {
+    x0 = ix / (N1 * N2);
+    x1 = (ix / N2) % N1;
+    x2 = ix % N2;
+
+    y0 = x0 % L0;
+    y1 = x1 % L1;
+    y2 = x2 % L2;
+    iy = y2 + L2 * y1 + L1 * L2 * y0;
+
+    np[0] = x0 / L0;
+    np[1] = x1 / L1;
+    np[2] = x2 / L2;
+
+    for (x3 = 0; x3 < N3; x3 += L3) {
+      np[3] = x3 / L3;
+      n = ipr_global(np);
+      if (my_rank == n)
+        get_links(iy);
+
+      if (n > 0) {
+        if (my_rank == 0) {
+          MPI_Send(&dmy, 1, MPI_INT, n, tag0, MPI_COMM_WORLD);
+          MPI_Recv(ubuf, 4 * L3 * 18, MPI_DOUBLE, n, tag1, MPI_COMM_WORLD,
+                   &stat);
+        } else if (my_rank == n) {
+          MPI_Recv(&dmy, 1, MPI_INT, 0, tag0, MPI_COMM_WORLD, &stat);
+          MPI_Send(ubuf, 4 * L3 * 18, MPI_DOUBLE, 0, tag1, MPI_COMM_WORLD);
+        }
       }
 
-      iw=fwrite(lsize,sizeof(stdint_t),4,fout);
-      iw+=fwrite(&plaq,sizeof(double),1,fout);
-
-      error_root(iw!=5,1,"export_cnfg [archive.c]","Incorrect write count");
-   }
-
-   iwa=0;
-
-   for (ix=0;ix<(N0*N1*N2);ix++)
-   {
-      x0=ix/(N1*N2);
-      x1=(ix/N2)%N1;
-      x2=ix%N2;
-
-      y0=x0%L0;
-      y1=x1%L1;
-      y2=x2%L2;
-      iy=y2+L2*y1+L1*L2*y0;
-
-      np[0]=x0/L0;
-      np[1]=x1/L1;
-      np[2]=x2/L2;
-
-      for (x3=0;x3<N3;x3+=L3)
-      {
-         np[3]=x3/L3;
-         n=ipr_global(np);
-         if (my_rank==n)
-            get_links(iy);
-
-         if (n>0)
-         {
-            if (my_rank==0)
-            {
-               MPI_Send(&dmy,1,MPI_INT,n,tag0,MPI_COMM_WORLD);
-               MPI_Recv(ubuf,4*L3*18,MPI_DOUBLE,n,tag1,MPI_COMM_WORLD,&stat);
-            }
-            else if (my_rank==n)
-            {
-               MPI_Recv(&dmy,1,MPI_INT,0,tag0,MPI_COMM_WORLD,&stat);
-               MPI_Send(ubuf,4*L3*18,MPI_DOUBLE,0,tag1,MPI_COMM_WORLD);
-            }
-         }
-
-         if (my_rank==0)
-         {
-            if (endian==BIG_ENDIAN)
-               bswap_double(4*L3*18,ubuf);
-            iw=fwrite(ubuf,sizeof(su3_dble),4*L3,fout);
-            iwa|=(iw!=(4*L3));
-         }
+      if (my_rank == 0) {
+        if (endian == BIG_ENDIAN)
+          bswap_double(4 * L3 * 18, ubuf);
+        iw = fwrite(ubuf, sizeof(su3_dble), 4 * L3, fout);
+        iwa |= (iw != (4 * L3));
       }
-   }
+    }
+  }
 
-   if (my_rank==0)
-   {
-      error_root(iwa!=0,1,"export_cnfg [archive.c]",
-                 "Incorrect write count");
-      fclose(fout);
-   }
+  if (my_rank == 0) {
+    error_root(iwa != 0, 1, "export_cnfg [archive.c]", "Incorrect write count");
+    fclose(fout);
+  }
 }
-
 
 void import_cnfg(char *in)
 {
-   int my_rank,np[4],ir,ie;
-   int ira,dmy,tag0,tag1;
-   int n0,n1,n2,n3,nc0,nc1,nc2,nc3;
-   int x0,x1,x2,y0,y1,y2,y3,c0,c1,c2,ix,iy,ic;
-   int n,k,l;
-   stdint_t lsize[4];
-   double nplaq,plaq0,plaq1,eps;
-   MPI_Status stat;
-   FILE *fin=NULL;
+  int my_rank, np[4], ir, ie;
+  int ira, dmy, tag0, tag1;
+  int n0, n1, n2, n3, nc0, nc1, nc2, nc3;
+  int x0, x1, x2, y0, y1, y2, y3, c0, c1, c2, ix, iy, ic;
+  int n, k, l;
+  stdint_t lsize[4];
+  double nplaq, plaq0, plaq1, eps;
+  MPI_Status stat;
+  FILE *fin = NULL;
 
-   MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-   if (ubuf==NULL)
-   {
-      check_machine();
-      alloc_ubuf(my_rank);
-   }
+  if (ubuf == NULL) {
+    check_machine();
+    alloc_ubuf(my_rank);
+  }
 
-   dmy=1;
-   tag0=mpi_tag();
-   tag1=mpi_tag();
-   udb=udfld();
+  dmy = 1;
+  tag0 = mpi_tag();
+  tag1 = mpi_tag();
+  udb = udfld();
 
-   if (my_rank==0)
-   {
-      fin=fopen(in,"rb");
-      error_root(fin==NULL,1,"import_cnfg [archive.c]",
-                 "Unable to open input file");
+  if (my_rank == 0) {
+    fin = fopen(in, "rb");
+    error_root(fin == NULL, 1, "import_cnfg [archive.c]",
+               "Unable to open input file");
 
-      ir=fread(lsize,sizeof(stdint_t),4,fin);
-      ir+=fread(&plaq0,sizeof(double),1,fin);
-      error_root(ir!=5,1,"import_cnfg [archive.c]","Incorrect read count");
+    ir = fread(lsize, sizeof(stdint_t), 4, fin);
+    ir += fread(&plaq0, sizeof(double), 1, fin);
+    error_root(ir != 5, 1, "import_cnfg [archive.c]", "Incorrect read count");
 
-      if (endian==BIG_ENDIAN)
-      {
-         bswap_int(4,lsize);
-         bswap_double(1,&plaq0);
+    if (endian == BIG_ENDIAN) {
+      bswap_int(4, lsize);
+      bswap_double(1, &plaq0);
+    }
+
+    np[0] = (int)(lsize[0]);
+    np[1] = (int)(lsize[1]);
+    np[2] = (int)(lsize[2]);
+    np[3] = (int)(lsize[3]);
+
+    error_root((np[0] < 1) || ((N0 % np[0]) != 0) || (np[1] < 1) ||
+                   ((N1 % np[1]) != 0) || (np[2] < 1) || ((N2 % np[2]) != 0) ||
+                   (np[3] < 1) || ((N3 % np[3]) != 0),
+               1, "import_cnfg [archive.c]",
+               "Unexpected or incompatible lattice sizes");
+
+    error_root((np[0] != N0) && (bc_type() != 3), 1, "import_cnfg [archive.c]",
+               "Periodic extension in time is only possible when\n"
+               "periodic boundary conditions are chosen");
+  } else {
+    np[0] = 0;
+    np[1] = 0;
+    np[2] = 0;
+    np[3] = 0;
+    plaq0 = 0.0;
+  }
+
+  MPI_Bcast(np, 4, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&plaq0, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  n0 = np[0];
+  n1 = np[1];
+  n2 = np[2];
+  n3 = np[3];
+
+  nc0 = N0 / n0;
+  nc1 = N1 / n1;
+  nc2 = N2 / n2;
+  nc3 = N3 / n3;
+  ira = 0;
+
+  for (ix = 0; ix < (n0 * n1 * n2); ix++) {
+    x0 = ix / (n1 * n2);
+    x1 = (ix / n2) % n1;
+    x2 = ix % n2;
+
+    if (my_rank == 0) {
+      n = 4 * n3;
+      ir = fread(vbuf, sizeof(su3_dble), n, fin);
+      ira |= (ir != n);
+
+      if (endian == BIG_ENDIAN)
+        bswap_double(n * 18, vbuf);
+
+      for (k = 1; k < nc3; k++) {
+        for (l = 0; l < n; l++)
+          vbuf[k * n + l] = vbuf[l];
       }
+    }
 
-      np[0]=(int)(lsize[0]);
-      np[1]=(int)(lsize[1]);
-      np[2]=(int)(lsize[2]);
-      np[3]=(int)(lsize[3]);
+    for (ic = 0; ic < (nc0 * nc1 * nc2); ic++) {
+      c0 = ic / (nc1 * nc2);
+      c1 = (ic / nc2) % nc1;
+      c2 = ic % nc2;
 
-      error_root((np[0]<1)||((N0%np[0])!=0)||
-                 (np[1]<1)||((N1%np[1])!=0)||
-                 (np[2]<1)||((N2%np[2])!=0)||
-                 (np[3]<1)||((N3%np[3])!=0),1,"import_cnfg [archive.c]",
-                 "Unexpected or incompatible lattice sizes");
+      y0 = x0 + c0 * n0;
+      y1 = x1 + c1 * n1;
+      y2 = x2 + c2 * n2;
+      iy = (y2 % L2) + L2 * (y1 % L1) + L1 * L2 * (y0 % L0);
 
-      error_root((np[0]!=N0)&&(bc_type()!=3),1,"import_cnfg [archive.c]",
-                 "Periodic extension in time is only possible when\n"
-                 "periodic boundary conditions are chosen");
-   }
-   else
-   {
-      np[0]=0;
-      np[1]=0;
-      np[2]=0;
-      np[3]=0;
-      plaq0=0.0;
-   }
+      np[0] = y0 / L0;
+      np[1] = y1 / L1;
+      np[2] = y2 / L2;
 
-   MPI_Bcast(np,4,MPI_INT,0,MPI_COMM_WORLD);
-   MPI_Bcast(&plaq0,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+      for (y3 = 0; y3 < N3; y3 += L3) {
+        np[3] = y3 / L3;
+        n = ipr_global(np);
 
-   n0=np[0];
-   n1=np[1];
-   n2=np[2];
-   n3=np[3];
+        if (n > 0) {
+          if (my_rank == 0) {
+            MPI_Send(vbuf + 4 * y3, 4 * L3 * 18, MPI_DOUBLE, n, tag1,
+                     MPI_COMM_WORLD);
+            MPI_Recv(&dmy, 1, MPI_INT, n, tag0, MPI_COMM_WORLD, &stat);
+          } else if (my_rank == n) {
+            MPI_Recv(ubuf, 4 * L3 * 18, MPI_DOUBLE, 0, tag1, MPI_COMM_WORLD,
+                     &stat);
+            MPI_Send(&dmy, 1, MPI_INT, 0, tag0, MPI_COMM_WORLD);
+          }
+        } else if (my_rank == 0)
+          for (l = 0; l < (4 * L3); l++)
+            ubuf[l] = vbuf[4 * y3 + l];
 
-   nc0=N0/n0;
-   nc1=N1/n1;
-   nc2=N2/n2;
-   nc3=N3/n3;
-   ira=0;
-
-   for (ix=0;ix<(n0*n1*n2);ix++)
-   {
-      x0=ix/(n1*n2);
-      x1=(ix/n2)%n1;
-      x2=ix%n2;
-
-      if (my_rank==0)
-      {
-         n=4*n3;
-         ir=fread(vbuf,sizeof(su3_dble),n,fin);
-         ira|=(ir!=n);
-
-         if (endian==BIG_ENDIAN)
-            bswap_double(n*18,vbuf);
-
-         for (k=1;k<nc3;k++)
-         {
-            for (l=0;l<n;l++)
-               vbuf[k*n+l]=vbuf[l];
-         }
+        if (my_rank == n)
+          set_links(iy);
       }
+    }
+  }
 
-      for (ic=0;ic<(nc0*nc1*nc2);ic++)
-      {
-         c0=ic/(nc1*nc2);
-         c1=(ic/nc2)%nc1;
-         c2=ic%nc2;
+  if (my_rank == 0) {
+    error_root(ira != 0, 1, "import_cnfg [archive.c]", "Incorrect read count");
+    fclose(fin);
+  }
 
-         y0=x0+c0*n0;
-         y1=x1+c1*n1;
-         y2=x2+c2*n2;
-         iy=(y2%L2)+L2*(y1%L1)+L1*L2*(y0%L0);
+  set_flags(UPDATED_UD);
+  ie = check_bc(64.0 * DBL_EPSILON);
+  error_root(ie != 1, 1, "import_cnfg [archive.c]",
+             "Incompatible boundary conditions");
 
-         np[0]=y0/L0;
-         np[1]=y1/L1;
-         np[2]=y2/L2;
-
-         for (y3=0;y3<N3;y3+=L3)
-         {
-            np[3]=y3/L3;
-            n=ipr_global(np);
-
-            if (n>0)
-            {
-               if (my_rank==0)
-               {
-                  MPI_Send(vbuf+4*y3,4*L3*18,MPI_DOUBLE,n,tag1,MPI_COMM_WORLD);
-                  MPI_Recv(&dmy,1,MPI_INT,n,tag0,MPI_COMM_WORLD,&stat);
-               }
-               else if (my_rank==n)
-               {
-                  MPI_Recv(ubuf,4*L3*18,MPI_DOUBLE,0,tag1,MPI_COMM_WORLD,&stat);
-                  MPI_Send(&dmy,1,MPI_INT,0,tag0,MPI_COMM_WORLD);
-               }
-            }
-            else if (my_rank==0)
-               for (l=0;l<(4*L3);l++)
-                  ubuf[l]=vbuf[4*y3+l];
-
-            if (my_rank==n)
-               set_links(iy);
-         }
-      }
-   }
-
-   if (my_rank==0)
-   {
-      error_root(ira!=0,1,"import_cnfg [archive.c]","Incorrect read count");
-      fclose(fin);
-   }
-
-   set_flags(UPDATED_UD);
-   ie=check_bc(64.0*DBL_EPSILON);
-   error_root(ie!=1,1,"import_cnfg [archive.c]",
-              "Incompatible boundary conditions");
-
-   ie=0;
-   nplaq=(double)(6*N0*N1)*(double)(N2*N3);
-   eps=sqrt(nplaq)*DBL_EPSILON;
-   plaq1=plaq_sum_dble(1)/nplaq;
-   ie|=(fabs(plaq1-plaq0)>eps);
-   set_bc();
-   plaq1=plaq_sum_dble(1)/nplaq;
-   ie|=(fabs(plaq1-plaq0)>eps);
-   error_root(ie!=0,1,"import_cnfg [archive.c]",
-              "Incorrect average plaquette");
+  ie = 0;
+  nplaq = (double)(6 * N0 * N1) * (double)(N2 * N3);
+  eps = sqrt(nplaq) * DBL_EPSILON;
+  plaq1 = plaq_sum_dble(1) / nplaq;
+  ie |= (fabs(plaq1 - plaq0) > eps);
+  set_bc();
+  plaq1 = plaq_sum_dble(1) / nplaq;
+  ie |= (fabs(plaq1 - plaq0) > eps);
+  error_root(ie != 0, 1, "import_cnfg [archive.c]",
+             "Incorrect average plaquette");
 }

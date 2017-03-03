@@ -146,515 +146,456 @@
 
 #define IRWMAX 32
 
-static int init=0;
-static rwfact_t rwfact[]={RWTM1,RWTM1_EO,RWTM2,RWTM2_EO,RWRAT};
-static rw_parms_t rw[IRWMAX+1]={{RWFACTS,0,0,0,0,NULL,NULL,NULL}};
-
+static int init = 0;
+static rwfact_t rwfact[] = {RWTM1, RWTM1_EO, RWTM2, RWTM2_EO, RWRAT};
+static rw_parms_t rw[IRWMAX + 1] = {{RWFACTS, 0, 0, 0, 0, NULL, NULL, NULL}};
 
 static void init_rw(void)
 {
-   int irw;
+  int irw;
 
-   for (irw=1;irw<=IRWMAX;irw++)
-      rw[irw]=rw[0];
+  for (irw = 1; irw <= IRWMAX; irw++)
+    rw[irw] = rw[0];
 
-   init=1;
+  init = 1;
 }
 
-
-rw_parms_t set_rw_parms(int irw,rwfact_t rwfact,int im0,int nsrc,
-                        int irp,int nfct,double *mu,int *np,int *isp)
+rw_parms_t set_rw_parms(int irw, rwfact_t rwfact, int im0, int nsrc, int irp,
+                        int nfct, double *mu, int *np, int *isp)
 {
-   int iprms[6],i,ie;
-   double dprms[1];
+  int iprms[6], i, ie;
+  double dprms[1];
 
-   if (init==0)
-      init_rw();
+  if (init == 0)
+    init_rw();
 
-   error_root((rwfact!=RWTM1)&&(rwfact!=RWTM1_EO)&&
-              (rwfact!=RWTM2)&&(rwfact!=RWTM2_EO)&&(rwfact!=RWRAT),1,
-              "set_rw_parms [rw_parms.c]","Unknown type of reweighting factor");
+  error_root((rwfact != RWTM1) && (rwfact != RWTM1_EO) && (rwfact != RWTM2) &&
+                 (rwfact != RWTM2_EO) && (rwfact != RWRAT),
+             1, "set_rw_parms [rw_parms.c]",
+             "Unknown type of reweighting factor");
 
-   if (rwfact!=RWRAT)
-      irp=0;
+  if (rwfact != RWRAT)
+    irp = 0;
 
-   if (NPROC>1)
-   {
-      iprms[0]=irw;
-      iprms[1]=(int)(rwfact);
-      iprms[2]=im0;
-      iprms[3]=nsrc;
-      iprms[4]=irp;
-      iprms[5]=nfct;
+  if (NPROC > 1) {
+    iprms[0] = irw;
+    iprms[1] = (int)(rwfact);
+    iprms[2] = im0;
+    iprms[3] = nsrc;
+    iprms[4] = irp;
+    iprms[5] = nfct;
 
-      MPI_Bcast(iprms,6,MPI_INT,0,MPI_COMM_WORLD);
+    MPI_Bcast(iprms, 6, MPI_INT, 0, MPI_COMM_WORLD);
 
-      ie=0;
-      ie|=(iprms[0]!=irw);
-      ie|=(iprms[1]!=(int)(rwfact));
-      ie|=(iprms[2]!=im0);
-      ie|=(iprms[3]!=nsrc);
-      ie|=(iprms[4]!=irp);
-      ie|=(iprms[5]!=nfct);
+    ie = 0;
+    ie |= (iprms[0] != irw);
+    ie |= (iprms[1] != (int)(rwfact));
+    ie |= (iprms[2] != im0);
+    ie |= (iprms[3] != nsrc);
+    ie |= (iprms[4] != irp);
+    ie |= (iprms[5] != nfct);
 
-      error(ie!=0,1,"set_rw_parms [rw_parms.c]",
-            "Parameters are not global");
-   }
+    error(ie != 0, 1, "set_rw_parms [rw_parms.c]", "Parameters are not global");
+  }
 
-   ie=0;
-   ie|=((irw<0)||(irw>=IRWMAX));
-   ie|=(im0<0);
-   ie|=(nsrc<1);
-   ie|=(irp<0);
-   ie|=(nfct<1);
+  ie = 0;
+  ie |= ((irw < 0) || (irw >= IRWMAX));
+  ie |= (im0 < 0);
+  ie |= (nsrc < 1);
+  ie |= (irp < 0);
+  ie |= (nfct < 1);
 
-   error_root(ie!=0,1,"set_rw_parms [rw_parms.c]",
-              "Parameters are out of range");
+  error_root(ie != 0, 1, "set_rw_parms [rw_parms.c]",
+             "Parameters are out of range");
 
-   if (NPROC>1)
-   {
-      if (rwfact!=RWRAT)
-      {
-         for (i=0;i<nfct;i++)
-         {
-            dprms[0]=mu[i];
-            iprms[0]=isp[i];
+  if (NPROC > 1) {
+    if (rwfact != RWRAT) {
+      for (i = 0; i < nfct; i++) {
+        dprms[0] = mu[i];
+        iprms[0] = isp[i];
 
-            MPI_Bcast(dprms,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-            MPI_Bcast(iprms,1,MPI_INT,0,MPI_COMM_WORLD);
+        MPI_Bcast(dprms, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+        MPI_Bcast(iprms, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-            ie|=(dprms[0]!=mu[i]);
-            ie|=(iprms[0]!=isp[i]);
-         }
-
-         error(ie!=0,1,"set_rw_parms [rw_parms.c]",
-               "Parameters mu or isp are not global");
+        ie |= (dprms[0] != mu[i]);
+        ie |= (iprms[0] != isp[i]);
       }
+
+      error(ie != 0, 1, "set_rw_parms [rw_parms.c]",
+            "Parameters mu or isp are not global");
+    } else {
+      for (i = 0; i < nfct; i++) {
+        iprms[0] = np[i];
+        iprms[1] = isp[i];
+
+        MPI_Bcast(iprms, 2, MPI_INT, 0, MPI_COMM_WORLD);
+
+        ie |= (iprms[0] != np[i]);
+        ie |= (iprms[1] != isp[i]);
+      }
+
+      error(ie != 0, 1, "set_rw_parms [rw_parms.c]",
+            "Parameters np or isp are not global");
+    }
+  }
+
+  error_root(rw[irw].rwfact != RWFACTS, 1, "set_rw_parms [rw_parms.c]",
+             "Attempt to reset an already specified parameter set");
+
+  rw[irw].rwfact = rwfact;
+  rw[irw].im0 = im0;
+  rw[irw].nsrc = nsrc;
+  rw[irw].irp = irp;
+  rw[irw].nfct = nfct;
+
+  if (rwfact != RWRAT) {
+    rw[irw].mu = malloc(nfct * sizeof(*mu));
+    rw[irw].np = NULL;
+    rw[irw].isp = malloc(nfct * sizeof(*isp));
+
+    error_root((rw[irw].mu == NULL) || (rw[irw].isp == NULL), 1,
+               "set_rw_parms [rw_parms.c]",
+               "Unable to allocate parameter arrays");
+
+    for (i = 0; i < nfct; i++) {
+      rw[irw].mu[i] = mu[i];
+      rw[irw].isp[i] = isp[i];
+
+      if (i == 0)
+        ie |= (mu[i] <= 0.0);
       else
-      {
-         for (i=0;i<nfct;i++)
-         {
-            iprms[0]=np[i];
-            iprms[1]=isp[i];
+        ie |= (mu[i] <= mu[i - 1]);
+    }
 
-            MPI_Bcast(iprms,2,MPI_INT,0,MPI_COMM_WORLD);
+    error_root(ie != 0, 1, "set_rw_parms [rw_parms.c]",
+               "The twisted masses must be in ascending order");
+  } else {
+    rw[irw].np = malloc(2 * nfct * sizeof(*np));
+    rw[irw].isp = rw[irw].np + nfct;
+    rw[irw].mu = NULL;
 
-            ie|=(iprms[0]!=np[i]);
-            ie|=(iprms[1]!=isp[i]);
-         }
+    error_root(rw[irw].np == NULL, 1, "set_rw_parms [rw_parms.c]",
+               "Unable to allocate parameter arrays");
 
-         error(ie!=0,1,"set_rw_parms [rw_parms.c]",
-               "Parameters np or isp are not global");
-      }
-   }
+    for (i = 0; i < nfct; i++) {
+      rw[irw].np[i] = np[i];
+      rw[irw].isp[i] = isp[i];
+    }
+  }
 
-   error_root(rw[irw].rwfact!=RWFACTS,1,"set_rw_parms [rw_parms.c]",
-              "Attempt to reset an already specified parameter set");
-
-   rw[irw].rwfact=rwfact;
-   rw[irw].im0=im0;
-   rw[irw].nsrc=nsrc;
-   rw[irw].irp=irp;
-   rw[irw].nfct=nfct;
-
-   if (rwfact!=RWRAT)
-   {
-      rw[irw].mu=malloc(nfct*sizeof(*mu));
-      rw[irw].np=NULL;
-      rw[irw].isp=malloc(nfct*sizeof(*isp));
-
-      error_root((rw[irw].mu==NULL)||(rw[irw].isp==NULL),1,
-                 "set_rw_parms [rw_parms.c]",
-                 "Unable to allocate parameter arrays");
-
-      for (i=0;i<nfct;i++)
-      {
-         rw[irw].mu[i]=mu[i];
-         rw[irw].isp[i]=isp[i];
-
-         if (i==0)
-            ie|=(mu[i]<=0.0);
-         else
-            ie|=(mu[i]<=mu[i-1]);
-      }
-
-      error_root(ie!=0,1,"set_rw_parms [rw_parms.c]",
-                 "The twisted masses must be in ascending order");
-   }
-   else
-   {
-      rw[irw].np=malloc(2*nfct*sizeof(*np));
-      rw[irw].isp=rw[irw].np+nfct;
-      rw[irw].mu=NULL;
-
-      error_root(rw[irw].np==NULL,1,"set_rw_parms [rw_parms.c]",
-                 "Unable to allocate parameter arrays");
-
-      for (i=0;i<nfct;i++)
-      {
-         rw[irw].np[i]=np[i];
-         rw[irw].isp[i]=isp[i];
-      }
-   }
-
-   return rw[irw];
+  return rw[irw];
 }
-
 
 rw_parms_t rw_parms(int irw)
 {
-   if (init==0)
-      init_rw();
+  if (init == 0)
+    init_rw();
 
-   if ((irw>=0)&&(irw<IRWMAX))
-      return rw[irw];
-   else
-   {
-      error_loc(1,1,"rw_parms [rw_parms.c]",
-                "Reweighting factor index is out of range");
-      return rw[IRWMAX];
-   }
+  if ((irw >= 0) && (irw < IRWMAX))
+    return rw[irw];
+  else {
+    error_loc(1, 1, "rw_parms [rw_parms.c]",
+              "Reweighting factor index is out of range");
+    return rw[IRWMAX];
+  }
 }
-
 
 void read_rw_parms(int irw)
 {
-   int my_rank,n,i;
-   int idr,im0,nsrc,irp,nfct;
-   int *np,*isp;
-   double *mu;
-   char line[NAME_SIZE];
+  int my_rank, n, i;
+  int idr, im0, nsrc, irp, nfct;
+  int *np, *isp;
+  double *mu;
+  char line[NAME_SIZE];
 
-   MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-   if (my_rank==0)
-   {
-      sprintf(line,"Reweighting factor %d",irw);
-      find_section(line);
+  if (my_rank == 0) {
+    sprintf(line, "Reweighting factor %d", irw);
+    find_section(line);
 
-      read_line("rwfact","%s",line);
+    read_line("rwfact", "%s", line);
 
-      if (strcmp(line,"RWTM1")==0)
-         idr=0;
-      else if (strcmp(line,"RWTM1_EO")==0)
-         idr=1;
-      else if (strcmp(line,"RWTM2")==0)
-         idr=2;
-      else if (strcmp(line,"RWTM2_EO")==0)
-         idr=3;
-      else if (strcmp(line,"RWRAT")==0)
-         idr=4;
-      else
-      {
-         idr=5;
-         error_root(1,1,"read_rw_parms [rw_parms.c]",
-                    "Unknown reweighting factor %s",line);
-      }
+    if (strcmp(line, "RWTM1") == 0)
+      idr = 0;
+    else if (strcmp(line, "RWTM1_EO") == 0)
+      idr = 1;
+    else if (strcmp(line, "RWTM2") == 0)
+      idr = 2;
+    else if (strcmp(line, "RWTM2_EO") == 0)
+      idr = 3;
+    else if (strcmp(line, "RWRAT") == 0)
+      idr = 4;
+    else {
+      idr = 5;
+      error_root(1, 1, "read_rw_parms [rw_parms.c]",
+                 "Unknown reweighting factor %s", line);
+    }
 
-      read_line("im0","%d",&im0);
-      read_line("nsrc","%d",&nsrc);
+    read_line("im0", "%d", &im0);
+    read_line("nsrc", "%d", &nsrc);
 
-      if (idr<4)
-      {
-         irp=0;
-         nfct=count_tokens("mu");
-         error_root(nfct<1,1,"read_rw_parms [rw_parms.c]",
-                    "No data on line with tag mu");
-      }
-      else
-      {
-         read_line("irp","%d",&irp);
-         nfct=count_tokens("np");
-         error_root(nfct<1,1,"read_rw_parms [rw_parms.c]",
-                    "No data on line with tag np");
-      }
-   }
+    if (idr < 4) {
+      irp = 0;
+      nfct = count_tokens("mu");
+      error_root(nfct < 1, 1, "read_rw_parms [rw_parms.c]",
+                 "No data on line with tag mu");
+    } else {
+      read_line("irp", "%d", &irp);
+      nfct = count_tokens("np");
+      error_root(nfct < 1, 1, "read_rw_parms [rw_parms.c]",
+                 "No data on line with tag np");
+    }
+  }
 
-   if (NPROC>1)
-   {
-      MPI_Bcast(&idr,1,MPI_INT,0,MPI_COMM_WORLD);
-      MPI_Bcast(&im0,1,MPI_INT,0,MPI_COMM_WORLD);
-      MPI_Bcast(&nsrc,1,MPI_INT,0,MPI_COMM_WORLD);
-      MPI_Bcast(&irp,1,MPI_INT,0,MPI_COMM_WORLD);
-      MPI_Bcast(&nfct,1,MPI_INT,0,MPI_COMM_WORLD);
-   }
+  if (NPROC > 1) {
+    MPI_Bcast(&idr, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&im0, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&nsrc, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&irp, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&nfct, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  }
 
-   if (idr<4)
-   {
-      mu=malloc(nfct*sizeof(*mu));
-      np=NULL;
-      isp=malloc(nfct*sizeof(*isp));
-      error((mu==NULL)||(isp==NULL),1,"read_rw_parms [rw_parms.c]",
-            "Unable to allocated data arrays");
-   }
-   else
-   {
-      mu=NULL;
-      np=malloc(2*nfct*sizeof(*np));
-      isp=np+nfct;
-      error(np==NULL,1,"read_rw_parms [rw_parms.c]",
-            "Unable to allocated data arrays");
-   }
+  if (idr < 4) {
+    mu = malloc(nfct * sizeof(*mu));
+    np = NULL;
+    isp = malloc(nfct * sizeof(*isp));
+    error((mu == NULL) || (isp == NULL), 1, "read_rw_parms [rw_parms.c]",
+          "Unable to allocated data arrays");
+  } else {
+    mu = NULL;
+    np = malloc(2 * nfct * sizeof(*np));
+    isp = np + nfct;
+    error(np == NULL, 1, "read_rw_parms [rw_parms.c]",
+          "Unable to allocated data arrays");
+  }
 
-   if (my_rank==0)
-   {
-      if (idr<4)
-         read_dprms("mu",nfct,mu);
-      else
-         read_iprms("np",nfct,np);
+  if (my_rank == 0) {
+    if (idr < 4)
+      read_dprms("mu", nfct, mu);
+    else
+      read_iprms("np", nfct, np);
 
-      n=count_tokens("isp");
-      error_root(n<1,1,"read_rw_parms [rw_parms.c]",
-            "No data on the line with tag isp");
+    n = count_tokens("isp");
+    error_root(n < 1, 1, "read_rw_parms [rw_parms.c]",
+               "No data on the line with tag isp");
 
-      if (n>nfct)
-         n=nfct;
-      read_iprms("isp",n,isp);
+    if (n > nfct)
+      n = nfct;
+    read_iprms("isp", n, isp);
 
-      for (i=n;i<nfct;i++)
-         isp[i]=isp[n-1];
-   }
+    for (i = n; i < nfct; i++)
+      isp[i] = isp[n - 1];
+  }
 
-   if (NPROC>1)
-   {
-      if (idr<4)
-         MPI_Bcast(mu,nfct,MPI_DOUBLE,0,MPI_COMM_WORLD);
-      else
-         MPI_Bcast(np,nfct,MPI_INT,0,MPI_COMM_WORLD);
+  if (NPROC > 1) {
+    if (idr < 4)
+      MPI_Bcast(mu, nfct, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    else
+      MPI_Bcast(np, nfct, MPI_INT, 0, MPI_COMM_WORLD);
 
-      MPI_Bcast(isp,nfct,MPI_INT,0,MPI_COMM_WORLD);
-   }
+    MPI_Bcast(isp, nfct, MPI_INT, 0, MPI_COMM_WORLD);
+  }
 
-   set_rw_parms(irw,rwfact[idr],im0,nsrc,irp,nfct,mu,np,isp);
+  set_rw_parms(irw, rwfact[idr], im0, nsrc, irp, nfct, mu, np, isp);
 
-   if (idr<4)
-   {
-      free(mu);
-      free(isp);
-   }
-   else
-      free(np);
+  if (idr < 4) {
+    free(mu);
+    free(isp);
+  } else
+    free(np);
 }
-
 
 void print_rw_parms(void)
 {
-   int my_rank,irw,idr,nfct,n,i;
+  int my_rank, irw, idr, nfct, n, i;
 
-   MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-   if ((my_rank==0)&&(init==1))
-   {
-      for (irw=0;irw<IRWMAX;irw++)
-      {
-         if (rw[irw].rwfact!=RWFACTS)
-         {
-            printf("Reweighting factor %d:\n",irw);
-            idr=0;
+  if ((my_rank == 0) && (init == 1)) {
+    for (irw = 0; irw < IRWMAX; irw++) {
+      if (rw[irw].rwfact != RWFACTS) {
+        printf("Reweighting factor %d:\n", irw);
+        idr = 0;
 
-            if (rw[irw].rwfact==RWTM1)
-               printf("RWTM1 factor\n");
-            else if (rw[irw].rwfact==RWTM1_EO)
-               printf("RWTM1_EO factor\n");
-            else if (rw[irw].rwfact==RWTM2)
-               printf("RWTM2 factor\n");
-            else if (rw[irw].rwfact==RWTM2_EO)
-               printf("RWTM2_EO factor\n");
-            else if (rw[irw].rwfact==RWRAT)
-            {
-               idr=1;
-               printf("RWRAT factor\n");
-            }
+        if (rw[irw].rwfact == RWTM1)
+          printf("RWTM1 factor\n");
+        else if (rw[irw].rwfact == RWTM1_EO)
+          printf("RWTM1_EO factor\n");
+        else if (rw[irw].rwfact == RWTM2)
+          printf("RWTM2 factor\n");
+        else if (rw[irw].rwfact == RWTM2_EO)
+          printf("RWTM2_EO factor\n");
+        else if (rw[irw].rwfact == RWRAT) {
+          idr = 1;
+          printf("RWRAT factor\n");
+        }
 
-            printf("im0 = %d\n",rw[irw].im0);
-            printf("nsrc = %d\n",rw[irw].nsrc);
-            nfct=rw[irw].nfct;
+        printf("im0 = %d\n", rw[irw].im0);
+        printf("nsrc = %d\n", rw[irw].nsrc);
+        nfct = rw[irw].nfct;
 
-            if (idr==0)
-            {
-               printf("mu =");
+        if (idr == 0) {
+          printf("mu =");
 
-               for (i=0;i<nfct;i++)
-               {
-                  n=fdigits(rw[irw].mu[i]);
-                  printf(" %.*f",IMAX(n,1),rw[irw].mu[i]);
-               }
+          for (i = 0; i < nfct; i++) {
+            n = fdigits(rw[irw].mu[i]);
+            printf(" %.*f", IMAX(n, 1), rw[irw].mu[i]);
+          }
 
-               printf("\n");
-            }
-            else
-            {
-               printf("irp = %d\n",rw[irw].irp);
-               printf("np =");
+          printf("\n");
+        } else {
+          printf("irp = %d\n", rw[irw].irp);
+          printf("np =");
 
-               for (i=0;i<nfct;i++)
-                  printf(" %d",rw[irw].np[i]);
+          for (i = 0; i < nfct; i++)
+            printf(" %d", rw[irw].np[i]);
 
-               printf("\n");
-            }
+          printf("\n");
+        }
 
-            printf("isp =");
+        printf("isp =");
 
-            for (i=0;i<nfct;i++)
-               printf(" %d",rw[irw].isp[i]);
+        for (i = 0; i < nfct; i++)
+          printf(" %d", rw[irw].isp[i]);
 
-            printf("\n\n");
-         }
+        printf("\n\n");
       }
-   }
+    }
+  }
 }
-
 
 void write_rw_parms(FILE *fdat)
 {
-   int my_rank,endian;
-   int iw,irw,nfct,i;
-   stdint_t istd[6];
-   double dstd[1];
+  int my_rank, endian;
+  int iw, irw, nfct, i;
+  stdint_t istd[6];
+  double dstd[1];
 
-   MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
-   endian=endianness();
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+  endian = endianness();
 
-   if ((my_rank==0)&&(init==1))
-   {
-      for (irw=0;irw<IRWMAX;irw++)
-      {
-         if (rw[irw].rwfact!=RWFACTS)
-         {
-            istd[0]=(stdint_t)(irw);
-            istd[1]=(stdint_t)(rw[irw].rwfact);
-            istd[2]=(stdint_t)(rw[irw].im0);
-            istd[3]=(stdint_t)(rw[irw].nsrc);
-            istd[4]=(stdint_t)(rw[irw].irp);
-            istd[5]=(stdint_t)(rw[irw].nfct);
+  if ((my_rank == 0) && (init == 1)) {
+    for (irw = 0; irw < IRWMAX; irw++) {
+      if (rw[irw].rwfact != RWFACTS) {
+        istd[0] = (stdint_t)(irw);
+        istd[1] = (stdint_t)(rw[irw].rwfact);
+        istd[2] = (stdint_t)(rw[irw].im0);
+        istd[3] = (stdint_t)(rw[irw].nsrc);
+        istd[4] = (stdint_t)(rw[irw].irp);
+        istd[5] = (stdint_t)(rw[irw].nfct);
 
-            if (endian==BIG_ENDIAN)
-               bswap_int(6,istd);
+        if (endian == BIG_ENDIAN)
+          bswap_int(6, istd);
 
-            iw=fwrite(istd,sizeof(stdint_t),6,fdat);
-            nfct=rw[irw].nfct;
+        iw = fwrite(istd, sizeof(stdint_t), 6, fdat);
+        nfct = rw[irw].nfct;
 
-            if (rw[irw].rwfact==RWRAT)
-            {
-               for (i=0;i<nfct;i++)
-               {
-                  istd[0]=(stdint_t)(rw[irw].np[i]);
+        if (rw[irw].rwfact == RWRAT) {
+          for (i = 0; i < nfct; i++) {
+            istd[0] = (stdint_t)(rw[irw].np[i]);
 
-                  if (endian==BIG_ENDIAN)
-                     bswap_int(1,istd);
+            if (endian == BIG_ENDIAN)
+              bswap_int(1, istd);
 
-                  iw+=fwrite(istd,sizeof(stdint_t),1,fdat);
-               }
-            }
-            else
-            {
-               for (i=0;i<nfct;i++)
-               {
-                  dstd[0]=rw[irw].mu[i];
+            iw += fwrite(istd, sizeof(stdint_t), 1, fdat);
+          }
+        } else {
+          for (i = 0; i < nfct; i++) {
+            dstd[0] = rw[irw].mu[i];
 
-                  if (endian==BIG_ENDIAN)
-                     bswap_double(1,dstd);
+            if (endian == BIG_ENDIAN)
+              bswap_double(1, dstd);
 
-                  iw+=fwrite(dstd,sizeof(double),1,fdat);
-               }
-            }
+            iw += fwrite(dstd, sizeof(double), 1, fdat);
+          }
+        }
 
-            for (i=0;i<nfct;i++)
-            {
-               istd[0]=(stdint_t)(rw[irw].isp[i]);
+        for (i = 0; i < nfct; i++) {
+          istd[0] = (stdint_t)(rw[irw].isp[i]);
 
-               if (endian==BIG_ENDIAN)
-                  bswap_int(1,istd);
+          if (endian == BIG_ENDIAN)
+            bswap_int(1, istd);
 
-               iw+=fwrite(istd,sizeof(stdint_t),1,fdat);
-            }
+          iw += fwrite(istd, sizeof(stdint_t), 1, fdat);
+        }
 
-            error_root(iw!=(6+2*nfct),1,"write_rw_parms [rw_parms.c]",
-                       "Incorrect write count");
-         }
+        error_root(iw != (6 + 2 * nfct), 1, "write_rw_parms [rw_parms.c]",
+                   "Incorrect write count");
       }
-   }
+    }
+  }
 }
-
 
 void check_rw_parms(FILE *fdat)
 {
-   int my_rank,endian;
-   int ir,irw,nfct,i,ie;
-   stdint_t istd[6];
-   double dstd[1];
+  int my_rank, endian;
+  int ir, irw, nfct, i, ie;
+  stdint_t istd[6];
+  double dstd[1];
 
-   MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
-   endian=endianness();
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+  endian = endianness();
 
-   if ((my_rank==0)&&(init==1))
-   {
-      ie=0;
+  if ((my_rank == 0) && (init == 1)) {
+    ie = 0;
 
-      for (irw=0;irw<IRWMAX;irw++)
-      {
-         if (rw[irw].rwfact!=RWFACTS)
-         {
-            ir=fread(istd,sizeof(stdint_t),6,fdat);
+    for (irw = 0; irw < IRWMAX; irw++) {
+      if (rw[irw].rwfact != RWFACTS) {
+        ir = fread(istd, sizeof(stdint_t), 6, fdat);
 
-            error_root(ir!=6,1,"check_rw_parms [rw_parms.c]",
-                       "Incorrect read count");
+        error_root(ir != 6, 1, "check_rw_parms [rw_parms.c]",
+                   "Incorrect read count");
 
-            if (endian==BIG_ENDIAN)
-               bswap_int(6,istd);
+        if (endian == BIG_ENDIAN)
+          bswap_int(6, istd);
 
-            ie|=(istd[0]!=(stdint_t)(irw));
-            ie|=(istd[1]!=(stdint_t)(rw[irw].rwfact));
-            ie|=(istd[2]!=(stdint_t)(rw[irw].im0));
-            ie|=(istd[3]!=(stdint_t)(rw[irw].nsrc));
-            ie|=(istd[4]!=(stdint_t)(rw[irw].irp));
-            ie|=(istd[5]!=(stdint_t)(rw[irw].nfct));
+        ie |= (istd[0] != (stdint_t)(irw));
+        ie |= (istd[1] != (stdint_t)(rw[irw].rwfact));
+        ie |= (istd[2] != (stdint_t)(rw[irw].im0));
+        ie |= (istd[3] != (stdint_t)(rw[irw].nsrc));
+        ie |= (istd[4] != (stdint_t)(rw[irw].irp));
+        ie |= (istd[5] != (stdint_t)(rw[irw].nfct));
 
-            error_root(ie!=0,1,"check_rw_parms [rw_parms.c]",
-                       "Parameters do not match");
+        error_root(ie != 0, 1, "check_rw_parms [rw_parms.c]",
+                   "Parameters do not match");
 
-            nfct=rw[irw].nfct;
+        nfct = rw[irw].nfct;
 
-            if (rw[irw].rwfact==RWRAT)
-            {
-               for (i=0;i<nfct;i++)
-               {
-                  ir+=fread(istd,sizeof(stdint_t),1,fdat);
+        if (rw[irw].rwfact == RWRAT) {
+          for (i = 0; i < nfct; i++) {
+            ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-                  if (endian==BIG_ENDIAN)
-                     bswap_int(1,istd);
+            if (endian == BIG_ENDIAN)
+              bswap_int(1, istd);
 
-                  ie|=(istd[0]!=(stdint_t)(rw[irw].np[i]));
-               }
-            }
-            else
-            {
-               for (i=0;i<nfct;i++)
-               {
-                  ir+=fread(dstd,sizeof(double),1,fdat);
+            ie |= (istd[0] != (stdint_t)(rw[irw].np[i]));
+          }
+        } else {
+          for (i = 0; i < nfct; i++) {
+            ir += fread(dstd, sizeof(double), 1, fdat);
 
-                  if (endian==BIG_ENDIAN)
-                     bswap_double(1,dstd);
+            if (endian == BIG_ENDIAN)
+              bswap_double(1, dstd);
 
-                  ie|=(dstd[0]!=rw[irw].mu[i]);
-               }
-            }
+            ie |= (dstd[0] != rw[irw].mu[i]);
+          }
+        }
 
-            for (i=0;i<nfct;i++)
-            {
-               ir+=fread(istd,sizeof(stdint_t),1,fdat);
+        for (i = 0; i < nfct; i++) {
+          ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-               if (endian==BIG_ENDIAN)
-                  bswap_int(1,istd);
+          if (endian == BIG_ENDIAN)
+            bswap_int(1, istd);
 
-               ie|=(istd[0]!=(stdint_t)(rw[irw].isp[i]));
-            }
+          ie |= (istd[0] != (stdint_t)(rw[irw].isp[i]));
+        }
 
-            error_root(ir!=(6+2*nfct),1,"check_rw_parms [rw_parms.c]",
-                       "Incorrect read count");
-            error_root(ie!=0,1,"check_rw_parms [rw_parms.c]",
-                       "Parameters do not match");
-         }
+        error_root(ir != (6 + 2 * nfct), 1, "check_rw_parms [rw_parms.c]",
+                   "Incorrect read count");
+        error_root(ie != 0, 1, "check_rw_parms [rw_parms.c]",
+                   "Parameters do not match");
       }
-   }
+    }
+  }
 }

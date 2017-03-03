@@ -60,392 +60,340 @@
 #include "sap.h"
 #include "global.h"
 
-static int nb,nbh,isw,init=0;
-static int bc,np,nmu[8],sflg[8];
-static int nsbf[2][8],nlbf[2][8],*imb[2][8];
-static weyl *snd_buf[2][8],*loc_buf[2][8],*rcv_buf[2][8];
-static const weyl w0={{{0.0f}}};
+static int nb, nbh, isw, init = 0;
+static int bc, np, nmu[8], sflg[8];
+static int nsbf[2][8], nlbf[2][8], *imb[2][8];
+static weyl *snd_buf[2][8], *loc_buf[2][8], *rcv_buf[2][8];
+static const weyl w0 = {{{0.0f}}};
 static block_t *b0;
-static MPI_Request snd_req[2][8],rcv_req[2][8];
-
+static MPI_Request snd_req[2][8], rcv_req[2][8];
 
 static void set_nbf(void)
 {
-   int ifc,ibu,ibd;
-   int *bo,*bs;
-   block_t *b,*bm;
-   bndry_t *bb;
+  int ifc, ibu, ibd;
+  int *bo, *bs;
+  block_t *b, *bm;
+  bndry_t *bb;
 
-   bc=bc_type();
-   np=(cpr[0]+cpr[1]+cpr[2]+cpr[3])&0x1;
+  bc = bc_type();
+  np = (cpr[0] + cpr[1] + cpr[2] + cpr[3]) & 0x1;
 
-   bs=(*b0).bs;
-   ibu=((cpr[0]==(NPROC0-1))&&(bc!=3));
-   ibd=((cpr[0]==0)&&(bc!=3));
+  bs = (*b0).bs;
+  ibu = ((cpr[0] == (NPROC0 - 1)) && (bc != 3));
+  ibd = ((cpr[0] == 0) && (bc != 3));
 
-   for (ifc=0;ifc<8;ifc++)
-   {
-      nmu[ifc]=cpr[ifc/2]&0x1;
-      sflg[ifc]=((ifc>1)||
-                 ((ifc==0)&&(cpr[0]!=0))||
-                 ((ifc==1)&&(cpr[0]!=(NPROC0-1)))||
-                 (bc==3));
+  for (ifc = 0; ifc < 8; ifc++) {
+    nmu[ifc] = cpr[ifc / 2] & 0x1;
+    sflg[ifc] = ((ifc > 1) || ((ifc == 0) && (cpr[0] != 0)) ||
+                 ((ifc == 1) && (cpr[0] != (NPROC0 - 1))) || (bc == 3));
 
-      nlbf[0][ifc]=0;
-      nsbf[0][ifc]=0;
-      nlbf[1][ifc]=0;
-      nsbf[1][ifc]=0;
+    nlbf[0][ifc] = 0;
+    nsbf[0][ifc] = 0;
+    nlbf[1][ifc] = 0;
+    nsbf[1][ifc] = 0;
 
-      b=b0;
-      bm=b+nbh;
+    b = b0;
+    bm = b + nbh;
 
-      for (;b<bm;b++)
-      {
-         bo=(*b).bo;
-         bb=(*b).bb;
+    for (; b < bm; b++) {
+      bo = (*b).bo;
+      bb = (*b).bb;
 
-         if ((bb[ifc].ibn)||
-             ((ifc==0)&&(ibd)&&(bo[0]==0))||
-             ((ifc==1)&&(ibu)&&((bo[0]+bs[0])==L0)))
-            nsbf[isw][ifc]+=bb[ifc].vol;
-         else
-            nlbf[isw][ifc]+=bb[ifc].vol;
-      }
+      if ((bb[ifc].ibn) || ((ifc == 0) && (ibd) && (bo[0] == 0)) ||
+          ((ifc == 1) && (ibu) && ((bo[0] + bs[0]) == L0)))
+        nsbf[isw][ifc] += bb[ifc].vol;
+      else
+        nlbf[isw][ifc] += bb[ifc].vol;
+    }
 
-      bm+=nbh;
+    bm += nbh;
 
-      for (;b<bm;b++)
-      {
-         bo=(*b).bo;
-         bb=(*b).bb;
+    for (; b < bm; b++) {
+      bo = (*b).bo;
+      bb = (*b).bb;
 
-         if ((bb[ifc].ibn)||
-             ((ifc==0)&&(ibd)&&(bo[0]==0))||
-             ((ifc==1)&&(ibu)&&((bo[0]+bs[0])==L0)))
-            nsbf[isw^0x1][ifc]+=bb[ifc].vol;
-         else
-            nlbf[isw^0x1][ifc]+=bb[ifc].vol;
-      }
-   }
+      if ((bb[ifc].ibn) || ((ifc == 0) && (ibd) && (bo[0] == 0)) ||
+          ((ifc == 1) && (ibu) && ((bo[0] + bs[0]) == L0)))
+        nsbf[isw ^ 0x1][ifc] += bb[ifc].vol;
+      else
+        nlbf[isw ^ 0x1][ifc] += bb[ifc].vol;
+    }
+  }
 }
-
 
 static void alloc_weyl(void)
 {
-   int n,ic,ifc;
-   weyl *w,*wm;
+  int n, ic, ifc;
+  weyl *w, *wm;
 
-   n=0;
+  n = 0;
 
-   for (ifc=0;ifc<8;ifc++)
-   {
-      n+=(nlbf[0][ifc]+2*nsbf[0][ifc]);
-      n+=(nlbf[1][ifc]+2*nsbf[1][ifc]);
-   }
+  for (ifc = 0; ifc < 8; ifc++) {
+    n += (nlbf[0][ifc] + 2 * nsbf[0][ifc]);
+    n += (nlbf[1][ifc] + 2 * nsbf[1][ifc]);
+  }
 
-   w=amalloc(n*sizeof(*w),ALIGN);
-   error(w==NULL,1,"alloc_weyl [sap_com.c]","Unable to allocate buffers");
+  w = amalloc(n * sizeof(*w), ALIGN);
+  error(w == NULL, 1, "alloc_weyl [sap_com.c]", "Unable to allocate buffers");
 
-   for (ic=0;ic<2;ic++)
-   {
-      for (ifc=0;ifc<8;ifc++)
-      {
-         snd_buf[ic][ifc]=w;
-         w+=nsbf[ic][ifc];
-         loc_buf[ic][ifc]=w;
-         w+=nlbf[ic][ifc];
-         rcv_buf[ic][ifc]=w;
-         w+=nsbf[ic][ifc];
-      }
-   }
+  for (ic = 0; ic < 2; ic++) {
+    for (ifc = 0; ifc < 8; ifc++) {
+      snd_buf[ic][ifc] = w;
+      w += nsbf[ic][ifc];
+      loc_buf[ic][ifc] = w;
+      w += nlbf[ic][ifc];
+      rcv_buf[ic][ifc] = w;
+      w += nsbf[ic][ifc];
+    }
+  }
 
-   w=snd_buf[0][0];
-   wm=w+n;
+  w = snd_buf[0][0];
+  wm = w + n;
 
-   for (;w<wm;w++)
-      (*w)=w0;
+  for (; w < wm; w++)
+    (*w) = w0;
 }
-
 
 static void add_weyl(void)
 {
-   int ifc,ibd,ibu;
-   int *bo,*bs;
-   weyl **pw,*ws,*wl;
-   block_t *b,*bm;
-   bndry_t *bb;
+  int ifc, ibd, ibu;
+  int *bo, *bs;
+  weyl **pw, *ws, *wl;
+  block_t *b, *bm;
+  bndry_t *bb;
 
-   pw=malloc(8*nb*sizeof(*pw));
-   error(pw==NULL,1,"add_weyl [sap_com.c]",
-         "Unable to add the Weyl fields to the block boundaries");
+  pw = malloc(8 * nb * sizeof(*pw));
+  error(pw == NULL, 1, "add_weyl [sap_com.c]",
+        "Unable to add the Weyl fields to the block boundaries");
 
-   bs=(*b0).bs;
-   ibd=((cpr[0]==0)&&(bc!=3));
-   ibu=((cpr[0]==(NPROC0-1))&&(bc!=3));
+  bs = (*b0).bs;
+  ibd = ((cpr[0] == 0) && (bc != 3));
+  ibu = ((cpr[0] == (NPROC0 - 1)) && (bc != 3));
 
-   for (ifc=0;ifc<8;ifc++)
-   {
-      b=b0;
-      bm=b+nbh;
-      ws=snd_buf[isw][ifc];
-      wl=loc_buf[isw][ifc];
+  for (ifc = 0; ifc < 8; ifc++) {
+    b = b0;
+    bm = b + nbh;
+    ws = snd_buf[isw][ifc];
+    wl = loc_buf[isw][ifc];
 
-      for (;b<bm;b++)
-      {
-         bo=(*b).bo;
-         bb=(*b).bb;
-         bb[ifc].nw=1;
-         bb[ifc].w=pw;
+    for (; b < bm; b++) {
+      bo = (*b).bo;
+      bb = (*b).bb;
+      bb[ifc].nw = 1;
+      bb[ifc].w = pw;
 
-         if ((bb[ifc].ibn)||
-             ((ifc==0)&&(ibd)&&(bo[0]==0))||
-             ((ifc==1)&&(ibu)&&((bo[0]+bs[0])==L0)))
-         {
-            (*pw)=ws;
-            ws+=bb[ifc].vol;
-         }
-         else
-         {
-            (*pw)=wl;
-            wl+=bb[ifc].vol;
-         }
-
-         pw+=1;
+      if ((bb[ifc].ibn) || ((ifc == 0) && (ibd) && (bo[0] == 0)) ||
+          ((ifc == 1) && (ibu) && ((bo[0] + bs[0]) == L0))) {
+        (*pw) = ws;
+        ws += bb[ifc].vol;
+      } else {
+        (*pw) = wl;
+        wl += bb[ifc].vol;
       }
 
-      bm+=nbh;
-      ws=snd_buf[isw^0x1][ifc];
-      wl=loc_buf[isw^0x1][ifc];
+      pw += 1;
+    }
 
-      for (;b<bm;b++)
-      {
-         bo=(*b).bo;
-         bb=(*b).bb;
-         bb[ifc].nw=1;
-         bb[ifc].w=pw;
+    bm += nbh;
+    ws = snd_buf[isw ^ 0x1][ifc];
+    wl = loc_buf[isw ^ 0x1][ifc];
 
-         if ((bb[ifc].ibn)||
-             ((ifc==0)&&(ibd)&&(bo[0]==0))||
-             ((ifc==1)&&(ibu)&&((bo[0]+bs[0])==L0)))
-         {
-            (*pw)=ws;
-            ws+=bb[ifc].vol;
-         }
-         else
-         {
-            (*pw)=wl;
-            wl+=bb[ifc].vol;
-         }
+    for (; b < bm; b++) {
+      bo = (*b).bo;
+      bb = (*b).bb;
+      bb[ifc].nw = 1;
+      bb[ifc].w = pw;
 
-         pw+=1;
+      if ((bb[ifc].ibn) || ((ifc == 0) && (ibd) && (bo[0] == 0)) ||
+          ((ifc == 1) && (ibu) && ((bo[0] + bs[0]) == L0))) {
+        (*pw) = ws;
+        ws += bb[ifc].vol;
+      } else {
+        (*pw) = wl;
+        wl += bb[ifc].vol;
       }
-   }
+
+      pw += 1;
+    }
+  }
 }
-
 
 static void set_mpi_req(void)
 {
-   int ic,ifc;
-   int saddr,raddr,tag,nbf;
+  int ic, ifc;
+  int saddr, raddr, tag, nbf;
 
-   for (ic=0;ic<2;ic++)
-   {
-      for (ifc=0;ifc<8;ifc++)
-      {
-         saddr=npr[ifc];
-         raddr=npr[ifc^0x1];
-         tag=mpi_permanent_tag();
-         nbf=12*nsbf[ic][ifc];
+  for (ic = 0; ic < 2; ic++) {
+    for (ifc = 0; ifc < 8; ifc++) {
+      saddr = npr[ifc];
+      raddr = npr[ifc ^ 0x1];
+      tag = mpi_permanent_tag();
+      nbf = 12 * nsbf[ic][ifc];
 
-         MPI_Send_init(snd_buf[ic][ifc],nbf,MPI_FLOAT,
-                       saddr,tag,MPI_COMM_WORLD,&snd_req[ic][ifc]);
-         MPI_Recv_init(rcv_buf[ic][ifc],nbf,MPI_FLOAT,
-                       raddr,tag,MPI_COMM_WORLD,&rcv_req[ic][ifc]);
-      }
-   }
+      MPI_Send_init(snd_buf[ic][ifc], nbf, MPI_FLOAT, saddr, tag,
+                    MPI_COMM_WORLD, &snd_req[ic][ifc]);
+      MPI_Recv_init(rcv_buf[ic][ifc], nbf, MPI_FLOAT, raddr, tag,
+                    MPI_COMM_WORLD, &rcv_req[ic][ifc]);
+    }
+  }
 }
-
 
 static void alloc_imb(void)
 {
-   int n,ic,ifc,ibd,ibu;
-   int *bo,*bs,*im;
-   block_t *b,*bm;
-   bndry_t *bb;
+  int n, ic, ifc, ibd, ibu;
+  int *bo, *bs, *im;
+  block_t *b, *bm;
+  bndry_t *bb;
 
-   n=0;
+  n = 0;
 
-   for (ifc=0;ifc<8;ifc++)
-   {
-      n+=(nlbf[0][ifc]+nsbf[0][ifc]);
-      n+=(nlbf[1][ifc]+nsbf[1][ifc]);
-   }
+  for (ifc = 0; ifc < 8; ifc++) {
+    n += (nlbf[0][ifc] + nsbf[0][ifc]);
+    n += (nlbf[1][ifc] + nsbf[1][ifc]);
+  }
 
-   im=malloc(n*sizeof(*im));
-   error(im==NULL,1,"alloc_imb [sap_com.c]",
-         "Unable to allocate index arrays");
+  im = malloc(n * sizeof(*im));
+  error(im == NULL, 1, "alloc_imb [sap_com.c]",
+        "Unable to allocate index arrays");
 
-   bs=(*b0).bs;
-   ibd=((cpr[0]==0)&&(bc!=3));
-   ibu=((cpr[0]==(NPROC0-1))&&(bc!=3));
+  bs = (*b0).bs;
+  ibd = ((cpr[0] == 0) && (bc != 3));
+  ibu = ((cpr[0] == (NPROC0 - 1)) && (bc != 3));
 
-   for (ic=0;ic<2;ic++)
-   {
-      for (ifc=0;ifc<8;ifc++)
-      {
-         imb[ic][ifc]=im;
+  for (ic = 0; ic < 2; ic++) {
+    for (ifc = 0; ifc < 8; ifc++) {
+      imb[ic][ifc] = im;
 
-         if (ic^isw)
-            b=b0+nbh;
-         else
-            b=b0;
-         bm=b+nbh;
+      if (ic ^ isw)
+        b = b0 + nbh;
+      else
+        b = b0;
+      bm = b + nbh;
 
-         for (;b<bm;b++)
-         {
-            bo=(*b).bo;
-            bb=(*b).bb;
+      for (; b < bm; b++) {
+        bo = (*b).bo;
+        bb = (*b).bb;
 
-            if (!((bb[ifc].ibn)||
-                  ((ifc==0)&&(ibd)&&(bo[0]==0))||
-                  ((ifc==1)&&(ibu)&&((bo[0]+bs[0])==L0))))
-            {
-               for (n=0;n<bb[ifc].vol;n++)
-                  im[n]=bb[ifc].imb[n];
+        if (!((bb[ifc].ibn) || ((ifc == 0) && (ibd) && (bo[0] == 0)) ||
+              ((ifc == 1) && (ibu) && ((bo[0] + bs[0]) == L0)))) {
+          for (n = 0; n < bb[ifc].vol; n++)
+            im[n] = bb[ifc].imb[n];
 
-               im+=bb[ifc].vol;
-            }
-         }
-
-         if (ic^isw)
-            b=b0;
-         else
-            b=b0+nbh;
-         bm=b+nbh;
-
-         for (;b<bm;b++)
-         {
-            bo=(*b).bo;
-            bb=(*b).bb;
-
-            if ((bb[ifc^0x1].ibn)||
-                ((ifc==1)&&(ibd)&&(bo[0]==0))||
-                ((ifc==0)&&(ibu)&&((bo[0]+bs[0])==L0)))
-            {
-               for (n=0;n<bb[ifc].vol;n++)
-                  im[n]=(*b).imb[bb[ifc].map[n]];
-
-               im+=bb[ifc].vol;
-            }
-         }
+          im += bb[ifc].vol;
+        }
       }
-   }
-}
 
+      if (ic ^ isw)
+        b = b0;
+      else
+        b = b0 + nbh;
+      bm = b + nbh;
+
+      for (; b < bm; b++) {
+        bo = (*b).bo;
+        bb = (*b).bb;
+
+        if ((bb[ifc ^ 0x1].ibn) || ((ifc == 1) && (ibd) && (bo[0] == 0)) ||
+            ((ifc == 0) && (ibu) && ((bo[0] + bs[0]) == L0))) {
+          for (n = 0; n < bb[ifc].vol; n++)
+            im[n] = (*b).imb[bb[ifc].map[n]];
+
+          im += bb[ifc].vol;
+        }
+      }
+    }
+  }
+}
 
 void alloc_sap_bufs(void)
 {
-   bndry_t *bb;
+  bndry_t *bb;
 
-   if (init==1)
-      return;
+  if (init == 1)
+    return;
 
-   b0=blk_list(SAP_BLOCKS,&nb,&isw);
-   error(b0==NULL,1,"alloc_sap_bufs [sap_com.c]",
-         "Block grid is not allocated");
+  b0 = blk_list(SAP_BLOCKS, &nb, &isw);
+  error(b0 == NULL, 1, "alloc_sap_bufs [sap_com.c]",
+        "Block grid is not allocated");
 
-   bb=(*b0).bb;
-   error((bb==NULL)||((*bb).nw!=0),1,"alloc_sap_bufs [sap_com.c]",
-         "Block boundary is not in the proper condition");
+  bb = (*b0).bb;
+  error((bb == NULL) || ((*bb).nw != 0), 1, "alloc_sap_bufs [sap_com.c]",
+        "Block boundary is not in the proper condition");
 
-   nbh=nb/2;
-   set_nbf();
-   alloc_weyl();
-   add_weyl();
-   set_mpi_req();
-   alloc_imb();
+  nbh = nb / 2;
+  set_nbf();
+  alloc_weyl();
+  add_weyl();
+  set_mpi_req();
+  alloc_imb();
 
-   init=1;
+  init = 1;
 }
 
-
-static void send_buf(int ic,int ifc,int eo)
+static void send_buf(int ic, int ifc, int eo)
 {
-   int io;
+  int io;
 
-   io=ifc^nmu[ifc];
+  io = ifc ^ nmu[ifc];
 
-   if (sflg[io])
-   {
-      if (np==eo)
-      {
-         if (nsbf[ic][io])
-            MPI_Start(&snd_req[ic][io]);
-      }
-      else
-      {
-         if (nsbf[ic][io^0x1])
-            MPI_Start(&rcv_req[ic][io^0x1]);
-      }
-   }
+  if (sflg[io]) {
+    if (np == eo) {
+      if (nsbf[ic][io])
+        MPI_Start(&snd_req[ic][io]);
+    } else {
+      if (nsbf[ic][io ^ 0x1])
+        MPI_Start(&rcv_req[ic][io ^ 0x1]);
+    }
+  }
 }
 
-
-static void wait_buf(int ic,int ifc,int eo)
+static void wait_buf(int ic, int ifc, int eo)
 {
-   int io;
-   MPI_Status stat;
+  int io;
+  MPI_Status stat;
 
-   io=ifc^nmu[ifc];
+  io = ifc ^ nmu[ifc];
 
-   if (sflg[io])
-   {
-      if (np==eo)
-      {
-         if (nsbf[ic][io])
-            MPI_Wait(&snd_req[ic][io],&stat);
-      }
-      else
-      {
-         if (nsbf[ic][io^0x1])
-            MPI_Wait(&rcv_req[ic][io^0x1],&stat);
-      }
-   }
+  if (sflg[io]) {
+    if (np == eo) {
+      if (nsbf[ic][io])
+        MPI_Wait(&snd_req[ic][io], &stat);
+    } else {
+      if (nsbf[ic][io ^ 0x1])
+        MPI_Wait(&rcv_req[ic][io ^ 0x1], &stat);
+    }
+  }
 }
 
-
-void sap_com(int ic,spinor *r)
+void sap_com(int ic, spinor *r)
 {
-   int ifc,io,nbf;
+  int ifc, io, nbf;
 
-   if (init==0)
-   {
-      error_root(1,1,"sap_com [sap_com.c]",
-                 "Communication buffers are not allocated");
-      return;
-   }
+  if (init == 0) {
+    error_root(1, 1, "sap_com [sap_com.c]",
+               "Communication buffers are not allocated");
+    return;
+  }
 
-   send_buf(ic,0,0);
-   send_buf(ic,0,1);
+  send_buf(ic, 0, 0);
+  send_buf(ic, 0, 1);
 
-   for (ifc=0;ifc<8;ifc++)
-   {
-      wait_buf(ic,ifc,0);
-      wait_buf(ic,ifc,1);
+  for (ifc = 0; ifc < 8; ifc++) {
+    wait_buf(ic, ifc, 0);
+    wait_buf(ic, ifc, 1);
 
-      if (ifc<7)
-      {
-         send_buf(ic,ifc+1,0);
-         send_buf(ic,ifc+1,1);
-      }
+    if (ifc < 7) {
+      send_buf(ic, ifc + 1, 0);
+      send_buf(ic, ifc + 1, 1);
+    }
 
-      io=(ifc^nmu[ifc])^0x1;
+    io = (ifc ^ nmu[ifc]) ^ 0x1;
 
-      if (sflg[io^0x1])
-         nbf=nlbf[ic][io]+nsbf[ic][io];
-      else
-         nbf=nlbf[ic][io];
+    if (sflg[io ^ 0x1])
+      nbf = nlbf[ic][io] + nsbf[ic][io];
+    else
+      nbf = nlbf[ic][io];
 
-      sub_assign_w2s[io^0x1](imb[ic][io],nbf,loc_buf[ic][io],r);
-   }
+    sub_assign_w2s[io ^ 0x1](imb[ic][io], nbf, loc_buf[ic][io], r);
+  }
 }

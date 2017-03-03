@@ -18,11 +18,11 @@
 *
 *   void bswap_int(int n,void *a)
 *     Inverts the byte order of the array elements a[0],..,a[n-1]
-*     assuming these are 4 byte long 
+*     assuming these are 4 byte long
 *
 *   void bswap_double(int n,void *a)
 *     Inverts the byte order of the array elements a[0],..,a[n-1]
-*     assuming these are 8 byte long 
+*     assuming these are 8 byte long
 *
 * Notes:
 *
@@ -45,66 +45,62 @@
 #include <stdio.h>
 #include "utils.h"
 
-
 int endianness(void)
 {
-   stduint_t i;
-   unsigned char *b;
+  stduint_t i;
+  unsigned char *b;
 
-   i=0x04030201;
-   b=(unsigned char*)(&i);
+  i = 0x04030201;
+  b = (unsigned char *)(&i);
 
-   if ((b[0]==1u)&&(b[1]==2u)&&(b[2]==3u)&&(b[3]==4u))
-      return LITTLE_ENDIAN;
-   else if ((b[0]==4u)&&(b[1]==3u)&&(b[2]==2u)&&(b[3]==1u))
-      return BIG_ENDIAN;
-   else return UNKNOWN_ENDIAN;
+  if ((b[0] == 1u) && (b[1] == 2u) && (b[2] == 3u) && (b[3] == 4u))
+    return LITTLE_ENDIAN;
+  else if ((b[0] == 4u) && (b[1] == 3u) && (b[2] == 2u) && (b[3] == 1u))
+    return BIG_ENDIAN;
+  else
+    return UNKNOWN_ENDIAN;
 }
 
-
-void bswap_int(int n,void *a)
+void bswap_int(int n, void *a)
 {
-   unsigned char *ba,*bam,bas;
+  unsigned char *ba, *bam, bas;
 
-   ba=(unsigned char*)(a);
-   bam=ba+4*n;
+  ba = (unsigned char *)(a);
+  bam = ba + 4 * n;
 
-   for (;ba<bam;ba+=4)
-   {
-      bas=ba[3];
-      ba[3]=ba[0];
-      ba[0]=bas;
+  for (; ba < bam; ba += 4) {
+    bas = ba[3];
+    ba[3] = ba[0];
+    ba[0] = bas;
 
-      bas=ba[2];
-      ba[2]=ba[1];
-      ba[1]=bas;      
-   }
+    bas = ba[2];
+    ba[2] = ba[1];
+    ba[1] = bas;
+  }
 }
 
-
-void bswap_double(int n,void *a)
+void bswap_double(int n, void *a)
 {
-   unsigned char *ba,*bam,bas;
+  unsigned char *ba, *bam, bas;
 
-   ba=(unsigned char*)(a);
-   bam=ba+8*n;
+  ba = (unsigned char *)(a);
+  bam = ba + 8 * n;
 
-   for (;ba<bam;ba+=8)
-   {
-      bas=ba[7];
-      ba[7]=ba[0];
-      ba[0]=bas;
+  for (; ba < bam; ba += 8) {
+    bas = ba[7];
+    ba[7] = ba[0];
+    ba[0] = bas;
 
-      bas=ba[6];
-      ba[6]=ba[1];
-      ba[1]=bas;      
+    bas = ba[6];
+    ba[6] = ba[1];
+    ba[1] = bas;
 
-      bas=ba[5];
-      ba[5]=ba[2];
-      ba[2]=bas;      
+    bas = ba[5];
+    ba[5] = ba[2];
+    ba[2] = bas;
 
-      bas=ba[4];
-      ba[4]=ba[3];
-      ba[3]=bas;
-   }
+    bas = ba[4];
+    ba[4] = ba[3];
+    ba[3] = bas;
+  }
 }

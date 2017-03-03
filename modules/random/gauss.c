@@ -30,68 +30,61 @@
 #include "utils.h"
 #include "random.h"
 
-static int init=0;
+static int init = 0;
 static double twopi;
 
-
-void gauss(float r[],int n)
+void gauss(float r[], int n)
 {
-   int k;
-   float u[2];
-   double x1,x2,rho,y1,y2;
+  int k;
+  float u[2];
+  double x1, x2, rho, y1, y2;
 
-   if (init==0)
-   {
-      twopi=8.0*atan(1.0);
-      init=1;
-   }
+  if (init == 0) {
+    twopi = 8.0 * atan(1.0);
+    init = 1;
+  }
 
-   for (k=0;k<n;)
-   {
-      ranlxs(u,2);
-      x1=(double)(u[0]);
-      x2=(double)(u[1]);
+  for (k = 0; k < n;) {
+    ranlxs(u, 2);
+    x1 = (double)(u[0]);
+    x2 = (double)(u[1]);
 
-      rho=-log(1.0-x1);
-      rho=sqrt(rho);
-      x2*=twopi;
-      y1=rho*sin(x2);
-      y2=rho*cos(x2);
+    rho = -log(1.0 - x1);
+    rho = sqrt(rho);
+    x2 *= twopi;
+    y1 = rho * sin(x2);
+    y2 = rho * cos(x2);
 
-      r[k++]=(float)(y1);
-      if (k<n)
-         r[k++]=(float)(y2);
-   }
+    r[k++] = (float)(y1);
+    if (k < n)
+      r[k++] = (float)(y2);
+  }
 }
 
-
-void gauss_dble(double rd[],int n)
+void gauss_dble(double rd[], int n)
 {
-   int k;
-   double ud[2];
-   double x1,x2,rho,y1,y2;
+  int k;
+  double ud[2];
+  double x1, x2, rho, y1, y2;
 
-   if (init==0)
-   {
-      twopi=8.0*atan(1.0);
-      init=1;
-   }
+  if (init == 0) {
+    twopi = 8.0 * atan(1.0);
+    init = 1;
+  }
 
-   for (k=0;k<n;)
-   {
-      ranlxd(ud,2);
-      x1=ud[0];
-      x2=ud[1];
+  for (k = 0; k < n;) {
+    ranlxd(ud, 2);
+    x1 = ud[0];
+    x2 = ud[1];
 
-      rho=-log(1.0-x1);
-      rho=sqrt(rho);
-      x2*=twopi;
-      y1=rho*sin(x2);
-      y2=rho*cos(x2);
+    rho = -log(1.0 - x1);
+    rho = sqrt(rho);
+    x2 *= twopi;
+    y1 = rho * sin(x2);
+    y2 = rho * cos(x2);
 
-      rd[k++]=y1;
-      if (k<n)
-         rd[k++]=y2;
-   }
+    rd[k++] = y1;
+    if (k < n)
+      rd[k++] = y2;
+  }
 }
-

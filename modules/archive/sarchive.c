@@ -74,377 +74,345 @@
 #include "archive.h"
 #include "global.h"
 
-#define N0 (NPROC0*L0)
-#define N1 (NPROC1*L1)
-#define N2 (NPROC2*L2)
-#define N3 (NPROC3*L3)
+#define N0 (NPROC0 * L0)
+#define N1 (NPROC1 * L1)
+#define N2 (NPROC2 * L2)
+#define N3 (NPROC3 * L3)
 
 static int endian;
-static spinor_dble *sbuf=NULL;
+static spinor_dble *sbuf = NULL;
 
-
-void write_sfld(char *out,spinor_dble *sd)
+void write_sfld(char *out, spinor_dble *sd)
 {
-   int ldat[16],iw;
-   double norm;
-   FILE *fout=NULL;
+  int ldat[16], iw;
+  double norm;
+  FILE *fout = NULL;
 
-   error(sd==NULL,1,"write_sfld [sarchive.c]",
-         "Attempt to access unallocated memory space");
-   error(iup[0][0]==0,1,"write_sfld [sarchive.c]",
-         "Geometry arrays are not set");
+  error(sd == NULL, 1, "write_sfld [sarchive.c]",
+        "Attempt to access unallocated memory space");
+  error(iup[0][0] == 0, 1, "write_sfld [sarchive.c]",
+        "Geometry arrays are not set");
 
-   fout=fopen(out,"wb");
-   error_loc(fout==NULL,1,"write_sfld [sarchive.c]",
-             "Unable to open output file");
-   error_chk();
+  fout = fopen(out, "wb");
+  error_loc(fout == NULL, 1, "write_sfld [sarchive.c]",
+            "Unable to open output file");
+  error_chk();
 
-   ldat[0]=NPROC0;
-   ldat[1]=NPROC1;
-   ldat[2]=NPROC2;
-   ldat[3]=NPROC3;
+  ldat[0] = NPROC0;
+  ldat[1] = NPROC1;
+  ldat[2] = NPROC2;
+  ldat[3] = NPROC3;
 
-   ldat[4]=L0;
-   ldat[5]=L1;
-   ldat[6]=L2;
-   ldat[7]=L3;
+  ldat[4] = L0;
+  ldat[5] = L1;
+  ldat[6] = L2;
+  ldat[7] = L3;
 
-   ldat[8]=NPROC0_BLK;
-   ldat[9]=NPROC1_BLK;
-   ldat[10]=NPROC2_BLK;
-   ldat[11]=NPROC3_BLK;
+  ldat[8] = NPROC0_BLK;
+  ldat[9] = NPROC1_BLK;
+  ldat[10] = NPROC2_BLK;
+  ldat[11] = NPROC3_BLK;
 
-   ldat[12]=cpr[0];
-   ldat[13]=cpr[1];
-   ldat[14]=cpr[2];
-   ldat[15]=cpr[3];
+  ldat[12] = cpr[0];
+  ldat[13] = cpr[1];
+  ldat[14] = cpr[2];
+  ldat[15] = cpr[3];
 
-   iw=fwrite(ldat,sizeof(int),16,fout);
-   norm=norm_square_dble(VOLUME,0,sd);
-   iw+=fwrite(&norm,sizeof(double),1,fout);
-   iw+=fwrite(sd,sizeof(spinor_dble),VOLUME,fout);
+  iw = fwrite(ldat, sizeof(int), 16, fout);
+  norm = norm_square_dble(VOLUME, 0, sd);
+  iw += fwrite(&norm, sizeof(double), 1, fout);
+  iw += fwrite(sd, sizeof(spinor_dble), VOLUME, fout);
 
-   error_loc(iw!=(17+VOLUME),1,"write_sfld [sarchive.c]",
-             "Incorrect write count");
-   error_chk();
-   fclose(fout);
+  error_loc(iw != (17 + VOLUME), 1, "write_sfld [sarchive.c]",
+            "Incorrect write count");
+  error_chk();
+  fclose(fout);
 }
 
-
-void read_sfld(char *in,spinor_dble *sd)
+void read_sfld(char *in, spinor_dble *sd)
 {
-   int ldat[16],ir,ie;
-   double norm0,norm1,eps;
-   FILE *fin=NULL;
+  int ldat[16], ir, ie;
+  double norm0, norm1, eps;
+  FILE *fin = NULL;
 
-   error(sd==NULL,1,"read_sfld [sarchive.c]",
-         "Attempt to access unallocated memory space");
-   error(iup[0][0]==0,1,"read_sfld [sarchive.c]",
-         "Geometry arrays are not set");
+  error(sd == NULL, 1, "read_sfld [sarchive.c]",
+        "Attempt to access unallocated memory space");
+  error(iup[0][0] == 0, 1, "read_sfld [sarchive.c]",
+        "Geometry arrays are not set");
 
-   fin=fopen(in,"rb");
-   error_loc(fin==NULL,1,"read_sfld [sarchive.c]",
-             "Unable to open input file");
-   error_chk();
+  fin = fopen(in, "rb");
+  error_loc(fin == NULL, 1, "read_sfld [sarchive.c]",
+            "Unable to open input file");
+  error_chk();
 
-   ir=fread(ldat,sizeof(int),16,fin);
+  ir = fread(ldat, sizeof(int), 16, fin);
 
-   ie=0;
-   ie|=((ldat[0]!=NPROC0)||(ldat[1]!=NPROC1)||
-        (ldat[2]!=NPROC2)||(ldat[3]!=NPROC3));
-   ie|=((ldat[4]!=L0)||(ldat[5]!=L1)||
-        (ldat[6]!=L2)||(ldat[7]!=L3));
-   ie|=((ldat[8]!=NPROC0_BLK)||(ldat[9]!=NPROC1_BLK)||
-        (ldat[10]!=NPROC2_BLK)||(ldat[11]!=NPROC3_BLK));
-   ie|=((ldat[12]!=cpr[0])||(ldat[13]!=cpr[1])||
-        (ldat[14]!=cpr[2])||(ldat[15]!=cpr[3]));
-   error(ie!=0,1,"read_sfld [sarchive.c]","Unexpected lattice data");
+  ie = 0;
+  ie |= ((ldat[0] != NPROC0) || (ldat[1] != NPROC1) || (ldat[2] != NPROC2) ||
+         (ldat[3] != NPROC3));
+  ie |= ((ldat[4] != L0) || (ldat[5] != L1) || (ldat[6] != L2) ||
+         (ldat[7] != L3));
+  ie |= ((ldat[8] != NPROC0_BLK) || (ldat[9] != NPROC1_BLK) ||
+         (ldat[10] != NPROC2_BLK) || (ldat[11] != NPROC3_BLK));
+  ie |= ((ldat[12] != cpr[0]) || (ldat[13] != cpr[1]) || (ldat[14] != cpr[2]) ||
+         (ldat[15] != cpr[3]));
+  error(ie != 0, 1, "read_sfld [sarchive.c]", "Unexpected lattice data");
 
-   ir+=fread(&norm0,sizeof(double),1,fin);
-   ir+=fread(sd,sizeof(spinor_dble),VOLUME,fin);
+  ir += fread(&norm0, sizeof(double), 1, fin);
+  ir += fread(sd, sizeof(spinor_dble), VOLUME, fin);
 
-   error_loc(ir!=(17+VOLUME),1,"read_sfld [sarchive.c]",
-             "Incorrect read count");
-   error_chk();
-   fclose(fin);
+  error_loc(ir != (17 + VOLUME), 1, "read_sfld [sarchive.c]",
+            "Incorrect read count");
+  error_chk();
+  fclose(fin);
 
-   norm1=norm_square_dble(VOLUME,0,sd);
-   eps=sqrt(64.0*(double)(VOLUME))*DBL_EPSILON;
-   error_loc(fabs(norm1-norm0)>(eps*norm0),1,"read_sfld [sarchive.c]",
-             "Incorrect square norm");
-   error_chk();
+  norm1 = norm_square_dble(VOLUME, 0, sd);
+  eps = sqrt(64.0 * (double)(VOLUME)) * DBL_EPSILON;
+  error_loc(fabs(norm1 - norm0) > (eps * norm0), 1, "read_sfld [sarchive.c]",
+            "Incorrect square norm");
+  error_chk();
 }
-
 
 static void check_machine(void)
 {
-   error_root(sizeof(stdint_t)!=4,1,"check_machine [sarchive.c]",
-              "Size of a stdint_t integer is not 4");
-   error_root(sizeof(double)!=8,1,"check_machine [sarchive.c]",
-              "Size of a double is not 8");
-   error_root(sizeof(spinor_dble)!=192,1,"check_machine [sarchive.c]",
-              "The spinor_dble structures are not properly packed");
+  error_root(sizeof(stdint_t) != 4, 1, "check_machine [sarchive.c]",
+             "Size of a stdint_t integer is not 4");
+  error_root(sizeof(double) != 8, 1, "check_machine [sarchive.c]",
+             "Size of a double is not 8");
+  error_root(sizeof(spinor_dble) != 192, 1, "check_machine [sarchive.c]",
+             "The spinor_dble structures are not properly packed");
 
-   endian=endianness();
-   error_root(endian==UNKNOWN_ENDIAN,1,"check_machine [sarchive.c]",
-              "Unkown endianness");
+  endian = endianness();
+  error_root(endian == UNKNOWN_ENDIAN, 1, "check_machine [sarchive.c]",
+             "Unkown endianness");
 }
-
 
 static void alloc_sbuf(void)
 {
-   error(iup[0][0]==0,1,"alloc_sbuf [sarchive.c]",
-         "Geometry arrays are not set");
-   sbuf=amalloc(L3*sizeof(spinor_dble),ALIGN);
-   error(sbuf==NULL,1,"alloc_sbuf [sarchive.c]",
-         "Unable to allocate auxiliary array");
+  error(iup[0][0] == 0, 1, "alloc_sbuf [sarchive.c]",
+        "Geometry arrays are not set");
+  sbuf = amalloc(L3 * sizeof(spinor_dble), ALIGN);
+  error(sbuf == NULL, 1, "alloc_sbuf [sarchive.c]",
+        "Unable to allocate auxiliary array");
 }
 
-
-static void get_spinors(int iy,spinor_dble *sd)
+static void get_spinors(int iy, spinor_dble *sd)
 {
-   int y3,iz;
-   spinor_dble *sb;
+  int y3, iz;
+  spinor_dble *sb;
 
-   sb=sbuf;
-   iy*=L3;
+  sb = sbuf;
+  iy *= L3;
 
-   for (y3=0;y3<L3;y3++)
-   {
-      iz=ipt[iy+y3];
-      (*sb)=sd[iz];
-      sb+=1;
-   }
+  for (y3 = 0; y3 < L3; y3++) {
+    iz = ipt[iy + y3];
+    (*sb) = sd[iz];
+    sb += 1;
+  }
 }
 
-
-static void set_spinors(int iy,spinor_dble *sd)
+static void set_spinors(int iy, spinor_dble *sd)
 {
-   int y3,iz;
-   spinor_dble *sb;
+  int y3, iz;
+  spinor_dble *sb;
 
-   sb=sbuf;
-   iy*=L3;
+  sb = sbuf;
+  iy *= L3;
 
-   for (y3=0;y3<L3;y3++)
-   {
-      iz=ipt[iy+y3];
-      sd[iz]=(*sb);
-      sb+=1;
-   }
+  for (y3 = 0; y3 < L3; y3++) {
+    iz = ipt[iy + y3];
+    sd[iz] = (*sb);
+    sb += 1;
+  }
 }
 
-
-void export_sfld(char *out,spinor_dble *sd)
+void export_sfld(char *out, spinor_dble *sd)
 {
-   int my_rank,np[4],n,iw;
-   int iwa,dmy,tag0,tag1;
-   int x0,x1,x2,x3,y0,y1,y2,ix,iy;
-   stdint_t lsize[4];
-   double norm;
-   MPI_Status stat;
-   FILE *fout=NULL;
+  int my_rank, np[4], n, iw;
+  int iwa, dmy, tag0, tag1;
+  int x0, x1, x2, x3, y0, y1, y2, ix, iy;
+  stdint_t lsize[4];
+  double norm;
+  MPI_Status stat;
+  FILE *fout = NULL;
 
-   MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-   if (sbuf==NULL)
-   {
-      check_machine();
-      alloc_sbuf();
-   }
+  if (sbuf == NULL) {
+    check_machine();
+    alloc_sbuf();
+  }
 
-   error(sd==NULL,1,"export_sfld [sarchive.c]",
-         "Attempt to access unallocated memory space");
+  error(sd == NULL, 1, "export_sfld [sarchive.c]",
+        "Attempt to access unallocated memory space");
 
-   dmy=1;
-   tag0=mpi_tag();
-   tag1=mpi_tag();
-   norm=norm_square_dble(VOLUME,1,sd);
+  dmy = 1;
+  tag0 = mpi_tag();
+  tag1 = mpi_tag();
+  norm = norm_square_dble(VOLUME, 1, sd);
 
-   if (my_rank==0)
-   {
-      fout=fopen(out,"wb");
-      error_root(fout==NULL,1,"export_sfld [sarchive.c]",
-                 "Unable to open output file");
+  if (my_rank == 0) {
+    fout = fopen(out, "wb");
+    error_root(fout == NULL, 1, "export_sfld [sarchive.c]",
+               "Unable to open output file");
 
-      lsize[0]=N0;
-      lsize[1]=N1;
-      lsize[2]=N2;
-      lsize[3]=N3;
+    lsize[0] = N0;
+    lsize[1] = N1;
+    lsize[2] = N2;
+    lsize[3] = N3;
 
-      if (endian==BIG_ENDIAN)
-      {
-         bswap_int(4,lsize);
-         bswap_double(1,&norm);
+    if (endian == BIG_ENDIAN) {
+      bswap_int(4, lsize);
+      bswap_double(1, &norm);
+    }
+
+    iw = fwrite(lsize, sizeof(stdint_t), 4, fout);
+    iw += fwrite(&norm, sizeof(double), 1, fout);
+    error_root(iw != 5, 1, "export_sfld [sarchive.c]", "Incorrect write count");
+  }
+
+  iwa = 0;
+
+  for (ix = 0; ix < (N0 * N1 * N2); ix++) {
+    x0 = ix / (N1 * N2);
+    x1 = (ix / N2) % N1;
+    x2 = ix % N2;
+
+    y0 = x0 % L0;
+    y1 = x1 % L1;
+    y2 = x2 % L2;
+    iy = y2 + L2 * y1 + L1 * L2 * y0;
+
+    np[0] = x0 / L0;
+    np[1] = x1 / L1;
+    np[2] = x2 / L2;
+
+    for (x3 = 0; x3 < N3; x3 += L3) {
+      np[3] = x3 / L3;
+      n = ipr_global(np);
+      if (my_rank == n)
+        get_spinors(iy, sd);
+
+      if (n > 0) {
+        if (my_rank == 0) {
+          MPI_Send(&dmy, 1, MPI_INT, n, tag0, MPI_COMM_WORLD);
+          MPI_Recv(sbuf, L3 * 24, MPI_DOUBLE, n, tag1, MPI_COMM_WORLD, &stat);
+        } else if (my_rank == n) {
+          MPI_Recv(&dmy, 1, MPI_INT, 0, tag0, MPI_COMM_WORLD, &stat);
+          MPI_Send(sbuf, L3 * 24, MPI_DOUBLE, 0, tag1, MPI_COMM_WORLD);
+        }
       }
 
-      iw=fwrite(lsize,sizeof(stdint_t),4,fout);
-      iw+=fwrite(&norm,sizeof(double),1,fout);
-      error_root(iw!=5,1,"export_sfld [sarchive.c]","Incorrect write count");
-   }
-
-   iwa=0;
-
-   for (ix=0;ix<(N0*N1*N2);ix++)
-   {
-      x0=ix/(N1*N2);
-      x1=(ix/N2)%N1;
-      x2=ix%N2;
-
-      y0=x0%L0;
-      y1=x1%L1;
-      y2=x2%L2;
-      iy=y2+L2*y1+L1*L2*y0;
-
-      np[0]=x0/L0;
-      np[1]=x1/L1;
-      np[2]=x2/L2;
-
-      for (x3=0;x3<N3;x3+=L3)
-      {
-         np[3]=x3/L3;
-         n=ipr_global(np);
-         if (my_rank==n)
-            get_spinors(iy,sd);
-
-         if (n>0)
-         {
-            if (my_rank==0)
-            {
-               MPI_Send(&dmy,1,MPI_INT,n,tag0,MPI_COMM_WORLD);
-               MPI_Recv(sbuf,L3*24,MPI_DOUBLE,n,tag1,MPI_COMM_WORLD,&stat);
-            }
-            else if (my_rank==n)
-            {
-               MPI_Recv(&dmy,1,MPI_INT,0,tag0,MPI_COMM_WORLD,&stat);
-               MPI_Send(sbuf,L3*24,MPI_DOUBLE,0,tag1,MPI_COMM_WORLD);
-            }
-         }
-
-         if (my_rank==0)
-         {
-            if (endian==BIG_ENDIAN)
-               bswap_double(L3*24,(double*)(sbuf));
-            iw=fwrite(sbuf,sizeof(spinor_dble),L3,fout);
-            iwa|=(iw!=L3);
-         }
+      if (my_rank == 0) {
+        if (endian == BIG_ENDIAN)
+          bswap_double(L3 * 24, (double *)(sbuf));
+        iw = fwrite(sbuf, sizeof(spinor_dble), L3, fout);
+        iwa |= (iw != L3);
       }
-   }
+    }
+  }
 
-   if (my_rank==0)
-   {
-      error_root(iwa!=0,1,"export_sfld [sarchive.c]","Incorrect write count");
-      fclose(fout);
-   }
+  if (my_rank == 0) {
+    error_root(iwa != 0, 1, "export_sfld [sarchive.c]",
+               "Incorrect write count");
+    fclose(fout);
+  }
 }
 
-
-void import_sfld(char *in,spinor_dble *sd)
+void import_sfld(char *in, spinor_dble *sd)
 {
-   int my_rank,np[4],n,ir;
-   int ira,dmy,tag0,tag1;
-   int x0,x1,x2,x3,y0,y1,y2,ix,iy;
-   stdint_t lsize[4];
-   double norm0,norm1,eps;
-   MPI_Status stat;
-   FILE *fin=NULL;
+  int my_rank, np[4], n, ir;
+  int ira, dmy, tag0, tag1;
+  int x0, x1, x2, x3, y0, y1, y2, ix, iy;
+  stdint_t lsize[4];
+  double norm0, norm1, eps;
+  MPI_Status stat;
+  FILE *fin = NULL;
 
-   MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-   if (sbuf==NULL)
-   {
-      check_machine();
-      alloc_sbuf();
-   }
+  if (sbuf == NULL) {
+    check_machine();
+    alloc_sbuf();
+  }
 
-   error(sd==NULL,1,"import_sfld [sarchive.c]",
-         "Attempt to access unallocated memory space");
+  error(sd == NULL, 1, "import_sfld [sarchive.c]",
+        "Attempt to access unallocated memory space");
 
-   dmy=1;
-   tag0=mpi_tag();
-   tag1=mpi_tag();
+  dmy = 1;
+  tag0 = mpi_tag();
+  tag1 = mpi_tag();
 
-   if (my_rank==0)
-   {
-      fin=fopen(in,"rb");
-      error_root(fin==NULL,1,"import_sfld [sarchive.c]",
-                 "Unable to open input file");
+  if (my_rank == 0) {
+    fin = fopen(in, "rb");
+    error_root(fin == NULL, 1, "import_sfld [sarchive.c]",
+               "Unable to open input file");
 
-      ir=fread(lsize,sizeof(stdint_t),4,fin);
-      ir+=fread(&norm0,sizeof(double),1,fin);
-      error_root(ir!=5,1,"import_sfld [sarchive.c]","Incorrect read count");
+    ir = fread(lsize, sizeof(stdint_t), 4, fin);
+    ir += fread(&norm0, sizeof(double), 1, fin);
+    error_root(ir != 5, 1, "import_sfld [sarchive.c]", "Incorrect read count");
 
-      if (endian==BIG_ENDIAN)
-      {
-         bswap_int(4,lsize);
-         bswap_double(1,&norm0);
+    if (endian == BIG_ENDIAN) {
+      bswap_int(4, lsize);
+      bswap_double(1, &norm0);
+    }
+
+    error_root((lsize[0] != N0) || (lsize[1] != N1) || (lsize[2] != N2) ||
+                   (lsize[3] != N3),
+               1, "import_sfld [sarchive.c]", "Lattice sizes do not match");
+  } else
+    norm0 = 0.0;
+
+  ira = 0;
+
+  for (ix = 0; ix < (N0 * N1 * N2); ix++) {
+    x0 = ix / (N1 * N2);
+    x1 = (ix / N2) % N1;
+    x2 = ix % N2;
+
+    y0 = x0 % L0;
+    y1 = x1 % L1;
+    y2 = x2 % L2;
+    iy = y2 + L2 * y1 + L1 * L2 * y0;
+
+    np[0] = x0 / L0;
+    np[1] = x1 / L1;
+    np[2] = x2 / L2;
+
+    for (x3 = 0; x3 < N3; x3 += L3) {
+      np[3] = x3 / L3;
+      n = ipr_global(np);
+
+      if (my_rank == 0) {
+        ir = fread(sbuf, sizeof(spinor_dble), L3, fin);
+        ira |= (ir != L3);
+
+        if (endian == BIG_ENDIAN)
+          bswap_double(L3 * 24, (double *)(sbuf));
       }
 
-      error_root((lsize[0]!=N0)||(lsize[1]!=N1)||(lsize[2]!=N2)||
-                 (lsize[3]!=N3),1,"import_sfld [sarchive.c]",
-                 "Lattice sizes do not match");
-   }
-   else
-      norm0=0.0;
-
-   ira=0;
-
-   for (ix=0;ix<(N0*N1*N2);ix++)
-   {
-      x0=ix/(N1*N2);
-      x1=(ix/N2)%N1;
-      x2=ix%N2;
-
-      y0=x0%L0;
-      y1=x1%L1;
-      y2=x2%L2;
-      iy=y2+L2*y1+L1*L2*y0;
-
-      np[0]=x0/L0;
-      np[1]=x1/L1;
-      np[2]=x2/L2;
-
-      for (x3=0;x3<N3;x3+=L3)
-      {
-         np[3]=x3/L3;
-         n=ipr_global(np);
-
-         if (my_rank==0)
-         {
-            ir=fread(sbuf,sizeof(spinor_dble),L3,fin);
-            ira|=(ir!=L3);
-
-            if (endian==BIG_ENDIAN)
-               bswap_double(L3*24,(double*)(sbuf));
-         }
-
-         if (n>0)
-         {
-            if (my_rank==0)
-            {
-               MPI_Send(sbuf,L3*24,MPI_DOUBLE,n,tag1,MPI_COMM_WORLD);
-               MPI_Recv(&dmy,1,MPI_INT,n,tag0,MPI_COMM_WORLD,&stat);
-            }
-            else if (my_rank==n)
-            {
-               MPI_Recv(sbuf,L3*24,MPI_DOUBLE,0,tag1,MPI_COMM_WORLD,&stat);
-               MPI_Send(&dmy,1,MPI_INT,0,tag0,MPI_COMM_WORLD);
-            }
-         }
-
-         if (my_rank==n)
-            set_spinors(iy,sd);
+      if (n > 0) {
+        if (my_rank == 0) {
+          MPI_Send(sbuf, L3 * 24, MPI_DOUBLE, n, tag1, MPI_COMM_WORLD);
+          MPI_Recv(&dmy, 1, MPI_INT, n, tag0, MPI_COMM_WORLD, &stat);
+        } else if (my_rank == n) {
+          MPI_Recv(sbuf, L3 * 24, MPI_DOUBLE, 0, tag1, MPI_COMM_WORLD, &stat);
+          MPI_Send(&dmy, 1, MPI_INT, 0, tag0, MPI_COMM_WORLD);
+        }
       }
-   }
 
-   if (my_rank==0)
-   {
-      error_root(ira!=0,1,"import_sfld [sarchive.c]","Incorrect read count");
-      fclose(fin);
-   }
+      if (my_rank == n)
+        set_spinors(iy, sd);
+    }
+  }
 
-   norm1=norm_square_dble(VOLUME,1,sd);
-   eps=sqrt(64.0*(double)(N0*N1)*(double)(N2*N3))*DBL_EPSILON;
-   error_root(fabs(norm1-norm0)>(eps*norm0),1,"import_sfld [sarchive.c]",
-              "Incorrect square norm");
+  if (my_rank == 0) {
+    error_root(ira != 0, 1, "import_sfld [sarchive.c]", "Incorrect read count");
+    fclose(fin);
+  }
+
+  norm1 = norm_square_dble(VOLUME, 1, sd);
+  eps = sqrt(64.0 * (double)(N0 * N1) * (double)(N2 * N3)) * DBL_EPSILON;
+  error_root(fabs(norm1 - norm0) > (eps * norm0), 1, "import_sfld [sarchive.c]",
+             "Incorrect square norm");
 }

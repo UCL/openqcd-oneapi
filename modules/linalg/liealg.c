@@ -42,7 +42,7 @@
 * Lie algebra elements X are traceless antihermitian 3x3 matrices that
 * are represented by structures with real elements x1,...,x8 through
 *
-*  X_11=i*(x1+x2), X_22=i*(x2-2*x1), X_33=i*(x1-2*x2), 
+*  X_11=i*(x1+x2), X_22=i*(x2-2*x1), X_33=i*(x1-2*x2),
 *
 *  X_12=x3+i*x4, X_13=x5+i*x6, X_23=x7+i*x8
 *
@@ -77,258 +77,235 @@
 
 static int cnt[MAX_LEVELS];
 static double smx[MAX_LEVELS];
-static double c1=0.0,c2,c3,rb[8],sm;
+static double c1 = 0.0, c2, c3, rb[8], sm;
 
-
-void random_alg(int vol,su3_alg_dble *X)
+void random_alg(int vol, su3_alg_dble *X)
 {
-   su3_alg_dble *Xm;
+  su3_alg_dble *Xm;
 
-   if (c1==0.0)
-   {
-      c1=(sqrt(3.0)+1.0)/6.0;
-      c2=(sqrt(3.0)-1.0)/6.0;
-      c3=1.0/sqrt(2.0);
-   }
+  if (c1 == 0.0) {
+    c1 = (sqrt(3.0) + 1.0) / 6.0;
+    c2 = (sqrt(3.0) - 1.0) / 6.0;
+    c3 = 1.0 / sqrt(2.0);
+  }
 
-   Xm=X+vol;
-   
-   for (;X<Xm;X++)
-   {
-      gauss_dble(rb,8);
+  Xm = X + vol;
 
-      (*X).c1=c1*rb[0]+c2*rb[1];
-      (*X).c2=c1*rb[1]+c2*rb[0];      
-      (*X).c3=c3*rb[2];
-      (*X).c4=c3*rb[3];
-      (*X).c5=c3*rb[4];
-      (*X).c6=c3*rb[5];
-      (*X).c7=c3*rb[6];
-      (*X).c8=c3*rb[7];
-   }
+  for (; X < Xm; X++) {
+    gauss_dble(rb, 8);
+
+    (*X).c1 = c1 * rb[0] + c2 * rb[1];
+    (*X).c2 = c1 * rb[1] + c2 * rb[0];
+    (*X).c3 = c3 * rb[2];
+    (*X).c4 = c3 * rb[3];
+    (*X).c5 = c3 * rb[4];
+    (*X).c6 = c3 * rb[5];
+    (*X).c7 = c3 * rb[6];
+    (*X).c8 = c3 * rb[7];
+  }
 }
 
-
-double norm_square_alg(int vol,int icom,su3_alg_dble *X)
+double norm_square_alg(int vol, int icom, su3_alg_dble *X)
 {
-   int n;
-   su3_alg_dble *Xm;
+  int n;
+  su3_alg_dble *Xm;
 
-   for (n=0;n<MAX_LEVELS;n++)
-   {
-      cnt[n]=0;
-      smx[n]=0.0;
-   }
+  for (n = 0; n < MAX_LEVELS; n++) {
+    cnt[n] = 0;
+    smx[n] = 0.0;
+  }
 
-   Xm=X+vol;
-   
-   for (;X<Xm;X++)
-   {
-      sm=3.0*((*X).c1*(*X).c1+(*X).c2*(*X).c2-(*X).c1*(*X).c2)+
-         (*X).c3*(*X).c3+(*X).c4*(*X).c4+(*X).c5*(*X).c5+
-         (*X).c6*(*X).c6+(*X).c7*(*X).c7+(*X).c8*(*X).c8;
+  Xm = X + vol;
 
-      cnt[0]+=1;
-      smx[0]+=sm;
+  for (; X < Xm; X++) {
+    sm = 3.0 * ((*X).c1 * (*X).c1 + (*X).c2 * (*X).c2 - (*X).c1 * (*X).c2) +
+         (*X).c3 * (*X).c3 + (*X).c4 * (*X).c4 + (*X).c5 * (*X).c5 +
+         (*X).c6 * (*X).c6 + (*X).c7 * (*X).c7 + (*X).c8 * (*X).c8;
 
-      for (n=1;(cnt[n-1]>=BLK_LENGTH)&&(n<MAX_LEVELS);n++)
-      {
-         cnt[n]+=1;
-         smx[n]+=smx[n-1];
+    cnt[0] += 1;
+    smx[0] += sm;
 
-         cnt[n-1]=0;
-         smx[n-1]=0.0;
-      }
-   }
+    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
+      cnt[n] += 1;
+      smx[n] += smx[n - 1];
 
-   for (n=1;n<MAX_LEVELS;n++)
-      smx[0]+=smx[n];
+      cnt[n - 1] = 0;
+      smx[n - 1] = 0.0;
+    }
+  }
 
-   if ((icom==1)&&(NPROC>1))
-   {
-      sm=smx[0];
-      MPI_Reduce(&sm,smx,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-      MPI_Bcast(smx,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-   }
-   
-   return 4.0*smx[0];
+  for (n = 1; n < MAX_LEVELS; n++)
+    smx[0] += smx[n];
+
+  if ((icom == 1) && (NPROC > 1)) {
+    sm = smx[0];
+    MPI_Reduce(&sm, smx, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Bcast(smx, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  }
+
+  return 4.0 * smx[0];
 }
 
-
-double scalar_prod_alg(int vol,int icom,su3_alg_dble *X,su3_alg_dble *Y)
+double scalar_prod_alg(int vol, int icom, su3_alg_dble *X, su3_alg_dble *Y)
 {
-   int n;
-   su3_alg_dble *Xm;
+  int n;
+  su3_alg_dble *Xm;
 
-   for (n=0;n<MAX_LEVELS;n++)
-   {
-      cnt[n]=0;
-      smx[n]=0.0;
-   }
+  for (n = 0; n < MAX_LEVELS; n++) {
+    cnt[n] = 0;
+    smx[n] = 0.0;
+  }
 
-   Xm=X+vol;
-   
-   for (;X<Xm;X++)
-   {
-      sm=12.0*((*X).c1*(*Y).c1+(*X).c2*(*Y).c2)
-         -6.0*((*X).c1*(*Y).c2+(*X).c2*(*Y).c1)
-         +4.0*((*X).c3*(*Y).c3+(*X).c4*(*Y).c4+(*X).c5*(*Y).c5+
-               (*X).c6*(*Y).c6+(*X).c7*(*Y).c7+(*X).c8*(*Y).c8);
+  Xm = X + vol;
 
-      Y+=1;
-      cnt[0]+=1;
-      smx[0]+=sm;
+  for (; X < Xm; X++) {
+    sm = 12.0 * ((*X).c1 * (*Y).c1 + (*X).c2 * (*Y).c2) -
+         6.0 * ((*X).c1 * (*Y).c2 + (*X).c2 * (*Y).c1) +
+         4.0 * ((*X).c3 * (*Y).c3 + (*X).c4 * (*Y).c4 + (*X).c5 * (*Y).c5 +
+                (*X).c6 * (*Y).c6 + (*X).c7 * (*Y).c7 + (*X).c8 * (*Y).c8);
 
-      for (n=1;(cnt[n-1]>=BLK_LENGTH)&&(n<MAX_LEVELS);n++)
-      {
-         cnt[n]+=1;
-         smx[n]+=smx[n-1];
+    Y += 1;
+    cnt[0] += 1;
+    smx[0] += sm;
 
-         cnt[n-1]=0;
-         smx[n-1]=0.0;
-      }
-   }
+    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
+      cnt[n] += 1;
+      smx[n] += smx[n - 1];
 
-   for (n=1;n<MAX_LEVELS;n++)
-      smx[0]+=smx[n];
+      cnt[n - 1] = 0;
+      smx[n - 1] = 0.0;
+    }
+  }
 
-   if ((icom==1)&&(NPROC>1))
-   {
-      sm=smx[0];
-      MPI_Reduce(&sm,smx,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-      MPI_Bcast(smx,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-   }
-   
-   return smx[0];
+  for (n = 1; n < MAX_LEVELS; n++)
+    smx[0] += smx[n];
+
+  if ((icom == 1) && (NPROC > 1)) {
+    sm = smx[0];
+    MPI_Reduce(&sm, smx, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Bcast(smx, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  }
+
+  return smx[0];
 }
 
-
-void set_alg2zero(int vol,su3_alg_dble *X)
+void set_alg2zero(int vol, su3_alg_dble *X)
 {
-   su3_alg_dble *Xm;
+  su3_alg_dble *Xm;
 
-   Xm=X+vol;
-   
-   for (;X<Xm;X++)
-   {
-      (*X).c1=0.0;
-      (*X).c2=0.0;
-      (*X).c3=0.0;
-      (*X).c4=0.0;
-      (*X).c5=0.0;
-      (*X).c6=0.0;
-      (*X).c7=0.0;      
-      (*X).c8=0.0;
-   }
+  Xm = X + vol;
+
+  for (; X < Xm; X++) {
+    (*X).c1 = 0.0;
+    (*X).c2 = 0.0;
+    (*X).c3 = 0.0;
+    (*X).c4 = 0.0;
+    (*X).c5 = 0.0;
+    (*X).c6 = 0.0;
+    (*X).c7 = 0.0;
+    (*X).c8 = 0.0;
+  }
 }
 
-
-void set_ualg2zero(int vol,u3_alg_dble *X)
+void set_ualg2zero(int vol, u3_alg_dble *X)
 {
-   u3_alg_dble *Xm;
+  u3_alg_dble *Xm;
 
-   Xm=X+vol;
-   
-   for (;X<Xm;X++)
-   {
-      (*X).c1=0.0;
-      (*X).c2=0.0;
-      (*X).c3=0.0;
-      (*X).c4=0.0;
-      (*X).c5=0.0;
-      (*X).c6=0.0;
-      (*X).c7=0.0;      
-      (*X).c8=0.0;
-      (*X).c9=0.0;      
-   }
+  Xm = X + vol;
+
+  for (; X < Xm; X++) {
+    (*X).c1 = 0.0;
+    (*X).c2 = 0.0;
+    (*X).c3 = 0.0;
+    (*X).c4 = 0.0;
+    (*X).c5 = 0.0;
+    (*X).c6 = 0.0;
+    (*X).c7 = 0.0;
+    (*X).c8 = 0.0;
+    (*X).c9 = 0.0;
+  }
 }
 
-
-void assign_alg2alg(int vol,su3_alg_dble *X,su3_alg_dble *Y)
+void assign_alg2alg(int vol, su3_alg_dble *X, su3_alg_dble *Y)
 {
-   su3_alg_dble *Xm;
+  su3_alg_dble *Xm;
 
-   Xm=X+vol;
-   
-   for (;X<Xm;X++)
-   {
-      (*Y).c1=(*X).c1;
-      (*Y).c2=(*X).c2;
-      (*Y).c3=(*X).c3;
-      (*Y).c4=(*X).c4;
-      (*Y).c5=(*X).c5;
-      (*Y).c6=(*X).c6;
-      (*Y).c7=(*X).c7;
-      (*Y).c8=(*X).c8;      
+  Xm = X + vol;
 
-      Y+=1;
-   }
+  for (; X < Xm; X++) {
+    (*Y).c1 = (*X).c1;
+    (*Y).c2 = (*X).c2;
+    (*Y).c3 = (*X).c3;
+    (*Y).c4 = (*X).c4;
+    (*Y).c5 = (*X).c5;
+    (*Y).c6 = (*X).c6;
+    (*Y).c7 = (*X).c7;
+    (*Y).c8 = (*X).c8;
+
+    Y += 1;
+  }
 }
 
-
-void swap_alg(int vol,su3_alg_dble *X,su3_alg_dble *Y)
+void swap_alg(int vol, su3_alg_dble *X, su3_alg_dble *Y)
 {
-   double r;
-   su3_alg_dble *Xm;
+  double r;
+  su3_alg_dble *Xm;
 
-   Xm=X+vol;
-   
-   for (;X<Xm;X++)
-   {
-      r=(*Y).c1;
-      (*Y).c1=(*X).c1;
-      (*X).c1=r;
+  Xm = X + vol;
 
-      r=(*Y).c2;
-      (*Y).c2=(*X).c2;
-      (*X).c2=r;
+  for (; X < Xm; X++) {
+    r = (*Y).c1;
+    (*Y).c1 = (*X).c1;
+    (*X).c1 = r;
 
-      r=(*Y).c3;
-      (*Y).c3=(*X).c3;
-      (*X).c3=r;
+    r = (*Y).c2;
+    (*Y).c2 = (*X).c2;
+    (*X).c2 = r;
 
-      r=(*Y).c4;
-      (*Y).c4=(*X).c4;
-      (*X).c4=r;
+    r = (*Y).c3;
+    (*Y).c3 = (*X).c3;
+    (*X).c3 = r;
 
-      r=(*Y).c5;
-      (*Y).c5=(*X).c5;
-      (*X).c5=r;
-      
-      r=(*Y).c6;
-      (*Y).c6=(*X).c6;
-      (*X).c6=r;
-      
-      r=(*Y).c7;
-      (*Y).c7=(*X).c7;
-      (*X).c7=r;
+    r = (*Y).c4;
+    (*Y).c4 = (*X).c4;
+    (*X).c4 = r;
 
-      r=(*Y).c8;
-      (*Y).c8=(*X).c8;
-      (*X).c8=r;
-      
-      Y+=1;
-   }
+    r = (*Y).c5;
+    (*Y).c5 = (*X).c5;
+    (*X).c5 = r;
+
+    r = (*Y).c6;
+    (*Y).c6 = (*X).c6;
+    (*X).c6 = r;
+
+    r = (*Y).c7;
+    (*Y).c7 = (*X).c7;
+    (*X).c7 = r;
+
+    r = (*Y).c8;
+    (*Y).c8 = (*X).c8;
+    (*X).c8 = r;
+
+    Y += 1;
+  }
 }
 
-
-void muladd_assign_alg(int vol,double r,su3_alg_dble *X,su3_alg_dble *Y)
+void muladd_assign_alg(int vol, double r, su3_alg_dble *X, su3_alg_dble *Y)
 {
-   su3_alg_dble *Xm;
+  su3_alg_dble *Xm;
 
-   Xm=X+vol;
-   
-   for (;X<Xm;X++)
-   {
-      (*Y).c1+=r*(*X).c1;
-      (*Y).c2+=r*(*X).c2;
-      (*Y).c3+=r*(*X).c3;
-      (*Y).c4+=r*(*X).c4;
-      (*Y).c5+=r*(*X).c5;
-      (*Y).c6+=r*(*X).c6;
-      (*Y).c7+=r*(*X).c7;
-      (*Y).c8+=r*(*X).c8;      
+  Xm = X + vol;
 
-      Y+=1;
-   }
+  for (; X < Xm; X++) {
+    (*Y).c1 += r * (*X).c1;
+    (*Y).c2 += r * (*X).c2;
+    (*Y).c3 += r * (*X).c3;
+    (*Y).c4 += r * (*X).c4;
+    (*Y).c5 += r * (*X).c5;
+    (*Y).c6 += r * (*X).c6;
+    (*Y).c7 += r * (*X).c7;
+    (*Y).c8 += r * (*X).c8;
+
+    Y += 1;
+  }
 }

@@ -147,235 +147,210 @@
 #include "dfl.h"
 #include "global.h"
 
-static int nit,stat,nv;
+static int nit, stat, nv;
 static float mus;
 static double mud;
 static sap_parms_t spr;
 static dfl_pro_parms_t dpr;
 
+static void Dop(spinor_dble *s, spinor_dble *r) { Dw_dble(mud, s, r); }
 
-static void Dop(spinor_dble *s,spinor_dble *r)
+static void Mop(int k, spinor *rho, spinor *phi, spinor *chi)
 {
-   Dw_dble(mud,s,r);
+  int n, status;
+  complex **wv;
+  complex_dble **wvd;
+  spinor **ws;
+
+  wv = reserve_wv(1);
+  wvd = reserve_wvd(1);
+  ws = reserve_ws(1);
+
+  dfl_s2v(rho, wv[0]);
+  assign_v2vd(nv, wv[0], wvd[0]);
+  ltl_gcr(dpr.nkv, dpr.nmx, dpr.res, mud, wvd[0], wvd[0], &status);
+  assign_vd2v(nv, wvd[0], wv[0]);
+  dfl_v2s(wv[0], ws[0]);
+
+  Dw(mus, ws[0], chi);
+  diff_s2s(VOLUME, rho, chi);
+  set_s2zero(VOLUME, phi);
+
+  for (n = 0; n < spr.ncy; n++)
+    sap(mus, spr.isolv, spr.nmr, phi, chi);
+
+  diff_s2s(VOLUME, rho, chi);
+  mulr_spinor_add(VOLUME, phi, ws[0], 1.0f);
+
+  if (stat >= 0) {
+    if (status >= 0) {
+      nit += 1;
+      stat += status;
+    } else
+      stat = status;
+  }
+
+  release_ws();
+  release_wvd();
+  release_wv();
 }
 
-
-static void Mop(int k,spinor *rho,spinor *phi,spinor *chi)
+double dfl_sap_gcr(int nkv, int nmx, double res, double mu, spinor_dble *eta,
+                   spinor_dble *psi, int *status)
 {
-   int n,status;
-   complex **wv;
-   complex_dble **wvd;
-   spinor **ws;
+  int *bs, nb, isw, ifail;
+  int swde, swdo, swu, swe, swo;
+  double rho, rho0, fact;
+  spinor **ws;
+  spinor_dble **wsd, **rsd;
+  dfl_parms_t dfl;
 
-   wv=reserve_wv(1);
-   wvd=reserve_wvd(1);
-   ws=reserve_ws(1);
+  dfl = dfl_parms();
+  error_root(dfl.Ns == 0, 1, "dfl_sap_gcr [dfl_sap_gcr.c]",
+             "Deflation parameters are not set");
+  bs = dfl.bs;
+  nv = dfl.Ns * VOLUME / (bs[0] * bs[1] * bs[2] * bs[3]);
 
-   dfl_s2v(rho,wv[0]);
-   assign_v2vd(nv,wv[0],wvd[0]);
-   ltl_gcr(dpr.nkv,dpr.nmx,dpr.res,mud,wvd[0],wvd[0],&status);
-   assign_vd2v(nv,wvd[0],wv[0]);
-   dfl_v2s(wv[0],ws[0]);
+  spr = sap_parms();
+  error_root(spr.ncy == 0, 1, "dfl_sap_gcr [dfl_sap_gcr.c]",
+             "SAP parameters are not set");
 
-   Dw(mus,ws[0],chi);
-   diff_s2s(VOLUME,rho,chi);
-   set_s2zero(VOLUME,phi);
+  dpr = dfl_pro_parms();
+  error_root(dpr.nkv == 0, 1, "dfl_sap_gcr [dfl_sap_gcr.c]",
+             "Deflation projector parameters are not set");
 
-   for (n=0;n<spr.ncy;n++)
-      sap(mus,spr.isolv,spr.nmr,phi,chi);
+  blk_list(SAP_BLOCKS, &nb, &isw);
 
-   diff_s2s(VOLUME,rho,chi);
-   mulr_spinor_add(VOLUME,phi,ws[0],1.0f);
+  if (nb == 0)
+    alloc_bgr(SAP_BLOCKS);
 
-   if (stat>=0)
-   {
-      if (status>=0)
-      {
-         nit+=1;
-         stat+=status;
-      }
-      else
-         stat=status;
-   }
+  if (query_grid_flags(SAP_BLOCKS, UBGR_MATCH_UD) != 1)
+    assign_ud2ubgr(SAP_BLOCKS);
 
-   release_ws();
-   release_wvd();
-   release_wv();
-}
+  if (query_flags(SWD_UP2DATE) != 1)
+    sw_term(NO_PTS);
 
+  swde = query_flags(SWD_E_INVERTED);
+  swdo = query_flags(SWD_O_INVERTED);
 
-double dfl_sap_gcr(int nkv,int nmx,double res,double mu,
-                   spinor_dble *eta,spinor_dble *psi,int *status)
-{
-   int *bs,nb,isw,ifail;
-   int swde,swdo,swu,swe,swo;
-   double rho,rho0,fact;
-   spinor **ws;
-   spinor_dble **wsd,**rsd;
-   dfl_parms_t dfl;
+  swu = query_grid_flags(SAP_BLOCKS, SW_UP2DATE);
+  swe = query_grid_flags(SAP_BLOCKS, SW_E_INVERTED);
+  swo = query_grid_flags(SAP_BLOCKS, SW_O_INVERTED);
+  ifail = 0;
 
-   dfl=dfl_parms();
-   error_root(dfl.Ns==0,1,"dfl_sap_gcr [dfl_sap_gcr.c]",
-              "Deflation parameters are not set");
-   bs=dfl.bs;
-   nv=dfl.Ns*VOLUME/(bs[0]*bs[1]*bs[2]*bs[3]);
-
-   spr=sap_parms();
-   error_root(spr.ncy==0,1,"dfl_sap_gcr [dfl_sap_gcr.c]",
-              "SAP parameters are not set");
-
-   dpr=dfl_pro_parms();
-   error_root(dpr.nkv==0,1,"dfl_sap_gcr [dfl_sap_gcr.c]",
-              "Deflation projector parameters are not set");
-
-   blk_list(SAP_BLOCKS,&nb,&isw);
-
-   if (nb==0)
-      alloc_bgr(SAP_BLOCKS);
-
-   if (query_grid_flags(SAP_BLOCKS,UBGR_MATCH_UD)!=1)
-      assign_ud2ubgr(SAP_BLOCKS);
-
-   if (query_flags(SWD_UP2DATE)!=1)
+  if (spr.isolv == 0) {
+    if ((swde == 1) || (swdo == 1))
       sw_term(NO_PTS);
 
-   swde=query_flags(SWD_E_INVERTED);
-   swdo=query_flags(SWD_O_INVERTED);
+    if ((swu != 1) || (swe == 1) || (swo == 1))
+      assign_swd2swbgr(SAP_BLOCKS, NO_PTS);
+  } else if (spr.isolv == 1) {
+    if ((swde != 1) && (swdo == 1)) {
+      if ((swu != 1) || (swe == 1) || (swo != 1))
+        assign_swd2swbgr(SAP_BLOCKS, NO_PTS);
 
-   swu=query_grid_flags(SAP_BLOCKS,SW_UP2DATE);
-   swe=query_grid_flags(SAP_BLOCKS,SW_E_INVERTED);
-   swo=query_grid_flags(SAP_BLOCKS,SW_O_INVERTED);
-   ifail=0;
+      sw_term(NO_PTS);
+    } else {
+      if ((swde == 1) || (swdo == 1))
+        sw_term(NO_PTS);
 
-   if (spr.isolv==0)
-   {
-      if ((swde==1)||(swdo==1))
-         sw_term(NO_PTS);
+      if ((swu != 1) || (swe == 1) || (swo != 1))
+        ifail = assign_swd2swbgr(SAP_BLOCKS, ODD_PTS);
+    }
+  } else
+    error_root(1, 1, "dfl_sap_gcr [dfl_sap_gcr.c]", "Unknown block solver");
 
-      if ((swu!=1)||(swe==1)||(swo==1))
-         assign_swd2swbgr(SAP_BLOCKS,NO_PTS);
-   }
-   else if (spr.isolv==1)
-   {
-      if ((swde!=1)&&(swdo==1))
-      {
-         if ((swu!=1)||(swe==1)||(swo!=1))
-            assign_swd2swbgr(SAP_BLOCKS,NO_PTS);
+  if (query_flags(U_MATCH_UD) != 1)
+    assign_ud2u();
 
-         sw_term(NO_PTS);
+  if ((query_flags(SW_UP2DATE) != 1) || (query_flags(SW_E_INVERTED) == 1) ||
+      (query_flags(SW_O_INVERTED) == 1))
+    assign_swd2sw();
+
+  rho0 = sqrt(norm_square_dble(VOLUME, 1, eta));
+  rho = rho0;
+  status[0] = 0;
+  status[1] = 0;
+
+  if (ifail)
+    status[0] = -2;
+  else {
+    ifail = set_Awhat(mu);
+
+    if (ifail)
+      status[0] = -3;
+    else {
+      ws = reserve_ws(2 * nkv + 1);
+      wsd = reserve_wsd(1);
+      rsd = reserve_wsd(1);
+
+      nit = 0;
+      stat = 0;
+      mus = (float)(mu);
+      mud = mu;
+
+      fact = rho0 / sqrt((double)(VOLUME) * (double)(24 * NPROC));
+
+      if (fact != 0.0) {
+        assign_sd2sd(VOLUME, eta, rsd[0]);
+        scale_dble(VOLUME, 1.0 / fact, rsd[0]);
+
+        rho = fgcr(VOLUME, 1, Dop, Mop, ws, wsd, nkv, nmx, res, rsd[0], psi,
+                   status);
+
+        scale_dble(VOLUME, fact, psi);
+        rho *= fact;
+
+        if ((nit > 0) && (stat >= 0))
+          status[1] = (stat + nit / 2) / nit;
+        else if (stat < 0)
+          status[1] = stat;
+      } else {
+        rho = 0.0;
+        set_sd2zero(VOLUME, psi);
       }
-      else
-      {
-         if ((swde==1)||(swdo==1))
-            sw_term(NO_PTS);
 
-         if ((swu!=1)||(swe==1)||(swo!=1))
-            ifail=assign_swd2swbgr(SAP_BLOCKS,ODD_PTS);
-      }
-   }
-   else
-      error_root(1,1,"dfl_sap_gcr [dfl_sap_gcr.c]","Unknown block solver");
+      release_wsd();
+      release_wsd();
+      release_ws();
+    }
+  }
 
-   if (query_flags(U_MATCH_UD)!=1)
-      assign_ud2u();
+  if ((status[0] < -1) || (status[1] < 0)) {
+    rho = rho0;
+    set_sd2zero(VOLUME, psi);
+  }
 
-   if ((query_flags(SW_UP2DATE)!=1)||
-       (query_flags(SW_E_INVERTED)==1)||(query_flags(SW_O_INVERTED)==1))
-      assign_swd2sw();
-
-   rho0=sqrt(norm_square_dble(VOLUME,1,eta));
-   rho=rho0;
-   status[0]=0;
-   status[1]=0;
-
-   if (ifail)
-      status[0]=-2;
-   else
-   {
-      ifail=set_Awhat(mu);
-
-      if (ifail)
-         status[0]=-3;
-      else
-      {
-         ws=reserve_ws(2*nkv+1);
-         wsd=reserve_wsd(1);
-         rsd=reserve_wsd(1);
-
-         nit=0;
-         stat=0;
-         mus=(float)(mu);
-         mud=mu;
-
-         fact=rho0/sqrt((double)(VOLUME)*(double)(24*NPROC));
-
-         if (fact!=0.0)
-         {
-            assign_sd2sd(VOLUME,eta,rsd[0]);
-            scale_dble(VOLUME,1.0/fact,rsd[0]);
-
-            rho=fgcr(VOLUME,1,Dop,Mop,ws,wsd,nkv,nmx,res,rsd[0],psi,status);
-
-            scale_dble(VOLUME,fact,psi);
-            rho*=fact;
-
-            if ((nit>0)&&(stat>=0))
-               status[1]=(stat+nit/2)/nit;
-            else if (stat<0)
-               status[1]=stat;
-         }
-         else
-         {
-            rho=0.0;
-            set_sd2zero(VOLUME,psi);
-         }
-
-         release_wsd();
-         release_wsd();
-         release_ws();
-      }
-   }
-
-   if ((status[0]<-1)||(status[1]<0))
-   {
-      rho=rho0;
-      set_sd2zero(VOLUME,psi);
-   }
-
-   return rho;
+  return rho;
 }
 
-
-double dfl_sap_gcr2(int nkv,int nmx,double res,double mu,
-                    spinor_dble *eta,spinor_dble *psi,int *status)
+double dfl_sap_gcr2(int nkv, int nmx, double res, double mu, spinor_dble *eta,
+                    spinor_dble *psi, int *status)
 {
-   double rho;
-   spinor_dble **wsd;
+  double rho;
+  spinor_dble **wsd;
 
-   wsd=reserve_wsd(1);
+  wsd = reserve_wsd(1);
 
-   if (eta==psi)
-   {
-      assign_sd2sd(VOLUME,eta,wsd[0]);
-      eta=wsd[0];
-   }
+  if (eta == psi) {
+    assign_sd2sd(VOLUME, eta, wsd[0]);
+    eta = wsd[0];
+  }
 
-   rho=dfl_sap_gcr(nkv,nmx,res,mu,eta,psi,status);
+  rho = dfl_sap_gcr(nkv, nmx, res, mu, eta, psi, status);
 
-   if ((status[0]==-3)||(status[1]<0))
-   {
-      dfl_modes(status+2);
+  if ((status[0] == -3) || (status[1] < 0)) {
+    dfl_modes(status + 2);
 
-      error_root(status[2]<0,1,"dfl_sap_gcr2 [dfl_sap_gcr.c]",
-                 "Deflation subspace regeneration failed (status = %d)",
-                 status[2]);
+    error_root(status[2] < 0, 1, "dfl_sap_gcr2 [dfl_sap_gcr.c]",
+               "Deflation subspace regeneration failed (status = %d)",
+               status[2]);
 
-      rho=dfl_sap_gcr(nkv,nmx,res,mu,eta,psi,status);
-   }
-   else
-      status[2]=0;
+    rho = dfl_sap_gcr(nkv, nmx, res, mu, eta, psi, status);
+  } else
+    status[2] = 0;
 
-   release_wsd();
+  release_wsd();
 
-   return rho;
+  return rho;
 }

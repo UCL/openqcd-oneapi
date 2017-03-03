@@ -53,110 +53,102 @@
 #include "vflds.h"
 #include "global.h"
 
-static int Ns,nv=0;
-static complex **vs=NULL,**v;
-static complex_dble **vds=NULL,**vd;
-
+static int Ns, nv = 0;
+static complex **vs = NULL, **v;
+static complex_dble **vds = NULL, **vd;
 
 static void vfld_size(void)
 {
-   int *bs;
-   dfl_parms_t dfl;
+  int *bs;
+  dfl_parms_t dfl;
 
-   error_root(sizeof(complex)!=(2*sizeof(float)),1,
-              "vfld_size [vflds.c]",
-              "The complex structures are not properly packed");
-   error_root(sizeof(complex_dble)!=(2*sizeof(double)),1,
-              "vfld_size [vflds.c]",
-              "The complex_dble structures are not properly packed");
+  error_root(sizeof(complex) != (2 * sizeof(float)), 1, "vfld_size [vflds.c]",
+             "The complex structures are not properly packed");
+  error_root(sizeof(complex_dble) != (2 * sizeof(double)), 1,
+             "vfld_size [vflds.c]",
+             "The complex_dble structures are not properly packed");
 
-   dfl=dfl_parms();
-   bs=dfl.bs;
-   Ns=dfl.Ns;
+  dfl = dfl_parms();
+  bs = dfl.bs;
+  Ns = dfl.Ns;
 
-   error_root(dfl.Ns==0,1,"vfld_size [vflds.c]",
-         "The deflation subspace parameters are not set");
+  error_root(dfl.Ns == 0, 1, "vfld_size [vflds.c]",
+             "The deflation subspace parameters are not set");
 
-   nv=VOLUME/(bs[0]*bs[1]*bs[2]*bs[3]);
-   nv*=Ns;
+  nv = VOLUME / (bs[0] * bs[1] * bs[2] * bs[3]);
+  nv *= Ns;
 }
-
 
 static void alloc_vflds(void)
 {
-   int n;
-   complex *w;
+  int n;
+  complex *w;
 
-   if (nv==0)
-      vfld_size();
+  if (nv == 0)
+    vfld_size();
 
-   vs=malloc(4*Ns*sizeof(*vs));
-   w=amalloc(2*Ns*nv*sizeof(*w),ALIGN);
+  vs = malloc(4 * Ns * sizeof(*vs));
+  w = amalloc(2 * Ns * nv * sizeof(*w), ALIGN);
 
-   error((vs==NULL)||(w==NULL),1,"alloc_vflds [vflds.c]",
-         "Unable to allocate vector fields");
+  error((vs == NULL) || (w == NULL), 1, "alloc_vflds [vflds.c]",
+        "Unable to allocate vector fields");
 
-   set_v2zero(2*Ns*nv,w);
-   v=vs+2*Ns;
+  set_v2zero(2 * Ns * nv, w);
+  v = vs + 2 * Ns;
 
-   for (n=0;n<(2*Ns);n++)
-   {
-      v[n]=NULL;
-      vs[n]=w;
-      w+=nv;
-   }
+  for (n = 0; n < (2 * Ns); n++) {
+    v[n] = NULL;
+    vs[n] = w;
+    w += nv;
+  }
 }
-
 
 static void alloc_vdflds(void)
 {
-   int n;
-   complex_dble *wd;
+  int n;
+  complex_dble *wd;
 
-   if (nv==0)
-      vfld_size();
+  if (nv == 0)
+    vfld_size();
 
-   vds=malloc(2*Ns*sizeof(*vds));
-   wd=amalloc(Ns*nv*sizeof(*wd),ALIGN);
+  vds = malloc(2 * Ns * sizeof(*vds));
+  wd = amalloc(Ns * nv * sizeof(*wd), ALIGN);
 
-   error((vds==NULL)||(wd==NULL),1,"alloc_vdflds [vflds.c]",
-         "Unable to allocate vector fields");
+  error((vds == NULL) || (wd == NULL), 1, "alloc_vdflds [vflds.c]",
+        "Unable to allocate vector fields");
 
-   set_vd2zero(Ns*nv,wd);
-   vd=vds+Ns;
+  set_vd2zero(Ns * nv, wd);
+  vd = vds + Ns;
 
-   for (n=0;n<Ns;n++)
-   {
-      vd[n]=NULL;
-      vds[n]=wd;
-      wd+=nv;
-   }
+  for (n = 0; n < Ns; n++) {
+    vd[n] = NULL;
+    vds[n] = wd;
+    wd += nv;
+  }
 }
-
 
 complex **vflds(void)
 {
-   int n;
+  int n;
 
-   if (vs==NULL)
-      alloc_vflds();
+  if (vs == NULL)
+    alloc_vflds();
 
-   for (n=0;n<(2*Ns);n++)
-      v[n]=vs[n];
+  for (n = 0; n < (2 * Ns); n++)
+    v[n] = vs[n];
 
-   return v;
+  return v;
 }
-
 
 complex_dble **vdflds(void)
 {
-   int n;
+  int n;
 
-   if (vds==NULL)
-      alloc_vdflds();
+  if (vds == NULL)
+    alloc_vdflds();
 
-   for (n=0;n<Ns;n++)
-      vd[n]=vds[n];
+  for (n = 0; n < Ns; n++)
+    vd[n] = vds[n];
 
-   return vd;
+  return vd;
 }

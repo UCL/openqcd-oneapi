@@ -88,291 +88,267 @@
 #include "dfl.h"
 #include "global.h"
 
-
-void dfl_sd2vd(spinor_dble *sd,complex_dble *vd)
+void dfl_sd2vd(spinor_dble *sd, complex_dble *vd)
 {
-   int Ns,nb,nbh,isw;
-   int n,m,i,vol;
-   block_t *b;
-   spinor_dble **sdb;
-   dfl_parms_t dfl;
+  int Ns, nb, nbh, isw;
+  int n, m, i, vol;
+  block_t *b;
+  spinor_dble **sdb;
+  dfl_parms_t dfl;
 
-   dfl=dfl_parms();
-   Ns=dfl.Ns;
-   b=blk_list(DFL_BLOCKS,&nb,&isw);
-   nbh=nb/2;
-   vol=(*b).vol;
+  dfl = dfl_parms();
+  Ns = dfl.Ns;
+  b = blk_list(DFL_BLOCKS, &nb, &isw);
+  nbh = nb / 2;
+  vol = (*b).vol;
 
-   for (n=0;n<nb;n++)
-   {
-      if (n<nbh)
-         m=n+isw*nbh;
-      else
-         m=n-isw*nbh;
+  for (n = 0; n < nb; n++) {
+    if (n < nbh)
+      m = n + isw * nbh;
+    else
+      m = n - isw * nbh;
 
-      assign_sd2sdblk(DFL_BLOCKS,m,ALL_PTS,sd,0);
-      sdb=b[m].sd;
+    assign_sd2sdblk(DFL_BLOCKS, m, ALL_PTS, sd, 0);
+    sdb = b[m].sd;
 
-      for (i=1;i<=Ns;i++)
-      {
-         (*vd)=spinor_prod_dble(vol,0,sdb[i],sdb[0]);
-         vd+=1;
-      }
-   }
+    for (i = 1; i <= Ns; i++) {
+      (*vd) = spinor_prod_dble(vol, 0, sdb[i], sdb[0]);
+      vd += 1;
+    }
+  }
 }
 
-
-void dfl_vd2sd(complex_dble *vd,spinor_dble *sd)
+void dfl_vd2sd(complex_dble *vd, spinor_dble *sd)
 {
-   int Ns,nb,nbh,isw;
-   int n,m,i,vol;
-   block_t *b;
-   spinor_dble **sdb;
-   dfl_parms_t dfl;
+  int Ns, nb, nbh, isw;
+  int n, m, i, vol;
+  block_t *b;
+  spinor_dble **sdb;
+  dfl_parms_t dfl;
 
-   dfl=dfl_parms();
-   Ns=dfl.Ns;
-   b=blk_list(DFL_BLOCKS,&nb,&isw);
-   nbh=nb/2;
-   vol=(*b).vol;
+  dfl = dfl_parms();
+  Ns = dfl.Ns;
+  b = blk_list(DFL_BLOCKS, &nb, &isw);
+  nbh = nb / 2;
+  vol = (*b).vol;
 
-   for (n=0;n<nb;n++)
-   {
-      if (n<nbh)
-         m=n+isw*nbh;
-      else
-         m=n-isw*nbh;
+  for (n = 0; n < nb; n++) {
+    if (n < nbh)
+      m = n + isw * nbh;
+    else
+      m = n - isw * nbh;
 
-      sdb=b[m].sd;
-      set_sd2zero(vol,sdb[0]);
+    sdb = b[m].sd;
+    set_sd2zero(vol, sdb[0]);
 
-      for (i=1;i<=Ns;i++)
-      {
-         mulc_spinor_add_dble(vol,sdb[0],sdb[i],*vd);
-         vd+=1;
-      }
+    for (i = 1; i <= Ns; i++) {
+      mulc_spinor_add_dble(vol, sdb[0], sdb[i], *vd);
+      vd += 1;
+    }
 
-      assign_sdblk2sd(DFL_BLOCKS,m,ALL_PTS,0,sd);
-   }
+    assign_sdblk2sd(DFL_BLOCKS, m, ALL_PTS, 0, sd);
+  }
 }
 
-
-void dfl_sub_vd2sd(complex_dble *vd,spinor_dble *sd)
+void dfl_sub_vd2sd(complex_dble *vd, spinor_dble *sd)
 {
-   int Ns,nb,nbh,isw;
-   int n,m,i,vol;
-   complex_dble z;
-   block_t *b;
-   spinor_dble **sdb;
-   dfl_parms_t dfl;
+  int Ns, nb, nbh, isw;
+  int n, m, i, vol;
+  complex_dble z;
+  block_t *b;
+  spinor_dble **sdb;
+  dfl_parms_t dfl;
 
-   dfl=dfl_parms();
-   Ns=dfl.Ns;
-   b=blk_list(DFL_BLOCKS,&nb,&isw);
-   nbh=nb/2;
-   vol=(*b).vol;
+  dfl = dfl_parms();
+  Ns = dfl.Ns;
+  b = blk_list(DFL_BLOCKS, &nb, &isw);
+  nbh = nb / 2;
+  vol = (*b).vol;
 
-   for (n=0;n<nb;n++)
-   {
-      if (n<nbh)
-         m=n+isw*nbh;
-      else
-         m=n-isw*nbh;
+  for (n = 0; n < nb; n++) {
+    if (n < nbh)
+      m = n + isw * nbh;
+    else
+      m = n - isw * nbh;
 
-      assign_sd2sdblk(DFL_BLOCKS,m,ALL_PTS,sd,0);
-      sdb=b[m].sd;
+    assign_sd2sdblk(DFL_BLOCKS, m, ALL_PTS, sd, 0);
+    sdb = b[m].sd;
 
-      for (i=1;i<=Ns;i++)
-      {
-         z.re=-(*vd).re;
-         z.im=-(*vd).im;
-         mulc_spinor_add_dble(vol,sdb[0],sdb[i],z);
-         vd+=1;
-      }
+    for (i = 1; i <= Ns; i++) {
+      z.re = -(*vd).re;
+      z.im = -(*vd).im;
+      mulc_spinor_add_dble(vol, sdb[0], sdb[i], z);
+      vd += 1;
+    }
 
-      assign_sdblk2sd(DFL_BLOCKS,m,ALL_PTS,0,sd);
-   }
+    assign_sdblk2sd(DFL_BLOCKS, m, ALL_PTS, 0, sd);
+  }
 }
 
-
-void dfl_s2v(spinor *s,complex *v)
+void dfl_s2v(spinor *s, complex *v)
 {
-   int Ns,nb,nbh,isw;
-   int n,m,i,vol;
-   block_t *b;
-   spinor **sb;
-   dfl_parms_t dfl;
+  int Ns, nb, nbh, isw;
+  int n, m, i, vol;
+  block_t *b;
+  spinor **sb;
+  dfl_parms_t dfl;
 
-   dfl=dfl_parms();
-   Ns=dfl.Ns;
-   b=blk_list(DFL_BLOCKS,&nb,&isw);
-   nbh=nb/2;
-   vol=(*b).vol;
+  dfl = dfl_parms();
+  Ns = dfl.Ns;
+  b = blk_list(DFL_BLOCKS, &nb, &isw);
+  nbh = nb / 2;
+  vol = (*b).vol;
 
-   for (n=0;n<nb;n++)
-   {
-      if (n<nbh)
-         m=n+isw*nbh;
-      else
-         m=n-isw*nbh;
+  for (n = 0; n < nb; n++) {
+    if (n < nbh)
+      m = n + isw * nbh;
+    else
+      m = n - isw * nbh;
 
-      assign_s2sblk(DFL_BLOCKS,m,ALL_PTS,s,0);
-      sb=b[m].s;
+    assign_s2sblk(DFL_BLOCKS, m, ALL_PTS, s, 0);
+    sb = b[m].s;
 
-      for (i=1;i<=Ns;i++)
-      {
-         (*v)=spinor_prod(vol,0,sb[i],sb[0]);
-         v+=1;
-      }
-   }
+    for (i = 1; i <= Ns; i++) {
+      (*v) = spinor_prod(vol, 0, sb[i], sb[0]);
+      v += 1;
+    }
+  }
 }
 
-
-void dfl_v2s(complex *v,spinor *s)
+void dfl_v2s(complex *v, spinor *s)
 {
-   int Ns,nb,nbh,isw;
-   int n,m,i,vol;
-   block_t *b;
-   spinor **sb;
-   dfl_parms_t dfl;
+  int Ns, nb, nbh, isw;
+  int n, m, i, vol;
+  block_t *b;
+  spinor **sb;
+  dfl_parms_t dfl;
 
-   dfl=dfl_parms();
-   Ns=dfl.Ns;
-   b=blk_list(DFL_BLOCKS,&nb,&isw);
-   nbh=nb/2;
-   vol=(*b).vol;
+  dfl = dfl_parms();
+  Ns = dfl.Ns;
+  b = blk_list(DFL_BLOCKS, &nb, &isw);
+  nbh = nb / 2;
+  vol = (*b).vol;
 
-   for (n=0;n<nb;n++)
-   {
-      if (n<nbh)
-         m=n+isw*nbh;
-      else
-         m=n-isw*nbh;
+  for (n = 0; n < nb; n++) {
+    if (n < nbh)
+      m = n + isw * nbh;
+    else
+      m = n - isw * nbh;
 
-      sb=b[m].s;
-      set_s2zero(vol,sb[0]);
+    sb = b[m].s;
+    set_s2zero(vol, sb[0]);
 
-      for (i=1;i<=Ns;i++)
-      {
-         mulc_spinor_add(vol,sb[0],sb[i],*v);
-         v+=1;
-      }
+    for (i = 1; i <= Ns; i++) {
+      mulc_spinor_add(vol, sb[0], sb[i], *v);
+      v += 1;
+    }
 
-      assign_sblk2s(DFL_BLOCKS,m,ALL_PTS,0,s);
-   }
+    assign_sblk2s(DFL_BLOCKS, m, ALL_PTS, 0, s);
+  }
 }
 
-
-void dfl_sub_v2s(complex *v,spinor *s)
+void dfl_sub_v2s(complex *v, spinor *s)
 {
-   int Ns,nb,nbh,isw;
-   int n,m,i,vol;
-   complex z;
-   block_t *b;
-   spinor **sb;
-   dfl_parms_t dfl;
+  int Ns, nb, nbh, isw;
+  int n, m, i, vol;
+  complex z;
+  block_t *b;
+  spinor **sb;
+  dfl_parms_t dfl;
 
-   dfl=dfl_parms();
-   Ns=dfl.Ns;
-   b=blk_list(DFL_BLOCKS,&nb,&isw);
-   nbh=nb/2;
-   vol=(*b).vol;
+  dfl = dfl_parms();
+  Ns = dfl.Ns;
+  b = blk_list(DFL_BLOCKS, &nb, &isw);
+  nbh = nb / 2;
+  vol = (*b).vol;
 
-   for (n=0;n<nb;n++)
-   {
-      if (n<nbh)
-         m=n+isw*nbh;
-      else
-         m=n-isw*nbh;
+  for (n = 0; n < nb; n++) {
+    if (n < nbh)
+      m = n + isw * nbh;
+    else
+      m = n - isw * nbh;
 
-      assign_s2sblk(DFL_BLOCKS,m,ALL_PTS,s,0);
-      sb=b[m].s;
+    assign_s2sblk(DFL_BLOCKS, m, ALL_PTS, s, 0);
+    sb = b[m].s;
 
-      for (i=1;i<=Ns;i++)
-      {
-         z.re=-(*v).re;
-         z.im=-(*v).im;
-         mulc_spinor_add(vol,sb[0],sb[i],z);
-         v+=1;
-      }
+    for (i = 1; i <= Ns; i++) {
+      z.re = -(*v).re;
+      z.im = -(*v).im;
+      mulc_spinor_add(vol, sb[0], sb[i], z);
+      v += 1;
+    }
 
-      assign_sblk2s(DFL_BLOCKS,m,ALL_PTS,0,s);
-   }
+    assign_sblk2s(DFL_BLOCKS, m, ALL_PTS, 0, s);
+  }
 }
-
 
 void dfl_subspace(spinor **mds)
 {
-   int Ns,nb,nbh,isw;
-   int n,m,i,j,vol;
-   complex **vs,*v;
-   complex_dble z;
-   block_t *b;
-   spinor **sb;
-   spinor_dble **sdb;
-   dfl_parms_t dfl;
+  int Ns, nb, nbh, isw;
+  int n, m, i, j, vol;
+  complex **vs, *v;
+  complex_dble z;
+  block_t *b;
+  spinor **sb;
+  spinor_dble **sdb;
+  dfl_parms_t dfl;
 
-   dfl=dfl_parms();
-   Ns=dfl.Ns;
+  dfl = dfl_parms();
+  Ns = dfl.Ns;
 
-   error_root(Ns==0,1,"dfl_subspace [dfl_subspace.c]",
-              "Deflation subspace parameters are not set");
+  error_root(Ns == 0, 1, "dfl_subspace [dfl_subspace.c]",
+             "Deflation subspace parameters are not set");
 
-   b=blk_list(DFL_BLOCKS,&nb,&isw);
+  b = blk_list(DFL_BLOCKS, &nb, &isw);
 
-   if (nb==0)
-   {
-      alloc_bgr(DFL_BLOCKS);
-      b=blk_list(DFL_BLOCKS,&nb,&isw);
-   }
+  if (nb == 0) {
+    alloc_bgr(DFL_BLOCKS);
+    b = blk_list(DFL_BLOCKS, &nb, &isw);
+  }
 
-   nbh=nb/2;
-   vol=(*b).vol;
-   vs=vflds()+Ns;
+  nbh = nb / 2;
+  vol = (*b).vol;
+  vs = vflds() + Ns;
 
-   for (n=0;n<nb;n++)
-   {
-      if (n<nbh)
-         m=n+isw*nbh;
-      else
-         m=n-isw*nbh;
+  for (n = 0; n < nb; n++) {
+    if (n < nbh)
+      m = n + isw * nbh;
+    else
+      m = n - isw * nbh;
 
-      sb=b[m].s;
-      sdb=b[m].sd;
+    sb = b[m].s;
+    sdb = b[m].sd;
 
-      for (i=1;i<=Ns;i++)
-      {
-         assign_s2sdblk(DFL_BLOCKS,m,ALL_PTS,mds[i-1],i);
-         v=vs[i-1]+Ns*n;
+    for (i = 1; i <= Ns; i++) {
+      assign_s2sdblk(DFL_BLOCKS, m, ALL_PTS, mds[i - 1], i);
+      v = vs[i - 1] + Ns * n;
 
-         for (j=1;j<i;j++)
-         {
-            z=spinor_prod_dble(vol,0,sdb[j],sdb[i]);
+      for (j = 1; j < i; j++) {
+        z = spinor_prod_dble(vol, 0, sdb[j], sdb[i]);
 
-            (*v).re=(float)(z.re);
-            (*v).im=(float)(z.im);
-            v+=1;
+        (*v).re = (float)(z.re);
+        (*v).im = (float)(z.im);
+        v += 1;
 
-            z.re=-(z).re;
-            z.im=-(z).im;
-            mulc_spinor_add_dble(vol,sdb[i],sdb[j],z);
-         }
-
-         (*v).re=(float)(normalize_dble(vol,0,sdb[i]));
-         (*v).im=0.0f;
-         v+=1;
-
-         for (j=(i+1);j<=Ns;j++)
-         {
-            (*v).re=0.0f;
-            (*v).im=0.0f;
-            v+=1;
-         }
-
-         assign_sd2s(vol,sdb[i],sb[i]);
+        z.re = -(z).re;
+        z.im = -(z).im;
+        mulc_spinor_add_dble(vol, sdb[i], sdb[j], z);
       }
-   }
 
-   set_flags(ERASED_AW);
-   set_flags(ERASED_AWHAT);
+      (*v).re = (float)(normalize_dble(vol, 0, sdb[i]));
+      (*v).im = 0.0f;
+      v += 1;
+
+      for (j = (i + 1); j <= Ns; j++) {
+        (*v).re = 0.0f;
+        (*v).im = 0.0f;
+        v += 1;
+      }
+
+      assign_sd2s(vol, sdb[i], sb[i]);
+    }
+  }
+
+  set_flags(ERASED_AW);
+  set_flags(ERASED_AWHAT);
 }

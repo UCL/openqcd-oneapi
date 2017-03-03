@@ -146,14 +146,14 @@
 
 typedef union
 {
-   spinor s;
-   float r[24];
+  spinor s;
+  float r[24];
 } spin_t;
 
-static int my_rank,eoflg;
-static int Ns=0,nv,nrn;
+static int my_rank, eoflg;
+static int Ns = 0, nv, nrn;
 static double m0;
-static complex_dble *cs1,*cs2;
+static complex_dble *cs1, *cs2;
 static dfl_pro_parms_t dpr;
 static dfl_gen_parms_t dgn;
 
@@ -161,566 +161,513 @@ static dfl_gen_parms_t dgn;
 
 static void print_res(spinor **mds)
 {
-   int k;
-   double r;
-   spinor **ws;
+  int k;
+  double r;
+  spinor **ws;
 
-   ws=reserve_ws(1);
+  ws = reserve_ws(1);
 
-   for (k=0;k<Ns;k++)
-   {
-      Dw((float)(dgn.mu),mds[k],ws[0]);
-      r=(double)(norm_square(VOLUME,1,ws[0])/
-                 norm_square(VOLUME,1,mds[k]));
+  for (k = 0; k < Ns; k++) {
+    Dw((float)(dgn.mu), mds[k], ws[0]);
+    r = (double)(norm_square(VOLUME, 1, ws[0]) /
+                 norm_square(VOLUME, 1, mds[k]));
 
-      if (my_rank==0)
-         printf("k = %2d, |Dw*psi|/|psi| = %.1e\n",k,sqrt(r));
-   }
+    if (my_rank == 0)
+      printf("k = %2d, |Dw*psi|/|psi| = %.1e\n", k, sqrt(r));
+  }
 
-   release_ws();
+  release_ws();
 }
 
 #endif
 
 static int set_frame(void)
 {
-   int nb,isw,ifail;
-   int *bs,swu,swe,swo;
-   sw_parms_t sw;
-   tm_parms_t tm;
-   dfl_parms_t dfl;
+  int nb, isw, ifail;
+  int *bs, swu, swe, swo;
+  sw_parms_t sw;
+  tm_parms_t tm;
+  dfl_parms_t dfl;
 
-   if (Ns==0)
-   {
-      MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);
+  if (Ns == 0) {
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-      dfl=dfl_parms();
-      error_root(dfl.Ns==0,1,"set_frame [dfl_modes.c]",
-                 "Parameters of the deflation subspace are not set");
+    dfl = dfl_parms();
+    error_root(dfl.Ns == 0, 1, "set_frame [dfl_modes.c]",
+               "Parameters of the deflation subspace are not set");
 
-      Ns=dfl.Ns;
-      bs=dfl.bs;
-      nv=Ns*VOLUME/(bs[0]*bs[1]*bs[2]*bs[3]);
-      nrn=0;
+    Ns = dfl.Ns;
+    bs = dfl.bs;
+    nv = Ns * VOLUME / (bs[0] * bs[1] * bs[2] * bs[3]);
+    nrn = 0;
 
-      cs1=amalloc(2*Ns*sizeof(*cs1),ALIGN);
-      error(cs1==NULL,1,"set_frame [dfl_modes.c]",
-            "Unable to allocate auxiliary arrays");
-      cs2=cs1+Ns;
+    cs1 = amalloc(2 * Ns * sizeof(*cs1), ALIGN);
+    error(cs1 == NULL, 1, "set_frame [dfl_modes.c]",
+          "Unable to allocate auxiliary arrays");
+    cs2 = cs1 + Ns;
 
-      blk_list(SAP_BLOCKS,&nb,&isw);
+    blk_list(SAP_BLOCKS, &nb, &isw);
 
-      if (nb==0)
-         alloc_bgr(SAP_BLOCKS);
-   }
+    if (nb == 0)
+      alloc_bgr(SAP_BLOCKS);
+  }
 
-   dpr=dfl_pro_parms();
-   error_root(dpr.nkv==0,1,"set_frame [dfl_modes.c]",
-              "Deflation projection parameters are not set");
+  dpr = dfl_pro_parms();
+  error_root(dpr.nkv == 0, 1, "set_frame [dfl_modes.c]",
+             "Deflation projection parameters are not set");
 
-   dgn=dfl_gen_parms();
-   error_root(dgn.ninv==0,1,"set_frame [dfl_modes.c]",
-              "Deflation subspace generation parameters are not set");
+  dgn = dfl_gen_parms();
+  error_root(dgn.ninv == 0, 1, "set_frame [dfl_modes.c]",
+             "Deflation subspace generation parameters are not set");
 
-   if (query_flags(U_MATCH_UD)!=1)
-      assign_ud2u();
+  if (query_flags(U_MATCH_UD) != 1)
+    assign_ud2u();
 
-   if (query_grid_flags(SAP_BLOCKS,UBGR_MATCH_UD)!=1)
-      assign_ud2ubgr(SAP_BLOCKS);
+  if (query_grid_flags(SAP_BLOCKS, UBGR_MATCH_UD) != 1)
+    assign_ud2ubgr(SAP_BLOCKS);
 
-   sw=sw_parms();
-   m0=sw.m0;
-   set_sw_parms(dgn.m0);
-   sw_term(NO_PTS);
+  sw = sw_parms();
+  m0 = sw.m0;
+  set_sw_parms(dgn.m0);
+  sw_term(NO_PTS);
 
-   if ((query_flags(SW_UP2DATE)!=1)||
-       (query_flags(SW_E_INVERTED)==1)||(query_flags(SW_O_INVERTED)==1))
-      assign_swd2sw();
+  if ((query_flags(SW_UP2DATE) != 1) || (query_flags(SW_E_INVERTED) == 1) ||
+      (query_flags(SW_O_INVERTED) == 1))
+    assign_swd2sw();
 
-   ifail=0;
-   swu=query_grid_flags(SAP_BLOCKS,SW_UP2DATE);
-   swe=query_grid_flags(SAP_BLOCKS,SW_E_INVERTED);
-   swo=query_grid_flags(SAP_BLOCKS,SW_O_INVERTED);
+  ifail = 0;
+  swu = query_grid_flags(SAP_BLOCKS, SW_UP2DATE);
+  swe = query_grid_flags(SAP_BLOCKS, SW_E_INVERTED);
+  swo = query_grid_flags(SAP_BLOCKS, SW_O_INVERTED);
 
-   if ((swu!=1)||(swe==1)||(swo!=1))
-      ifail=assign_swd2swbgr(SAP_BLOCKS,ODD_PTS);
+  if ((swu != 1) || (swe == 1) || (swo != 1))
+    ifail = assign_swd2swbgr(SAP_BLOCKS, ODD_PTS);
 
-   tm=tm_parms();
-   eoflg=tm.eoflg;
-   if (eoflg!=1)
-      set_tm_parms(1);
+  tm = tm_parms();
+  eoflg = tm.eoflg;
+  if (eoflg != 1)
+    set_tm_parms(1);
 
-   return ifail;
+  return ifail;
 }
-
 
 static void random_fields(spinor **mds)
 {
-   int k,l;
-   spin_t *s,*sm;
+  int k, l;
+  spin_t *s, *sm;
 
-   for (k=0;k<Ns;k++)
-   {
-      s=(spin_t*)(mds[k]);
-      sm=s+VOLUME;
+  for (k = 0; k < Ns; k++) {
+    s = (spin_t *)(mds[k]);
+    sm = s + VOLUME;
 
-      for (;s<sm;s++)
-      {
-         ranlxs((*s).r,24);
+    for (; s < sm; s++) {
+      ranlxs((*s).r, 24);
 
-         for (l=0;l<24;l++)
-            (*s).r[l]-=0.5f;
-      }
+      for (l = 0; l < 24; l++)
+        (*s).r[l] -= 0.5f;
+    }
 
-      bnd_s2zero(ALL_PTS,mds[k]);
-   }
+    bnd_s2zero(ALL_PTS, mds[k]);
+  }
 
-   nrn=0;
+  nrn = 0;
 }
-
 
 static void renormalize_fields(spinor **mds)
 {
-   int k,l;
+  int k, l;
 
-   for (k=0;k<Ns;k++)
-   {
-      for (l=0;l<k;l++)
-         project(VOLUME,1,mds[k],mds[l]);
+  for (k = 0; k < Ns; k++) {
+    for (l = 0; l < k; l++)
+      project(VOLUME, 1, mds[k], mds[l]);
 
-      normalize(VOLUME,1,mds[k]);
-   }
+    normalize(VOLUME, 1, mds[k]);
+  }
 
-   nrn=0;
+  nrn = 0;
 }
-
 
 static void sum_vprod(int n)
 {
-   int k;
+  int k;
 
-   if (NPROC>1)
-   {
-      MPI_Reduce(cs1,cs2,2*n,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-      MPI_Bcast(cs2,2*n,MPI_DOUBLE,0,MPI_COMM_WORLD);
-   }
-   else
-   {
-      for (k=0;k<n;k++)
-      {
-         cs2[k].re=cs1[k].re;
-         cs2[k].im=cs1[k].im;
-      }
-   }
+  if (NPROC > 1) {
+    MPI_Reduce(cs1, cs2, 2 * n, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Bcast(cs2, 2 * n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  } else {
+    for (k = 0; k < n; k++) {
+      cs2[k].re = cs1[k].re;
+      cs2[k].im = cs1[k].im;
+    }
+  }
 }
-
 
 static void restore_fields(spinor **mds)
 {
-   int k,l;
-   complex **vs,z;
+  int k, l;
+  complex **vs, z;
 
-   vs=vflds()+Ns;
+  vs = vflds() + Ns;
 
-   for (k=0;k<Ns;k++)
-   {
-      if (k>0)
-      {
-         for (l=0;l<k;l++)
-         {
-            z=vprod(nv,0,vs[l],vs[k]);
-            cs1[l].re=(double)(z.re);
-            cs1[l].im=(double)(z.im);
-         }
-
-         sum_vprod(k);
-
-         for (l=0;l<k;l++)
-         {
-            z.re=(float)(-cs2[l].re);
-            z.im=(float)(-cs2[l].im);
-            mulc_vadd(nv,vs[k],vs[l],z);
-         }
+  for (k = 0; k < Ns; k++) {
+    if (k > 0) {
+      for (l = 0; l < k; l++) {
+        z = vprod(nv, 0, vs[l], vs[k]);
+        cs1[l].re = (double)(z.re);
+        cs1[l].im = (double)(z.im);
       }
 
-      vnormalize(nv,1,vs[k]);
-      dfl_v2s(vs[k],mds[k]);
-   }
+      sum_vprod(k);
 
-   nrn=0;
+      for (l = 0; l < k; l++) {
+        z.re = (float)(-cs2[l].re);
+        z.im = (float)(-cs2[l].im);
+        mulc_vadd(nv, vs[k], vs[l], z);
+      }
+    }
+
+    vnormalize(nv, 1, vs[k]);
+    dfl_v2s(vs[k], mds[k]);
+  }
+
+  nrn = 0;
 }
 
 #ifdef DFL_MODES_DBG
 
-static void smooth_fields(int ncy,spinor **mds)
+static void smooth_fields(int ncy, spinor **mds)
 {
-   int k,l;
-   double r0,r1;
-   spinor **ws;
+  int k, l;
+  double r0, r1;
+  spinor **ws;
 
-   ws=reserve_ws(1);
-   r0=1.0;
-   r1=1.0;
+  ws = reserve_ws(1);
+  r0 = 1.0;
+  r1 = 1.0;
 
-   for (k=0;k<Ns;k++)
-   {
-      assign_s2s(VOLUME,mds[k],ws[0]);
-      set_s2zero(VOLUME,mds[k]);
-      r0=(double)(norm_square(VOLUME,1,ws[0]));
+  for (k = 0; k < Ns; k++) {
+    assign_s2s(VOLUME, mds[k], ws[0]);
+    set_s2zero(VOLUME, mds[k]);
+    r0 = (double)(norm_square(VOLUME, 1, ws[0]));
 
-      for (l=0;l<ncy;l++)
-         sap((float)(dgn.mu),1,dgn.nmr,mds[k],ws[0]);
+    for (l = 0; l < ncy; l++)
+      sap((float)(dgn.mu), 1, dgn.nmr, mds[k], ws[0]);
 
-      r1=(double)(norm_square(VOLUME,1,ws[0]));
-      r0=sqrt(r0);
-      r1=sqrt(r1);
+    r1 = (double)(norm_square(VOLUME, 1, ws[0]));
+    r0 = sqrt(r0);
+    r1 = sqrt(r1);
 
-      if (my_rank==0)
-         printf("SAP smoothing of mode no %2d: "
-                "residue %.1e -> %.1e, ratio = %.1e\n",k,r0,r1,r1/r0);
-   }
+    if (my_rank == 0)
+      printf("SAP smoothing of mode no %2d: "
+             "residue %.1e -> %.1e, ratio = %.1e\n",
+             k, r0, r1, r1 / r0);
+  }
 
-   release_ws();
+  release_ws();
 }
 
-
-static void dfl_smooth_fields(spinor **mds,int *status)
+static void dfl_smooth_fields(spinor **mds, int *status)
 {
-   int k,l,stat;
-   double r0,r1;
-   complex **vs,**wv;
-   complex_dble **wvd;
-   spinor **ws;
+  int k, l, stat;
+  double r0, r1;
+  complex **vs, **wv;
+  complex_dble **wvd;
+  spinor **ws;
 
-   vs=vflds()+Ns;
-   wv=reserve_wv(1);
-   wvd=reserve_wvd(1);
-   ws=reserve_ws(2);
-   r0=1.0;
-   r1=1.0;
+  vs = vflds() + Ns;
+  wv = reserve_wv(1);
+  wvd = reserve_wvd(1);
+  ws = reserve_ws(2);
+  r0 = 1.0;
+  r1 = 1.0;
 
-   for (k=0;k<Ns;k++)
-   {
-      assign_v2vd(nv,vs[k],wvd[0]);
-      ltl_gcr(dpr.nkv,dpr.nmx,dpr.res,dgn.mu,wvd[0],wvd[0],&stat);
-      assign_vd2v(nv,wvd[0],wv[0]);
+  for (k = 0; k < Ns; k++) {
+    assign_v2vd(nv, vs[k], wvd[0]);
+    ltl_gcr(dpr.nkv, dpr.nmx, dpr.res, dgn.mu, wvd[0], wvd[0], &stat);
+    assign_vd2v(nv, wvd[0], wv[0]);
 
-      dfl_v2s(wv[0],ws[1]);
-      Dw((float)(dgn.mu),ws[1],ws[0]);
-      mulr_spinor_add(VOLUME,mds[k],ws[0],-1.0f);
-      assign_s2s(VOLUME,mds[k],ws[0]);
-      set_s2zero(VOLUME,mds[k]);
-      r0=(double)(norm_square(VOLUME,1,ws[0]));
+    dfl_v2s(wv[0], ws[1]);
+    Dw((float)(dgn.mu), ws[1], ws[0]);
+    mulr_spinor_add(VOLUME, mds[k], ws[0], -1.0f);
+    assign_s2s(VOLUME, mds[k], ws[0]);
+    set_s2zero(VOLUME, mds[k]);
+    r0 = (double)(norm_square(VOLUME, 1, ws[0]));
 
-      for (l=0;l<dgn.ncy;l++)
-         sap((float)(dgn.mu),1,dgn.nmr,mds[k],ws[0]);
+    for (l = 0; l < dgn.ncy; l++)
+      sap((float)(dgn.mu), 1, dgn.nmr, mds[k], ws[0]);
 
-      r1=(double)(norm_square(VOLUME,1,ws[0]));
-      r0=sqrt(r0);
-      r1=sqrt(r1);
+    r1 = (double)(norm_square(VOLUME, 1, ws[0]));
+    r0 = sqrt(r0);
+    r1 = sqrt(r1);
 
-      if (my_rank==0)
-         printf("Deflated SAP smoothing of mode no %2d: "
-                "status = %d, residue %.1e -> %.1e, ratio = %.1e\n",
-                k,stat,r0,r1,r1/r0);
+    if (my_rank == 0)
+      printf("Deflated SAP smoothing of mode no %2d: "
+             "status = %d, residue %.1e -> %.1e, ratio = %.1e\n",
+             k, stat, r0, r1, r1 / r0);
 
-      mulr_spinor_add(VOLUME,mds[k],ws[1],1.0f);
+    mulr_spinor_add(VOLUME, mds[k], ws[1], 1.0f);
 
-      if (status[0]>=0)
-      {
-         if (stat>=0)
-            status[0]+=stat;
-         else
-            status[0]=stat;
-      }
-   }
+    if (status[0] >= 0) {
+      if (stat >= 0)
+        status[0] += stat;
+      else
+        status[0] = stat;
+    }
+  }
 
-   release_ws();
-   release_wvd();
-   release_wv();
+  release_ws();
+  release_wvd();
+  release_wv();
 }
 
 #else
 
-static void smooth_fields(int ncy,spinor **mds)
+static void smooth_fields(int ncy, spinor **mds)
 {
-   int k,l;
-   spinor **ws;
+  int k, l;
+  spinor **ws;
 
-   ws=reserve_ws(1);
+  ws = reserve_ws(1);
 
-   for (k=0;k<Ns;k++)
-   {
-      assign_s2s(VOLUME,mds[k],ws[0]);
-      set_s2zero(VOLUME,mds[k]);
+  for (k = 0; k < Ns; k++) {
+    assign_s2s(VOLUME, mds[k], ws[0]);
+    set_s2zero(VOLUME, mds[k]);
 
-      for (l=0;l<ncy;l++)
-         sap((float)(dgn.mu),1,dgn.nmr,mds[k],ws[0]);
-   }
+    for (l = 0; l < ncy; l++)
+      sap((float)(dgn.mu), 1, dgn.nmr, mds[k], ws[0]);
+  }
 
-   release_ws();
+  release_ws();
 }
 
-
-static void dfl_smooth_fields(spinor **mds,int *status)
+static void dfl_smooth_fields(spinor **mds, int *status)
 {
-   int k,l,stat;
-   complex **vs,**wv;
-   complex_dble **wvd;
-   spinor **ws;
+  int k, l, stat;
+  complex **vs, **wv;
+  complex_dble **wvd;
+  spinor **ws;
 
-   vs=vflds()+Ns;
-   wv=reserve_wv(1);
-   wvd=reserve_wvd(1);
-   ws=reserve_ws(2);
+  vs = vflds() + Ns;
+  wv = reserve_wv(1);
+  wvd = reserve_wvd(1);
+  ws = reserve_ws(2);
 
-   for (k=0;k<Ns;k++)
-   {
-      assign_v2vd(nv,vs[k],wvd[0]);
-      ltl_gcr(dpr.nkv,dpr.nmx,dpr.res,dgn.mu,wvd[0],wvd[0],&stat);
-      assign_vd2v(nv,wvd[0],wv[0]);
+  for (k = 0; k < Ns; k++) {
+    assign_v2vd(nv, vs[k], wvd[0]);
+    ltl_gcr(dpr.nkv, dpr.nmx, dpr.res, dgn.mu, wvd[0], wvd[0], &stat);
+    assign_vd2v(nv, wvd[0], wv[0]);
 
-      dfl_v2s(wv[0],ws[1]);
-      Dw((float)(dgn.mu),ws[1],ws[0]);
-      mulr_spinor_add(VOLUME,mds[k],ws[0],-1.0f);
-      assign_s2s(VOLUME,mds[k],ws[0]);
-      set_s2zero(VOLUME,mds[k]);
+    dfl_v2s(wv[0], ws[1]);
+    Dw((float)(dgn.mu), ws[1], ws[0]);
+    mulr_spinor_add(VOLUME, mds[k], ws[0], -1.0f);
+    assign_s2s(VOLUME, mds[k], ws[0]);
+    set_s2zero(VOLUME, mds[k]);
 
-      for (l=0;l<dgn.ncy;l++)
-         sap((float)(dgn.mu),1,dgn.nmr,mds[k],ws[0]);
+    for (l = 0; l < dgn.ncy; l++)
+      sap((float)(dgn.mu), 1, dgn.nmr, mds[k], ws[0]);
 
-      mulr_spinor_add(VOLUME,mds[k],ws[1],1.0f);
+    mulr_spinor_add(VOLUME, mds[k], ws[1], 1.0f);
 
-      if (status[0]>=0)
-      {
-         if (stat>=0)
-            status[0]+=stat;
-         else
-            status[0]=stat;
-      }
-   }
+    if (status[0] >= 0) {
+      if (stat >= 0)
+        status[0] += stat;
+      else
+        status[0] = stat;
+    }
+  }
 
-   release_ws();
-   release_wvd();
-   release_wv();
+  release_ws();
+  release_wvd();
+  release_wv();
 }
 
 #endif
 
 void dfl_modes(int *status)
 {
-   int n,ifail;
-   spinor **mds;
+  int n, ifail;
+  spinor **mds;
 
-   status[0]=0;
-   ifail=set_frame();
-   mds=reserve_ws(Ns);
-   random_fields(mds);
+  status[0] = 0;
+  ifail = set_frame();
+  mds = reserve_ws(Ns);
+  random_fields(mds);
 
 #ifdef DFL_MODES_DBG
-   if (my_rank==0)
-   {
-      printf("Progress report [program dfl_modes]:\n\n");
-      printf("Ns = %d, ninv = %d, nmr = %d, ncy = %d\n",
-             Ns,dgn.ninv,dgn.nmr,dgn.ncy);
-      printf("nkv = %d, nmx = %d, res = %.1e, ifail = %d\n\n",
-             dpr.nkv,dpr.nmx,dpr.res,ifail);
-   }
+  if (my_rank == 0) {
+    printf("Progress report [program dfl_modes]:\n\n");
+    printf("Ns = %d, ninv = %d, nmr = %d, ncy = %d\n", Ns, dgn.ninv, dgn.nmr,
+           dgn.ncy);
+    printf("nkv = %d, nmx = %d, res = %.1e, ifail = %d\n\n", dpr.nkv, dpr.nmx,
+           dpr.res, ifail);
+  }
 #endif
 
-   if (ifail)
-   {
+  if (ifail) {
+    dfl_subspace(mds);
+    status[0] = -2;
+  } else {
+    for (n = 0; n < 3; n++) {
+      smooth_fields(n + 1, mds);
+
+#ifdef DFL_MODES_DBG
+      print_res(mds);
+#endif
+    }
+
+    for (; n < dgn.ninv; n++) {
+      if (nrn > 3)
+        renormalize_fields(mds);
+
       dfl_subspace(mds);
-      status[0]=-2;
-   }
-   else
-   {
-      for (n=0;n<3;n++)
-      {
-         smooth_fields(n+1,mds);
+      ifail = set_Awhat(dgn.mu);
+
+      if (ifail) {
+        status[0] = -3;
+        break;
+      } else {
+        dfl_smooth_fields(mds, status);
+        nrn += 1;
+
+        if (status[0] < 0)
+          break;
 
 #ifdef DFL_MODES_DBG
-         print_res(mds);
+        print_res(mds);
 #endif
       }
+    }
 
-      for (;n<dgn.ninv;n++)
-      {
-         if (nrn>3)
-            renormalize_fields(mds);
+    if (status[0] >= 0) {
+      dfl_subspace(mds);
+      n = Ns * (dgn.ninv - 3);
+      status[0] = (status[0] + n / 2) / n;
+    }
+  }
 
-         dfl_subspace(mds);
-         ifail=set_Awhat(dgn.mu);
-
-         if (ifail)
-         {
-            status[0]=-3;
-            break;
-         }
-         else
-         {
-            dfl_smooth_fields(mds,status);
-            nrn+=1;
-
-            if (status[0]<0)
-               break;
+  release_ws();
+  set_sw_parms(m0);
+  if (eoflg != 1)
+    set_tm_parms(eoflg);
 
 #ifdef DFL_MODES_DBG
-            print_res(mds);
-#endif
-         }
-      }
-
-      if (status[0]>=0)
-      {
-         dfl_subspace(mds);
-         n=Ns*(dgn.ninv-3);
-         status[0]=(status[0]+n/2)/n;
-      }
-   }
-
-   release_ws();
-   set_sw_parms(m0);
-   if (eoflg!=1)
-      set_tm_parms(eoflg);
-
-#ifdef DFL_MODES_DBG
-   if (my_rank==0)
-   {
-      printf("status = %d\n",status[0]);
-      printf("dfl_modes: all done\n\n");
-      fflush(stdout);
-   }
+  if (my_rank == 0) {
+    printf("status = %d\n", status[0]);
+    printf("dfl_modes: all done\n\n");
+    fflush(stdout);
+  }
 #endif
 }
 
-
-void dfl_update(int nsm,int *status)
+void dfl_update(int nsm, int *status)
 {
-   int n,ifail,iprms[1];
-   spinor **mds;
+  int n, ifail, iprms[1];
+  spinor **mds;
 
-   if (NPROC>1)
-   {
-      iprms[0]=nsm;
+  if (NPROC > 1) {
+    iprms[0] = nsm;
 
-      MPI_Bcast(iprms,1,MPI_INT,0,MPI_COMM_WORLD);
+    MPI_Bcast(iprms, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-      error(iprms[0]!=nsm,1,"dfl_update [dfl_modes.c]",
-            "Parameters are not global");
-   }
+    error(iprms[0] != nsm, 1, "dfl_update [dfl_modes.c]",
+          "Parameters are not global");
+  }
 
-   status[0]=0;
-   ifail=set_frame();
-   mds=reserve_ws(Ns);
-   restore_fields(mds);
-
-#ifdef DFL_MODES_DBG
-   if (my_rank==0)
-   {
-      printf("Progress report [program dfl_update]:\n\n");
-      printf("nsm = %d\n",nsm);
-      printf("Ns = %d, ninv = %d, nmr = %d, ncy = %d\n",
-             Ns,dgn.ninv,dgn.nmr,dgn.ncy);
-      printf("nkv = %d, nmx = %d, res = %.1e, ifail = %d\n\n",
-             dpr.nkv,dpr.nmx,dpr.res,ifail);
-   }
-#endif
-
-   if (ifail)
-      status[0]=-2;
-   else
-   {
-      for (n=0;n<nsm;n++)
-      {
-         ifail=set_Awhat(dgn.mu);
-
-         if (ifail)
-         {
-            status[0]=-3;
-            break;
-         }
-         else
-         {
-            dfl_smooth_fields(mds,status);
-            nrn+=1;
-
-            if (status[0]<0)
-               break;
-
-            if ((nrn>3)&&(n<(nsm-1)))
-               renormalize_fields(mds);
-
-            dfl_subspace(mds);
+  status[0] = 0;
+  ifail = set_frame();
+  mds = reserve_ws(Ns);
+  restore_fields(mds);
 
 #ifdef DFL_MODES_DBG
-            print_res(mds);
+  if (my_rank == 0) {
+    printf("Progress report [program dfl_update]:\n\n");
+    printf("nsm = %d\n", nsm);
+    printf("Ns = %d, ninv = %d, nmr = %d, ncy = %d\n", Ns, dgn.ninv, dgn.nmr,
+           dgn.ncy);
+    printf("nkv = %d, nmx = %d, res = %.1e, ifail = %d\n\n", dpr.nkv, dpr.nmx,
+           dpr.res, ifail);
+  }
 #endif
-         }
+
+  if (ifail)
+    status[0] = -2;
+  else {
+    for (n = 0; n < nsm; n++) {
+      ifail = set_Awhat(dgn.mu);
+
+      if (ifail) {
+        status[0] = -3;
+        break;
+      } else {
+        dfl_smooth_fields(mds, status);
+        nrn += 1;
+
+        if (status[0] < 0)
+          break;
+
+        if ((nrn > 3) && (n < (nsm - 1)))
+          renormalize_fields(mds);
+
+        dfl_subspace(mds);
+
+#ifdef DFL_MODES_DBG
+        print_res(mds);
+#endif
       }
-   }
+    }
+  }
 
-   if (status[0]>0)
-   {
-      n=Ns*nsm;
-      status[0]=(status[0]+n/2)/n;
-   }
+  if (status[0] > 0) {
+    n = Ns * nsm;
+    status[0] = (status[0] + n / 2) / n;
+  }
 
-   release_ws();
-   set_sw_parms(m0);
-   if (eoflg!=1)
-      set_tm_parms(eoflg);
+  release_ws();
+  set_sw_parms(m0);
+  if (eoflg != 1)
+    set_tm_parms(eoflg);
 
 #ifdef DFL_MODES_DBG
-   if (my_rank==0)
-   {
-      printf("status = %d\n",status[0]);
-      printf("dfl_update: all done\n\n");
-      fflush(stdout);
-   }
+  if (my_rank == 0) {
+    printf("status = %d\n", status[0]);
+    printf("dfl_update: all done\n\n");
+    fflush(stdout);
+  }
 #endif
 }
-
 
 void dfl_modes2(int *status)
 {
-   dfl_modes(status);
+  dfl_modes(status);
 
-   if (status[0]==-3)
-   {
+  if (status[0] == -3) {
 #ifdef DFL_MODES_DBG
-      if (my_rank==0)
-      {
-         printf("Generation of deflation subspace failed\n");
-         printf("Start second attempt\n");
-         fflush(stdout);
-      }
+    if (my_rank == 0) {
+      printf("Generation of deflation subspace failed\n");
+      printf("Start second attempt\n");
+      fflush(stdout);
+    }
 #endif
 
-      dfl_modes(status+1);
-   }
-   else
-      status[1]=0;
+    dfl_modes(status + 1);
+  } else
+    status[1] = 0;
 }
 
-
-void dfl_update2(int nsm,int *status)
+void dfl_update2(int nsm, int *status)
 {
-   dfl_update(nsm,status);
+  dfl_update(nsm, status);
 
-   if (status[0]==-3)
-   {
+  if (status[0] == -3) {
 #ifdef DFL_MODES_DBG
-      if (my_rank==0)
-      {
-         printf("Update of deflation subspace failed\n");
-         printf("Attempt to regenerate subspace\n");
-         fflush(stdout);
-      }
+    if (my_rank == 0) {
+      printf("Update of deflation subspace failed\n");
+      printf("Attempt to regenerate subspace\n");
+      fflush(stdout);
+    }
 #endif
 
-      dfl_modes(status+1);
-   }
-   else
-      status[1]=0;
+    dfl_modes(status + 1);
+  } else
+    status[1] = 0;
 }

@@ -12,7 +12,7 @@
 *
 * The externally accessible function is
 *
-*   void zolotarev(int n,double eps,double *A,double *ar,double *delta) 
+*   void zolotarev(int n,double eps,double *A,double *ar,double *delta)
 *     Computes the amplitude A, the coefficients ar[r-1]=a_r, r=1,..,2n,
 *     and the error delta of the Zolotarev optimal rational approximation
 *     of degree [n,n] to the function f(y)=1/sqrt(y).
@@ -46,7 +46,7 @@
 *
 * See N.I. Achiezer: "Theory of Approximation" (Dover Publications, New York,
 * 1992) for the proof of these formulae.
-* 
+*
 *******************************************************************************/
 
 #define ZOLOTAREV_C
@@ -57,57 +57,50 @@
 #include "utils.h"
 #include "ratfcts.h"
 
-
-void zolotarev(int n,double eps,double *A,double *ar,double *delta)
+void zolotarev(int n, double eps, double *A, double *ar, double *delta)
 {
-   int r;
-   double v,k,rk,d,s;
-   double sn,cn,dn,snx,cnx,dnx;
+  int r;
+  double v, k, rk, d, s;
+  double sn, cn, dn, snx, cnx, dnx;
 
-   if ((n<1)||(eps<=0.0)||(eps>=1.0))
-   {
-      error_loc(1,1,"zolotarev [zolotarev.c]","Arguments are out of range");
+  if ((n < 1) || (eps <= 0.0) || (eps >= 1.0)) {
+    error_loc(1, 1, "zolotarev [zolotarev.c]", "Arguments are out of range");
 
-      (*A)=1.0;
-      (*delta)=1.0;
+    (*A) = 1.0;
+    (*delta) = 1.0;
 
-      return;
-   }
-   
-   k=sqrt(1.0-eps);
-   rk=k/sqrt(eps);
-   v=ellipticK(rk)/(double)(2*n+1);
-   
-   (*A)=1.0;
-   d=k;
+    return;
+  }
 
-   for (r=1;r<=(2*n);r++)
-   {
-      if (r<=n)
-      {
-         sncndn((double)(r)*v,rk,&sn,&cn,&dn);
-         ar[r-1]=(cn*cn)/(sn*sn);
-      }
-      else
-      {
-         sncndn((double)(2*n+1-r)*v,rk,&snx,&cnx,&dnx);
-         ar[r-1]=eps*((snx*snx)/(cnx*cnx));
-         sn=cnx/dnx;
-      }
+  k = sqrt(1.0 - eps);
+  rk = k / sqrt(eps);
+  v = ellipticK(rk) / (double)(2 * n + 1);
 
-      s=sn*sn;
-         
-      if ((r%2)==0)
-         (*A)/=s;
-      else
-      {
-         (*A)*=s;
-         s*=k;
-         d*=(s*s);
-      }
-   }
+  (*A) = 1.0;
+  d = k;
 
-   s=1.0+sqrt(1.0-d*d);
-   (*A)*=(2.0/s);
-   (*delta)=(d*d)/(s*s);
+  for (r = 1; r <= (2 * n); r++) {
+    if (r <= n) {
+      sncndn((double)(r)*v, rk, &sn, &cn, &dn);
+      ar[r - 1] = (cn * cn) / (sn * sn);
+    } else {
+      sncndn((double)(2 * n + 1 - r) * v, rk, &snx, &cnx, &dnx);
+      ar[r - 1] = eps * ((snx * snx) / (cnx * cnx));
+      sn = cnx / dnx;
+    }
+
+    s = sn * sn;
+
+    if ((r % 2) == 0)
+      (*A) /= s;
+    else {
+      (*A) *= s;
+      s *= k;
+      d *= (s * s);
+    }
+  }
+
+  s = 1.0 + sqrt(1.0 - d * d);
+  (*A) *= (2.0 / s);
+  (*delta) = (d * d) / (s * s);
 }

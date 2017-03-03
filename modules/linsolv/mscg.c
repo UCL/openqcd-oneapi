@@ -25,8 +25,8 @@
 *
 * The algorithm implemented in this module is described in the notes
 * "Multi-shift conjugate gradient algorithm" (file doc/mscg.pdf).
-*  
-* The program Dop_dble() for the Dirac operator is assumed to have the 
+*
+* The program Dop_dble() for the Dirac operator is assumed to have the
 * following properties:
 *
 *   void Dop_dble(double mu,spinor_dble *s,spinor_dble *r)
@@ -40,7 +40,7 @@
 *
 * The other parameters of the program mscg() are:
 *
-*   vol     Number of spinors in the Dirac fields.         
+*   vol     Number of spinors in the Dirac fields.
 *
 *   icom    Indicates whether the equation to be solved is a local
 *           equation (icom=0) or a global one (icom=1). Scalar products
@@ -54,14 +54,14 @@
 *   nmx     Maximal number of CG iterations that may be applied.
 *
 *   res     Array of the desired maximal relative residues of the
-*           calculated solutions (nmu elements). 
+*           calculated solutions (nmu elements).
 *
 *   wsd     Array of at least 3+nmu (5 if nmu=1) double-precision spinor
 *           fields (used as work space).
 *
 *   eta     Source field (unchanged on exit).
 *
-*   psi     Array of the calculated approximate solutions of the Dirac 
+*   psi     Array of the calculated approximate solutions of the Dirac
 *           equations (D^dag*D+mu^2)*psi=eta (nmu elements).
 *
 *   status  On exit, this parameter reports the number of CG iterations
@@ -89,438 +89,402 @@
 
 typedef struct
 {
-   int stop;
-   double s,tol;
-   double ah,bh,gh,rh;
-   spinor_dble *xh,*ph;
+  int stop;
+  double s, tol;
+  double ah, bh, gh, rh;
+  spinor_dble *xh, *ph;
 } cgsh_t;
 
 typedef struct
 {
-   int k,stop;
-   double mu,tol;
-   double a,b;
-   double rn0,rn,rnsq;
-   spinor_dble *x,*r,*p,*ap,*w;
+  int k, stop;
+  double mu, tol;
+  double a, b;
+  double rn0, rn, rnsq;
+  spinor_dble *x, *r, *p, *ap, *w;
 } cgs_t;
 
-static int ns=0;
+static int ns = 0;
 static double *dprms;
 static cgs_t cgs;
 static cgsh_t *cgsh;
 
-
-static int alloc_cgs(int nmu,double *mu,double *res,spinor_dble **wsd,
+static int alloc_cgs(int nmu, double *mu, double *res, spinor_dble **wsd,
                      spinor_dble **psi)
 {
-   int k,l,k0;
-   
-   if (nmu>ns)
-   {
-      if (ns>0)
-         free(dprms);
-      if (ns>1)
-         free(cgsh);
-      
-      dprms=malloc(2*nmu*sizeof(*dprms));
-      if (dprms==NULL)
-         return 1;
+  int k, l, k0;
 
-      if (nmu>1)
-      {
-         cgsh=malloc((nmu-1)*sizeof(*cgsh));
-         if (cgsh==NULL)
-            return 1;
-      }
-      
-      ns=nmu;
-   }
+  if (nmu > ns) {
+    if (ns > 0)
+      free(dprms);
+    if (ns > 1)
+      free(cgsh);
 
-   k0=0;
+    dprms = malloc(2 * nmu * sizeof(*dprms));
+    if (dprms == NULL)
+      return 1;
 
-   for (k=1;k<nmu;k++)
-   {
-      if (fabs(mu[k])<fabs(mu[k0]))
-         k0=k;
-   }
+    if (nmu > 1) {
+      cgsh = malloc((nmu - 1) * sizeof(*cgsh));
+      if (cgsh == NULL)
+        return 1;
+    }
 
-   cgs.k=k0;
-   cgs.stop=0;
-   cgs.mu=mu[k0];
-   cgs.a=1.0;
-   cgs.b=0.0;
-   cgs.tol=res[k0];
-   
-   cgs.x=psi[k0];
-   cgs.r=wsd[0];
-   cgs.p=wsd[1];
-   cgs.ap=wsd[2];
-   cgs.w=wsd[3];
+    ns = nmu;
+  }
 
-   l=0;
+  k0 = 0;
 
-   for (k=0;k<nmu;k++)
-   {
-      if (k!=k0)
-      {
-         cgsh[l].stop=0;
-         cgsh[l].s=mu[k]*mu[k]-mu[k0]*mu[k0];
-         cgsh[l].tol=res[k];
-         cgsh[l].ah=1.0;
-         cgsh[l].bh=0.0;
-         cgsh[l].gh=1.0;
-         cgsh[l].rh=1.0;
+  for (k = 1; k < nmu; k++) {
+    if (fabs(mu[k]) < fabs(mu[k0]))
+      k0 = k;
+  }
 
-         cgsh[l].xh=psi[k];
-         cgsh[l].ph=wsd[4+l];
+  cgs.k = k0;
+  cgs.stop = 0;
+  cgs.mu = mu[k0];
+  cgs.a = 1.0;
+  cgs.b = 0.0;
+  cgs.tol = res[k0];
 
-         l+=1;
-      }
-   }
+  cgs.x = psi[k0];
+  cgs.r = wsd[0];
+  cgs.p = wsd[1];
+  cgs.ap = wsd[2];
+  cgs.w = wsd[3];
 
-   return 0;
+  l = 0;
+
+  for (k = 0; k < nmu; k++) {
+    if (k != k0) {
+      cgsh[l].stop = 0;
+      cgsh[l].s = mu[k] * mu[k] - mu[k0] * mu[k0];
+      cgsh[l].tol = res[k];
+      cgsh[l].ah = 1.0;
+      cgsh[l].bh = 0.0;
+      cgsh[l].gh = 1.0;
+      cgsh[l].rh = 1.0;
+
+      cgsh[l].xh = psi[k];
+      cgsh[l].ph = wsd[4 + l];
+
+      l += 1;
+    }
+  }
+
+  return 0;
 }
 
-
-static void cg_init(int vol,int icom,int nmu,spinor_dble *eta)
+static void cg_init(int vol, int icom, int nmu, spinor_dble *eta)
 {
-   int k;
-   
-   set_sd2zero(vol,cgs.x);
-   assign_sd2sd(vol,eta,cgs.r);
-   assign_sd2sd(vol,eta,cgs.p);
+  int k;
 
-   cgs.rnsq=norm_square_dble(vol,icom,eta);
-   cgs.rn=sqrt(cgs.rnsq);
-   cgs.rn0=cgs.rn;
-   cgs.tol*=cgs.rn0;
+  set_sd2zero(vol, cgs.x);
+  assign_sd2sd(vol, eta, cgs.r);
+  assign_sd2sd(vol, eta, cgs.p);
 
-   for (k=0;k<(nmu-1);k++)
-   {
-      set_sd2zero(vol,cgsh[k].xh);
-      assign_sd2sd(vol,eta,cgsh[k].ph);
+  cgs.rnsq = norm_square_dble(vol, icom, eta);
+  cgs.rn = sqrt(cgs.rnsq);
+  cgs.rn0 = cgs.rn;
+  cgs.tol *= cgs.rn0;
 
-      cgsh[k].tol*=cgs.rn0;
-   }
+  for (k = 0; k < (nmu - 1); k++) {
+    set_sd2zero(vol, cgsh[k].xh);
+    assign_sd2sd(vol, eta, cgsh[k].ph);
+
+    cgsh[k].tol *= cgs.rn0;
+  }
 }
 
-
-static void cg_step1(int vol,int icom,int nmu,
-                     void (*Dop_dble)(double mu,spinor_dble *s,spinor_dble *r))
+static void cg_step1(int vol, int icom, int nmu,
+                     void (*Dop_dble)(double mu, spinor_dble *s,
+                                      spinor_dble *r))
 {
-   int k;
-   double om;
-   
-   Dop_dble(cgs.mu,cgs.p,cgs.w);
-   Dop_dble(cgs.mu,cgs.w,cgs.ap);
+  int k;
+  double om;
 
-   om=cgs.b/cgs.a;
-   cgs.a=cgs.rnsq/norm_square_dble(vol,icom,cgs.w);
-   om*=cgs.a;
+  Dop_dble(cgs.mu, cgs.p, cgs.w);
+  Dop_dble(cgs.mu, cgs.w, cgs.ap);
 
-   for (k=0;k<(nmu-1);k++)
-   {
-      if (cgsh[k].stop==0)
-      {
-         cgsh[k].rh=1.0/(1.0+cgsh[k].s*cgs.a+(1.0-cgsh[k].rh)*om);
-         cgsh[k].ah=cgsh[k].rh*cgs.a;
-      }
-   }
+  om = cgs.b / cgs.a;
+  cgs.a = cgs.rnsq / norm_square_dble(vol, icom, cgs.w);
+  om *= cgs.a;
+
+  for (k = 0; k < (nmu - 1); k++) {
+    if (cgsh[k].stop == 0) {
+      cgsh[k].rh = 1.0 / (1.0 + cgsh[k].s * cgs.a + (1.0 - cgsh[k].rh) * om);
+      cgsh[k].ah = cgsh[k].rh * cgs.a;
+    }
+  }
 }
 
-
-static void cg_step2(int vol,int nmu)
+static void cg_step2(int vol, int nmu)
 {
-   int k;
-   
-   mulr_spinor_add_dble(vol,cgs.x,cgs.p,cgs.a);
-   mulr_spinor_add_dble(vol,cgs.r,cgs.ap,-cgs.a);
+  int k;
 
-   for (k=0;k<(nmu-1);k++)
-   {
-      if (cgsh[k].stop==0)
-         mulr_spinor_add_dble(vol,cgsh[k].xh,cgsh[k].ph,cgsh[k].ah);
-   }
+  mulr_spinor_add_dble(vol, cgs.x, cgs.p, cgs.a);
+  mulr_spinor_add_dble(vol, cgs.r, cgs.ap, -cgs.a);
+
+  for (k = 0; k < (nmu - 1); k++) {
+    if (cgsh[k].stop == 0)
+      mulr_spinor_add_dble(vol, cgsh[k].xh, cgsh[k].ph, cgsh[k].ah);
+  }
 }
 
-
-static void cg_step3(int vol,int icom,int nmu)
+static void cg_step3(int vol, int icom, int nmu)
 {
-   int k;
-   double rnsq,rh;
+  int k;
+  double rnsq, rh;
 
-   rnsq=norm_square_dble(vol,icom,cgs.r);
-   cgs.b=rnsq/cgs.rnsq;
-   cgs.rnsq=rnsq;
-   cgs.rn=sqrt(rnsq);
+  rnsq = norm_square_dble(vol, icom, cgs.r);
+  cgs.b = rnsq / cgs.rnsq;
+  cgs.rnsq = rnsq;
+  cgs.rn = sqrt(rnsq);
 
-   for (k=0;k<(nmu-1);k++)
-   {
-      if (cgsh[k].stop==0)
-      {
-         rh=cgsh[k].rh;
-         cgsh[k].bh=rh*rh*cgs.b;
-         cgsh[k].gh*=rh;
-      }
-   }
+  for (k = 0; k < (nmu - 1); k++) {
+    if (cgsh[k].stop == 0) {
+      rh = cgsh[k].rh;
+      cgsh[k].bh = rh * rh * cgs.b;
+      cgsh[k].gh *= rh;
+    }
+  }
 }
 
-
-static void cg_step4(int vol,int nmu)
+static void cg_step4(int vol, int nmu)
 {
-   int k;
+  int k;
 
-   combine_spinor_dble(vol,cgs.p,cgs.r,cgs.b,1.0);
+  combine_spinor_dble(vol, cgs.p, cgs.r, cgs.b, 1.0);
 
-   for (k=0;k<(nmu-1);k++)
-   {
-      if (cgsh[k].stop==0)
-         combine_spinor_dble(vol,cgsh[k].ph,cgs.r,cgsh[k].bh,cgsh[k].gh);
-   }
+  for (k = 0; k < (nmu - 1); k++) {
+    if (cgsh[k].stop == 0)
+      combine_spinor_dble(vol, cgsh[k].ph, cgs.r, cgsh[k].bh, cgsh[k].gh);
+  }
 }
-
 
 static int set_stop_flag(int nmu)
 {
-   int nstop,k;
-   double rn;
+  int nstop, k;
+  double rn;
 
-   rn=cgs.rn;
-   cgs.stop|=(rn<(0.99*cgs.tol));
-   nstop=cgs.stop;
+  rn = cgs.rn;
+  cgs.stop |= (rn < (0.99 * cgs.tol));
+  nstop = cgs.stop;
 
-   for (k=0;k<(nmu-1);k++)
-   {
-      cgsh[k].stop|=((cgsh[k].gh*rn)<(0.99*cgsh[k].tol));
-      nstop+=cgsh[k].stop;
-   }
-   
-   return nstop;
+  for (k = 0; k < (nmu - 1); k++) {
+    cgsh[k].stop |= ((cgsh[k].gh * rn) < (0.99 * cgsh[k].tol));
+    nstop += cgsh[k].stop;
+  }
+
+  return nstop;
 }
 
-
-static int check_res(int vol,int icom,double mu,
-                     void (*Dop_dble)(double mu,spinor_dble *s,spinor_dble *r),
-                     spinor_dble **wsd,int nmx,double res,
-                     spinor_dble *eta,spinor_dble *psi,int *ncg)
+static int check_res(int vol, int icom, double mu,
+                     void (*Dop_dble)(double mu, spinor_dble *s,
+                                      spinor_dble *r),
+                     spinor_dble **wsd, int nmx, double res, spinor_dble *eta,
+                     spinor_dble *psi, int *ncg)
 {
-   double tol,rnsq,rn,a,b;
-   spinor_dble *x,*r,*p,*ap,*w;
+  double tol, rnsq, rn, a, b;
+  spinor_dble *x, *r, *p, *ap, *w;
 
-   tol=res*cgs.rn0;
-   r=wsd[0];
-   w=wsd[1];
-   
-   Dop_dble(mu,psi,w);
-   Dop_dble(mu,w,r);
+  tol = res * cgs.rn0;
+  r = wsd[0];
+  w = wsd[1];
 
-   mulr_spinor_add_dble(vol,r,eta,-1.0);
-   rnsq=norm_square_dble(vol,icom,r);
-   rn=sqrt(rnsq);
+  Dop_dble(mu, psi, w);
+  Dop_dble(mu, w, r);
 
-   if (rn<=tol)
-      return 0;
-   else if ((*ncg)>=nmx)
-      return 1;
+  mulr_spinor_add_dble(vol, r, eta, -1.0);
+  rnsq = norm_square_dble(vol, icom, r);
+  rn = sqrt(rnsq);
 
-   x=wsd[2];
-   p=wsd[3];
-   ap=wsd[4];
+  if (rn <= tol)
+    return 0;
+  else if ((*ncg) >= nmx)
+    return 1;
 
-   set_sd2zero(vol,x);
-   assign_sd2sd(vol,r,p);
-   
-   while ((rn>tol)&&((*ncg)<nmx))
-   {
-      Dop_dble(mu,p,w);
-      Dop_dble(mu,w,ap);
+  x = wsd[2];
+  p = wsd[3];
+  ap = wsd[4];
 
-      a=rnsq/norm_square_dble(vol,icom,w);
-      mulr_spinor_add_dble(vol,x,p,a);
-      mulr_spinor_add_dble(vol,r,ap,-a);
+  set_sd2zero(vol, x);
+  assign_sd2sd(vol, r, p);
 
-      rn=norm_square_dble(vol,icom,r);
-      b=rn/rnsq;
-      rnsq=rn;
-      rn=sqrt(rnsq);
-         
-      combine_spinor_dble(vol,p,r,b,1.0);
-      (*ncg)+=1;
-   }
+  while ((rn > tol) && ((*ncg) < nmx)) {
+    Dop_dble(mu, p, w);
+    Dop_dble(mu, w, ap);
 
-   mulr_spinor_add_dble(vol,psi,x,-1.0);
+    a = rnsq / norm_square_dble(vol, icom, w);
+    mulr_spinor_add_dble(vol, x, p, a);
+    mulr_spinor_add_dble(vol, r, ap, -a);
 
-   if (rn<=tol)
-      return 0;
-   else
-      return 1;
+    rn = norm_square_dble(vol, icom, r);
+    b = rn / rnsq;
+    rnsq = rn;
+    rn = sqrt(rnsq);
+
+    combine_spinor_dble(vol, p, r, b, 1.0);
+    (*ncg) += 1;
+  }
+
+  mulr_spinor_add_dble(vol, psi, x, -1.0);
+
+  if (rn <= tol)
+    return 0;
+  else
+    return 1;
 }
 
-
-void mscg(int vol,int icom,int nmu,double *mu,
-          void (*Dop_dble)(double mu,spinor_dble *s,spinor_dble *r),
-          spinor_dble **wsd,int nmx,double *res,
-          spinor_dble *eta,spinor_dble **psi,int *status)
+void mscg(int vol, int icom, int nmu, double *mu,
+          void (*Dop_dble)(double mu, spinor_dble *s, spinor_dble *r),
+          spinor_dble **wsd, int nmx, double *res, spinor_dble *eta,
+          spinor_dble **psi, int *status)
 {
-   int ncg,nstop,k,ie;
-   int iprms[3];
+  int ncg, nstop, k, ie;
+  int iprms[3];
 
-   if ((icom==1)&&(NPROC>1))
-   {
-      iprms[0]=vol;
-      iprms[1]=nmu;
-      iprms[2]=nmx;
+  if ((icom == 1) && (NPROC > 1)) {
+    iprms[0] = vol;
+    iprms[1] = nmu;
+    iprms[2] = nmx;
 
-      MPI_Bcast(iprms,3,MPI_INT,0,MPI_COMM_WORLD);
-      error((iprms[0]!=vol)||(iprms[1]!=nmu)||(iprms[2]!=nmx),1,
-            "mscg [mscg.c]","Integer parameters are not global");
-      error_root((vol<1)||(nmu<1)||(nmx<1),1,"mscg [mscg.c]",
-                 "Improper choice of vol,nmu or nmx");
-      
-      ie=alloc_cgs(nmu,mu,res,wsd,psi);
-      error(ie!=0,1,"mscg [mscg.c]","Unable to allocate auxiliary arrays");
+    MPI_Bcast(iprms, 3, MPI_INT, 0, MPI_COMM_WORLD);
+    error((iprms[0] != vol) || (iprms[1] != nmu) || (iprms[2] != nmx), 1,
+          "mscg [mscg.c]", "Integer parameters are not global");
+    error_root((vol < 1) || (nmu < 1) || (nmx < 1), 1, "mscg [mscg.c]",
+               "Improper choice of vol,nmu or nmx");
 
-      for (k=0;k<nmu;k++)
-      {
-         dprms[k]=mu[k];
-         dprms[nmu+k]=res[k];
-      }
+    ie = alloc_cgs(nmu, mu, res, wsd, psi);
+    error(ie != 0, 1, "mscg [mscg.c]", "Unable to allocate auxiliary arrays");
 
-      MPI_Bcast(dprms,2*nmu,MPI_DOUBLE,0,MPI_COMM_WORLD);
+    for (k = 0; k < nmu; k++) {
+      dprms[k] = mu[k];
+      dprms[nmu + k] = res[k];
+    }
 
-      for (k=0;k<nmu;k++)
-      {
-         ie|=(dprms[k]!=mu[k]);
-         ie|=(dprms[nmu+k]!=res[k]);
-      }      
+    MPI_Bcast(dprms, 2 * nmu, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-      error(ie!=0,1,"mscg [mscg.c]","Shifts or residues are not global");
+    for (k = 0; k < nmu; k++) {
+      ie |= (dprms[k] != mu[k]);
+      ie |= (dprms[nmu + k] != res[k]);
+    }
 
-      for (k=0;k<nmu;k++)
-         ie|=(res[k]<=DBL_EPSILON);
+    error(ie != 0, 1, "mscg [mscg.c]", "Shifts or residues are not global");
 
-      error_root(ie!=0,1,"mscg [mscg.c]","Improper choice of residues");
-   }
-   else
-   {
-      if ((vol<1)||(nmu<1)||(nmx<1))
-      {
-         error_loc(1,1,"mscg [mscg.c]",
-                   "Improper choice of vol,nmu or nmx");
-         (*status)=0;
-         return;
-      }
+    for (k = 0; k < nmu; k++)
+      ie |= (res[k] <= DBL_EPSILON);
 
-      ie=alloc_cgs(nmu,mu,res,wsd,psi);
-
-      if (ie!=0)
-      {
-         error_loc(1,1,"mscg [mscg.c]",
-                   "Unable to allocate auxiliary arrays");
-         (*status)=0;
-         return;
-      }
-
-      for (k=0;k<nmu;k++)
-         ie|=(res[k]<=DBL_EPSILON);
-      
-      if (ie!=0)
-      {
-         error_loc(1,1,"mscg [mscg.c]",
-                   "Improper choice of residues");
-         (*status)=0;
-         return;
-      }      
-   }
-
-#ifdef MSCG_DBG
-   message("[mscg]: nmu = %d, mu = %.2e",nmu,cgs.mu);
-
-   for (k=0;k<nmu;k++)
-   {
-      if (k!=cgs.k)
-         message(", %.2e",mu[k]);
-   }
-#endif
-
-   cg_init(vol,icom,nmu,eta);
-   nstop=set_stop_flag(nmu);
-   ncg=0;
-   
-#ifdef MSCG_DBG   
-   message("\n[mscg]: tol = %.2e",cgs.tol);
-
-   for (k=0;k<(nmu-1);k++)
-      message(", %.2e",cgsh[k].tol);
-
-   message("\n");
-#endif
-   
-   while ((ncg<nmx)&&(nstop<nmu))
-   {
-#ifdef MSCG_DBG
-      if (cgs.stop)
-         message("[mscg]: res =         ");
-      else
-         message("[mscg]: res = %.2e",cgs.rn);
-
-      for (k=0;k<(nmu-1);k++)
-      {
-         if (cgsh[k].stop)
-            message(",         ");
-         else
-            message(", %.2e",cgsh[k].gh*cgs.rn);
-      }
-
-      message("\n");
-#endif
-
-      cg_step1(vol,icom,nmu,Dop_dble);
-      cg_step2(vol,nmu);
-      cg_step3(vol,icom,nmu);
-      cg_step4(vol,nmu);
-      
-      nstop=set_stop_flag(nmu);
-      ncg+=1;
-   }
-
-#ifdef MSCG_DBG
-   message("[mscg]: ncg = %d, nstop = %d\n",ncg,nstop);
-#endif
-   
-   if ((ncg==nmx)&&(nstop<nmu))
-   {
-      (*status)=-1;
+    error_root(ie != 0, 1, "mscg [mscg.c]", "Improper choice of residues");
+  } else {
+    if ((vol < 1) || (nmu < 1) || (nmx < 1)) {
+      error_loc(1, 1, "mscg [mscg.c]", "Improper choice of vol,nmu or nmx");
+      (*status) = 0;
       return;
-   }
+    }
 
-   k=cgs.k;
-   ie=check_res(vol,icom,mu[k],Dop_dble,wsd,nmx,res[k],eta,psi[k],&ncg);
+    ie = alloc_cgs(nmu, mu, res, wsd, psi);
+
+    if (ie != 0) {
+      error_loc(1, 1, "mscg [mscg.c]", "Unable to allocate auxiliary arrays");
+      (*status) = 0;
+      return;
+    }
+
+    for (k = 0; k < nmu; k++)
+      ie |= (res[k] <= DBL_EPSILON);
+
+    if (ie != 0) {
+      error_loc(1, 1, "mscg [mscg.c]", "Improper choice of residues");
+      (*status) = 0;
+      return;
+    }
+  }
 
 #ifdef MSCG_DBG
-   message("[mscg]: ie,ncg = %d,%d",ie,ncg);
+  message("[mscg]: nmu = %d, mu = %.2e", nmu, cgs.mu);
+
+  for (k = 0; k < nmu; k++) {
+    if (k != cgs.k)
+      message(", %.2e", mu[k]);
+  }
 #endif
 
-   for (k=0;k<nmu;k++)
-   {
-      if (k!=cgs.k)
-      {
-         ie+=check_res(vol,icom,mu[k],Dop_dble,wsd,nmx,res[k],eta,psi[k],&ncg);
+  cg_init(vol, icom, nmu, eta);
+  nstop = set_stop_flag(nmu);
+  ncg = 0;
 
 #ifdef MSCG_DBG
-         message("; %d,%d",ie,ncg);
+  message("\n[mscg]: tol = %.2e", cgs.tol);
+
+  for (k = 0; k < (nmu - 1); k++)
+    message(", %.2e", cgsh[k].tol);
+
+  message("\n");
 #endif
-      }
-   }
 
-#ifdef MSCG_DBG   
-   message("\n");
-#endif   
-   
-   if (ie!=0)
-      (*status)=-1;
-   else
-      (*status)=ncg;
+  while ((ncg < nmx) && (nstop < nmu)) {
+#ifdef MSCG_DBG
+    if (cgs.stop)
+      message("[mscg]: res =         ");
+    else
+      message("[mscg]: res = %.2e", cgs.rn);
 
-   return;
+    for (k = 0; k < (nmu - 1); k++) {
+      if (cgsh[k].stop)
+        message(",         ");
+      else
+        message(", %.2e", cgsh[k].gh * cgs.rn);
+    }
+
+    message("\n");
+#endif
+
+    cg_step1(vol, icom, nmu, Dop_dble);
+    cg_step2(vol, nmu);
+    cg_step3(vol, icom, nmu);
+    cg_step4(vol, nmu);
+
+    nstop = set_stop_flag(nmu);
+    ncg += 1;
+  }
+
+#ifdef MSCG_DBG
+  message("[mscg]: ncg = %d, nstop = %d\n", ncg, nstop);
+#endif
+
+  if ((ncg == nmx) && (nstop < nmu)) {
+    (*status) = -1;
+    return;
+  }
+
+  k = cgs.k;
+  ie = check_res(vol, icom, mu[k], Dop_dble, wsd, nmx, res[k], eta, psi[k],
+                 &ncg);
+
+#ifdef MSCG_DBG
+  message("[mscg]: ie,ncg = %d,%d", ie, ncg);
+#endif
+
+  for (k = 0; k < nmu; k++) {
+    if (k != cgs.k) {
+      ie += check_res(vol, icom, mu[k], Dop_dble, wsd, nmx, res[k], eta, psi[k],
+                      &ncg);
+
+#ifdef MSCG_DBG
+      message("; %d,%d", ie, ncg);
+#endif
+    }
+  }
+
+#ifdef MSCG_DBG
+  message("\n");
+#endif
+
+  if (ie != 0)
+    (*status) = -1;
+  else
+    (*status) = ncg;
+
+  return;
 }

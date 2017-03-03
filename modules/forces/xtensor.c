@@ -99,259 +99,237 @@
 #include "forces.h"
 #include "global.h"
 
-#define _u3_alg_mul_add_assign(r,c,s) \
-   (r).c1+=(c)*(s).c1; \
-   (r).c2+=(c)*(s).c2; \
-   (r).c3+=(c)*(s).c3; \
-   (r).c4+=(c)*(s).c4; \
-   (r).c5+=(c)*(s).c5; \
-   (r).c6+=(c)*(s).c6; \
-   (r).c7+=(c)*(s).c7; \
-   (r).c8+=(c)*(s).c8; \
-   (r).c9+=(c)*(s).c9
+#define _u3_alg_mul_add_assign(r, c, s)                                        \
+  (r).c1 += (c) * (s).c1;                                                      \
+  (r).c2 += (c) * (s).c2;                                                      \
+  (r).c3 += (c) * (s).c3;                                                      \
+  (r).c4 += (c) * (s).c4;                                                      \
+  (r).c5 += (c) * (s).c5;                                                      \
+  (r).c6 += (c) * (s).c6;                                                      \
+  (r).c7 += (c) * (s).c7;                                                      \
+  (r).c8 += (c) * (s).c8;                                                      \
+  (r).c9 += (c) * (s).c9
 
-#define _su3_mul_add_assign(r,c,s) \
-   (r).c11.re+=(c)*(s).c11.re; \
-   (r).c11.im+=(c)*(s).c11.im; \
-   (r).c12.re+=(c)*(s).c12.re; \
-   (r).c12.im+=(c)*(s).c12.im; \
-   (r).c13.re+=(c)*(s).c13.re; \
-   (r).c13.im+=(c)*(s).c13.im; \
-   (r).c21.re+=(c)*(s).c21.re; \
-   (r).c21.im+=(c)*(s).c21.im; \
-   (r).c22.re+=(c)*(s).c22.re; \
-   (r).c22.im+=(c)*(s).c22.im; \
-   (r).c23.re+=(c)*(s).c23.re; \
-   (r).c23.im+=(c)*(s).c23.im; \
-   (r).c31.re+=(c)*(s).c31.re; \
-   (r).c31.im+=(c)*(s).c31.im; \
-   (r).c32.re+=(c)*(s).c32.re; \
-   (r).c32.im+=(c)*(s).c32.im; \
-   (r).c33.re+=(c)*(s).c33.re; \
-   (r).c33.im+=(c)*(s).c33.im
+#define _su3_mul_add_assign(r, c, s)                                           \
+  (r).c11.re += (c) * (s).c11.re;                                              \
+  (r).c11.im += (c) * (s).c11.im;                                              \
+  (r).c12.re += (c) * (s).c12.re;                                              \
+  (r).c12.im += (c) * (s).c12.im;                                              \
+  (r).c13.re += (c) * (s).c13.re;                                              \
+  (r).c13.im += (c) * (s).c13.im;                                              \
+  (r).c21.re += (c) * (s).c21.re;                                              \
+  (r).c21.im += (c) * (s).c21.im;                                              \
+  (r).c22.re += (c) * (s).c22.re;                                              \
+  (r).c22.im += (c) * (s).c22.im;                                              \
+  (r).c23.re += (c) * (s).c23.re;                                              \
+  (r).c23.im += (c) * (s).c23.im;                                              \
+  (r).c31.re += (c) * (s).c31.re;                                              \
+  (r).c31.im += (c) * (s).c31.im;                                              \
+  (r).c32.re += (c) * (s).c32.re;                                              \
+  (r).c32.im += (c) * (s).c32.im;                                              \
+  (r).c33.re += (c) * (s).c33.re;                                              \
+  (r).c33.im += (c) * (s).c33.im
 
 static u3_alg_dble X[6];
-static u3_alg_dble **xts=NULL,**xt;
-static const su3_dble ud0={{0.0}};
+static u3_alg_dble **xts = NULL, **xt;
+static const su3_dble ud0 = {{0.0}};
 static su3_dble w ALIGNED16;
-static su3_dble *xvs=NULL,*xv;
-
+static su3_dble *xvs = NULL, *xv;
 
 static void alloc_xts(void)
 {
-   int n,nt,nxt[6];
-   u3_alg_dble **pp,*p;
-   ftidx_t *idx;
+  int n, nt, nxt[6];
+  u3_alg_dble **pp, *p;
+  ftidx_t *idx;
 
-   idx=ftidx();
-   nt=0;
+  idx = ftidx();
+  nt = 0;
 
-   for (n=0;n<6;n++)
-   {
-      nxt[n]=VOLUME+idx[n].nft[0]+idx[n].nft[1];
-      nt+=nxt[n];
-   }
+  for (n = 0; n < 6; n++) {
+    nxt[n] = VOLUME + idx[n].nft[0] + idx[n].nft[1];
+    nt += nxt[n];
+  }
 
-   pp=malloc(12*sizeof(*pp));
-   p=amalloc(nt*sizeof(*p),ALIGN);
-   error((pp==NULL)||(p==NULL),1,"alloc_xts [xtensor.c]",
-         "Unable to allocate field arrays");
+  pp = malloc(12 * sizeof(*pp));
+  p = amalloc(nt * sizeof(*p), ALIGN);
+  error((pp == NULL) || (p == NULL), 1, "alloc_xts [xtensor.c]",
+        "Unable to allocate field arrays");
 
-   set_ualg2zero(nt,p);
-   xts=pp;
-   xt=pp+6;
+  set_ualg2zero(nt, p);
+  xts = pp;
+  xt = pp + 6;
 
-   for (n=0;n<6;n++)
-   {
-      (*pp)=p;
-      pp+=1;
-      p+=nxt[n];
-   }
+  for (n = 0; n < 6; n++) {
+    (*pp) = p;
+    pp += 1;
+    p += nxt[n];
+  }
 }
-
 
 u3_alg_dble **xtensor(void)
 {
-   int n;
+  int n;
 
-   if (xts==NULL)
-      alloc_xts();
+  if (xts == NULL)
+    alloc_xts();
 
-   for (n=0;n<6;n++)
-      xt[n]=xts[n];
+  for (n = 0; n < 6; n++)
+    xt[n] = xts[n];
 
-   return xt;
+  return xt;
 }
-
 
 void set_xt2zero(void)
 {
-   int n;
+  int n;
 
-   if (xts==NULL)
-      alloc_xts();
-   else
-   {
-      for (n=0;n<6;n++)
-         set_ualg2zero(VOLUME,xts[n]);
-   }
+  if (xts == NULL)
+    alloc_xts();
+  else {
+    for (n = 0; n < 6; n++)
+      set_ualg2zero(VOLUME, xts[n]);
+  }
 }
 
-
-int add_det2xt(double c,ptset_t set)
+int add_det2xt(double c, ptset_t set)
 {
-   int n,ifail;
-   pauli_dble *m,*mm;
+  int n, ifail;
+  pauli_dble *m, *mm;
 
-   if (set==NO_PTS)
-      return 0;
+  if (set == NO_PTS)
+    return 0;
 
-   ifail=sw_term(set);
+  ifail = sw_term(set);
 
-   if (ifail!=0)
-      return ifail;
+  if (ifail != 0)
+    return ifail;
 
-   if (xts==NULL)
-      alloc_xts();
+  if (xts == NULL)
+    alloc_xts();
 
-   if (set==ODD_PTS)
-   {
-      for (n=0;n<6;n++)
-         xt[n]=xts[n]+(VOLUME/2);
+  if (set == ODD_PTS) {
+    for (n = 0; n < 6; n++)
+      xt[n] = xts[n] + (VOLUME / 2);
 
-      m=swdfld()+VOLUME;
-   }
-   else
-   {
-      for (n=0;n<6;n++)
-         xt[n]=xts[n];
+    m = swdfld() + VOLUME;
+  } else {
+    for (n = 0; n < 6; n++)
+      xt[n] = xts[n];
 
-      m=swdfld();
-   }
+    m = swdfld();
+  }
 
-   if (set==ALL_PTS)
-      mm=m+(2*VOLUME);
-   else
-      mm=m+VOLUME;
+  if (set == ALL_PTS)
+    mm = m + (2 * VOLUME);
+  else
+    mm = m + VOLUME;
 
-   for (;m<mm;m+=2)
-   {
-      det2xt(m,X);
+  for (; m < mm; m += 2) {
+    det2xt(m, X);
 
-      for (n=0;n<6;n++)
-      {
-         _u3_alg_mul_add_assign(xt[n][0],c,X[n]);
-         xt[n]+=1;
-      }
-   }
+    for (n = 0; n < 6; n++) {
+      _u3_alg_mul_add_assign(xt[n][0], c, X[n]);
+      xt[n] += 1;
+    }
+  }
 
-   return 0;
+  return 0;
 }
 
-
-void add_prod2xt(double c,spinor_dble *r,spinor_dble *s)
+void add_prod2xt(double c, spinor_dble *r, spinor_dble *s)
 {
-   int n;
-   spinor_dble *rm;
+  int n;
+  spinor_dble *rm;
 
-   if (xts==NULL)
-      alloc_xts();
+  if (xts == NULL)
+    alloc_xts();
 
-   for (n=0;n<6;n++)
-      xt[n]=xts[n];
+  for (n = 0; n < 6; n++)
+    xt[n] = xts[n];
 
-   rm=r+VOLUME;
+  rm = r + VOLUME;
 
-   for (;r<rm;r++)
-   {
-      prod2xt(r,s,X);
+  for (; r < rm; r++) {
+    prod2xt(r, s, X);
 
-      for (n=0;n<6;n++)
-      {
-         _u3_alg_mul_add_assign(xt[n][0],c,X[n]);
-         xt[n]+=1;
-      }
+    for (n = 0; n < 6; n++) {
+      _u3_alg_mul_add_assign(xt[n][0], c, X[n]);
+      xt[n] += 1;
+    }
 
-      s+=1;
-   }
+    s += 1;
+  }
 }
-
 
 static void alloc_xvs(void)
 {
-   int ix;
+  int ix;
 
-   xvs=amalloc(4*VOLUME*sizeof(*xv),ALIGN);
-   error(xvs==NULL,1,"alloc_xvs [xtensor.c]",
-         "Unable to allocate field array");
+  xvs = amalloc(4 * VOLUME * sizeof(*xv), ALIGN);
+  error(xvs == NULL, 1, "alloc_xvs [xtensor.c]",
+        "Unable to allocate field array");
 
-   for (ix=0;ix<(4*VOLUME);ix++)
-      xvs[ix]=ud0;
+  for (ix = 0; ix < (4 * VOLUME); ix++)
+    xvs[ix] = ud0;
 }
-
 
 su3_dble *xvector(void)
 {
-   if (xvs==NULL)
-      alloc_xvs();
+  if (xvs == NULL)
+    alloc_xvs();
 
-   return xvs;
+  return xvs;
 }
-
 
 void set_xv2zero(void)
 {
-   int ix;
+  int ix;
 
-   if (xvs==NULL)
-      alloc_xvs();
-   else
-   {
-      for (ix=0;ix<(4*VOLUME);ix++)
-         xvs[ix]=ud0;
-   }
+  if (xvs == NULL)
+    alloc_xvs();
+  else {
+    for (ix = 0; ix < (4 * VOLUME); ix++)
+      xvs[ix] = ud0;
+  }
 }
 
-
-void add_prod2xv(double c,spinor_dble *r,spinor_dble *s)
+void add_prod2xv(double c, spinor_dble *r, spinor_dble *s)
 {
-   int mu,*piup,*pidn;
-   su3_dble *xvm;
-   spinor_dble *ro,*so;
+  int mu, *piup, *pidn;
+  su3_dble *xvm;
+  spinor_dble *ro, *so;
 
-   if (xvs==NULL)
-      alloc_xvs();
+  if (xvs == NULL)
+    alloc_xvs();
 
-   cpsd_int_bnd(0x1,r);
-   cpsd_int_bnd(0x1,s);
+  cpsd_int_bnd(0x1, r);
+  cpsd_int_bnd(0x1, s);
 
-   piup=iup[VOLUME/2];
-   pidn=idn[VOLUME/2];
+  piup = iup[VOLUME / 2];
+  pidn = idn[VOLUME / 2];
 
-   ro=r+(VOLUME/2);
-   so=s+(VOLUME/2);
+  ro = r + (VOLUME / 2);
+  so = s + (VOLUME / 2);
 
-   xv=xvs;
-   xvm=xv+4*VOLUME;
+  xv = xvs;
+  xvm = xv + 4 * VOLUME;
 
-   while (xv<xvm)
-   {
-      for (mu=0;mu<4;mu++)
-      {
-         prod2xv[mu](ro,r+(*piup),so,s+(*piup),&w);
-         _su3_mul_add_assign(*xv,c,w);
+  while (xv < xvm) {
+    for (mu = 0; mu < 4; mu++) {
+      prod2xv[mu](ro, r + (*piup), so, s + (*piup), &w);
+      _su3_mul_add_assign(*xv, c, w);
 
-         piup+=1;
-         xv+=1;
+      piup += 1;
+      xv += 1;
 
-         prod2xv[mu](r+(*pidn),ro,s+(*pidn),so,&w);
-         _su3_mul_add_assign(*xv,c,w);
+      prod2xv[mu](r + (*pidn), ro, s + (*pidn), so, &w);
+      _su3_mul_add_assign(*xv, c, w);
 
-         pidn+=1;
-         xv+=1;
-      }
+      pidn += 1;
+      xv += 1;
+    }
 
-      ro+=1;
-      so+=1;
-   }
+    ro += 1;
+    so += 1;
+  }
 }

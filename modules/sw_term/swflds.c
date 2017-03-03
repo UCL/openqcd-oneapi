@@ -44,92 +44,88 @@
 #include "sw_term.h"
 #include "global.h"
 
-static const pauli sw0={{0.0f}};
-static const pauli_dble swd0={{0.0}};
-static pauli *swb=NULL;
-static pauli_dble *swdb=NULL;
-
+static const pauli sw0 = {{0.0f}};
+static const pauli_dble swd0 = {{0.0}};
+static pauli *swb = NULL;
+static pauli_dble *swdb = NULL;
 
 static void alloc_sw(void)
 {
-   pauli *sw,*sm,unity;
+  pauli *sw, *sm, unity;
 
-   error_root(sizeof(pauli)!=(36*sizeof(float)),1,"alloc_sw [swflds.c]",
-              "The pauli structures are not properly packed");
+  error_root(sizeof(pauli) != (36 * sizeof(float)), 1, "alloc_sw [swflds.c]",
+             "The pauli structures are not properly packed");
 
-   swb=amalloc(2*VOLUME*sizeof(*swb),ALIGN);
-   error(swb==NULL,1,"alloc_sw [swflds.c]",
-         "Unable to allocate the global single-precision SW field");
+  swb = amalloc(2 * VOLUME * sizeof(*swb), ALIGN);
+  error(swb == NULL, 1, "alloc_sw [swflds.c]",
+        "Unable to allocate the global single-precision SW field");
 
-   unity=sw0;
-   unity.u[0]=1.0f;
-   unity.u[1]=1.0f;
-   unity.u[2]=1.0f;
-   unity.u[3]=1.0f;
-   unity.u[4]=1.0f;
-   unity.u[5]=1.0f;
+  unity = sw0;
+  unity.u[0] = 1.0f;
+  unity.u[1] = 1.0f;
+  unity.u[2] = 1.0f;
+  unity.u[3] = 1.0f;
+  unity.u[4] = 1.0f;
+  unity.u[5] = 1.0f;
 
-   sw=swb;
-   sm=sw+2*VOLUME;
+  sw = swb;
+  sm = sw + 2 * VOLUME;
 
-   for (;sw<sm;sw++)
-      (*sw)=unity;
+  for (; sw < sm; sw++)
+    (*sw) = unity;
 }
-
 
 pauli *swfld(void)
 {
-   if (swb==NULL)
-      alloc_sw();
+  if (swb == NULL)
+    alloc_sw();
 
-   return swb;
+  return swb;
 }
-
 
 static void alloc_swd(void)
 {
-   pauli_dble *sw,*sm,unity;
+  pauli_dble *sw, *sm, unity;
 
-   error_root(sizeof(pauli_dble)!=(36*sizeof(double)),1,"alloc_swd [swflds.c]",
-              "The pauli_dble structures are not properly packed");
+  error_root(sizeof(pauli_dble) != (36 * sizeof(double)), 1,
+             "alloc_swd [swflds.c]",
+             "The pauli_dble structures are not properly packed");
 
-   swdb=amalloc(2*VOLUME*sizeof(*swdb),ALIGN);
-   error(swdb==NULL,1,"alloc_swd [swflds.c]",
-         "Unable to allocate the global double-precision SW field");
+  swdb = amalloc(2 * VOLUME * sizeof(*swdb), ALIGN);
+  error(swdb == NULL, 1, "alloc_swd [swflds.c]",
+        "Unable to allocate the global double-precision SW field");
 
-   unity=swd0;
-   unity.u[0]=1.0;
-   unity.u[1]=1.0;
-   unity.u[2]=1.0;
-   unity.u[3]=1.0;
-   unity.u[4]=1.0;
-   unity.u[5]=1.0;
+  unity = swd0;
+  unity.u[0] = 1.0;
+  unity.u[1] = 1.0;
+  unity.u[2] = 1.0;
+  unity.u[3] = 1.0;
+  unity.u[4] = 1.0;
+  unity.u[5] = 1.0;
 
-   sw=swdb;
-   sm=sw+2*VOLUME;
+  sw = swdb;
+  sm = sw + 2 * VOLUME;
 
-   for (;sw<sm;sw++)
-      (*sw)=unity;
+  for (; sw < sm; sw++)
+    (*sw) = unity;
 }
-
 
 pauli_dble *swdfld(void)
 {
-   if (swdb==NULL)
-      alloc_swd();
+  if (swdb == NULL)
+    alloc_swd();
 
-   return swdb;
+  return swdb;
 }
-
 
 void assign_swd2sw(void)
 {
-   error(swdb==NULL,1,"assign_swd2sw [swflds.c]",
-          "Attempt to access unallocated memory space");
+  error(swdb == NULL, 1, "assign_swd2sw [swflds.c]",
+        "Attempt to access unallocated memory space");
 
-   if (swb==NULL)
-      alloc_sw();
+  if (swb == NULL)
+    alloc_sw();
 
-   assign_pauli(2*VOLUME,swdb,swb);
-   set_flags(ASSIGNED_SWD2SW);
+  assign_pauli(2 * VOLUME, swdb, swb);
+  set_flags(ASSIGNED_SWD2SW);
 }
