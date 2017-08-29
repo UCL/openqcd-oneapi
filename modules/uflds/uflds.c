@@ -144,6 +144,62 @@ su3_dble *udfld(void)
   return udb;
 }
 
+void apply_ani_ud(void)
+{
+  su3_dble *u, *um;
+  ani_params_t ani;
+  double ani_t, ani_s;
+
+  ani = ani_parms();
+
+  if (!ani.has_ani)
+    return;
+
+  ani_t = 1.0 / (ani.ut_tilde);
+  ani_s = (ani.nu) / (ani.xi * ani.ut_tilde);
+
+  u = udfld();
+  um = u + 4 * VOLUME;
+  for (; u < um; u += 8) {
+    cm3x3_mulr(&ani_t, (u + 0), (u + 0));
+    cm3x3_mulr(&ani_t, (u + 1), (u + 1));
+    cm3x3_mulr(&ani_s, (u + 2), (u + 2));
+    cm3x3_mulr(&ani_s, (u + 3), (u + 3));
+    cm3x3_mulr(&ani_s, (u + 4), (u + 4));
+    cm3x3_mulr(&ani_s, (u + 5), (u + 5));
+    cm3x3_mulr(&ani_s, (u + 6), (u + 6));
+    cm3x3_mulr(&ani_s, (u + 7), (u + 7));
+  }
+}
+
+void remove_ani_ud(void)
+{
+  su3_dble *u, *um;
+  ani_params_t ani;
+  double ani_inv_t, ani_inv_s;
+
+  ani = ani_parms();
+
+  if (!ani.has_ani)
+    return;
+
+  ani_inv_t = ani.ut_tilde;
+  ani_inv_s = (ani.xi * ani.ut_tilde) / ani.nu;
+
+  u = udfld();
+  um = u + 4 * VOLUME;
+  for (; u < um; u += 8) {
+    cm3x3_mulr(&ani_inv_t, (u + 0), (u + 0));
+    cm3x3_mulr(&ani_inv_t, (u + 1), (u + 1));
+    cm3x3_mulr(&ani_inv_s, (u + 2), (u + 2));
+    cm3x3_mulr(&ani_inv_s, (u + 3), (u + 3));
+    cm3x3_mulr(&ani_inv_s, (u + 4), (u + 4));
+    cm3x3_mulr(&ani_inv_s, (u + 5), (u + 5));
+    cm3x3_mulr(&ani_inv_s, (u + 6), (u + 6));
+    cm3x3_mulr(&ani_inv_s, (u + 7), (u + 7));
+  }
+}
+
 void random_ud(void)
 {
   int bc, ix, t, ifc;

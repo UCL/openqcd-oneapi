@@ -3,7 +3,7 @@
 *
 * File utils.c
 *
-* Copyright (C) 2005, 2008, 2011 Martin Luescher
+ * Copyright (C) 2005, 2008, 2011 Martin Luescher, 2013 Hubert Simma
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -28,6 +28,15 @@
 *     address previously returned by amalloc, the program does not do
 *     anything
 *
+ *   double amem_use_mb()
+ *     Returns the current size in MByte of the total memory area which
+ *     has been allocated through amalloc (but not yet freed by afree)
+ *
+ *   double amem_max_mb()
+ *     Returns the maximum size in MByte of the total memory area which
+ *     has been allocated through amalloc at any moment since the start
+ *     of the program execution and until the current call to amem_max_mb()
+ *
 *   int mpi_permanent_tag(void)
 *     Returns a new send tag that is guaranteed to be unique and which
 *     is therefore suitable for use in permanent communication requests.
@@ -68,6 +77,22 @@
 *     Prints a message from process 0 to stdout. The usage and argument
 *     list is the same as in the case of the printf function
 *
+ *   void mpc_gsum_d(double *src, double *dst, int num)
+ *     Compute global sum of num double precision values from src and
+ *     store results in dst
+ *
+ *    void mpc_bcast_c(char *buf, int num)
+ *     Broadcast num char values from buf of rank 0
+ *
+ *    void mpc_bcast_d(double *buf, int num)
+ *     Broadcast num double values from buf of rank 0
+ *
+ *    void mpc_bcast_i(int *buf, int num)
+ *     Broadcast num int values from buf of rank 0
+ *
+ *    void mpc_print_info()
+ *     Print info how mpc functions are implemented
+ *
 * Notes:
 *
 * If an error is detected in a locally operating program, it is not possible
@@ -96,14 +121,23 @@
 #define MAX_TAG 32767
 #define MAX_PERMANENT_TAG MAX_TAG / 2
 
+#define MPC_BUF_LEN 2048
+
+static int mpcBuf[MPC_BUF_LEN];
+static int mpcRank = -1;
+
 static int pcmn_cnt = -1, cmn_cnt = MAX_TAG;
 static int err_no, err_flg = 0;
 static char prog_name[128], err_msg[512];
+
+static long long int amem_use = 0;
+static long long int amem_max = 0;
 
 struct addr_t
 {
   char *addr;
   char *true_addr;
+  size_t true_size;
   struct addr_t *next;
 };
 
@@ -142,8 +176,13 @@ void *amalloc(size_t size, int p)
   addr = (char *)(((unsigned long)(true_addr + shift)) & (~mask));
   (*new).addr = addr;
   (*new).true_addr = true_addr;
+  (*new).true_size = size + shift;
   (*new).next = first;
   first = new;
+
+  amem_use += size + shift;
+  if (amem_max < amem_use)
+    amem_max = amem_use;
 
   return (void *)(addr);
 }
@@ -162,6 +201,7 @@ void afree(void *addr)
         first = (*p).next;
 
       free((*p).true_addr);
+      amem_use -= (*p).true_size;
       free(p);
       return;
     }
@@ -169,6 +209,10 @@ void afree(void *addr)
     q = p;
   }
 }
+
+double amem_use_mb() { return ((double)amem_use) / (1024 * 1024); }
+
+double amem_max_mb() { return ((double)amem_max) / (1024 * 1024); }
 
 void error(int test, int no, char *name, char *format, ...)
 {
@@ -318,4 +362,105 @@ void message(char *format, ...)
     vprintf(format, args);
     va_end(args);
   }
+}
+
+#undef USE_MPI_BCAST
+#define USE_MPI_ALLREDUCE
+
+void mpc_print_info()
+{
+#ifdef USE_MPI_BCAST
+  message("mpc_bcast implemented as MPI_Bcast\n");
+#else
+  message("mpc_bcast implemented as MPI_Allreduce\n");
+#endif
+
+#ifdef USE_MPI_ALLREDUCE
+  message("mpc_gsum_d implemented as MPI_Allreduce\n");
+#else
+  message("mpc_gsum_d implemented as MPI_Reduce + mpc_bcast\n");
+#endif
+}
+
+void mpc_bcast_c(char *buf, int num)
+{
+#ifdef USE_MPI_BCAST
+  MPI_Bcast(buf, num, MPI_CHAR, 0, MPI_COMM_WORLD);
+#else
+  int i, nint;
+  char *pc;
+  int *pi;
+  nint = (sizeof(char) * num) / sizeof(int);
+  while (nint * sizeof(int) < num * sizeof(char))
+    nint++;
+  pc = (char *)mpcBuf;
+  pi = (int *)mpcBuf;
+  if (mpcRank < 0)
+    MPI_Comm_rank(MPI_COMM_WORLD, &mpcRank);
+  error_root(nint > MPC_BUF_LEN, 0, "mpc_bcast_c [utils.c]",
+             "Too many elements: %d", num);
+  if (mpcRank == 0) {
+    for (i = 0; i < num; i++)
+      pc[i] = buf[i];
+  } else {
+    for (i = 0; i < nint; i++)
+      pi[i] = 0;
+  }
+  MPI_Allreduce((int *)mpcBuf, (int *)buf, nint, MPI_INT, MPI_SUM,
+                MPI_COMM_WORLD);
+#endif
+}
+
+void mpc_bcast_d(double *buf, int num)
+{
+#ifdef USE_MPI_BCAST
+  MPI_Bcast(buf, num, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+#else
+  int i;
+  double *p = (double *)mpcBuf;
+  if (mpcRank < 0)
+    MPI_Comm_rank(MPI_COMM_WORLD, &mpcRank);
+  error_root(num * sizeof(double) > MPC_BUF_LEN * sizeof(int), 0,
+             "mpc_bcast_d [utils.c]", "Too many elements: %d", num);
+  if (mpcRank == 0) {
+    for (i = 0; i < num; i++)
+      p[i] = buf[i];
+  } else {
+    for (i = 0; i < num; i++)
+      p[i] = 0;
+  }
+  MPI_Allreduce((double *)mpcBuf, buf, num, MPI_DOUBLE, MPI_SUM,
+                MPI_COMM_WORLD);
+#endif
+}
+
+void mpc_bcast_i(int *buf, int num)
+{
+#ifdef USE_MPI_BCAST
+  MPI_Bcast(buf, num, MPI_INT, 0, MPI_COMM_WORLD);
+#else
+  int i;
+  if (mpcRank < 0)
+    MPI_Comm_rank(MPI_COMM_WORLD, &mpcRank);
+  error_root(num > MPC_BUF_LEN, 0, "mpc_bcast_i [utils.c]",
+             "Too many elements: %d", num);
+  if (mpcRank == 0) {
+    for (i = 0; i < num; i++)
+      mpcBuf[i] = buf[i];
+  } else {
+    for (i = 0; i < num; i++)
+      mpcBuf[i] = 0;
+  }
+  MPI_Allreduce(mpcBuf, buf, num, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+#endif
+}
+
+void mpc_gsum_d(double *src, double *dst, int num)
+{
+#ifdef USE_MPI_ALLREDUCE
+  MPI_Allreduce(src, dst, num, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#else
+  MPI_Reduce(src, dst, num, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  mpc_bcast_d(dst, num);
+#endif
 }

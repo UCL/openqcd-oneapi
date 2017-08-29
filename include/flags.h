@@ -207,6 +207,21 @@ typedef struct
 
 typedef struct
 {
+  int has_ani;
+  int has_tts;
+
+  double nu;
+  double xi;
+  double cR;
+  double cT;
+  double us;
+  double ut;
+  double us_tilde;
+  double ut_tilde;
+} ani_params_t;
+
+typedef struct
+{
   int n;
   double eps;
 } wflow_parms_t;
@@ -280,6 +295,11 @@ extern sw_parms_t set_sw_parms(double m0);
 extern sw_parms_t sw_parms(void);
 extern tm_parms_t set_tm_parms(int eoflg);
 extern tm_parms_t tm_parms(void);
+extern ani_params_t set_ani_parms(int use_tts, double nu, double xi, double cR,
+                                  double cT, double us, double ut, double ust,
+                                  double utt);
+extern ani_params_t ani_parms(void);
+extern void print_ani_parms(void);
 
 /* MDINT_PARMS_C */
 extern mdint_parms_t set_mdint_parms(int ilv, integrator_t integrator,

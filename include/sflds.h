@@ -49,6 +49,7 @@ extern void diff_sd2s(int vol, spinor_dble *sd, spinor_dble *rd, spinor *r);
 /* SCOM_C */
 extern void cps_int_bnd(int is, spinor *s);
 extern void cps_ext_bnd(int is, spinor *s);
+extern void free_sbufs(void);
 
 /* SDCOM_C */
 extern void cpsd_int_bnd(int is, spinor_dble *sd);

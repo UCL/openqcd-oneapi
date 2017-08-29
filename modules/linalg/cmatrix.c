@@ -1037,6 +1037,102 @@ void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
   }
 }
 
+#elif (defined QPX)
+
+static vector4double perm1 = {2.000000, 2.250000, 3.000000, 3.250000};
+static vector4double perm2 = {2.500000, 2.750000, 3.500000, 3.750000};
+
+void cmat_vec(int n, complex *a, complex *v, complex *w)
+{
+  complex *vv, *vm, *wm, *b;
+  vector4double v1, v2, v3, v4, v5, v6, res1, res2;
+
+  if ((n & 0x1) == 0x0) {
+    b = a;
+    vm = v + n;
+    wm = w + n;
+
+    for (; w < wm; w += 2) {
+      a = b;
+      b += n;
+      res1 = (vector4double){0.f, 0.f, 0.f, 0.f};
+
+      for (vv = v; vv < vm; vv += 2) {
+        v1 = vec_lda(0, &((*a).re));
+        v2 = vec_lda(0, &((*b).re));
+        v3 = vec_perm(v1, v2, perm1);
+        v4 = vec_perm(v1, v2, perm2);
+        v5 = vec_ld2a(0, &((*vv).re));
+        v6 = vec_ld2a(0, &((*(vv + 1)).re));
+        res1 = vec_add(res1, vec_xxnpmadd(v3, v5, vec_xmul(v5, v3)));
+        res1 = vec_add(res1, vec_xxnpmadd(v4, v6, vec_xmul(v6, v4)));
+        a += 2;
+        b += 2;
+      }
+      vec_sta(res1, 0, &((*w).re));
+    }
+  } else {
+    vm = v + n;
+    wm = w + n;
+
+    for (; w < wm; w++) {
+      (*w).re = 0.0f;
+      (*w).im = 0.0f;
+
+      for (vv = v; vv < vm; vv++) {
+        (*w).re += ((*a).re * (*vv).re - (*a).im * (*vv).im);
+        (*w).im += ((*a).re * (*vv).im + (*a).im * (*vv).re);
+        a += 1;
+      }
+    }
+  }
+}
+
+void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
+{
+  complex *vv, *vm, *wm, *b;
+  ;
+  vector4double v1, v2, v3, v4, v5, v6, res1, res2;
+
+  if ((n & 0x1) == 0x0) {
+    b = a;
+    vm = v + n;
+    wm = w + n;
+
+    for (; w < wm; w += 2) {
+      a = b;
+      b += n;
+      res1 = vec_lda(0, &((*w).re));
+
+      for (vv = v; vv < vm; vv += 2) {
+        v1 = vec_lda(0, &((*a).re));
+        v2 = vec_lda(0, &((*b).re));
+        v3 = vec_perm(v1, v2, perm1);
+        v4 = vec_perm(v1, v2, perm2);
+        v5 = vec_ld2a(0, &((*vv).re));
+        v6 = vec_ld2a(0, &((*(vv + 1)).re));
+        res1 = vec_add(res1, vec_xxnpmadd(v3, v5, vec_xmul(v5, v3)));
+        res1 = vec_add(res1, vec_xxnpmadd(v4, v6, vec_xmul(v6, v4)));
+        a += 2;
+        b += 2;
+      }
+      vec_sta(res1, 0, &((*w).re));
+    }
+  } else {
+
+    vm = v + n;
+    wm = w + n;
+
+    for (; w < wm; w++) {
+      for (vv = v; vv < vm; vv++) {
+        (*w).re += ((*a).re * (*vv).re - (*a).im * (*vv).im);
+        (*w).im += ((*a).re * (*vv).im + (*a).im * (*vv).re);
+        a += 1;
+      }
+    }
+  }
+}
+
 #else
 
 void cmat_vec(int n, complex *a, complex *v, complex *w)

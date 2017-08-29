@@ -991,6 +991,313 @@ static void bck_house(void)
   }
 }
 
+#elif (defined QPX)
+#include "qpx.h"
+static double rr[5];
+static complex_dble aa[36], dd[6];
+
+void mul_pauli_dble_qpx(pauli_dble *m, vector4double *im1[3],
+                        vector4double *im2[3])
+{
+  vector4double s1, s2, s3, s4, s5, s6, s10, s11;
+  vector4double v1, v2, v3, v4, v5, v6, v7, v71, v8, v9, v10, v11, v12, v13,
+      v14, v15, v100;
+  vector4double r10, r11, r12, r13, r14, r15, r100, r101, r102, r110, r111, ri1,
+      ri2;
+
+  s1 = vec_perm(*(im1[0]), *(im1[0]), perm1);
+  s2 = vec_perm(*(im1[0]), *(im1[0]), perm2);
+  s3 = vec_perm(*(im1[1]), *(im1[1]), perm1);
+  s4 = vec_perm(*(im1[1]), *(im1[1]), perm2);
+  s5 = vec_perm(*(im1[2]), *(im1[2]), perm1);
+  s6 = vec_perm(*(im1[2]), *(im1[2]), perm2);
+  v10 = vec_ld2a(0, &((*m).u[0]));
+  v11 = vec_ld2a(0, &((*m).u[2]));
+  v10 = vec_sldw(v10, v11, 2);
+  v11 = vec_ld2a(0, &((*m).u[4]));
+  v1 = vec_ld2a(0, &((*m).u[6]));
+  v2 = vec_ld2a(0, &((*m).u[8]));
+  v3 = vec_ld2a(0, &((*m).u[10]));
+  v2 = vec_sldw(v2, v3, 2);
+  v3 = vec_ld2a(0, &((*m).u[12]));
+  v4 = vec_ld2a(0, &((*m).u[14]));
+  v3 = vec_sldw(v3, v4, 2);
+  v4 = vec_ld2a(0, &((*m).u[16]));
+  v5 = vec_ld2a(0, &((*m).u[18]));
+  v4 = vec_sldw(v4, v5, 2);
+  v5 = vec_ld2a(0, &((*m).u[20]));
+  v6 = vec_ld2a(0, &((*m).u[22]));
+  v5 = vec_sldw(v5, v6, 2);
+  v6 = vec_ld2a(0, &((*m).u[24]));
+  v7 = vec_ld2a(0, &((*m).u[26]));
+  v71 = vec_ld2a(0, &((*m).u[28]));
+  v8 = vec_ld2a(0, &((*m).u[30]));
+  v9 = vec_ld2a(0, &((*m).u[32]));
+  v7 = vec_sldw(v7, v71, 2);
+  v8 = vec_sldw(v8, v9, 2);
+  v9 = vec_ld2a(0, &((*m).u[34]));
+
+  v100 = vec_perm(v10, v10, perm0011);
+  s10 = vec_sldw(s1, s2, 2);
+  s11 = vec_sldw(s2, s1, 2);
+  v12 = vec_perm(v2, v4, perm1);
+  v13 = vec_perm(v2, v4, perm2);
+  v14 = vec_perm(v3, v5, perm1);
+  v15 = vec_perm(v3, v5, perm2);
+
+  r10 = vec_xmul(v100, s10);
+  r11 = vec_xxnpmadd(s11, vec_mul(sign0, v1), vec_xmadd(v1, s11, r10));
+  r12 = vec_xxnpmadd(v12, s3, vec_xmadd(s3, v12, r11));
+  r13 = vec_xxnpmadd(v13, s4, vec_xmadd(s4, v13, r12));
+  r14 = vec_xxnpmadd(v14, s5, vec_xmadd(s5, v14, r13));
+  *(im2[0]) = vec_xxnpmadd(v15, s6, vec_xmadd(s6, v15, r14));
+
+  v100 = vec_perm(v10, v10, perm2233);
+  s10 = vec_sldw(s3, s4, 2);
+  s11 = vec_sldw(s4, s3, 2);
+  v12 = vec_perm(v7, v8, perm1);
+  v13 = vec_perm(v7, v8, perm2);
+  r10 = vec_xxcpnmadd(s1, v2, vec_xmul(v2, s1));
+  r11 = vec_xxcpnmadd(s2, v4, vec_xmadd(v4, s2, r10));
+  r12 = vec_xmadd(v100, s10, r11);
+  r13 = vec_xxnpmadd(s11, vec_mul(sign0, v6), vec_xmadd(v6, s11, r12));
+  r14 = vec_xxnpmadd(v12, s5, vec_xmadd(s5, v12, r13));
+  *(im2[1]) = vec_xxnpmadd(v13, s6, vec_xmadd(s6, v13, r14));
+
+  v100 = vec_perm(v11, v11, perm0011);
+  s10 = vec_sldw(s5, s6, 2);
+  s11 = vec_sldw(s6, s5, 2);
+  r10 = vec_xxcpnmadd(s1, v3, vec_xmul(v3, s1));
+  r11 = vec_xxcpnmadd(s2, v5, vec_xmadd(v5, s2, r10));
+  r12 = vec_xxcpnmadd(s3, v7, vec_xmadd(v7, s3, r11));
+  r13 = vec_xxcpnmadd(s4, v8, vec_xmadd(v8, s4, r12));
+  r14 = vec_xmadd(v100, s10, r13);
+  *(im2[2]) = vec_xxnpmadd(s11, vec_mul(sign0, v9), vec_xmadd(v9, s11, r14));
+}
+
+void mul_pauli_dble(double mu, pauli_dble *m, weyl_dble *s, weyl_dble *r)
+{
+  vector4double s1, s2, s3, s4, s5, s6, s10, s11;
+  vector4double v1, v2, v3, v4, v5, v6, v7, v71, v8, v9, v10, v11, v12, v13,
+      v14, v15, v100, v16, v17, v18;
+  vector4double r10, r11, r12, r13, r14, r15, r100, r101, r102, r110, r111;
+
+  s1 = vec_ld2a(0, &((*s).c1.c1.re));
+  s2 = vec_ld2a(0, &((*s).c1.c2.re));
+  s3 = vec_ld2a(0, &((*s).c1.c3.re));
+  s4 = vec_ld2a(0, &((*s).c2.c1.re));
+  s5 = vec_ld2a(0, &((*s).c2.c2.re));
+  s6 = vec_ld2a(0, &((*s).c2.c3.re));
+  v16 = vec_splats(mu);
+  v10 = vec_ld2a(0, &((*m).u[0]));
+  v11 = vec_ld2a(0, &((*m).u[2]));
+  v10 = vec_sldw(v10, v11, 2);
+  v11 = vec_ld2a(0, &((*m).u[4]));
+  v1 = vec_ld2a(0, &((*m).u[6]));
+  v2 = vec_ld2a(0, &((*m).u[8]));
+  v3 = vec_ld2a(0, &((*m).u[10]));
+  v2 = vec_sldw(v2, v3, 2);
+  v3 = vec_ld2a(0, &((*m).u[12]));
+  v4 = vec_ld2a(0, &((*m).u[14]));
+  v3 = vec_sldw(v3, v4, 2);
+  v4 = vec_ld2a(0, &((*m).u[16]));
+  v5 = vec_ld2a(0, &((*m).u[18]));
+  v4 = vec_sldw(v4, v5, 2);
+  v5 = vec_ld2a(0, &((*m).u[20]));
+  v6 = vec_ld2a(0, &((*m).u[22]));
+  v5 = vec_sldw(v5, v6, 2);
+  v6 = vec_ld2a(0, &((*m).u[24]));
+  v7 = vec_ld2a(0, &((*m).u[26]));
+  v71 = vec_ld2a(0, &((*m).u[28]));
+  v8 = vec_ld2a(0, &((*m).u[30]));
+  v9 = vec_ld2a(0, &((*m).u[32]));
+  v7 = vec_sldw(v7, v71, 2);
+  v8 = vec_sldw(v8, v9, 2);
+  v9 = vec_ld2a(0, &((*m).u[34]));
+
+  v100 = vec_perm(v10, v16, perml1);
+  v17 = vec_mul(sign0, vec_perm(v100, v1, perm1));
+  v18 = vec_perm(v1, v100, perm2);
+  v12 = vec_perm(v2, v4, perm1);
+  v13 = vec_perm(v2, v4, perm2);
+  v14 = vec_perm(v3, v5, perm1);
+  v15 = vec_perm(v3, v5, perm2);
+  r10 = vec_xxnpmadd(v17, s1, vec_xmul(s1, v17));
+  r11 = vec_xxnpmadd(v18, s2, vec_xmadd(s2, v18, r10));
+  r12 = vec_xxnpmadd(v12, s3, vec_xmadd(s3, v12, r11));
+  r13 = vec_xxnpmadd(v13, s4, vec_xmadd(s4, v13, r12));
+  r14 = vec_xxnpmadd(v14, s5, vec_xmadd(s5, v14, r13));
+  r15 = vec_xxnpmadd(v15, s6, vec_xmadd(s6, v15, r14));
+  vec_sta(r15, 0, &((*r).c1.c1.re));
+
+  v100 = vec_perm(v10, v16, perml2);
+  v17 = vec_mul(sign0, vec_perm(v100, v6, perm1));
+  v18 = vec_perm(v6, v100, perm2);
+  v12 = vec_perm(v7, v8, perm1);
+  v13 = vec_perm(v7, v8, perm2);
+  r10 = vec_xxcpnmadd(s1, v2, vec_xmul(v2, s1));
+  r11 = vec_xxcpnmadd(s2, v4, vec_xmadd(v4, s2, r10));
+  r12 = vec_xxnpmadd(v17, s3, vec_xmadd(s3, v17, r11));
+  r13 = vec_xxnpmadd(v18, s4, vec_xmadd(s4, v18, r12));
+  r14 = vec_xxnpmadd(v12, s5, vec_xmadd(s5, v12, r13));
+  r15 = vec_xxnpmadd(v13, s6, vec_xmadd(s6, v13, r14));
+  vec_sta(r15, 0, &((*r).c1.c3.re));
+
+  v100 = vec_perm(v11, v16, perml1);
+  v17 = vec_mul(sign0, vec_perm(v100, v9, perm1));
+  v18 = vec_perm(v9, v100, perm2);
+  r10 = vec_xxcpnmadd(s1, v3, vec_xmul(v3, s1));
+  r11 = vec_xxcpnmadd(s2, v5, vec_xmadd(v5, s2, r10));
+  r12 = vec_xxcpnmadd(s3, v7, vec_xmadd(v7, s3, r11));
+  r13 = vec_xxcpnmadd(s4, v8, vec_xmadd(v8, s4, r12));
+  r14 = vec_xxnpmadd(v17, s5, vec_xmadd(s5, v17, r13));
+  r15 = vec_xxnpmadd(v18, s6, vec_xmadd(s6, v18, r14));
+  vec_sta(r15, 0, &((*r).c2.c2.re));
+}
+
+static int fwd_house(double eps)
+{
+  int i, j, k, ifail;
+  double r1, r2, r3;
+  complex_dble z;
+
+  ifail = 0;
+
+  for (k = 0; k < 5; k++) {
+    r1 = aa[6 * k + k].re * aa[6 * k + k].re +
+         aa[6 * k + k].im * aa[6 * k + k].im;
+    r2 = sqrt(r1);
+
+    for (j = (k + 1); j < 6; j++)
+      r1 += (aa[6 * j + k].re * aa[6 * j + k].re +
+             aa[6 * j + k].im * aa[6 * j + k].im);
+
+    if (r1 >= eps)
+      r1 = sqrt(r1);
+    else {
+      ifail = 1;
+      r1 = 1.0;
+    }
+
+    if (r2 >= (DBL_EPSILON * r1)) {
+      r3 = 1.0 / r2;
+      z.re = r3 * aa[6 * k + k].re;
+      z.im = r3 * aa[6 * k + k].im;
+    } else {
+      z.re = 1.0;
+      z.im = 0.0;
+    }
+
+    aa[6 * k + k].re += r1 * z.re;
+    aa[6 * k + k].im += r1 * z.im;
+
+    r3 = 1.0 / (r1 * (r1 + r2));
+    rr[k] = r3;
+    dd[k].re = -(r1 + r2) * r3 * z.re;
+    dd[k].im = (r1 + r2) * r3 * z.im;
+
+    for (j = (k + 1); j < 6; j++) {
+      z.re = 0.0;
+      z.im = 0.0;
+
+      for (i = k; i < 6; i++) {
+        z.re += (aa[6 * i + k].re * aa[6 * i + j].re +
+                 aa[6 * i + k].im * aa[6 * i + j].im);
+        z.im += (aa[6 * i + k].re * aa[6 * i + j].im -
+                 aa[6 * i + k].im * aa[6 * i + j].re);
+      }
+
+      z.re *= r3;
+      z.im *= r3;
+
+      for (i = k; i < 6; i++) {
+        aa[6 * i + j].re -= (z.re * aa[6 * i + k].re - z.im * aa[6 * i + k].im);
+        aa[6 * i + j].im -= (z.re * aa[6 * i + k].im + z.im * aa[6 * i + k].re);
+      }
+    }
+  }
+
+  r1 = aa[35].re * aa[35].re + aa[35].im * aa[35].im;
+
+  if (r1 >= eps)
+    r1 = 1.0 / r1;
+  else {
+    ifail = 1;
+    r1 = 1.0;
+  }
+
+  dd[5].re = r1 * aa[35].re;
+  dd[5].im = -r1 * aa[35].im;
+
+  return ifail;
+}
+
+static void solv_sys(void)
+{
+  int i, j, k;
+  complex_dble z;
+
+  for (k = 5; k > 0; k--) {
+    for (i = (k - 1); i >= 0; i--) {
+      z.re = aa[6 * i + k].re * dd[k].re - aa[6 * i + k].im * dd[k].im;
+      z.im = aa[6 * i + k].re * dd[k].im + aa[6 * i + k].im * dd[k].re;
+
+      for (j = (k - 1); j > i; j--) {
+        z.re += (aa[6 * i + j].re * aa[6 * j + k].re -
+                 aa[6 * i + j].im * aa[6 * j + k].im);
+        z.im += (aa[6 * i + j].re * aa[6 * j + k].im +
+                 aa[6 * i + j].im * aa[6 * j + k].re);
+      }
+
+      aa[6 * i + k].re = -dd[i].re * z.re + dd[i].im * z.im;
+      aa[6 * i + k].im = -dd[i].re * z.im - dd[i].im * z.re;
+    }
+  }
+}
+
+static void bck_house(void)
+{
+  int i, j, k;
+  complex_dble z;
+
+  aa[35].re = dd[5].re;
+  aa[35].im = dd[5].im;
+
+  for (k = 4; k >= 0; k--) {
+    z.re = dd[k].re;
+    z.im = dd[k].im;
+    dd[k].re = aa[6 * k + k].re;
+    dd[k].im = aa[6 * k + k].im;
+    aa[6 * k + k].re = z.re;
+    aa[6 * k + k].im = z.im;
+
+    for (j = (k + 1); j < 6; j++) {
+      dd[j].re = aa[6 * j + k].re;
+      dd[j].im = aa[6 * j + k].im;
+      aa[6 * j + k].re = 0.0;
+      aa[6 * j + k].im = 0.0;
+    }
+
+    for (i = 0; i < 6; i++) {
+      z.re = 0.0;
+      z.im = 0.0;
+
+      for (j = k; j < 6; j++) {
+        z.re += (aa[6 * i + j].re * dd[j].re - aa[6 * i + j].im * dd[j].im);
+        z.im += (aa[6 * i + j].re * dd[j].im + aa[6 * i + j].im * dd[j].re);
+      }
+
+      z.re *= rr[k];
+      z.im *= rr[k];
+
+      for (j = k; j < 6; j++) {
+        aa[6 * i + j].re -= (z.re * dd[j].re + z.im * dd[j].im);
+        aa[6 * i + j].im += (z.re * dd[j].im - z.im * dd[j].re);
+      }
+    }
+  }
+}
+
 #else
 
 static weyl_dble rs;

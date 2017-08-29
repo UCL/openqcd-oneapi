@@ -356,11 +356,11 @@ static void read_dirs(void)
       cnfg_dir[0] = '\0';
   }
 
-  MPI_Bcast(nbase, NAME_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);
-  MPI_Bcast(log_dir, NAME_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);
-  MPI_Bcast(dat_dir, NAME_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);
-  MPI_Bcast(loc_dir, NAME_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);
-  MPI_Bcast(cnfg_dir, NAME_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);
+  mpc_bcast_c(nbase, NAME_SIZE);
+  mpc_bcast_c(log_dir, NAME_SIZE);
+  mpc_bcast_c(dat_dir, NAME_SIZE);
+  mpc_bcast_c(loc_dir, NAME_SIZE);
+  mpc_bcast_c(cnfg_dir, NAME_SIZE);
 }
 
 static void setup_files(void)
@@ -404,10 +404,10 @@ static void read_lat_parms(void)
     read_line("csw", "%lf", &csw);
   }
 
-  MPI_Bcast(&beta, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&c0, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&nk, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&csw, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  mpc_bcast_d(&beta, 1);
+  mpc_bcast_d(&c0, 1);
+  mpc_bcast_i(&nk, 1);
+  mpc_bcast_d(&csw, 1);
 
   if (nk > 0) {
     kappa = malloc(nk * sizeof(*kappa));
@@ -415,7 +415,7 @@ static void read_lat_parms(void)
           "Unable to allocate parameter array");
     if (my_rank == 0)
       read_dprms("kappa", nk, kappa);
-    MPI_Bcast(kappa, nk, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    mpc_bcast_d(kappa, nk);
   } else
     kappa = NULL;
 
@@ -466,13 +466,13 @@ static void read_bc_parms(void)
     }
   }
 
-  MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(phi, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(phi_prime, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&cG, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&cG_prime, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&cF, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&cF_prime, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  mpc_bcast_i(&bc, 1);
+  mpc_bcast_d(phi, 2);
+  mpc_bcast_d(phi_prime, 2);
+  mpc_bcast_d(&cG, 1);
+  mpc_bcast_d(&cG_prime, 1);
+  mpc_bcast_d(&cF, 1);
+  mpc_bcast_d(&cF_prime, 1);
 
   set_bc_parms(bc, cG, cG_prime, cF, cF_prime, phi, phi_prime);
 
@@ -521,11 +521,11 @@ static void read_schedule(void)
                "Improper value of nth,ntr,dtr_log,dtr_ms or dtr_cnfg");
   }
 
-  MPI_Bcast(&nth, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&ntr, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&dtr_log, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&dtr_ms, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&dtr_cnfg, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  mpc_bcast_i(&nth, 1);
+  mpc_bcast_i(&ntr, 1);
+  mpc_bcast_i(&dtr_log, 1);
+  mpc_bcast_i(&dtr_ms, 1);
+  mpc_bcast_i(&dtr_cnfg, 1);
 
   if (my_rank == 0) {
     if (append) {
@@ -572,10 +572,10 @@ static void read_actions(void)
     read_line("tau", "%lf", &tau);
   }
 
-  MPI_Bcast(&nact, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&npf, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&nlv, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&tau, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  mpc_bcast_i(&nact, 1);
+  mpc_bcast_i(&npf, 1);
+  mpc_bcast_i(&nlv, 1);
+  mpc_bcast_d(&tau, 1);
 
   if (nact > 0) {
     iact = malloc(nact * sizeof(*iact));
@@ -583,7 +583,7 @@ static void read_actions(void)
           "Unable to allocate temporary array");
     if (my_rank == 0)
       read_iprms("actions", nact, iact);
-    MPI_Bcast(iact, nact, MPI_INT, 0, MPI_COMM_WORLD);
+    mpc_bcast_i(iact, nact);
   } else
     iact = NULL;
 
@@ -613,7 +613,7 @@ static void read_actions(void)
         nmu = count_tokens("mu");
       }
 
-      MPI_Bcast(&nmu, 1, MPI_INT, 0, MPI_COMM_WORLD);
+      mpc_bcast_i(&nmu, 1);
     }
   }
 
@@ -627,7 +627,7 @@ static void read_actions(void)
       read_dprms("mu", nmu, mu);
     }
 
-    MPI_Bcast(mu, nmu, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    mpc_bcast_d(mu, nmu);
   } else
     mu = NULL;
 
@@ -699,7 +699,7 @@ static void read_sap_parms(void)
     read_line("bs", "%d %d %d %d", bs, bs + 1, bs + 2, bs + 3);
   }
 
-  MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);
+  mpc_bcast_i(bs, 4);
   set_sap_parms(bs, 1, 4, 5);
 
   if (append)
@@ -720,8 +720,8 @@ static void read_dfl_parms(void)
     read_line("Ns", "%d", &Ns);
   }
 
-  MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&Ns, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  mpc_bcast_i(bs, 4);
+  mpc_bcast_i(&Ns, 1);
   set_dfl_parms(bs, Ns);
 
   if (my_rank == 0) {
@@ -733,11 +733,11 @@ static void read_dfl_parms(void)
     read_line("ncy", "%d", &ncy);
   }
 
-  MPI_Bcast(&kappa, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&mu, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&ninv, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&nmr, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&ncy, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  mpc_bcast_d(&kappa, 1);
+  mpc_bcast_d(&mu, 1);
+  mpc_bcast_i(&ninv, 1);
+  mpc_bcast_i(&nmr, 1);
+  mpc_bcast_i(&ncy, 1);
   set_dfl_gen_parms(kappa, mu, ninv, nmr, ncy);
 
   if (my_rank == 0) {
@@ -747,9 +747,9 @@ static void read_dfl_parms(void)
     read_line("res", "%lf", &res);
   }
 
-  MPI_Bcast(&nkv, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&nmx, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&res, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  mpc_bcast_i(&nkv, 1);
+  mpc_bcast_i(&nmx, 1);
+  mpc_bcast_d(&res, 1);
   set_dfl_pro_parms(nkv, nmx, res);
 
   if (my_rank == 0) {
@@ -758,8 +758,8 @@ static void read_dfl_parms(void)
     read_line("nsm", "%d", &nsm);
   }
 
-  MPI_Bcast(&dtau, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&nsm, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  mpc_bcast_d(&dtau, 1);
+  mpc_bcast_i(&nsm, 1);
   set_dfl_upd_parms(dtau, nsm);
 
   if (append)
@@ -914,10 +914,10 @@ static void read_wflow_parms(void)
     }
   }
 
-  MPI_Bcast(&flint, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&eps, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&nstep, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&dnms, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  mpc_bcast_i(&flint, 1);
+  mpc_bcast_d(&eps, 1);
+  mpc_bcast_i(&nstep, 1);
+  mpc_bcast_i(&dnms, 1);
 
   file_head.dn = dnms;
   file_head.nn = nstep / dnms;
@@ -963,6 +963,38 @@ static void read_wflow_parms(void)
   }
 }
 
+static void read_ani_parms(void)
+{
+
+  int has_tts;
+  double nu, xi, cR, cT, us, ut, ust, utt;
+
+  if (my_rank == 0) {
+    find_section("Anisotropy parameters");
+    read_line("use_tts", "%d", &has_tts);
+    read_line("nu", "%lf", &nu);
+    read_line("xi", "%lf", &xi);
+    read_line("cR", "%lf", &cR);
+    read_line("cT", "%lf", &cT);
+    read_line("us", "%lf", &us);
+    read_line("ut", "%lf", &ut);
+    read_line("ust", "%lf", &ust);
+    read_line("utt", "%lf", &utt);
+  }
+
+  mpc_bcast_i(&has_tts, 1);
+  mpc_bcast_d(&nu, 1);
+  mpc_bcast_d(&xi, 1);
+  mpc_bcast_d(&cR, 1);
+  mpc_bcast_d(&cT, 1);
+  mpc_bcast_d(&us, 1);
+  mpc_bcast_d(&ut, 1);
+  mpc_bcast_d(&ust, 1);
+  mpc_bcast_d(&utt, 1);
+
+  set_ani_parms(has_tts, nu, xi, cR, cT, us, ut, ust, utt);
+}
+
 static void read_infile(int argc, char *argv[])
 {
   int ifile;
@@ -1003,15 +1035,15 @@ static void read_infile(int argc, char *argv[])
                "Unable to open input file");
   }
 
-  MPI_Bcast(&noloc, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&noexp, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&rmold, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&noms, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&scnfg, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&append, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&norng, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&endian, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(cnfg, NAME_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);
+  mpc_bcast_i(&noloc, 1);
+  mpc_bcast_i(&noexp, 1);
+  mpc_bcast_i(&rmold, 1);
+  mpc_bcast_i(&noms, 1);
+  mpc_bcast_i(&scnfg, 1);
+  mpc_bcast_i(&append, 1);
+  mpc_bcast_i(&norng, 1);
+  mpc_bcast_i(&endian, 1);
+  mpc_bcast_c(cnfg, NAME_SIZE);
 
   if (my_rank == 0) {
     find_section("Random number generator");
@@ -1019,8 +1051,8 @@ static void read_infile(int argc, char *argv[])
     read_line("seed", "%d", &seed);
   }
 
-  MPI_Bcast(&level, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&seed, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  mpc_bcast_i(&level, 1);
+  mpc_bcast_i(&seed, 1);
 
   read_dirs();
   setup_files();
@@ -1035,6 +1067,7 @@ static void read_infile(int argc, char *argv[])
                "Unable to open parameter file");
   }
 
+  read_ani_parms();
   read_lat_parms();
   read_bc_parms();
   read_schedule();
@@ -1233,8 +1266,8 @@ static void check_files(int *nl, int *icnfg)
     }
   }
 
-  MPI_Bcast(nl, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(icnfg, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  mpc_bcast_i(nl, 1);
+  mpc_bcast_i(icnfg, 1);
 }
 
 static void init_ud(void)
@@ -1384,6 +1417,7 @@ static void print_info(int icnfg)
 
     if (append == 0) {
       print_lat_parms();
+      print_ani_parms();
       print_bc_parms();
     }
 
@@ -1565,7 +1599,7 @@ static void check_endflag(int *iend)
       (*iend) = 0;
   }
 
-  MPI_Bcast(iend, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  mpc_bcast_i(iend, 1);
 }
 
 static void remove_cnfg(int icnfg)
@@ -1655,8 +1689,7 @@ int main(int argc, char *argv[])
 
       w0[1] = plaq_wsum_dble(0) / npl;
 
-      MPI_Reduce(w0, w1, 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-      MPI_Bcast(w1, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      mpc_gsum_d(w0, w1, 2);
 
       ndat.nt = nl + n + 1;
       ndat.iac = iac;
@@ -1707,8 +1740,15 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
+    fprintf(flog, "Memory footprint at program end:\n");
+    fprintf(flog, "   Current memory usage per proc: %8.3f MB\n",
+            amem_use_mb());
+    fprintf(flog, "   Maximal memory usage per proc: %8.3f MB\n",
+            amem_max_mb());
+
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

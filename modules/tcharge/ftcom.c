@@ -51,7 +51,6 @@
 #include "global.h"
 
 static const int plns[6][2] = {{0, 1}, {0, 2}, {0, 3}, {2, 3}, {3, 1}, {1, 2}};
-static const u3_alg_dble ft0 = {0.0};
 static u3_alg_dble *ftbuf;
 static ftidx_t *idx = NULL;
 

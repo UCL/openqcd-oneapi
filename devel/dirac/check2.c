@@ -1,16 +1,15 @@
-
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2005, 2011-2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Action of Dw() on plane waves.
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2005, 2011-2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Action of Dw() on plane waves.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -139,6 +138,11 @@ int main(int argc, char *argv[])
   phi_prime[0] = 0.0;
   phi_prime[1] = 0.0;
   set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime);
+  set_ani_parms(1.0, 2.0);
+
+  ani_params_t ani = ani_parms();
+  double gamma_f = (ani.xi / ani.nu);
+  double one_over_gammaf = (ani.nu / ani.xi);
   print_bc_parms();
 
   start_ranlux(0, 12345);
@@ -281,6 +285,13 @@ int main(int argc, char *argv[])
               _vector_add_assign(s2.c2, s4.c2);
               _vector_add_assign(s2.c3, s4.c3);
               _vector_add_assign(s2.c4, s4.c4);
+
+              if (nu > 0) {
+                _vector_mul(s2.c1, one_over_gammaf, s2.c1);
+                _vector_mul(s2.c2, one_over_gammaf, s2.c2);
+                _vector_mul(s2.c3, one_over_gammaf, s2.c3);
+                _vector_mul(s2.c4, one_over_gammaf, s2.c4);
+              }
             }
 
             if (((cpr[0] == 0) && (x0 == 0) && (bc != 3)) ||

@@ -415,6 +415,38 @@ static void read_lat_parms(void)
     write_lat_parms(fdat);
 }
 
+static void read_ani_parms(void)
+{
+
+  int has_tts;
+  double nu, xi, cR, cT, us, ut, ust, utt;
+
+  if (my_rank == 0) {
+    find_section("Anisotropy parameters");
+    read_line("use_tts", "%d", &has_tts);
+    read_line("nu", "%lf", &nu);
+    read_line("xi", "%lf", &xi);
+    read_line("cR", "%lf", &cR);
+    read_line("cT", "%lf", &cT);
+    read_line("us", "%lf", &us);
+    read_line("ut", "%lf", &ut);
+    read_line("ust", "%lf", &ust);
+    read_line("utt", "%lf", &utt);
+  }
+
+  mpc_bcast_i(&has_tts, 1);
+  mpc_bcast_d(&nu, 1);
+  mpc_bcast_d(&xi, 1);
+  mpc_bcast_d(&cR, 1);
+  mpc_bcast_d(&cT, 1);
+  mpc_bcast_d(&us, 1);
+  mpc_bcast_d(&ut, 1);
+  mpc_bcast_d(&ust, 1);
+  mpc_bcast_d(&utt, 1);
+
+  set_ani_parms(has_tts, nu, xi, cR, cT, us, ut, ust, utt);
+}
+
 static void read_bc_parms(void)
 {
   int bc;
@@ -786,6 +818,7 @@ static void read_infile(int argc, char *argv[])
   read_schedule();
   read_integrator();
   read_wflow_parms();
+  read_ani_parms();
 
   if (my_rank == 0) {
     fclose(fin);

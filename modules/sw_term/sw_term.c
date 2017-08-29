@@ -145,11 +145,52 @@ static void u3_alg2pauli3(pauli_dble *m)
   (*m).u[35] = -X.c8;
 }
 
+static void u3_alg_mul_const_sub(double cl, u3_alg_dble const *l, double cr,
+                                 u3_alg_dble const *r, u3_alg_dble *result)
+{
+  result->c1 = (cl * l->c1) - (cr * r->c1);
+  result->c2 = (cl * l->c2) - (cr * r->c2);
+  result->c3 = (cl * l->c3) - (cr * r->c3);
+  result->c4 = (cl * l->c4) - (cr * r->c4);
+  result->c5 = (cl * l->c5) - (cr * r->c5);
+  result->c6 = (cl * l->c6) - (cr * r->c6);
+  result->c7 = (cl * l->c7) - (cr * r->c7);
+  result->c8 = (cl * l->c8) - (cr * r->c8);
+  result->c9 = (cl * l->c9) - (cr * r->c9);
+}
+
+static void u3_alg_mul_const_add(double cl, u3_alg_dble const *l, double cr,
+                                 u3_alg_dble const *r, u3_alg_dble *result)
+{
+  result->c1 = (cl * l->c1) + (cr * r->c1);
+  result->c2 = (cl * l->c2) + (cr * r->c2);
+  result->c3 = (cl * l->c3) + (cr * r->c3);
+  result->c4 = (cl * l->c4) + (cr * r->c4);
+  result->c5 = (cl * l->c5) + (cr * r->c5);
+  result->c6 = (cl * l->c6) + (cr * r->c6);
+  result->c7 = (cl * l->c7) + (cr * r->c7);
+  result->c8 = (cl * l->c8) + (cr * r->c8);
+  result->c9 = (cl * l->c9) + (cr * r->c9);
+}
+
 static void set_swd(int vol, int ofs, u3_alg_dble **ft, pauli_dble *sw)
 {
   int bc, ix, t;
   double c, *u;
+  double ct, cs;
   u3_alg_dble *ft0, *ft1, *ft2, *ft3, *ft4, *ft5;
+  ani_params_t ani;
+
+  ani = ani_parms();
+
+  ct = c2;
+  cs = c2;
+
+  if (ani.has_ani) {
+    ct *= ani.cT / (ani.us_tilde * ani.us_tilde * ani.ut_tilde * ani.ut_tilde);
+    cs *= ani.cR /
+          (ani.xi * ani.us_tilde * ani.us_tilde * ani.us_tilde * ani.ut_tilde);
+  }
 
   bc = bc_type();
   vol += ofs;
@@ -169,19 +210,20 @@ static void set_swd(int vol, int ofs, u3_alg_dble **ft, pauli_dble *sw)
       sw[1] = sw0;
       sw += 2;
     } else {
-      if ((t == 1) && (bc != 3))
+      if ((t == 1) && (bc != 3)) {
         c = c3[0];
-      else if (((t == (N0 - 2)) && (bc == 0)) ||
-               ((t == (N0 - 1)) && ((bc == 1) || (bc == 2))))
+      } else if (((t == (N0 - 2)) && (bc == 0)) ||
+                 ((t == (N0 - 1)) && ((bc == 1) || (bc == 2)))) {
         c = c3[1];
-      else
+      } else {
         c = c1;
+      }
 
-      _u3_alg_mul_sub(X, c2, *ft3, *ft0);
+      u3_alg_mul_const_sub(cs, ft3, ct, ft0, &X);
       u3_alg2pauli1(sw);
-      _u3_alg_mul_sub(X, c2, *ft4, *ft1);
+      u3_alg_mul_const_sub(cs, ft4, ct, ft1, &X);
       u3_alg2pauli2(sw);
-      _u3_alg_mul_sub(X, c2, *ft5, *ft2);
+      u3_alg_mul_const_sub(cs, ft5, ct, ft2, &X);
       u3_alg2pauli3(sw);
 
       u = (*sw).u;
@@ -193,11 +235,11 @@ static void set_swd(int vol, int ofs, u3_alg_dble **ft, pauli_dble *sw)
       u[5] += c;
       sw += 1;
 
-      _u3_alg_mul_add(X, c2, *ft3, *ft0);
+      u3_alg_mul_const_add(cs, ft3, ct, ft0, &X);
       u3_alg2pauli1(sw);
-      _u3_alg_mul_add(X, c2, *ft4, *ft1);
+      u3_alg_mul_const_add(cs, ft4, ct, ft1, &X);
       u3_alg2pauli2(sw);
-      _u3_alg_mul_add(X, c2, *ft5, *ft2);
+      u3_alg_mul_const_add(cs, ft5, ct, ft2, &X);
       u3_alg2pauli3(sw);
 
       u = (*sw).u;
@@ -244,6 +286,7 @@ int sw_term(ptset_t set)
   pauli_dble *sw;
   u3_alg_dble **ft;
   sw_parms_t swp;
+  ani_params_t ani;
 
   if (NPROC > 1) {
     iprms[0] = (int)(set);
@@ -254,7 +297,9 @@ int sw_term(ptset_t set)
   }
 
   swp = sw_parms();
-  c1 = 4.0 + swp.m0;
+  ani = ani_parms();
+
+  c1 = 1.0 + 3.0 * ani.nu / ani.xi + swp.m0;
   c2 = -0.5 * swp.csw;
   c3[0] = c1 + swp.cF[0] - 1.0;
   c3[1] = c1 + swp.cF[1] - 1.0;

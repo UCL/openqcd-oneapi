@@ -1,16 +1,15 @@
-
 /*******************************************************************************
-*
-* File time3.c
-*
-* Copyright (C) 2011-2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Timing of Dw_blk() and Dwhat_blk().
-*
-*******************************************************************************/
+ *
+ * File time3.c
+ *
+ * Copyright (C) 2011-2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of Dw_blk() and Dwhat_blk().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -113,6 +112,7 @@ int main(int argc, char *argv[])
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
   set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime);
+  set_ani_parms(1.2, 1.1);
   print_bc_parms();
 
   start_ranlux(0, 12345);

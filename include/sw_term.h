@@ -40,6 +40,8 @@ extern int apply_swinv_dble(int vol, double mu, pauli_dble *m, spinor_dble *s,
 /* SWFLDS_C */
 extern pauli *swfld(void);
 extern pauli_dble *swdfld(void);
+extern void free_sw(void);
+extern void free_swd(void);
 extern void assign_swd2sw(void);
 
 /* SW_TERM_C */

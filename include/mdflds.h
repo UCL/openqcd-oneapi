@@ -27,6 +27,7 @@ typedef struct
 /* FCOM_C */
 extern void copy_bnd_frc(void);
 extern void add_bnd_frc(void);
+extern void free_fcom_bufs(void);
 
 /* MDFLDS_C */
 extern mdflds_t *mdflds(void);

@@ -169,12 +169,14 @@ static bc_parms_t bc = {
     0, {1.0, 1.0}, {1.0, 1.0}, {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}}};
 static sw_parms_t sw = {DBL_MAX, 1.0, {1.0, 1.0}};
 static tm_parms_t tm = {0};
+static ani_params_t ani = {0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 lat_parms_t set_lat_parms(double beta, double c0, int nk, double *kappa,
                           double csw)
 {
   int iprms[1], ik, ie;
   double dprms[3], *k;
+  ani_params_t ani;
 
   error(flg_lat != 0, 1, "set_lat_parms [lat_parms.c]",
         "Attempt to reset the lattice parameters");
@@ -236,9 +238,14 @@ lat_parms_t set_lat_parms(double beta, double c0, int nk, double *kappa,
   lat.c1 = 0.125 * (1.0 - c0);
   lat.csw = csw;
 
+  ani = ani_parms();
+
+  error(ani.xi == 0.0, 1, "set_lat_parms [lat_parms.c]",
+        "Anisotropic parameters not set");
+
   for (ik = 0; ik < nk; ik++) {
     if (lat.kappa[ik] != 0.0)
-      lat.m0[ik] = 1.0 / (2.0 * lat.kappa[ik]) - 4.0;
+      lat.m0[ik] = 1.0 / (2.0 * lat.kappa[ik]) - 1.0 - 3.0 * ani.nu / ani.xi;
     else
       lat.m0[ik] = DBL_MAX;
   }
@@ -672,3 +679,81 @@ tm_parms_t set_tm_parms(int eoflg)
 }
 
 tm_parms_t tm_parms(void) { return tm; }
+
+ani_params_t set_ani_parms(int use_tts, double nu, double xi, double cR,
+                           double cT, double us, double ut, double us_tilde,
+                           double ut_tilde)
+{
+  int iprms[2];
+  double dprms[8];
+
+  if ((nu == 1.0) && (xi == 1.0) && (cR == 1.0) && (cT == 1.0) && (us == 1.0) &&
+      (ut == 1.0) && (us_tilde == 1.0) && (ut_tilde == 1.0)) {
+    iprms[0] = 0;
+  } else {
+    iprms[0] = 1;
+  }
+
+  if (use_tts) {
+    iprms[1] = 1;
+  } else {
+    iprms[1] = 0;
+  }
+
+  dprms[0] = nu;
+  dprms[1] = xi;
+  dprms[2] = cR;
+  dprms[3] = cT;
+  dprms[4] = us;
+  dprms[5] = ut;
+  dprms[6] = us_tilde;
+  dprms[7] = ut_tilde;
+
+  if (NPROC > 1) {
+    MPI_Bcast(iprms, 2, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(dprms, 8, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  }
+
+  ani.has_ani = iprms[0];
+  ani.has_tts = iprms[1];
+  ani.nu = dprms[0];
+  ani.xi = dprms[1];
+  ani.cR = dprms[2];
+  ani.cT = dprms[3];
+  ani.us = dprms[4];
+  ani.ut = dprms[5];
+  ani.us_tilde = dprms[6];
+  ani.ut_tilde = dprms[7];
+
+  return ani;
+}
+
+ani_params_t ani_parms(void) { return ani; }
+
+void print_ani_parms(void)
+{
+  int my_rank, n;
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+
+  if (my_rank == 0) {
+    printf("Anisotropy parameters:\n");
+    printf("use tts = %s\n", ani.has_tts ? "true" : "false");
+    n = fdigits(ani.nu);
+    printf("nu = %.*f\n", IMAX(n, 1), ani.nu);
+    n = fdigits(ani.xi);
+    printf("xi = %.*f\n", IMAX(n, 1), ani.xi);
+    n = fdigits(ani.cR);
+    printf("cR = %.*f\n", IMAX(n, 1), ani.cR);
+    n = fdigits(ani.cT);
+    printf("cT = %.*f\n", IMAX(n, 1), ani.cT);
+    n = fdigits(ani.ut);
+    printf("ut = %.*f\n", IMAX(n, 1), ani.ut);
+    n = fdigits(ani.us);
+    printf("us = %.*f\n", IMAX(n, 1), ani.us);
+    n = fdigits(ani.us_tilde);
+    printf("us_tilde = %.*f\n", IMAX(n, 1), ani.us_tilde);
+    n = fdigits(ani.ut_tilde);
+    printf("ut_tilde = %.*f\n", IMAX(n, 1), ani.ut_tilde);
+  }
+}

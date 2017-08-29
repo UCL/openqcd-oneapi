@@ -195,8 +195,11 @@ void plaq_frc(void)
 {
   int bc, n, ix, t, ip[4];
   double r;
+  double gamma_g, one_over_gamma_g;
+  double ut2, us2, us4;
   su3_alg_dble *fdb;
   mdflds_t *mdfs;
+  ani_params_t ani;
 
   if (query_flags(UDBUF_UP2DATE) != 1)
     copy_bnd_ud();
@@ -207,10 +210,20 @@ void plaq_frc(void)
   fdb = (*mdfs).frc;
   set_frc2zero();
 
+  ani = ani_parms();
+  gamma_g = ani.xi;
+  one_over_gamma_g = 1.0 / gamma_g;
+
+  ut2 = 1.0 / (ani.ut * ani.ut);
+  us2 = 1.0 / (ani.us * ani.us);
+  us4 = us2 * 1.0 / (ani.us * ani.us);
+
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
 
     if ((t < (N0 - 1)) || (bc != 0)) {
+      r = 1.0 * gamma_g * ut2 * us2;
+
       for (n = 0; n < 3; n++) {
         plaq_uidx(n, ix, ip);
 
@@ -219,27 +232,27 @@ void plaq_frc(void)
 
         if ((t < (N0 - 1)) || (bc == 3)) {
           prod2su3alg(wd, wd + 1, &X);
-          _su3_alg_add_assign(*(fdb + ip[1]), X);
+          _su3_alg_mul_add_assign(*(fdb + ip[1]), r, X);
         }
 
         prod2su3alg(wd + 1, wd, &X);
-        _su3_alg_sub_assign(*(fdb + ip[3]), X);
+        _su3_alg_mul_sub_assign(*(fdb + ip[3]), r, X);
 
         su3xsu3dag(wd, udb + ip[2], wd + 1);
         prod2su3alg(udb + ip[0], wd + 1, &X);
-        _su3_alg_add_assign(*(fdb + ip[0]), X);
+        _su3_alg_mul_add_assign(*(fdb + ip[0]), r, X);
 
         if ((t > 0) || (bc != 1)) {
-          _su3_alg_sub_assign(*(fdb + ip[2]), X);
+          _su3_alg_mul_sub_assign(*(fdb + ip[2]), r, X);
         }
       }
     }
 
     if ((t > 0) || (bc != 1)) {
-      r = 1.0;
+      r = 1.0 * one_over_gamma_g * us4;
 
       if (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0)))
-        r = 0.5;
+        r = 0.5 * one_over_gamma_g * us4;
 
       for (n = 3; n < 6; n++) {
         plaq_uidx(n, ix, ip);
@@ -267,10 +280,15 @@ void force0(double c)
   int bc, n, ix, t, ip[4];
   double c0, c1, *cG;
   double r0, r1;
+  double gamma_g, one_over_gamma_g;
+  double aniso_plaq_weight = 1.0;
+  double ut2, us2, us4, us6;
+
   su3_alg_dble *fdb;
   mdflds_t *mdfs;
   lat_parms_t lat;
   bc_parms_t bcp;
+  ani_params_t ani;
 
   lat = lat_parms();
   c *= (lat.beta / 6.0);
@@ -281,6 +299,14 @@ void force0(double c)
   bc = bcp.type;
   cG = bcp.cG;
 
+  ani = ani_parms();
+  gamma_g = ani.xi;
+  one_over_gamma_g = 1.0 / gamma_g;
+  ut2 = 1.0 / (ani.ut * ani.ut);
+  us2 = 1.0 / (ani.us * ani.us);
+  us4 = us2 * 1.0 / (ani.us * ani.us);
+  us6 = us4 * 1.0 / (ani.us * ani.us);
+
   if (query_flags(UDBUF_UP2DATE) != 1)
     copy_bnd_ud();
 
@@ -289,14 +315,23 @@ void force0(double c)
   fdb = (*mdfs).frc;
   set_frc2zero();
 
-  if (c0 == 1.0)
+  /* No rectangulars */
+  if (c0 == 1.0) {
     hdb = NULL;
-  else {
+
+    /* has rectangular */
+  } else {
+
+    if (!ani.has_tts) {
+      aniso_plaq_weight = (1.0 - 4 * c1) / c0;
+    }
+
     if (init == 0)
       set_ofs();
 
     if (query_flags(BSTAP_UP2DATE) != 1)
       set_bstap();
+
     hdb = bstap();
   }
 
@@ -304,8 +339,8 @@ void force0(double c)
     t = global_time(ix);
 
     if ((t < (N0 - 1)) || (bc != 0)) {
-      r0 = c * c0;
-      r1 = c * c1;
+      r0 = c * c0 * gamma_g * aniso_plaq_weight * ut2 * us2;
+      r1 = c * c1 * gamma_g * ut2 * us4;
 
       if ((t == 0) && (bc == 1))
         r0 *= cG[0];
@@ -381,34 +416,41 @@ void force0(double c)
           prod2su3alg(wd + 1, wd, &X);
           _su3_alg_mul_sub_assign(*(fdb + ip[3]), r1, X);
 
-          if ((t < (N0 - 2)) || ((t == (N0 - 2)) && (bc != 0)) || (bc == 3)) {
-            su3xsu3dag(udb + ip[3], vd + 1, wd + 1);
-            su3xsu3dag(wd + 1, udb + ip[0], wd + 2);
-            prod2su3alg(udb + ip[2], wd + 2, &X);
-            _su3_alg_mul_sub_assign(*(fdb + ip[0]), r1, X);
+          /* These are the forces for the tts extended plaquettes
+           * Logic: vd+n extended in directions (-nu, mu, -mu, nu)
+           *        since t is always a mu direction, we want to disable
+           *        every term that is vd+1 and vd+2 */
+          if (ani.has_tts) {
+            if ((t < (N0 - 2)) || ((t == (N0 - 2)) && (bc != 0)) || (bc == 3)) {
+              su3xsu3dag(udb + ip[3], vd + 1, wd + 1);
+              su3xsu3dag(wd + 1, udb + ip[0], wd + 2);
+              prod2su3alg(udb + ip[2], wd + 2, &X);
+              _su3_alg_mul_sub_assign(*(fdb + ip[0]), r1, X);
 
-            if ((t > 0) || (bc != 1)) {
-              _su3_alg_mul_add_assign(*(fdb + ip[2]), r1, X);
+              if ((t > 0) || (bc != 1)) {
+                _su3_alg_mul_add_assign(*(fdb + ip[2]), r1, X);
+              }
+
+              prod2su3alg(wd + 2, udb + ip[2], &X);
+              _su3_alg_mul_add_assign(*(fdb + ip[3]), r1, X);
             }
 
-            prod2su3alg(wd + 2, udb + ip[2], &X);
-            _su3_alg_mul_add_assign(*(fdb + ip[3]), r1, X);
-          }
+            if ((t > 0) || (bc == 3)) {
+              su3xsu3dag(wd, vd + 2, wd + 1);
+              prod2su3alg(udb + ip[0], wd + 1, &X);
+              _su3_alg_mul_add_assign(*(fdb + ip[0]), r1, X);
 
-          if ((t > 0) || (bc == 3)) {
-            su3xsu3dag(wd, vd + 2, wd + 1);
-            prod2su3alg(udb + ip[0], wd + 1, &X);
-            _su3_alg_mul_add_assign(*(fdb + ip[0]), r1, X);
+              if ((t < (N0 - 1)) || (bc == 3)) {
+                prod2su3alg(wd + 1, udb + ip[0], &X);
+                _su3_alg_mul_add_assign(*(fdb + ip[1]), r1, X);
+              }
 
-            if ((t < (N0 - 1)) || (bc == 3)) {
-              prod2su3alg(wd + 1, udb + ip[0], &X);
-              _su3_alg_mul_add_assign(*(fdb + ip[1]), r1, X);
+              su3dagxsu3(vd + 2, udb + ip[0], wd + 1);
+              prod2su3alg(wd + 1, wd, &X);
+              _su3_alg_mul_sub_assign(*(fdb + ip[3]), r1, X);
             }
-
-            su3dagxsu3(vd + 2, udb + ip[0], wd + 1);
-            prod2su3alg(wd + 1, wd, &X);
-            _su3_alg_mul_sub_assign(*(fdb + ip[3]), r1, X);
           }
+          /* End of TTS */
 
           su3xsu3dag(udb + ip[1], vd + 3, wd);
           su3xsu3dag(wd, udb + ip[2], wd + 1);
@@ -428,8 +470,8 @@ void force0(double c)
     }
 
     if ((t > 0) || (bc != 1)) {
-      r0 = c * c0;
-      r1 = c * c1;
+      r0 = c * c0 * one_over_gamma_g * us4;
+      r1 = c * c1 * one_over_gamma_g * us6;
 
       if ((t == 0) && (bc != 3)) {
         r0 *= (0.5 * cG[0]);
@@ -553,8 +595,14 @@ double action0(int icom)
   int bc, n, ix, t;
   double c0, c1, *cG;
   double r0, r1, trU[4], act;
+  double gamma_g, one_over_gamma_g;
+  double aniso_plaq_weight = 1.0;
+  double tts_weight = 1.0;
+  double ut2, us2, us4, us6;
+
   lat_parms_t lat;
   bc_parms_t bcp;
+  ani_params_t ani;
 
   lat = lat_parms();
   c0 = lat.c0;
@@ -564,13 +612,35 @@ double action0(int icom)
   bc = bcp.type;
   cG = bcp.cG;
 
+  ani = ani_parms();
+  gamma_g = ani.xi;
+  one_over_gamma_g = 1.0 / gamma_g;
+  ut2 = 1.0 / (ani.ut * ani.ut);
+  us2 = 1.0 / (ani.us * ani.us);
+  us4 = us2 * 1.0 / (ani.us * ani.us);
+  us6 = us4 * 1.0 / (ani.us * ani.us);
+
+  if (!ani.has_tts) {
+    tts_weight = 0.0;
+  }
+
   if (query_flags(UDBUF_UP2DATE) != 1)
     copy_bnd_ud();
+
   udb = udfld();
 
-  if (c0 == 1.0)
+  /* No rectangulars */
+  if (c0 == 1.0) {
     hdb = NULL;
-  else {
+
+    /* has rectangular */
+  } else {
+    /* If no TTS rectangles are computed, the plaquette must be weighted by a
+     * factor of (1 - 4*c1) / c0 if we want to retrieve the continuum limit */
+    if (!ani.has_tts) {
+      aniso_plaq_weight = (1.0 - 4 * c1) / c0;
+    }
+
     if (init == 0)
       set_ofs();
 
@@ -589,16 +659,22 @@ double action0(int icom)
     act = 0.0;
 
     if ((t < (N0 - 1)) || (bc != 0)) {
-      r0 = c0;
+      r0 = c0 * aniso_plaq_weight;
 
       if ((t == 0) && (bc == 1))
         r0 *= cG[0];
       else if ((t == (N0 - 1)) && (bc != 3))
         r0 *= cG[1];
 
+      /* Store plaquette in trU[0], and mununu in trU[1] and mumunu in trU[2]
+       * Thus for the three first plaquette directions the TTS plaquettes are
+       * stored in trU[2], which will be multiplied with tts_weight, which is
+       * zero if has_tts == 0 */
       for (n = 0; n < 3; n++) {
         wloops(n, ix, t, c0, trU);
-        act += (r0 * trU[0] + c1 * (trU[1] + trU[2] + 0.5 * trU[3]));
+        act += gamma_g * ut2 *
+               (us2 * r0 * trU[0] + us4 * c1 * (trU[1] + 0.5 * trU[3]) +
+                ut2 * us2 * c1 * tts_weight * trU[2]);
       }
     }
 
@@ -616,7 +692,8 @@ double action0(int icom)
 
       for (n = 3; n < 6; n++) {
         wloops(n, ix, t, c0, trU);
-        act += (r0 * trU[0] + r1 * (trU[1] + trU[2]));
+        act += one_over_gamma_g *
+               (us4 * r0 * trU[0] + us6 * r1 * (trU[1] + trU[2]));
       }
     }
 
@@ -638,8 +715,9 @@ double action0(int icom)
   if (icom == 1) {
     MPI_Reduce(smx, &act, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Bcast(&act, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  } else
+  } else {
     act = smx[0];
+  }
 
   return (lat.beta / 3.0) * act;
 }
