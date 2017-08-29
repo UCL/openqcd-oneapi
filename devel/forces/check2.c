@@ -367,6 +367,7 @@ int main(int argc, char *argv[])
   phi_prime[1] = 0.078;
   set_bc_parms(bc, 0.9012, 1.2034, 1.0, 1.0, phi, phi_prime);
   print_bc_parms();
+  set_ani_parms(1.1, 1.1);
 
   start_ranlux(0, 123);
   geometry();

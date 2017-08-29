@@ -136,11 +136,13 @@ static double sdet(void)
   complex_dble z;
   pauli_dble *m;
   sw_parms_t swp;
+  ani_params_t ani;
 
   swp = sw_parms();
+  ani = ani_parms();
 
-  if ((4.0 + swp.m0) > 1.0)
-    c = pow(4.0 + swp.m0, -6.0);
+  if ((1.0 + 3.0 * ani.nu / ani.xi + swp.m0) > 1.0)
+    c = pow(1.0 + 3.0 * ani.nu / ani.xi + swp.m0, -6.0);
   else
     c = 1.0;
 

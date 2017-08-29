@@ -182,6 +182,8 @@ int main(int argc, char *argv[])
     fflush(flog);
   }
 
+  set_ani_parms(1.0, 2.0);
+
   start_ranlux(0, 123456);
 
   for (iv = 0; iv < 3; iv++) {

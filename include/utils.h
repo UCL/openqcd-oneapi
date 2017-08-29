@@ -72,6 +72,8 @@ extern int copy_file(char *in, char *out);
 extern int safe_mod(int x, int y);
 extern void *amalloc(size_t size, int p);
 extern void afree(void *addr);
+extern double amem_use_mb(void);
+extern double amem_max_mb(void);
 extern int mpi_permanent_tag(void);
 extern int mpi_tag(void);
 extern void error(int test, int no, char *name, char *format, ...);
@@ -79,6 +81,11 @@ extern void error_root(int test, int no, char *name, char *format, ...);
 extern int error_loc(int test, int no, char *name, char *message);
 extern void error_chk(void);
 extern void message(char *format, ...);
+extern void mpc_bcast_c(char *buf, int num);
+extern void mpc_bcast_d(double *buf, int num);
+extern void mpc_bcast_i(int *buf, int num);
+extern void mpc_gsum_d(double *src, double *dst, int num);
+extern void mpc_print_info(void);
 
 /* WSPACE_C */
 extern void alloc_wud(int n);

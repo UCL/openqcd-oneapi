@@ -69,6 +69,8 @@ LOGOPTION =
 
 # search path for modules
 
+MPI_HOME = /usr
+
 MDIR = ../../modules
 
 VPATH = .:$(MDIR)/flags:$(MDIR)/lattice:$(MDIR)/linalg:$(MDIR)/linsolv:\
@@ -92,9 +94,8 @@ LIBPATH = $(MPI_HOME)/lib
 
 # scheduling and optimization options
 
-CFLAGS = -std=c89 -pedantic -fstrict-aliasing \
-         -Wall -Wno-long-long -Wstrict-prototypes -Werror \
-         -O -mno-avx -Dx64 -DPM
+
+CFLAGS = -std=c89 -O0 
 
 
 ############################## do not change ###################################

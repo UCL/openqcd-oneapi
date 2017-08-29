@@ -596,8 +596,7 @@ complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
     v.re = x;
     v.im = -y;
 
-    MPI_Reduce(&v.re, &w.re, 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&w.re, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    mpc_gsum_d(&v.re, &w.re, 2);
 
     z.re = (float)(w.re);
     z.im = (float)(w.im);
@@ -677,8 +676,7 @@ float spinor_prod_re(int vol, int icom, spinor *s, spinor *r)
                        : "xmm12");
 
   if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&x, &y, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&y, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    mpc_gsum_d(&x, &y, 1);
     return (float)(y);
   } else
     return (float)(x);
@@ -744,8 +742,7 @@ float norm_square(int vol, int icom, spinor *s)
                        : "xmm12");
 
   if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&x, &y, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&y, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    mpc_gsum_d(&x, &y, 1);
     return (float)(y);
   } else
     return (float)(x);
@@ -911,6 +908,303 @@ void mulmg5(int vol, spinor *s)
   }
 }
 
+#elif (defined QPX)
+
+#include "qpx.h"
+
+complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
+{
+  double x, y;
+  complex z;
+  complex_dble v, w;
+  spinor *sm;
+  vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
+  vector4double res11, res12, res13;
+
+  x = 0.0;
+  y = 0.0;
+  res11 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  res12 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  res13 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    _qpx_load_w1(v1, s);
+    _qpx_load_w1(v3, r);
+    _qpx_vec_prod(v1, v3, res1);
+    _qpx_load_w2(v2, s);
+    _qpx_load_w2(v4, r);
+    _qpx_vec_prod(v2, v4, res1);
+
+    r += 1;
+  }
+
+  res11 = vec_add(res13, vec_add(res11, res12));
+  x = (double)(res11[0] + res11[2]);
+  y = (double)(res11[1] + res11[3]);
+
+  if ((icom != 1) || (NPROC == 1)) {
+    z.re = (float)(x);
+    z.im = (float)(y);
+  } else {
+    v.re = x;
+    v.im = y;
+
+    mpc_gsum_d(&v.re, &w.re, 2);
+
+    z.re = (float)(w.re);
+    z.im = (float)(w.im);
+  }
+
+  return z;
+}
+
+float spinor_prod_re(int vol, int icom, spinor *s, spinor *r)
+{
+  double x, y;
+  spinor *sm;
+  double __attribute((aligned(32))) res[4];
+  vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
+  vector4double res11, res12, res13;
+
+  x = 0.0;
+  res11 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  res12 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  res13 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    _qpx_load_w1(v1, s);
+    _qpx_load_w1(v3, r);
+    res11 = vec_madd(v11, v31, res11);
+    res12 = vec_madd(v12, v32, res12);
+    res13 = vec_madd(v13, v33, res13);
+    _qpx_load_w2(v2, s);
+    _qpx_load_w2(v4, r);
+    res11 = vec_madd(v21, v41, res11);
+    res12 = vec_madd(v22, v42, res12);
+    res13 = vec_madd(v23, v43, res13);
+
+    r += 1;
+  }
+
+  res11 = vec_add(res13, vec_add(res11, res12));
+  x = (res11[0] + res11[1] + res11[2] + res11[3]);
+
+  if ((icom != 1) || (NPROC == 1))
+    return (float)(x);
+  else {
+    mpc_gsum_d(&x, &y, 1);
+    return (float)(y);
+  }
+}
+
+float norm_square(int vol, int icom, spinor *s)
+{
+  double x, y;
+  spinor *sm;
+  vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
+  vector4double res11, res12, res13;
+
+  res11 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  res12 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  res13 = (vector4double){0.0, 0.0, 0.0, 0.0};
+
+  x = 0.0;
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    _qpx_load_w1(v1, s);
+    res11 = vec_madd(v11, v11, res11);
+    res12 = vec_madd(v12, v12, res12);
+    res13 = vec_madd(v13, v13, res13);
+    _qpx_load_w2(v2, s);
+    res11 = vec_madd(v21, v21, res11);
+    res12 = vec_madd(v22, v22, res12);
+    res13 = vec_madd(v23, v23, res13);
+  }
+
+  res11 = vec_add(res13, vec_add(res11, res12));
+  x = (double)(res11[0] + res11[1] + res11[2] + res11[3]);
+
+  if ((icom != 1) || (NPROC == 1))
+    return (float)(x);
+  else {
+    mpc_gsum_d(&x, &y, 1);
+    return (float)(y);
+  }
+}
+
+void mulc_spinor_add(int vol, spinor *s, spinor *r, complex z)
+{
+  spinor *sm;
+  vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
+  vector4double z11, z12;
+
+  sm = s + vol;
+  z11 = vec_splats(z.re);
+  z12 = vec_splats(z.im);
+
+  for (; s < sm; s++) {
+    _qpx_load_w1(v1, s);
+    _qpx_load_w2(v2, s);
+    _qpx_load_w1(v3, r);
+    _qpx_load_w2(v4, r);
+    v11 = vec_xxnpmadd(v31, z12, vec_madd(v31, z11, v11));
+    v12 = vec_xxnpmadd(v32, z12, vec_madd(v32, z11, v12));
+    v13 = vec_xxnpmadd(v33, z12, vec_madd(v33, z11, v13));
+    v21 = vec_xxnpmadd(v41, z12, vec_madd(v41, z11, v21));
+    v22 = vec_xxnpmadd(v42, z12, vec_madd(v42, z11, v22));
+    v23 = vec_xxnpmadd(v43, z12, vec_madd(v43, z11, v23));
+
+    _qpx_store_w1(v1, s);
+    _qpx_store_w2(v2, s);
+    r += 1;
+  }
+}
+
+void mulr_spinor_add(int vol, spinor *s, spinor *r, float c)
+{
+  spinor *sm;
+  vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
+  vector4double z11;
+
+  sm = s + vol;
+  z11 = vec_splats(c);
+
+  for (; s < sm; s++) {
+    _qpx_load_w1(v1, s);
+    _qpx_load_w2(v2, s);
+    _qpx_load_w1(v3, r);
+    _qpx_load_w2(v4, r);
+
+    v11 = vec_madd(v31, z11, v11);
+    v12 = vec_madd(v32, z11, v12);
+    v13 = vec_madd(v33, z11, v13);
+    v21 = vec_madd(v41, z11, v21);
+    v22 = vec_madd(v42, z11, v22);
+    v23 = vec_madd(v43, z11, v23);
+
+    _qpx_store_w1(v1, s);
+    _qpx_store_w2(v2, s);
+
+    r += 1;
+  }
+}
+
+void scale(int vol, float c, spinor *s)
+{
+  spinor *sm;
+  vector4double v11, v12, v13, v21, v22, v23;
+  vector4double z11;
+
+  sm = s + vol;
+  z11 = vec_splats(c);
+  for (; s < sm; s++) {
+    _qpx_load_w1(v1, s);
+    _qpx_load_w2(v2, s);
+
+    v11 = vec_mul(v11, z11);
+    v12 = vec_mul(v12, z11);
+    v13 = vec_mul(v13, z11);
+    v21 = vec_mul(v21, z11);
+    v22 = vec_mul(v22, z11);
+    v23 = vec_mul(v23, z11);
+
+    _qpx_store_w1(v1, s);
+    _qpx_store_w2(v2, s);
+  }
+}
+
+void rotate(int vol, int n, spinor **ppk, complex *v)
+{
+  int k, j, ix;
+  complex *z;
+  spinor *pk, *pj;
+  vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
+  vector4double z11, z12;
+
+  if ((n > nrot) && (ifail == 0))
+    alloc_wrotate(n);
+
+  if ((n > 0) && (ifail == 0)) {
+    for (ix = 0; ix < vol; ix++) {
+      for (k = 0; k < n; k++) {
+        pk = psi + k;
+        pj = ppk[0] + ix;
+        z = v + k;
+        z11 = vec_splats((*z).re);
+        z12 = vec_splats((*z).im);
+        _qpx_load_w1(v3, pj);
+        _qpx_load_w2(v4, pj);
+        v11 = vec_xxnpmadd(v31, z12, vec_mul(v31, z11));
+        v12 = vec_xxnpmadd(v32, z12, vec_mul(v32, z11));
+        v13 = vec_xxnpmadd(v33, z12, vec_mul(v33, z11));
+        v21 = vec_xxnpmadd(v41, z12, vec_mul(v41, z11));
+        v22 = vec_xxnpmadd(v42, z12, vec_mul(v42, z11));
+        v23 = vec_xxnpmadd(v43, z12, vec_mul(v43, z11));
+
+        for (j = 1; j < n; j++) {
+          pj = ppk[j] + ix;
+          z += n;
+          z11 = vec_splats((*z).re);
+          z12 = vec_splats((*z).im);
+          _qpx_load_w1(v3, pj);
+          _qpx_load_w2(v4, pj);
+
+          v11 = vec_xxnpmadd(v31, z12, vec_madd(v31, z11, v11));
+          v12 = vec_xxnpmadd(v32, z12, vec_madd(v32, z11, v12));
+          v13 = vec_xxnpmadd(v33, z12, vec_madd(v33, z11, v13));
+          v21 = vec_xxnpmadd(v41, z12, vec_madd(v41, z11, v21));
+          v22 = vec_xxnpmadd(v42, z12, vec_madd(v42, z11, v22));
+          v23 = vec_xxnpmadd(v43, z12, vec_madd(v43, z11, v23));
+        }
+        _qpx_store_w1(v1, pk);
+        _qpx_store_w2(v2, pk);
+      }
+
+      for (k = 0; k < n; k++)
+        ppk[k][ix] = psi[k];
+    }
+  }
+}
+
+void mulg5(int vol, spinor *s)
+{
+  spinor *sm;
+  vector4double v11, v12, v13;
+
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    _qpx_load_w2(v1, s);
+
+    v11 = vec_neg(v11);
+    v12 = vec_neg(v12);
+    v13 = vec_neg(v13);
+
+    _qpx_store_w2(v1, s);
+  }
+}
+
+void mulmg5(int vol, spinor *s)
+{
+  spinor *sm;
+  vector4double v11, v12, v13;
+
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    _qpx_load_w1(v1, s);
+
+    v11 = vec_neg(v11);
+    v12 = vec_neg(v12);
+    v13 = vec_neg(v13);
+
+    _qpx_store_w1(v1, s);
+  }
+}
+
 #else
 
 complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
@@ -945,8 +1239,7 @@ complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
     v.re = x;
     v.im = y;
 
-    MPI_Reduce(&v.re, &w.re, 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&w.re, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    mpc_gsum_d(&v.re, &w.re, 2);
 
     z.re = (float)(w.re);
     z.im = (float)(w.im);
@@ -975,8 +1268,7 @@ float spinor_prod_re(int vol, int icom, spinor *s, spinor *r)
   if ((icom != 1) || (NPROC == 1))
     return (float)(x);
   else {
-    MPI_Reduce(&x, &y, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&y, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    mpc_gsum_d(&x, &y, 1);
     return (float)(y);
   }
 }
@@ -999,8 +1291,7 @@ float norm_square(int vol, int icom, spinor *s)
   if ((icom != 1) || (NPROC == 1))
     return (float)(x);
   else {
-    MPI_Reduce(&x, &y, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&y, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    mpc_gsum_d(&x, &y, 1);
     return (float)(y);
   }
 }

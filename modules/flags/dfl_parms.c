@@ -167,7 +167,7 @@ dfl_parms_t set_dfl_parms(int *bs, int Ns)
     iprms[3] = bs[3];
     iprms[4] = Ns;
 
-    MPI_Bcast(iprms, 5, MPI_INT, 0, MPI_COMM_WORLD);
+    mpc_bcast_i(iprms, 5);
 
     error((iprms[0] != bs[0]) || (iprms[1] != bs[1]) || (iprms[2] != bs[2]) ||
               (iprms[3] != bs[3]) || (iprms[4] != Ns),
@@ -206,8 +206,8 @@ dfl_pro_parms_t set_dfl_pro_parms(int nkv, int nmx, double res)
 
     dprms[0] = res;
 
-    MPI_Bcast(iprms, 2, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast(dprms, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    mpc_bcast_i(iprms, 2);
+    mpc_bcast_d(dprms, 1);
 
     error((iprms[0] != nkv) || (iprms[1] != nmx) || (dprms[0] != res), 1,
           "set_dfl_pro_parms [dfl_parms.c]", "Parameters are not global");
@@ -230,6 +230,7 @@ dfl_gen_parms_t set_dfl_gen_parms(double kappa, double mu, int ninv, int nmr,
 {
   int iprms[3];
   double dprms[2];
+  ani_params_t ani;
 
   if (NPROC > 1) {
     iprms[0] = ninv;
@@ -239,8 +240,8 @@ dfl_gen_parms_t set_dfl_gen_parms(double kappa, double mu, int ninv, int nmr,
     dprms[0] = kappa;
     dprms[1] = mu;
 
-    MPI_Bcast(iprms, 3, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast(dprms, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    mpc_bcast_i(iprms, 3);
+    mpc_bcast_d(dprms, 2);
 
     error((iprms[0] != ninv) || (iprms[1] != nmr) || (iprms[2] != ncy) ||
               (dprms[0] != kappa) || (dprms[1] != mu),
@@ -257,8 +258,13 @@ dfl_gen_parms_t set_dfl_gen_parms(double kappa, double mu, int ninv, int nmr,
   dfl_gen.kappa = kappa;
   dfl_gen.mu = mu;
 
+  ani = ani_parms();
+
+  error(ani.xi == 0.0, 1, "set_dfl_gen_parms [dfl_parms.c]",
+        "Anisotropic parameters not set");
+
   if (kappa != 0.0)
-    dfl_gen.m0 = 1.0 / (2.0 * kappa) - 4.0;
+    dfl_gen.m0 = 1.0 / (2.0 * kappa) - 1.0 - 3.0 * ani.nu / ani.xi;
   else
     dfl_gen.m0 = DBL_MAX;
 
@@ -276,8 +282,8 @@ dfl_upd_parms_t set_dfl_upd_parms(double dtau, int nsm)
     iprms[0] = nsm;
     dprms[0] = dtau;
 
-    MPI_Bcast(iprms, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast(dprms, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    mpc_bcast_i(iprms, 1);
+    mpc_bcast_d(dprms, 1);
 
     error((iprms[0] != nsm) || (dprms[0] != dtau), 1,
           "set_dfl_upd_parms [dfl_parms.c]", "Parameters are not global");

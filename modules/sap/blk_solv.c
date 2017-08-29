@@ -626,6 +626,155 @@ void blk_eo_mres(int n, float mu, int nmr)
   }
 }
 
+#elif (defined QPX)
+
+#include "qpx.h"
+
+static vector4double res11, res12, res13, res21, res22, res23;
+
+static qpx_scalar_prods(float *r, complex *z)
+{
+  spinor *s1, *s2, *sm;
+  float __attribute((aligned(16))) r1[4];
+  float __attribute((aligned(16))) z1[4];
+  vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
+  res11 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  res12 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  res13 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  res21 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  res22 = (vector4double){0.0, 0.0, 0.0, 0.0};
+  res23 = (vector4double){0.0, 0.0, 0.0, 0.0};
+
+  s1 = s[1];
+  s2 = s[2];
+  sm = s1 + vol;
+
+  for (; s1 < sm; s1++) {
+    _qpx_load_w1(v1, s1);
+    _qpx_load_w1(v3, s2);
+    _qpx_load_w2(v2, s1);
+    _qpx_load_w2(v4, s2);
+
+    res11 = vec_madd(v31, v31, res11);
+    res12 = vec_madd(v32, v32, res12);
+    res13 = vec_madd(v33, v33, res13);
+    res11 = vec_madd(v41, v41, res11);
+    res12 = vec_madd(v42, v42, res12);
+    res13 = vec_madd(v43, v43, res13);
+
+    _qpx_vec_prod(v3, v1, res2);
+    _qpx_vec_prod(v4, v2, res2);
+
+    s2 += 1;
+  }
+
+  res11 = vec_add(res13, vec_add(res11, res12));
+  res21 = vec_add(res23, vec_add(res21, res22));
+  (*r) = res11[0] + res11[1] + res11[2] + res11[3];
+  (*z).re = res21[0] + res21[2];
+  (*z).im = res21[1] + res21[3];
+}
+
+static qpx_linear_cmbs(float *r, complex *z)
+{
+
+  spinor *s0, *s1, *s2, *sm;
+  vector4double v1, z11, z12, zn11, zn12;
+  vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
+
+  s0 = s[0];
+  s1 = s[1];
+  s2 = s[2];
+  sm = s0 + vol;
+  v1 = vec_splats(1 / (*r));
+  z11 = vec_mul(v1, vec_splats((*z).re));
+  z12 = vec_mul(v1, vec_splats((*z).im));
+  /* It is not faster to keep z in res21, from linear_prods.*/
+  /* This way code is maybe more readable. */
+  /* res21=vec_mul(v1,res21); */
+  /* z11=vec_splats(res21[0]+res21[2]); */
+  /* z12=vec_splats(res21[1]+res21[3]); */
+  zn11 = vec_neg(z11);
+  zn12 = vec_neg(z12);
+  for (; s0 < sm; s0++) {
+    _qpx_load_w1(v1, s0);
+    _qpx_load_w2(v2, s0);
+    _qpx_load_w1(v3, s1);
+    _qpx_load_w2(v4, s1);
+    v11 = vec_xxnpmadd(v31, z12, vec_madd(v31, z11, v11));
+    v12 = vec_xxnpmadd(v32, z12, vec_madd(v32, z11, v12));
+    v13 = vec_xxnpmadd(v33, z12, vec_madd(v33, z11, v13));
+    v21 = vec_xxnpmadd(v41, z12, vec_madd(v41, z11, v21));
+    v22 = vec_xxnpmadd(v42, z12, vec_madd(v42, z11, v22));
+    v23 = vec_xxnpmadd(v43, z12, vec_madd(v43, z11, v23));
+
+    _qpx_store_w1(v1, s0);
+    _qpx_store_w2(v2, s0);
+    _qpx_load_w1(v1, s2);
+    _qpx_load_w2(v2, s2);
+    v31 = vec_xxnpmadd(v11, zn12, vec_madd(v11, zn11, v31));
+    v32 = vec_xxnpmadd(v12, zn12, vec_madd(v12, zn11, v32));
+    v33 = vec_xxnpmadd(v13, zn12, vec_madd(v13, zn11, v33));
+    v41 = vec_xxnpmadd(v21, zn12, vec_madd(v21, zn11, v41));
+    v42 = vec_xxnpmadd(v22, zn12, vec_madd(v22, zn11, v42));
+    v43 = vec_xxnpmadd(v23, zn12, vec_madd(v23, zn11, v43));
+
+    _qpx_store_w1(v3, s1);
+    _qpx_store_w2(v4, s1);
+
+    s1 += 1;
+    s2 += 1;
+  }
+}
+
+void blk_mres(int n, float mu, int nmr)
+{
+  int nb, isw, imr;
+  float r;
+  complex z;
+  spinor *sm;
+  block_t *b;
+  vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
+
+  b = blk_list(SAP_BLOCKS, &nb, &isw);
+  vol = (*b).vol;
+  s = (*b).s;
+
+  set_s2zero(vol, s[0]);
+
+  for (imr = 0; imr < nmr; imr++) {
+    Dw_blk(SAP_BLOCKS, n, mu, 1, 2);
+    qpx_scalar_prods(&r, &z);
+
+    if (r < (2.0f * FLT_MIN))
+      return;
+    qpx_linear_cmbs(&r, &z);
+  }
+}
+
+void blk_eo_mres(int n, float mu, int nmr)
+{
+  int nb, isw, imr;
+  float r;
+  complex z;
+  block_t *b;
+
+  b = blk_list(SAP_BLOCKS, &nb, &isw);
+  vol = (*b).vol / 2;
+  s = (*b).s;
+
+  set_s2zero(vol, s[0]);
+
+  for (imr = 0; imr < nmr; imr++) {
+    Dwhat_blk(SAP_BLOCKS, n, mu, 1, 2);
+    qpx_scalar_prods(&r, &z);
+
+    if (r < (2.0f * FLT_MIN))
+      return;
+    qpx_linear_cmbs(&r, &z);
+  }
+}
+
 #else
 
 void blk_mres(int n, float mu, int nmr)

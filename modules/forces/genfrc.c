@@ -76,6 +76,15 @@ void sw_frc(double c)
   mdflds_t *mdfs;
   sw_parms_t swp;
 
+  ani_params_t ani;
+  double ct, cs, c_ani;
+
+  ani = ani_parms();
+
+  ct = ani.cT / (ani.us_tilde * ani.us_tilde * ani.ut_tilde * ani.ut_tilde);
+  cs = ani.cR / ani.xi * 1.0 /
+       (ani.us_tilde * ani.us_tilde * ani.us_tilde * ani.ut_tilde);
+
   bc = bc_type();
   swp = sw_parms();
   c *= 0.0625 * swp.csw;
@@ -92,6 +101,12 @@ void sw_frc(double c)
   for (n = 0; n < 6; n++) {
     Xb = xt[n];
     copy_bnd_ft(n, Xb);
+
+    if (n < 3) {
+      c_ani = c * ct;
+    } else {
+      c_ani = c * cs;
+    }
 
     for (ix = 0; ix < VOLUME; ix++) {
       t = global_time(ix);
@@ -134,27 +149,27 @@ void sw_frc(double c)
       _su3_alg_add_assign(Y[1], Y[2]);
 
       fr = fb + ipu[0];
-      _su3_alg_mul_add_assign(*fr, c, Y[0]);
+      _su3_alg_mul_add_assign(*fr, c_ani, Y[0]);
 
       if ((n >= 3) || (bc == 0) || (bc == 3)) {
         fr = fb + ipu[1];
-        _su3_alg_mul_add_assign(*fr, c, Y[6]);
+        _su3_alg_mul_add_assign(*fr, c_ani, Y[6]);
         fr = fb + ipu[2];
-        _su3_alg_mul_sub_assign(*fr, c, Y[1]);
+        _su3_alg_mul_sub_assign(*fr, c_ani, Y[1]);
       } else {
         if (t < (N0 - 1)) {
           fr = fb + ipu[1];
-          _su3_alg_mul_add_assign(*fr, c, Y[6]);
+          _su3_alg_mul_add_assign(*fr, c_ani, Y[6]);
         }
 
         if ((t > 0) || (bc == 2)) {
           fr = fb + ipu[2];
-          _su3_alg_mul_sub_assign(*fr, c, Y[1]);
+          _su3_alg_mul_sub_assign(*fr, c_ani, Y[1]);
         }
       }
 
       fr = fb + ipu[3];
-      _su3_alg_mul_sub_assign(*fr, c, Y[3]);
+      _su3_alg_mul_sub_assign(*fr, c_ani, Y[3]);
     }
   }
 
@@ -175,6 +190,8 @@ void hop_frc(double c)
   um = u + 4 * VOLUME;
   c *= -0.5;
 
+  apply_ani_ud();
+
   for (; u < um; u++) {
     prod2su3alg(u, xv, Y);
     _su3_alg_mul_add_assign(*fr, c, *Y);
@@ -182,4 +199,6 @@ void hop_frc(double c)
     xv += 1;
     fr += 1;
   }
+
+  remove_ani_ud();
 }

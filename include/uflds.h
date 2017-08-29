@@ -32,7 +32,13 @@ extern int shift_ud(int *s);
 /* UFLDS_C */
 extern su3 *ufld(void);
 extern su3_dble *udfld(void);
+extern void apply_ani_ud(void);
+extern void apply_ani_u(void);
+extern void remove_ani_ud(void);
+extern void remove_ani_u(void);
+extern void random_u(void);
 extern void random_ud(void);
+extern void renormalize_u(void);
 extern void renormalize_ud(void);
 extern void assign_ud2u(void);
 

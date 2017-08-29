@@ -115,6 +115,8 @@ typedef union
 } spin_t;
 
 static double coe, ceo;
+static double gamma_f, one_over_gammaf;
+static double one_over_ut_tilde;
 static const spinor_dble sd0 = {{{0.0}}};
 static spin_t rs ALIGNED32;
 
@@ -182,6 +184,14 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _avx_weyl_load_dble(rs.w[1]);
   _avx_vector_sub_dble();
   _avx_weyl_store_dble(rs.w[1]);
+
+  _load_cst(gamma_f);
+  _avx_weyl_load_dble(rs.w[0]);
+  _avx_weyl_load_up_dble(rs.w[1]);
+  _mul_cst();
+  _mul_cst_up();
+  _avx_weyl_store_dble(rs.w[0]);
+  _avx_weyl_store_up_dble(rs.w[1]);
 
   /******************************* direction +1
    * *********************************/
@@ -303,6 +313,14 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _mul_cst();
   _avx_pair_store_dble(rs.s.c3, rs.s.c4);
 
+  _load_cst(one_over_gammaf);
+  _avx_pair_load_dble(rs.s.c1, rs.s.c2);
+  _avx_pair_load_up_dble(rs.s.c3, rs.s.c4);
+  _mul_cst();
+  _mul_cst_up();
+  _avx_pair_store_dble(rs.s.c1, rs.s.c2);
+  _avx_pair_store_up_dble(rs.s.c3, rs.s.c4);
+
   _avx_zeroupper();
 }
 
@@ -359,6 +377,14 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
 
   /******************************* direction +1
    * *********************************/
+
+  _load_cst(one_over_gammaf);
+  _avx_weyl_load_dble(rs.w[0]);
+  _avx_weyl_load_up_dble(rs.w[1]);
+  _mul_cst();
+  _mul_cst_up();
+  _avx_weyl_store_dble(rs.w[0]);
+  _avx_weyl_store_up_dble(rs.w[1]);
 
   _avx_weyl_load_dble(rs.w[0]);
   _avx_weyl_load_up_dble(rs.w[1]);
@@ -574,6 +600,20 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _sse_vector_sub_dble();
   _sse_store_dble(rs.s.c4);
 
+  _load_cst(gamma_f);
+  _sse_load_dble(rs.s.c1);
+  _sse_load_up_dble(rs.s.c3);
+  _mul_cst();
+  _mul_cst_up();
+  _sse_store_dble(rs.s.c1);
+  _sse_store_up_dble(rs.s.c3);
+  _sse_load_dble(rs.s.c2);
+  _sse_load_up_dble(rs.s.c4);
+  _mul_cst();
+  _mul_cst_up();
+  _sse_store_dble(rs.s.c2);
+  _sse_store_up_dble(rs.s.c4);
+
   /******************************* direction +1
    * *********************************/
 
@@ -812,6 +852,23 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _sse_vector_sub_dble();
   _mul_cst();
   _sse_store_dble(rs.s.c4);
+
+  /*
+   * New ani
+   */
+  _load_cst(one_over_gammaf);
+  _sse_load_dble(rs.s.c1);
+  _sse_load_up_dble(rs.s.c3);
+  _mul_cst();
+  _mul_cst_up();
+  _sse_store_dble(rs.s.c1);
+  _sse_store_up_dble(rs.s.c3);
+  _sse_load_dble(rs.s.c2);
+  _sse_load_up_dble(rs.s.c4);
+  _mul_cst();
+  _mul_cst_up();
+  _sse_store_dble(rs.s.c2);
+  _sse_store_up_dble(rs.s.c4);
 }
 
 static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
@@ -900,6 +957,23 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
 
   /******************************* direction +1
    * *********************************/
+
+  /*
+   * New ani
+   */
+  _load_cst(one_over_gammaf);
+  _sse_load_dble(rs.s.c1);
+  _sse_load_up_dble(rs.s.c3);
+  _mul_cst();
+  _mul_cst_up();
+  _sse_store_dble(rs.s.c1);
+  _sse_store_up_dble(rs.s.c3);
+  _sse_load_dble(rs.s.c2);
+  _sse_load_up_dble(rs.s.c4);
+  _mul_cst();
+  _mul_cst_up();
+  _sse_store_dble(rs.s.c2);
+  _sse_store_up_dble(rs.s.c4);
 
   _sse_load_dble(rs.s.c1);
   _sse_load_up_dble(rs.s.c4);
@@ -1109,6 +1183,322 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
   _sse_store_dble((*sm).c4);
 }
 
+#elif (defined QPX)
+#include "qpx.h"
+
+static vector4double dim11, dim12, dim13, dim21, dim22, dim23;
+static vector4double v11, v12, v13, v21, v22, v23;
+static vector4double *im1[3] = {&dim11, &dim12, &dim13};
+static vector4double *im2[3] = {&dim21, &dim22, &dim23};
+
+static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
+{
+  spinor_dble *sp, *sm;
+  su3_vector_dble psi, chi;
+  vector4double psi11, psi12, chi11, chi12, psi13, chi13, psi21, psi22, psi23,
+      chi21, chi22, chi23, vcoe, vmul;
+  int myrank;
+
+  /******************************* direction +0
+   * *********************************/
+
+  sp = pk + (*(piup++));
+  _qpx_load_w1(psi1, sp);
+  _qpx_load_w2(psi2, sp);
+  sm = pk + (*(pidn++));
+  _qpx_prefetch_spinor_dp(sm);
+  _qpx_vec_add(psi1, psi1, psi2);
+  _qpx_su3_mul(dim1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  dim21 = dim11;
+  dim22 = dim12;
+  dim23 = dim13;
+
+  /******************************* direction -0
+   * *********************************/
+
+  _qpx_load_w1(psi1, sm);
+  _qpx_load_w2(psi2, sm);
+  sp = pk + (*(piup++));
+  _qpx_prefetch_spinor_dp(sp);
+  _qpx_vec_sub(psi1, psi1, psi2);
+  _qpx_su3_inv_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_vec_add_assign(dim1, chi1);
+  _qpx_vec_sub_assign(dim2, chi1);
+
+  vmul = vec_splats(gamma_f);
+  dim11 = vec_mul(vmul, dim11);
+  dim12 = vec_mul(vmul, dim12);
+  dim13 = vec_mul(vmul, dim13);
+  dim21 = vec_mul(vmul, dim21);
+  dim22 = vec_mul(vmul, dim22);
+  dim23 = vec_mul(vmul, dim23);
+
+  /******************************* direction +1
+   * *********************************/
+
+  _qpx_load_w1(psi1, sp);
+  _qpx_load_w2(psi2, sp);
+  sm = pk + (*(pidn++));
+  _qpx_prefetch_spinor_dp(sm);
+  _qpx_vec_x(chi1, psi2);
+  _qpx_vec_i_add(psi1, psi1, chi1);
+  _qpx_su3_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_vec_add_assign(dim1, chi1);
+  _qpx_vec_x(chi2, chi1);
+  _qpx_vec_i_sub(dim2, dim2, chi2);
+
+  /******************************* direction -1
+   * *********************************/
+
+  _qpx_load_w1(psi1, sm);
+  _qpx_load_w2(psi2, sm);
+  sp = pk + (*(piup++));
+  _qpx_prefetch_spinor_dp(sp);
+  _qpx_vec_x(chi1, psi2);
+  _qpx_vec_i_sub(psi1, psi1, chi1);
+  _qpx_su3_inv_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_vec_add_assign(dim1, chi1);
+  _qpx_vec_x(chi2, chi1);
+  _qpx_vec_i_add(dim2, dim2, chi2);
+
+  /******************************* direction +2
+   * *********************************/
+
+  _qpx_load_w1(psi1, sp);
+  _qpx_load_w2(psi2, sp);
+  sm = pk + (*(pidn++));
+  _qpx_prefetch_spinor_dp(sm);
+  _qpx_vec_x(chi1, psi2);
+  _qpx_vec_add_n(psi1, psi1, chi1);
+  _qpx_su3_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_vec_add_assign(dim1, chi1);
+  _qpx_vec_x(chi2, chi1);
+  _qpx_vec_sub_n(dim2, dim2, chi2);
+
+  /******************************* direction -2
+   * *********************************/
+
+  _qpx_load_w1(psi1, sm);
+  _qpx_load_w2(psi2, sm);
+  sp = pk + (*(piup));
+  _qpx_prefetch_spinor_dp(sp);
+  _qpx_vec_x(chi1, psi2);
+  _qpx_vec_sub_n(psi1, psi1, chi1);
+  _qpx_su3_inv_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_vec_add_assign(dim1, chi1);
+  _qpx_vec_x(chi2, chi1);
+  _qpx_vec_add_n(dim2, dim2, chi2);
+
+  /******************************* direction +3
+   * *********************************/
+
+  _qpx_load_w1(psi1, sp);
+  _qpx_load_w2(psi2, sp);
+  sm = pk + (*(pidn));
+  _qpx_prefetch_spinor_dp(sm);
+  _qpx_vec_i_add_n(psi1, psi1, psi2);
+  _qpx_su3_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_vec_add(dim1, dim1, chi1);
+  _qpx_vec_i_sub_n(dim2, dim2, chi1);
+
+  /******************************* direction -3
+   * *********************************/
+
+  _qpx_load_w1(psi1, sm);
+  _qpx_load_w2(psi2, sm);
+  _qpx_vec_i_sub_n(psi1, psi1, psi2);
+  _qpx_su3_inv_mul(chi1, *u, psi1);
+  _qpx_vec_add(dim1, dim1, chi1);
+  _qpx_vec_i_add_n(dim2, dim2, chi1);
+
+  vcoe = vec_splats(coe);
+  dim11 = vec_mul(vcoe, dim11);
+  dim12 = vec_mul(vcoe, dim12);
+  dim13 = vec_mul(vcoe, dim13);
+  dim21 = vec_mul(vcoe, dim21);
+  dim22 = vec_mul(vcoe, dim22);
+  dim23 = vec_mul(vcoe, dim23);
+
+  vmul = vec_splats(one_over_gammaf);
+  dim11 = vec_mul(vmul, dim11);
+  dim12 = vec_mul(vmul, dim12);
+  dim13 = vec_mul(vmul, dim13);
+  dim21 = vec_mul(vmul, dim21);
+  dim22 = vec_mul(vmul, dim22);
+  dim23 = vec_mul(vmul, dim23);
+}
+
+static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
+{
+  spinor_dble *sp, *sm;
+  su3_vector_dble psi, chi;
+  vector4double psi11, psi12, chi11, chi12, psi13, chi13, chi21, chi22, chi23,
+      vceo, vmul;
+
+  vceo = vec_splats(ceo);
+  dim11 = vec_mul(vceo, dim11);
+  dim12 = vec_mul(vceo, dim12);
+  dim13 = vec_mul(vceo, dim13);
+  dim21 = vec_mul(vceo, dim21);
+  dim22 = vec_mul(vceo, dim22);
+  dim23 = vec_mul(vceo, dim23);
+
+  /******************************* direction +0
+   * *********************************/
+
+  sp = pl + (*(piup++));
+  _qpx_vec_sub(psi1, dim1, dim2);
+  sm = pl + (*(pidn++));
+  _qpx_prefetch_spinor_dp(sm);
+  _qpx_su3_inv_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_load_w1(v1, sp);
+  _qpx_load_w2(v2, sp);
+  _qpx_vec_add(v1, v1, chi1);
+  _qpx_store_w1(v1, sp);
+  _qpx_vec_sub(v2, v2, chi1);
+  _qpx_store_w2(v2, sp);
+
+  /******************************* direction -0
+   * *********************************/
+
+  _qpx_vec_add(psi1, dim1, dim2);
+  sp = pl + (*(piup++));
+  _qpx_prefetch_spinor_dp(sp);
+  _qpx_su3_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_load_w1(v1, sm);
+  _qpx_load_w2(v2, sm);
+  _qpx_vec_add(v1, v1, chi1);
+  _qpx_store_w1(v1, sm);
+  _qpx_vec_add(v2, v2, chi1);
+  _qpx_store_w2(v2, sm);
+
+  /******************************* direction +1
+   * *********************************/
+
+  vmul = vec_splats(one_over_gammaf);
+  dim11 = vec_mul(vmul, dim11);
+  dim12 = vec_mul(vmul, dim12);
+  dim13 = vec_mul(vmul, dim13);
+  dim21 = vec_mul(vmul, dim21);
+  dim22 = vec_mul(vmul, dim22);
+  dim23 = vec_mul(vmul, dim23);
+
+  _qpx_vec_x(v1, dim2);
+  _qpx_vec_i_sub(psi1, dim1, v1);
+  sm = pl + (*(pidn++));
+  _qpx_prefetch_spinor_dp(sm);
+  _qpx_su3_inv_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_load_w1(v1, sp);
+  _qpx_load_w2(v2, sp);
+  _qpx_vec_add(v1, v1, chi1);
+  _qpx_store_w1(v1, sp);
+  _qpx_vec_x(chi2, chi1);
+  _qpx_vec_i_add(psi1, v2, chi2);
+  _qpx_store_w2(psi1, sp);
+
+  /******************************* direction -1
+   * *********************************/
+
+  _qpx_vec_x(v1, dim2);
+  _qpx_vec_i_add(psi1, dim1, v1);
+  sp = pl + (*(piup++));
+  _qpx_prefetch_spinor_dp(sp);
+  _qpx_su3_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_load_w1(v1, sm);
+  _qpx_load_w2(v2, sm);
+  _qpx_vec_add(v1, v1, chi1);
+  _qpx_store_w1(v1, sm);
+  _qpx_vec_x(chi2, chi1);
+  _qpx_vec_i_sub(psi1, v2, chi2);
+  _qpx_store_w2(psi1, sm);
+
+  /******************************* direction +2
+   * *********************************/
+
+  _qpx_vec_x(v1, dim2);
+  _qpx_vec_sub_n(psi1, dim1, v1);
+  sm = pl + (*(pidn++));
+  _qpx_prefetch_spinor_dp(sm);
+  _qpx_su3_inv_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_load_w1(v1, sp);
+  _qpx_load_w2(v2, sp);
+  _qpx_vec_add(v1, v1, chi1);
+  _qpx_store_w1(v1, sp);
+  _qpx_vec_x(chi2, chi1);
+  _qpx_vec_add_n(psi1, v2, chi2);
+  _qpx_store_w2(psi1, sp);
+
+  /******************************* direction -2
+   * *********************************/
+
+  _qpx_vec_x(v1, dim2);
+  _qpx_vec_add_n(psi1, dim1, v1);
+  sp = pl + (*(piup));
+  _qpx_prefetch_spinor_dp(sp);
+  _qpx_su3_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_load_w1(v1, sm);
+  _qpx_load_w2(v2, sm);
+  _qpx_vec_add(v1, v1, chi1);
+  _qpx_store_w1(v1, sm);
+  _qpx_vec_x(chi2, chi1);
+  _qpx_vec_sub_n(psi1, v2, chi2);
+  _qpx_store_w2(psi1, sm);
+
+  /******************************* direction +3
+   * *********************************/
+
+  _qpx_vec_i_sub_n(psi1, dim1, dim2);
+  sm = pl + (*(pidn));
+  _qpx_prefetch_spinor_dp(sm);
+  _qpx_su3_inv_mul(chi1, *u, psi1);
+  u += 1;
+  _qpx_prefetch_su3_dp(u);
+  _qpx_load_w1(v1, sp);
+  _qpx_load_w2(v2, sp);
+  _qpx_vec_add(v1, v1, chi1);
+  _qpx_store_w1(v1, sp);
+  _qpx_vec_i_add_n(psi1, v2, chi1);
+  _qpx_store_w2(psi1, sp);
+
+  /******************************* direction -3
+   * *********************************/
+
+  _qpx_vec_i_add_n(psi1, dim1, dim2);
+  _qpx_su3_mul(chi1, *u, psi1);
+  _qpx_load_w1(v1, sm);
+  _qpx_load_w2(v2, sm);
+  _qpx_vec_add(v1, v1, chi1);
+  _qpx_store_w1(v1, sm);
+  _qpx_vec_i_sub_n(psi1, v2, chi1);
+  _qpx_store_w2(psi1, sm);
+}
+
 #else
 
 #define _vector_mul_assign(r, c)                                               \
@@ -1152,6 +1542,11 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _su3_inverse_multiply(chi, *u, psi);
   _vector_add_assign(rs.s.c2, chi);
   _vector_sub_assign(rs.s.c4, chi);
+
+  _vector_mul_assign(rs.s.c1, gamma_f);
+  _vector_mul_assign(rs.s.c2, gamma_f);
+  _vector_mul_assign(rs.s.c3, gamma_f);
+  _vector_mul_assign(rs.s.c4, gamma_f);
 
   /******************************* direction +1
    * *********************************/
@@ -1253,6 +1648,11 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _vector_mul_assign(rs.s.c2, coe);
   _vector_mul_assign(rs.s.c3, coe);
   _vector_mul_assign(rs.s.c4, coe);
+
+  _vector_mul_assign(rs.s.c1, one_over_gammaf);
+  _vector_mul_assign(rs.s.c2, one_over_gammaf);
+  _vector_mul_assign(rs.s.c3, one_over_gammaf);
+  _vector_mul_assign(rs.s.c4, one_over_gammaf);
 }
 
 static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
@@ -1298,6 +1698,11 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
 
   /******************************* direction +1
    * *********************************/
+
+  _vector_mul_assign(rs.s.c1, one_over_gammaf);
+  _vector_mul_assign(rs.s.c2, one_over_gammaf);
+  _vector_mul_assign(rs.s.c3, one_over_gammaf);
+  _vector_mul_assign(rs.s.c4, one_over_gammaf);
 
   sp = pl + (*(piup++));
   u += 1;
@@ -1399,21 +1804,36 @@ void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
 {
   int bc, ix, t;
   int *piup, *pidn;
+
+#if (defined QPX)
+  vector4double chid11, chid12, chid13, chid21, chid22, chid23;
+#endif
   su3_dble *u, *um;
   pauli_dble *m;
   spin_t *so, *ro;
   tm_parms_t tm;
+  ani_params_t ani;
 
   cpsd_int_bnd(0x1, s);
   m = swdfld();
   apply_sw_dble(VOLUME / 2, mu, m, s, r);
   set_sd2zero(BNDRY / 2, r + VOLUME);
   tm = tm_parms();
+
+  ani = ani_parms();
+  gamma_f = ani.xi / ani.nu;
+  one_over_gammaf = ani.nu / ani.xi;
+  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+
   if (tm.eoflg == 1)
     mu = 0.0;
 
   coe = -0.5;
   ceo = -0.5;
+
+  coe *= one_over_ut_tilde;
+  ceo *= one_over_ut_tilde;
+
   bc = bc_type();
   piup = iup[VOLUME / 2];
   pidn = idn[VOLUME / 2];
@@ -1437,11 +1857,22 @@ void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
         mul_pauli_dble(mu, m, (*so).w, (*ro).w);
         mul_pauli_dble(-mu, m + 1, (*so).w + 1, (*ro).w + 1);
 
+#if (defined QPX)
+        _qpx_load_w1(chid1, &((*ro).s));
+        _qpx_load_w2(chid2, &((*ro).s));
+        _qpx_vec_add_assign(chid1, dim1);
+        _qpx_vec_add_assign(chid2, dim2);
+        _qpx_store_w1(chid1, &((*ro).s));
+        _qpx_store_w2(chid2, &((*ro).s));
+        _qpx_load_w1(dim1, &((*so).s));
+        _qpx_load_w2(dim2, &((*so).s));
+#else
         _vector_add_assign((*ro).s.c1, rs.s.c1);
         _vector_add_assign((*ro).s.c2, rs.s.c2);
         _vector_add_assign((*ro).s.c3, rs.s.c3);
         _vector_add_assign((*ro).s.c4, rs.s.c4);
         rs = (*so);
+#endif
 
         deo(piup, pidn, u, r);
       } else {
@@ -1462,12 +1893,22 @@ void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
       mul_pauli_dble(mu, m, (*so).w, (*ro).w);
       mul_pauli_dble(-mu, m + 1, (*so).w + 1, (*ro).w + 1);
 
+#if (defined QPX)
+      _qpx_load_w1(chid1, &((*ro).s));
+      _qpx_load_w2(chid2, &((*ro).s));
+      _qpx_vec_add_assign(chid1, dim1);
+      _qpx_vec_add_assign(chid2, dim2);
+      _qpx_store_w1(chid1, &((*ro).s));
+      _qpx_store_w2(chid2, &((*ro).s));
+      _qpx_load_w1(dim1, &((*so).s));
+      _qpx_load_w2(dim2, &((*so).s));
+#else
       _vector_add_assign((*ro).s.c1, rs.s.c1);
       _vector_add_assign((*ro).s.c2, rs.s.c2);
       _vector_add_assign((*ro).s.c3, rs.s.c3);
       _vector_add_assign((*ro).s.c4, rs.s.c4);
       rs = (*so);
-
+#endif
       deo(piup, pidn, u, r);
 
       piup += 4;
@@ -1573,10 +2014,18 @@ void Dwoe_dble(spinor_dble *s, spinor_dble *r)
   int *piup, *pidn;
   su3_dble *u, *um;
   spin_t *ro;
+  ani_params_t ani;
 
   cpsd_int_bnd(0x1, s);
 
+  ani = ani_parms();
+  gamma_f = ani.xi / ani.nu;
+  one_over_gammaf = ani.nu / ani.xi;
+  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+
   coe = -0.5;
+  coe *= one_over_ut_tilde;
+
   bc = bc_type();
   piup = iup[VOLUME / 2];
   pidn = idn[VOLUME / 2];
@@ -1594,7 +2043,12 @@ void Dwoe_dble(spinor_dble *s, spinor_dble *r)
 
       if ((t > 0) && ((t < (N0 - 1)) || (bc != 0))) {
         doe(piup, pidn, u, s);
+#if (defined QPX)
+        _qpx_store_w1(dim1, &((*ro).s));
+        _qpx_store_w2(dim2, &((*ro).s));
+#else
         (*ro) = rs;
+#endif
       } else
         (*ro).s = sd0;
 
@@ -1605,7 +2059,12 @@ void Dwoe_dble(spinor_dble *s, spinor_dble *r)
   } else {
     for (; u < um; u += 8) {
       doe(piup, pidn, u, s);
+#if (defined QPX)
+      _qpx_store_w1(dim1, &((*ro).s));
+      _qpx_store_w2(dim2, &((*ro).s));
+#else
       (*ro) = rs;
+#endif
 
       piup += 4;
       pidn += 4;
@@ -1620,10 +2079,18 @@ void Dweo_dble(spinor_dble *s, spinor_dble *r)
   int *piup, *pidn;
   su3_dble *u, *um;
   spin_t *so;
+  ani_params_t ani;
 
   set_sd2zero(BNDRY / 2, r + VOLUME);
 
+  ani = ani_parms();
+  gamma_f = ani.xi / ani.nu;
+  one_over_gammaf = ani.nu / ani.xi;
+  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+
   ceo = 0.5;
+  ceo *= one_over_ut_tilde;
+
   bc = bc_type();
   piup = iup[VOLUME / 2];
   pidn = idn[VOLUME / 2];
@@ -1639,8 +2106,13 @@ void Dweo_dble(spinor_dble *s, spinor_dble *r)
       t = global_time(ix);
       ix += 1;
 
-      if ((t > 0) && ((t < (N0 - 1)) || (bc != 0))) {
+      if ((t > 0) && (t < (NPROC0 * L0 - 1))) {
+#if (defined QPX)
+        _qpx_load_w1(dim1, &((*so).s));
+        _qpx_load_w2(dim2, &((*so).s));
+#else
         rs = (*so);
+#endif
         deo(piup, pidn, u, r);
       } else
         (*so).s = sd0;
@@ -1651,7 +2123,12 @@ void Dweo_dble(spinor_dble *s, spinor_dble *r)
     }
   } else {
     for (; u < um; u += 8) {
+#if (defined QPX)
+      _qpx_load_w1(dim1, &((*so).s));
+      _qpx_load_w2(dim2, &((*so).s));
+#else
       rs = (*so);
+#endif
       deo(piup, pidn, u, r);
 
       piup += 4;
@@ -1669,14 +2146,24 @@ void Dwhat_dble(double mu, spinor_dble *s, spinor_dble *r)
   int *piup, *pidn;
   su3_dble *u, *um;
   pauli_dble *m;
+  ani_params_t ani;
 
   cpsd_int_bnd(0x1, s);
   m = swdfld();
   apply_sw_dble(VOLUME / 2, mu, m, s, r);
   set_sd2zero(BNDRY / 2, r + VOLUME);
 
+  ani = ani_parms();
+  gamma_f = ani.xi / ani.nu;
+  one_over_gammaf = ani.nu / ani.xi;
+  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+
   coe = -0.5;
   ceo = 0.5;
+
+  coe *= one_over_ut_tilde;
+  ceo *= one_over_ut_tilde;
+
   bc = bc_type();
   piup = iup[VOLUME / 2];
   pidn = idn[VOLUME / 2];
@@ -1694,10 +2181,13 @@ void Dwhat_dble(double mu, spinor_dble *s, spinor_dble *r)
 
       if ((t > 0) && ((t < (N0 - 1)) || (bc != 0))) {
         doe(piup, pidn, u, s);
-
+#if (defined QPX)
+        mul_pauli_dble_qpx(m, im1, im1);
+        mul_pauli_dble_qpx(m + 1, im2, im2);
+#else
         mul_pauli_dble(0.0, m, rs.w, rs.w);
         mul_pauli_dble(0.0, m + 1, rs.w + 1, rs.w + 1);
-
+#endif
         deo(piup, pidn, u, r);
       }
 
@@ -1708,10 +2198,13 @@ void Dwhat_dble(double mu, spinor_dble *s, spinor_dble *r)
   } else {
     for (; u < um; u += 8) {
       doe(piup, pidn, u, s);
-
+#if (defined QPX)
+      mul_pauli_dble_qpx(m, im1, im1);
+      mul_pauli_dble_qpx(m + 1, im2, im2);
+#else
       mul_pauli_dble(0.0, m, rs.w, rs.w);
       mul_pauli_dble(0.0, m + 1, rs.w + 1, rs.w + 1);
-
+#endif
       deo(piup, pidn, u, r);
 
       piup += 4;
@@ -1727,12 +2220,16 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
 {
   int nb, iswd, vol, volh, ibu, ibd;
   int *piup, *pidn, *ibp, *ibm;
+#if (defined QPX)
+  vector4double chid11, chid12, chid13, chid21, chid22, chid23;
+#endif
   su3_dble *u, *um;
   pauli_dble *m;
   spinor_dble *s, *r;
   spin_t *so, *ro;
   block_t *b;
   tm_parms_t tm;
+  ani_params_t ani;
 
   b = blk_list(grid, &nb, &iswd);
 
@@ -1762,11 +2259,21 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   m = (*b).swd;
   apply_sw_dble(volh, mu, m, s, r);
   tm = tm_parms();
+
+  ani = ani_parms();
+  gamma_f = ani.xi / ani.nu;
+  one_over_gammaf = ani.nu / ani.xi;
+  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+
   if (tm.eoflg == 1)
     mu = 0.0;
 
   coe = -0.5;
   ceo = -0.5;
+
+  coe *= one_over_ut_tilde;
+  ceo *= one_over_ut_tilde;
+
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
   m += vol;
@@ -1791,12 +2298,22 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
         mul_pauli_dble(mu, m, (*so).w, (*ro).w);
         mul_pauli_dble(-mu, m + 1, (*so).w + 1, (*ro).w + 1);
 
+#if (defined QPX)
+        _qpx_load_w1(chid1, &((*ro).s));
+        _qpx_load_w2(chid2, &((*ro).s));
+        _qpx_vec_add_assign(chid1, dim1);
+        _qpx_vec_add_assign(chid2, dim2);
+        _qpx_store_w1(chid1, &((*ro).s));
+        _qpx_store_w2(chid2, &((*ro).s));
+        _qpx_load_w1(dim1, &((*so).s));
+        _qpx_load_w2(dim2, &((*so).s));
+#else
         _vector_add_assign((*ro).s.c1, rs.s.c1);
         _vector_add_assign((*ro).s.c2, rs.s.c2);
         _vector_add_assign((*ro).s.c3, rs.s.c3);
         _vector_add_assign((*ro).s.c4, rs.s.c4);
         rs = (*so);
-
+#endif
         deo(piup, pidn, u, r);
       } else {
         (*so).s = sd0;
@@ -1822,11 +2339,22 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
       mul_pauli_dble(mu, m, (*so).w, (*ro).w);
       mul_pauli_dble(-mu, m + 1, (*so).w + 1, (*ro).w + 1);
 
+#if (defined QPX)
+      _qpx_load_w1(chid1, &((*ro).s));
+      _qpx_load_w2(chid2, &((*ro).s));
+      _qpx_vec_add_assign(chid1, dim1);
+      _qpx_vec_add_assign(chid2, dim2);
+      _qpx_store_w1(chid1, &((*ro).s));
+      _qpx_store_w2(chid2, &((*ro).s));
+      _qpx_load_w1(dim1, &((*so).s));
+      _qpx_load_w2(dim2, &((*so).s));
+#else
       _vector_add_assign((*ro).s.c1, rs.s.c1);
       _vector_add_assign((*ro).s.c2, rs.s.c2);
       _vector_add_assign((*ro).s.c3, rs.s.c3);
       _vector_add_assign((*ro).s.c4, rs.s.c4);
       rs = (*so);
+#endif
 
       deo(piup, pidn, u, r);
 
@@ -1979,6 +2507,7 @@ void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l)
   spinor_dble *s;
   spin_t *ro;
   block_t *b;
+  ani_params_t ani;
 
   b = blk_list(grid, &nb, &iswd);
 
@@ -2002,7 +2531,14 @@ void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l)
   ro = (spin_t *)((*b).sd[l] + volh);
   s[vol] = sd0;
 
+  ani = ani_parms();
+  gamma_f = ani.xi / ani.nu;
+  one_over_gammaf = ani.nu / ani.xi;
+  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+
   coe = -0.5;
+  coe *= one_over_ut_tilde;
+
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
   u = (*b).ud;
@@ -2022,7 +2558,12 @@ void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l)
     for (; u < um; u += 8) {
       if (((pidn[0] < vol) || (!ibd)) && ((piup[0] < vol) || (!ibu))) {
         doe(piup, pidn, u, s);
+#if (defined QPX)
+        _qpx_store_w1(dim1, &((*ro).s));
+        _qpx_store_w2(dim2, &((*ro).s));
+#else
         (*ro) = rs;
+#endif
       } else
         (*ro).s = sd0;
 
@@ -2033,8 +2574,12 @@ void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l)
   } else {
     for (; u < um; u += 8) {
       doe(piup, pidn, u, s);
+#if (defined QPX)
+      _qpx_store_w1(dim1, &((*ro).s));
+      _qpx_store_w2(dim2, &((*ro).s));
+#else
       (*ro) = rs;
-
+#endif
       piup += 4;
       pidn += 4;
       ro += 1;
@@ -2050,6 +2595,7 @@ void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l)
   spinor_dble *r;
   spin_t *so;
   block_t *b;
+  ani_params_t ani;
 
   b = blk_list(grid, &nb, &iswd);
 
@@ -2073,7 +2619,14 @@ void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l)
   r = (*b).sd[l];
   r[vol] = sd0;
 
+  ani = ani_parms();
+  gamma_f = ani.xi / ani.nu;
+  one_over_gammaf = ani.nu / ani.xi;
+  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+
   ceo = 0.5;
+  ceo *= one_over_ut_tilde;
+
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
   u = (*b).ud;
@@ -2086,7 +2639,12 @@ void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l)
 
     for (; u < um; u += 8) {
       if (((pidn[0] < vol) || (!ibd)) && ((piup[0] < vol) || (!ibu))) {
+#if (defined QPX)
+        _qpx_load_w1(dim1, &((*so).s));
+        _qpx_load_w2(dim2, &((*so).s));
+#else
         rs = (*so);
+#endif
         deo(piup, pidn, u, r);
       } else
         (*so).s = sd0;
@@ -2103,7 +2661,12 @@ void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l)
       r[*ibp] = sd0;
   } else {
     for (; u < um; u += 8) {
+#if (defined QPX)
+      _qpx_load_w1(dim1, &((*so).s));
+      _qpx_load_w2(dim2, &((*so).s));
+#else
       rs = (*so);
+#endif
       deo(piup, pidn, u, r);
 
       piup += 4;
@@ -2121,6 +2684,7 @@ void Dwhat_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   pauli_dble *m;
   spinor_dble *s, *r;
   block_t *b;
+  ani_params_t ani;
 
   b = blk_list(grid, &nb, &iswd);
 
@@ -2148,8 +2712,17 @@ void Dwhat_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   m = (*b).swd;
   apply_sw_dble(volh, mu, m, s, r);
 
+  ani = ani_parms();
+  gamma_f = ani.xi / ani.nu;
+  one_over_gammaf = ani.nu / ani.xi;
+  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+
   coe = -0.5;
   ceo = 0.5;
+
+  coe *= one_over_ut_tilde;
+  ceo *= one_over_ut_tilde;
+
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
   m += vol;
@@ -2170,10 +2743,13 @@ void Dwhat_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
     for (; u < um; u += 8) {
       if (((pidn[0] < vol) || (!ibd)) && ((piup[0] < vol) || (!ibu))) {
         doe(piup, pidn, u, s);
-
+#if (defined QPX)
+        mul_pauli_dble_qpx(m, im1, im1);
+        mul_pauli_dble_qpx(m + 1, im2, im2);
+#else
         mul_pauli_dble(0.0f, m, rs.w, rs.w);
         mul_pauli_dble(0.0f, m + 1, rs.w + 1, rs.w + 1);
-
+#endif
         deo(piup, pidn, u, r);
       }
 
@@ -2190,10 +2766,13 @@ void Dwhat_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   } else {
     for (; u < um; u += 8) {
       doe(piup, pidn, u, s);
-
+#if (defined QPX)
+      mul_pauli_dble_qpx(m, im1, im1);
+      mul_pauli_dble_qpx(m + 1, im2, im2);
+#else
       mul_pauli_dble(0.0f, m, rs.w, rs.w);
       mul_pauli_dble(0.0f, m + 1, rs.w + 1, rs.w + 1);
-
+#endif
       deo(piup, pidn, u, r);
 
       piup += 4;

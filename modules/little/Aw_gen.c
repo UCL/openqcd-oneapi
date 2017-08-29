@@ -59,6 +59,7 @@
 #include "su3.h"
 #include "utils.h"
 #include "little.h"
+#include "flags.h"
 
 #define MAX_LEVELS 8
 #define BLK_LENGTH 8
@@ -773,6 +774,7 @@ static void spinor_prod_gamma3(int vol, spinor_dble *sd, spinor_dble *rd,
     sm0[0].im += z0.im;
     sm1[0].re += z1.re;
     sm1[0].im += z1.im;
+
     acc_sm();
   }
 
