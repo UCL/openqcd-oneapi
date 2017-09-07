@@ -68,7 +68,7 @@
 #include "flags.h"
 #include "global.h"
 
-#define NFLGS (9 + 4 * (int)(BLK_GRIDS))
+#define NFLGS (11 + 4 * (int)(BLK_GRIDS))
 
 static struct
 {
@@ -76,7 +76,9 @@ static struct
   int bstap, fts;
   int sw[3], swd[3];
   int aw, awh;
-} lat = {0, 0, 0, 0, 0, {0, 0, 0}, {0, 0, 0}, 0, 0};
+  int smeared_tag;
+  int is_smeared;
+} lat = {0, 0, 0, 0, 0, {0, 0, 0}, {0, 0, 0}, 0, 0, 0, 0};
 
 typedef struct
 {
@@ -87,9 +89,9 @@ typedef struct
 
 static int init = 0, tag = 0;
 static int flgs[NFLGS];
-static grid_flags_t gfs[(int)(BLK_GRIDS) + 1] =
-    {{0x0, 0, 0, {0, 0, 0}, {0, 0, 0}}},
-                                           *gf;
+static grid_flags_t gfs[(int)(BLK_GRIDS) + 1] = {
+    {0x0, 0, 0, {0, 0, 0}, {0, 0, 0}}};
+static grid_flags_t *gf;
 
 static void set_flgs(void)
 {
@@ -104,8 +106,10 @@ static void set_flgs(void)
   flgs[6] = lat.swd[0];
   flgs[7] = lat.aw;
   flgs[8] = lat.awh;
+  flgs[9] = lat.smeared_tag;
+  flgs[10] = lat.is_smeared;
 
-  n = 9;
+  n = 11;
 
   for (igr = 0; igr < (int)(BLK_GRIDS); igr++) {
     flgs[n++] = gfs[igr].u;
@@ -175,8 +179,10 @@ static void compress_flags(void)
   lat.swd[0] = flgs[6];
   lat.aw = flgs[7];
   lat.awh = flgs[8];
+  lat.smeared_tag = flgs[9];
+  lat.is_smeared = flgs[10];
 
-  n = 9;
+  n = 11;
 
   for (igr = 0; igr < (int)(BLK_GRIDS); igr++) {
     gfs[igr].u = flgs[n++];
@@ -327,6 +333,8 @@ void print_flags(void)
     printf("sw         = %d,%d,%d\n", lat.sw[0], lat.sw[1], lat.sw[2]);
     printf("swd        = %d,%d,%d\n", lat.swd[0], lat.swd[1], lat.swd[2]);
     printf("aw,awh     = %d,%d\n", lat.aw, lat.awh);
+    printf("smeared_tag (is_smeared) = %d (%d)\n", lat.smeared_tag,
+           lat.is_smeared);
     printf("\n");
   }
 }

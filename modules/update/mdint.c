@@ -52,6 +52,7 @@
 #include "forces.h"
 #include "update.h"
 #include "global.h"
+#include "stout_smearing.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -233,7 +234,7 @@ static void dfl_upd(int isp)
 
 void run_mdint(void)
 {
-  int my_rank, nop, itu;
+  int my_rank, nop, itu, ismear, iunsmear;
   int iop, status[6];
   double *mu, eps, nlk, nrm;
   mdflds_t *mdfs;
@@ -255,22 +256,24 @@ void run_mdint(void)
   else if (bc_type() == 1)
     nlk -= (double)(3 * N1) * (double)(N2 * N3);
 
-  s = mdsteps(&nop, &itu);
+  s = mdsteps(&nop, &ismear, &iunsmear, &itu);
   sm = s + nop;
+
+  set_frc2zero();
 
   for (; s < sm; s++) {
     iop = (*s).iop;
     eps = (*s).eps;
 
-    if (iop < itu) {
+    if (iop < ismear) {
       fp = force_parms(iop);
 
       MPI_Barrier(MPI_COMM_WORLD);
       wt1 = MPI_Wtime();
 
-      if (fp.force == FRG)
+      if (fp.force == FRG) {
         force0(eps);
-      else {
+      } else {
         dfl_upd(fp.isp[0]);
         set_sw_parms(sea_quark_mass(fp.im0));
         set_frc2zero();
@@ -327,10 +330,16 @@ void run_mdint(void)
                "time = %.2e sec\n",
                nrm / fabs(eps), eps, nrm, wt2 - wt1);
       }
+    } else if (iop == ismear) {
+      smear_fields();
+    } else if (iop == iunsmear) {
+      unsmear_mdforce();
+      unsmear_fields();
     } else if (iop == itu) {
       update_ud(eps);
       step_mdtime(eps);
       rtau += eps;
+      set_frc2zero();
     }
   }
 }
@@ -339,7 +348,7 @@ void run_mdint(void)
 
 void run_mdint(void)
 {
-  int nop, itu;
+  int nop, ismear, iunsmear, itu;
   int iop, status[6];
   double *mu, eps;
   mdstep_t *s, *sm;
@@ -351,19 +360,24 @@ void run_mdint(void)
   reset_chrono();
   start_dfl_upd();
 
-  s = mdsteps(&nop, &itu);
+  s = mdsteps(&nop, &ismear, &iunsmear, &itu);
   sm = s + nop;
+
+  set_frc2zero();
+
+  if (query_flags(UDBUF_UP2DATE) != 1)
+    copy_bnd_ud();
 
   for (; s < sm; s++) {
     iop = (*s).iop;
     eps = (*s).eps;
 
-    if (iop < itu) {
+    if (iop < ismear) {
       fp = force_parms(iop);
 
-      if (fp.force == FRG)
+      if (fp.force == FRG) {
         force0(eps);
-      else {
+      } else {
         dfl_upd(fp.isp[0]);
         set_sw_parms(sea_quark_mass(fp.im0));
         status[2] = 0;
@@ -389,13 +403,21 @@ void run_mdint(void)
         chk_mode_regen(fp.isp[0], status);
         add2counter("force", iop, status);
       }
+    } else if (iop == ismear) {
+      smear_fields();
+    } else if (iop == iunsmear) {
+      unsmear_mdforce();
+      unsmear_fields();
     } else if (iop == itu) {
       update_mom();
       update_ud(eps);
+      copy_bnd_ud();
       step_mdtime(eps);
       rtau += eps;
-    } else
+      set_frc2zero();
+    } else {
       update_mom();
+    }
   }
 }
 

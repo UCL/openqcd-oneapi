@@ -152,9 +152,9 @@ void cm3x3_unity(int vol, su3_dble *u)
   }
 }
 
-void cm3x3_assign(int vol, su3_dble *u, su3_dble *v)
+void cm3x3_assign(int vol, su3_dble const *u, su3_dble *v)
 {
-  su3_dble *um;
+  su3_dble const *um;
 
   um = u + vol;
 
@@ -264,7 +264,7 @@ void cm3x3_swap(int vol, su3_dble *u, su3_dble *v)
   }
 }
 
-void cm3x3_dagger(su3_dble *u, su3_dble *v)
+void cm3x3_dagger(su3_dble const *u, su3_dble *v)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %0, %%xmm1"
@@ -312,7 +312,7 @@ void cm3x3_dagger(su3_dble *u, su3_dble *v)
                        : "xmm8", "xmm9", "xmm10");
 }
 
-void cm3x3_tr(su3_dble *u, su3_dble *v, complex_dble *tr)
+void cm3x3_tr(su3_dble const *u, su3_dble const *v, complex_dble *tr)
 {
   __asm__ __volatile__("movddup %0, %%xmm0 \n\t"
                        "movddup %1, %%xmm1 \n\t"
@@ -403,7 +403,7 @@ void cm3x3_tr(su3_dble *u, su3_dble *v, complex_dble *tr)
                        : "xmm0", "xmm3");
 }
 
-void cm3x3_retr(su3_dble *u, su3_dble *v, double *tr)
+void cm3x3_retr(su3_dble const *u, su3_dble const *v, double *tr)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %1, %%xmm1 \n\t"
@@ -455,7 +455,7 @@ void cm3x3_retr(su3_dble *u, su3_dble *v, double *tr)
                        : "xmm0", "xmm1");
 }
 
-void cm3x3_imtr(su3_dble *u, su3_dble *v, double *tr)
+void cm3x3_imtr(su3_dble const *u, su3_dble const *v, double *tr)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %1, %%xmm1 \n\t"
@@ -516,7 +516,7 @@ void cm3x3_imtr(su3_dble *u, su3_dble *v, double *tr)
                        : "xmm0", "xmm1");
 }
 
-void cm3x3_add(su3_dble *u, su3_dble *v)
+void cm3x3_add(su3_dble const *u, su3_dble *v)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %1, %%xmm1 \n\t"
@@ -567,7 +567,7 @@ void cm3x3_add(su3_dble *u, su3_dble *v)
                        : "=m"((*v).c31), "=m"((*v).c32), "=m"((*v).c33));
 }
 
-void cm3x3_mul_add(su3_dble *u, su3_dble *v, su3_dble *w)
+void cm3x3_mul_add(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %1, %%xmm1 \n\t"
@@ -627,7 +627,7 @@ void cm3x3_mul_add(su3_dble *u, su3_dble *v, su3_dble *w)
                        : "xmm3", "xmm4", "xmm5");
 }
 
-void cm3x3_mulr(double *r, su3_dble *u, su3_dble *v)
+void cm3x3_mulr(double const *r, su3_dble const *u, su3_dble *v)
 {
   __asm__ __volatile__("movddup %0, %%xmm0 \n\t"
                        "movddup %0, %%xmm1 \n\t"
@@ -682,7 +682,7 @@ void cm3x3_mulr(double *r, su3_dble *u, su3_dble *v)
                        : "=m"((*v).c31), "=m"((*v).c32), "=m"((*v).c33));
 }
 
-void cm3x3_mulr_add(double *r, su3_dble *u, su3_dble *v)
+void cm3x3_mulr_add(double const *r, su3_dble const *u, su3_dble *v)
 {
   __asm__ __volatile__("movddup %0, %%xmm0 \n\t"
                        "movddup %0, %%xmm1 \n\t"
@@ -752,7 +752,7 @@ void cm3x3_mulr_add(double *r, su3_dble *u, su3_dble *v)
                        : "xmm9", "xmm10", "xmm11");
 }
 
-void cm3x3_mulc(complex_dble *c, su3_dble *u, su3_dble *v)
+void cm3x3_mulc(complex_dble const *c, su3_dble const *u, su3_dble *v)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %0, %%xmm1 \n\t"
@@ -843,7 +843,7 @@ void cm3x3_mulc(complex_dble *c, su3_dble *u, su3_dble *v)
                        : "xmm2", "xmm4", "xmm6");
 }
 
-void cm3x3_mulc_add(complex_dble *c, su3_dble *u, su3_dble *v)
+void cm3x3_mulc_add(complex_dble const *c, su3_dble const *u, su3_dble *v)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %0, %%xmm1 \n\t"
@@ -943,7 +943,7 @@ void cm3x3_mulc_add(complex_dble *c, su3_dble *u, su3_dble *v)
                        : "xmm2", "xmm4", "xmm6");
 }
 
-void cm3x3_lc1(complex_dble *c, su3_dble *u, su3_dble *v)
+void cm3x3_lc1(complex_dble const *c, su3_dble const *u, su3_dble *v)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %1, %%xmm1 \n\t"
@@ -1102,9 +1102,9 @@ void cm3x3_unity(int vol, su3_dble *u)
   }
 }
 
-void cm3x3_assign(int vol, su3_dble *u, su3_dble *v)
+void cm3x3_assign(int vol, su3_dble const *u, su3_dble *v)
 {
-  su3_dble *um;
+  su3_dble const *um;
 
   um = u + vol;
 
@@ -1209,7 +1209,7 @@ void cm3x3_swap(int vol, su3_dble *u, su3_dble *v)
   }
 }
 
-void cm3x3_dagger(su3_dble *u, su3_dble *v)
+void cm3x3_dagger(su3_dble const *u, su3_dble *v)
 {
   complex_dble z;
 
@@ -1242,7 +1242,7 @@ void cm3x3_dagger(su3_dble *u, su3_dble *v)
   (*v).c32.im = z.im;
 }
 
-void cm3x3_tr(su3_dble *u, su3_dble *v, complex_dble *tr)
+void cm3x3_tr(su3_dble const *u, su3_dble const *v, complex_dble *tr)
 {
   complex_dble z;
 
@@ -1271,7 +1271,7 @@ void cm3x3_tr(su3_dble *u, su3_dble *v, complex_dble *tr)
   (*tr).im = z.im;
 }
 
-void cm3x3_retr(su3_dble *u, su3_dble *v, double *tr)
+void cm3x3_retr(su3_dble const *u, su3_dble const *v, double *tr)
 {
   double r;
 
@@ -1290,7 +1290,7 @@ void cm3x3_retr(su3_dble *u, su3_dble *v, double *tr)
   (*tr) = r;
 }
 
-void cm3x3_imtr(su3_dble *u, su3_dble *v, double *tr)
+void cm3x3_imtr(su3_dble const *u, su3_dble const *v, double *tr)
 {
   double r;
 
@@ -1309,7 +1309,7 @@ void cm3x3_imtr(su3_dble *u, su3_dble *v, double *tr)
   (*tr) = r;
 }
 
-void cm3x3_add(su3_dble *u, su3_dble *v)
+void cm3x3_add(su3_dble const *u, su3_dble *v)
 {
   (*v).c11.re += (*u).c11.re;
   (*v).c11.im += (*u).c11.im;
@@ -1333,13 +1333,13 @@ void cm3x3_add(su3_dble *u, su3_dble *v)
   (*v).c33.im += (*u).c33.im;
 }
 
-void cm3x3_mul_add(su3_dble *u, su3_dble *v, su3_dble *w)
+void cm3x3_mul_add(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   su3xsu3(u, v, &ww);
   cm3x3_add(&ww, w);
 }
 
-void cm3x3_mulr(double *r, su3_dble *u, su3_dble *v)
+void cm3x3_mulr(double const *r, su3_dble const *u, su3_dble *v)
 {
   double rr;
 
@@ -1367,7 +1367,7 @@ void cm3x3_mulr(double *r, su3_dble *u, su3_dble *v)
   (*v).c33.im = rr * (*u).c33.im;
 }
 
-void cm3x3_mulr_add(double *r, su3_dble *u, su3_dble *v)
+void cm3x3_mulr_add(double const *r, su3_dble const *u, su3_dble *v)
 {
   double rr;
 
@@ -1395,7 +1395,7 @@ void cm3x3_mulr_add(double *r, su3_dble *u, su3_dble *v)
   (*v).c33.im += rr * (*u).c33.im;
 }
 
-void cm3x3_mulc(complex_dble *c, su3_dble *u, su3_dble *v)
+void cm3x3_mulc(complex_dble const *c, su3_dble const *u, su3_dble *v)
 {
   double rr;
   complex_dble cc;
@@ -1434,7 +1434,7 @@ void cm3x3_mulc(complex_dble *c, su3_dble *u, su3_dble *v)
   (*v).c33.im = rr;
 }
 
-void cm3x3_mulc_add(complex_dble *c, su3_dble *u, su3_dble *v)
+void cm3x3_mulc_add(complex_dble const *c, su3_dble const *u, su3_dble *v)
 {
   double rr;
   complex_dble cc;
@@ -1473,7 +1473,7 @@ void cm3x3_mulc_add(complex_dble *c, su3_dble *u, su3_dble *v)
   (*v).c33.im += rr;
 }
 
-void cm3x3_lc1(complex_dble *c, su3_dble *u, su3_dble *v)
+void cm3x3_lc1(complex_dble const *c, su3_dble const *u, su3_dble *v)
 {
   complex_dble cc;
 
@@ -1492,7 +1492,7 @@ void cm3x3_lc1(complex_dble *c, su3_dble *u, su3_dble *v)
 
 #endif
 
-void cm3x3_lc2(complex_dble *c, su3_dble *u, su3_dble *v)
+void cm3x3_lc2(complex_dble const *c, su3_dble const *u, su3_dble *v)
 {
   cm3x3_lc1(c, u, v);
   cm3x3_mulc_add(c + 2, u + 1, v);

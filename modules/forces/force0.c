@@ -61,6 +61,7 @@
 #include "uflds.h"
 #include "mdflds.h"
 #include "forces.h"
+#include "linalg.h"
 #include "global.h"
 
 #define N0 (NPROC0 * L0)
@@ -73,6 +74,25 @@ static double smx[MAX_LEVELS];
 static su3_dble *udb, *hdb;
 static su3_dble wd[3], vd[4] ALIGNED16;
 static su3_alg_dble X ALIGNED16;
+static su3_alg_dble *force_buffer = NULL;
+
+static void alloc_force_buffer(void)
+{
+  error_root(sizeof(su3_alg_dble) != (8 * sizeof(double)), 1,
+             "alloc_force_buffer [force0.c]",
+             "The su3_alg_dble structures are not properly packed");
+
+  error(iup[0][0] == 0, 1, "alloc_force_buffer [force0.c]",
+        "The geometry arrays are not set");
+
+  force_buffer =
+      amalloc((4 * VOLUME + 7 * (BNDRY / 4)) * sizeof(*force_buffer), ALIGN);
+
+  error(force_buffer == NULL, 1, "alloc_force_buffer [force0.c]",
+        "Unable to allocate extra force fields");
+
+  set_alg2zero(4 * VOLUME + 7 * (BNDRY / 4), force_buffer);
+}
 
 static void set_ofs(void)
 {
@@ -191,6 +211,7 @@ static void set_staples(int n, int ix, int ia)
   }
 }
 
+/* XXX: This does not use the buffer when computing the force, is that OK? */
 void plaq_frc(void)
 {
   int bc, n, ix, t, ip[4];
@@ -312,8 +333,12 @@ void force0(double c)
 
   udb = udfld();
   mdfs = mdflds();
-  fdb = (*mdfs).frc;
-  set_frc2zero();
+
+  if (force_buffer == NULL)
+    alloc_force_buffer();
+  
+  fdb = force_buffer;
+  set_alg2zero(4 * VOLUME + 7 * (BNDRY / 4), fdb);
 
   /* No rectangulars */
   if (c0 == 1.0) {
@@ -543,7 +568,10 @@ void force0(double c)
     }
   }
 
-  add_bnd_frc();
+  /*add_bnd_frc();*/
+  add_boundaries_force(force_buffer);
+
+  add_alg(4 * VOLUME, force_buffer, (*mdfs).frc);
 }
 
 static void wloops(int n, int ix, int t, double c0, double *trU)

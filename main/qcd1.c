@@ -647,6 +647,41 @@ static void read_actions(void)
   }
 }
 
+static void read_smearing(void)
+{
+  int i, use_smearing;
+  action_parms_t ap;
+  int n_smear;
+  double rho_t, rho_s;
+
+  use_smearing = 0;
+  for (i = 0; i < hmc.nact; ++i) {
+    ap = action_parms(i);
+
+    if (ap.smear) {
+      use_smearing = 1;
+      break;
+    }
+  }
+
+  /* If none of the actions use smearing, the section need not be specified */
+  if (use_smearing == 0)
+    return;
+
+  if (my_rank == 0) {
+    find_section("Smearing parameters");
+    read_line("n_smear", "%d", &n_smear);
+    read_line("rho_t", "%lf", &rho_t);
+    read_line("rho_s", "%lf", &rho_s);
+  }
+
+  mpc_bcast_i(&n_smear, 1);
+  mpc_bcast_d(&rho_t, 1);
+  mpc_bcast_d(&rho_s, 1);
+
+  set_stout_smearing_parms(n_smear, rho_t, rho_s);
+}
+
 static void read_integrator(void)
 {
   int nlv, i, j, k, l;
@@ -967,7 +1002,7 @@ static void read_ani_parms(void)
 {
 
   int has_tts;
-  double nu, xi, cR, cT, us, ut, ust, utt;
+  double nu, xi, cR, cT, us, ut, us_tilde, ut_tilde;
 
   if (my_rank == 0) {
     find_section("Anisotropy parameters");
@@ -978,8 +1013,8 @@ static void read_ani_parms(void)
     read_line("cT", "%lf", &cT);
     read_line("us", "%lf", &us);
     read_line("ut", "%lf", &ut);
-    read_line("ust", "%lf", &ust);
-    read_line("utt", "%lf", &utt);
+    read_line("us_tilde", "%lf", &us_tilde);
+    read_line("ut_tilde", "%lf", &ut_tilde);
   }
 
   mpc_bcast_i(&has_tts, 1);
@@ -989,10 +1024,10 @@ static void read_ani_parms(void)
   mpc_bcast_d(&cT, 1);
   mpc_bcast_d(&us, 1);
   mpc_bcast_d(&ut, 1);
-  mpc_bcast_d(&ust, 1);
-  mpc_bcast_d(&utt, 1);
+  mpc_bcast_d(&us_tilde, 1);
+  mpc_bcast_d(&ut_tilde, 1);
 
-  set_ani_parms(has_tts, nu, xi, cR, cT, us, ut, ust, utt);
+  set_ani_parms(has_tts, nu, xi, cR, cT, us, ut, us_tilde, ut_tilde);
 }
 
 static void read_infile(int argc, char *argv[])
@@ -1072,6 +1107,7 @@ static void read_infile(int argc, char *argv[])
   read_bc_parms();
   read_schedule();
   read_actions();
+  read_smearing();
   read_integrator();
   read_solvers();
   read_wflow_parms();

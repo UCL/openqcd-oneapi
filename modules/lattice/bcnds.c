@@ -15,6 +15,11 @@
 *     are the integer offsets of the time-like link variables on the local
 *     lattice at global time NPROC0*L0-1.
 *
+*   int *bnd_bnd_lks(int *n)
+*     Returns the starting address of an array of length n whose elements
+*     are the integer offsets of the time-like link variables on the boundary
+*     lattice at global time NPROC0*L0-1.
+*
 *   int *bnd_pts(int *n)
 *     Returns the starting address of an array of length n whose elements
 *     are the indices of the points on the local lattice at global time 0
@@ -39,6 +44,12 @@
 *     and the determinants of the link variables have opposite sign, (2) the
 *     boundary conditions are of type 3 (periodic for the gauge field). The
 *     program returns 1 if the link variables are changed and 0 otherwise.
+*
+*     New:
+*     The routine will now also apply the boundary condition to links on the
+*     boundary, this means that it will first check and communicate the boundary
+*     if necessary, then it will update everything. This means that a changed
+*     boundary will not constitute at new configuration as previous.
 *
 *   void bnd_s2zero(ptset_t set,spinor *s)
 *     Sets the components of the single-precision spinor field s on the
@@ -107,7 +118,7 @@ typedef union
   double r[18];
 } umat_t;
 
-static int init0 = 0, nlks, *lks;
+static int init0 = 0, nlks, *lks, nbclks, *bclks;
 static int init1 = 0, npts, *pts;
 static int init2 = 0;
 static const su3_dble ud0 = {{0.0}};
@@ -117,18 +128,26 @@ static su3_dble ubnd[2][3];
 
 static void alloc_lks(void)
 {
-  int ix, t, *lk;
+  int ix, iy, t, *lk;
+  int pidx[4];
 
   error(iup[0][0] == 0, 1, "alloc_lks [bcnds.c]",
         "Geometry arrays are not set");
 
   if ((cpr[0] == 0) || (cpr[0] == (NPROC0 - 1))) {
-    if (NPROC0 > 1)
-      nlks = (L1 * L2 * L3) / 2;
-    else
-      nlks = L1 * L2 * L3;
+    nlks = (L1 * L2 * L3) / 2;
+    nbclks = 0;
+
+    if (cpr[0] == (NPROC0 - 1)) {
+      nlks += (NPROC0 == 1) * (L1 * L2 * L3 / 2);
+      nbclks += (FACE0 > 0) * (L1 * L2 * L3 / 2);
+      nbclks += (FACE1 > 0) * L2 * L3;
+      nbclks += (FACE2 > 0) * L1 * L3;
+      nbclks += (FACE3 > 0) * L1 * L2;
+    }
 
     lks = malloc(nlks * sizeof(*lks));
+    bclks = malloc(nbclks * sizeof(*bclks));
 
     if (lks != NULL) {
       lk = lks;
@@ -145,9 +164,61 @@ static void alloc_lks(void)
         }
       }
     }
+
+    /* Links on the boundary that crosses the temporal boundary */
+    if ((nbclks != 0) && (bclks != NULL)) {
+      lk = bclks;
+
+      /* Type 1 links at FACE0 */
+      for (ix = 0; ix < FACE0 / 2; ix++) {
+        (*lk) = 4 * VOLUME + ix;
+        lk += 1;
+      }
+
+      /* Type 2 links at the spatial faces pointing in t-dir at the time
+       * boundary */
+
+      /* Type 2 links at FACE1 */
+      if (FACE1 != 0) {
+        for (ix = 0; ix < L2; ++ix) {
+          for (iy = 0; iy < L3; ++iy) {
+            plaq_uidx(0, ipt[iy + L3 * (ix + L2 * (L1 - 1 + L1 * (L0 - 1)))],
+                      pidx);
+            (*lk) = pidx[3];
+            lk += 1;
+          }
+        }
+      }
+
+      /* Type 2 links at FACE2 */
+      if (FACE2 != 0) {
+        for (ix = 0; ix < L1; ++ix) {
+          for (iy = 0; iy < L3; ++iy) {
+            plaq_uidx(1, ipt[iy + L3 * ((L2 - 1) + L2 * (ix + L1 * (L0 - 1)))],
+                      pidx);
+            (*lk) = pidx[3];
+            lk += 1;
+          }
+        }
+      }
+
+      /* Type 2 links at FACE3 */
+      if (FACE3 != 0) {
+        for (ix = 0; ix < L1; ++ix) {
+          for (iy = 0; iy < L2; ++iy) {
+            plaq_uidx(2, ipt[(L3 - 1) + L3 * (iy + L2 * (ix + L1 * (L0 - 1)))],
+                      pidx);
+            (*lk) = pidx[3];
+            lk += 1;
+          }
+        }
+      }
+    }
   } else {
     nlks = 0;
+    nbclks = 0;
     lks = NULL;
+    bclks = NULL;
   }
 
   error((nlks > 0) && (lks == NULL), 1, "alloc_lks [bcnds.c]",
@@ -201,6 +272,16 @@ int *bnd_lks(int *n)
   (*n) = nlks;
 
   return lks;
+}
+
+int *bnd_bnd_lks(int *n)
+{
+  if (init0 == 0)
+    alloc_lks();
+
+  (*n) = nbclks;
+
+  return bclks;
 }
 
 int *bnd_pts(int *n)
@@ -483,7 +564,7 @@ int check_bc(double tol)
   return it;
 }
 
-static int sdet(su3_dble *u)
+static int sdet(su3_dble const *u)
 {
   double r;
   complex_dble z;
@@ -518,12 +599,34 @@ static int sdet(su3_dble *u)
     return -1;
 }
 
+static int chs_links(int ibc, su3_dble *ub, int *links, int num_links)
+{
+  int i, *last_link;
+  umat_t *um;
+
+  if (sdet(ub + (*links)) != ibc) {
+    last_link = links + num_links;
+
+    for (; links < last_link; links++) {
+      um = (umat_t *)(ub + (*links));
+
+      for (i = 0; i < 18; i++)
+        (*um).r[i] = -(*um).r[i];
+    }
+
+    return 1;
+  }
+
+  return 0;
+}
+
 int chs_ubnd(int ibc)
 {
-  int iprms[1], i, ich, ichs;
-  int *lk, *lkm;
+  int iprms[1], ich, ichs, bcich, bcichs;
   su3_dble *ub;
-  umat_t *um;
+
+  if (query_flags(UDBUF_UP2DATE) != 1)
+    copy_bnd_ud();
 
   if (bc_type() == 3) {
     if (NPROC > 1) {
@@ -544,30 +647,27 @@ int chs_ubnd(int ibc)
     ub = udfld();
     ich = 0;
 
-    if (nlks > 0) {
-      lk = lks;
+    /* Change boundaries of links in the bulk */
+    if (nlks > 0)
+      ich = chs_links(ibc, ub, lks, nlks);
 
-      if (sdet(ub + (*lk)) != ibc) {
-        ich = 1;
-        lkm = lk + nlks;
+    bcich = 0;
 
-        for (; lk < lkm; lk++) {
-          um = (umat_t *)(ub + (*lk));
-
-          for (i = 0; i < 18; i++)
-            (*um).r[i] = -(*um).r[i];
-        }
-      }
-    }
+    /* Change boundaries of links on the boundary */
+    if (nbclks > 0)
+      bcich = chs_links(ibc, ub, bclks, nbclks);
 
     MPI_Allreduce(&ich, &ichs, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+    MPI_Allreduce(&bcich, &bcichs, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
 
-    if (ichs == 1)
-      set_flags(UPDATED_UD);
+    error((nbclks != 0) && (ichs != bcichs), 1, "chs_bcnd [bcnds.c]",
+          "The boundaries in the volume and the boundaries on the boundary "
+          "were not changed in a consistent matter");
 
     return ichs;
-  } else
+  } else {
     return 0;
+  }
 }
 
 void bnd_s2zero(ptset_t set, spinor *s)

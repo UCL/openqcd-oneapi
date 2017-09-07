@@ -31,6 +31,7 @@ typedef struct
 
 /* BCNDS_C */
 extern int *bnd_lks(int *n);
+extern int *bnd_bnd_lks(int *n);
 extern int *bnd_pts(int *n);
 extern void set_bc(void);
 extern int check_bc(double tol);

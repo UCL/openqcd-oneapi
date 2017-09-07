@@ -46,10 +46,13 @@ extern double scalar_prod_alg(int vol, int icom, su3_alg_dble *X,
                               su3_alg_dble *Y);
 extern void set_alg2zero(int vol, su3_alg_dble *X);
 extern void set_ualg2zero(int vol, u3_alg_dble *X);
-extern void assign_alg2alg(int vol, su3_alg_dble *X, su3_alg_dble *Y);
+extern void assign_alg2alg(int vol, su3_alg_dble const *X, su3_alg_dble *Y);
 extern void swap_alg(int vol, su3_alg_dble *X, su3_alg_dble *Y);
-extern void muladd_assign_alg(int vol, double r, su3_alg_dble *X,
+extern void add_alg(int vol, su3_alg_dble const *X, su3_alg_dble *Y);
+extern void muladd_assign_alg(int vol, double r, su3_alg_dble const *X,
                               su3_alg_dble *Y);
+extern void project_to_su3alg(su3_dble const *u, su3_alg_dble *X);
+extern void su3alg_to_cm3x3(su3_alg_dble const *X, su3_dble *u);
 
 /* SALG_C */
 extern complex spinor_prod(int vol, int icom, spinor *s, spinor *r);

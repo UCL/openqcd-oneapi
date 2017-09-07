@@ -76,6 +76,14 @@ static void LatComputedAw(void) { lat.aw = lat.ud; }
 
 static void LatComputedAwhat(void) { lat.awh = lat.ud; }
 
+static void LatUdFieldSmeared(void)
+{
+  lat.smeared_tag = lat.ud;
+  lat.is_smeared = 1;
+}
+
+static void LatUdFieldUnsmeared(void) { lat.is_smeared = 0; }
+
 static void set_events(void)
 {
   event_fcts[(int)(UPDATED_U)] = LatUpdatedU;
@@ -95,6 +103,8 @@ static void set_events(void)
   event_fcts[(int)(ERASED_AWHAT)] = LatErasedAwhat;
   event_fcts[(int)(COMPUTED_AW)] = LatComputedAw;
   event_fcts[(int)(COMPUTED_AWHAT)] = LatComputedAwhat;
+  event_fcts[(int)(SMEARED_UD)] = LatUdFieldSmeared;
+  event_fcts[(int)(UNSMEARED_UD)] = LatUdFieldUnsmeared;
 }
 
 #endif

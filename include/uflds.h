@@ -17,6 +17,10 @@
 #include "su3.h"
 #endif
 
+#ifndef FLAGS_H
+#include "flags.h"
+#endif
+
 /* BSTAP_C */
 extern su3_dble *bstap(void);
 extern void set_bstap(void);
@@ -41,8 +45,10 @@ extern void random_ud(void);
 extern void renormalize_u(void);
 extern void renormalize_ud(void);
 extern void assign_ud2u(void);
+extern void swap_udfld(su3_dble **new_field);
 
 /* UDCOM_C */
 extern void copy_bnd_ud(void);
+extern void copy_boundaries_udfield(su3_dble *ud_field);
 
 #endif

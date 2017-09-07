@@ -42,6 +42,8 @@ typedef enum {
   ERASED_AWHAT,
   COMPUTED_AW,
   COMPUTED_AWHAT,
+  SMEARED_UD,
+  UNSMEARED_UD,
   EVENTS
 } event_t;
 
@@ -60,6 +62,8 @@ typedef enum {
   SWD_O_INVERTED,
   AW_UP2DATE,
   AWHAT_UP2DATE,
+  UD_IS_SMEARED,
+  SMEARED_UD_UP2DATE,
   QUERIES
 } query_t;
 
@@ -99,6 +103,7 @@ typedef struct
   int ipf, im0;
   int irat[3], imu[4];
   int isp[4];
+  int smear;
 } action_parms_t;
 
 typedef struct
@@ -226,6 +231,17 @@ typedef struct
   double eps;
 } wflow_parms_t;
 
+typedef struct
+{
+  int num_smear;
+
+  int smear_temporal;
+  double rho_temporal;
+
+  int smear_spatial;
+  double rho_spatial;
+} stout_smearing_params_t;
+
 /* FLAGS_C */
 extern void set_flags(event_t event);
 extern void set_grid_flags(blk_grid_t grid, event_t event);
@@ -236,7 +252,8 @@ extern void print_grid_flags(blk_grid_t grid);
 
 /* ACTION_PARMS_C */
 extern action_parms_t set_action_parms(int iact, action_t action, int ipf,
-                                       int im0, int *irat, int *imu, int *isp);
+                                       int im0, int *irat, int *imu, int *isp,
+                                       int smear);
 extern action_parms_t action_parms(int iact);
 extern void read_action_parms(int iact);
 extern void print_action_parms(void);
@@ -349,5 +366,10 @@ extern void check_solver_parms(FILE *fdat);
 /* WFLOW_PARMS_C */
 extern wflow_parms_t set_wflow_parms(int n, double eps);
 extern wflow_parms_t wflow_parms(void);
+
+/* SMEARING_PARMS_C */
+extern stout_smearing_params_t set_stout_smearing_parms(int n, double pt,
+                                                        double ps);
+extern stout_smearing_params_t sout_smearing_parms(void);
 
 #endif

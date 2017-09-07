@@ -60,6 +60,10 @@ static int QueryAwhatUp2date(void)
   return ((lat.ud > 0) && (lat.awh == lat.ud));
 }
 
+static int QueryUdIsSmeared(void) { return lat.is_smeared; }
+
+static int QueryUdSmearingUp2date(void) { return (lat.smeared_tag == lat.ud); }
+
 static void set_queries(void)
 {
   query_fcts[(int)(U_MATCH_UD)] = QueryUMatchUd;
@@ -74,6 +78,8 @@ static void set_queries(void)
   query_fcts[(int)(SWD_O_INVERTED)] = QuerySwdOInverted;
   query_fcts[(int)(AW_UP2DATE)] = QueryAwUp2date;
   query_fcts[(int)(AWHAT_UP2DATE)] = QueryAwhatUp2date;
+  query_fcts[(int)(UD_IS_SMEARED)] = QueryUdIsSmeared;
+  query_fcts[(int)(SMEARED_UD_UP2DATE)] = QueryUdSmearingUp2date;
 }
 
 #endif
