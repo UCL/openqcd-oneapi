@@ -89,7 +89,7 @@ static void compute_omega_field(su3_dble const *gfield)
   int num_links, plane_id, ix;
   stout_smearing_params_t smear_params;
 
-  smear_params = sout_smearing_parms();
+  smear_params = stout_smearing_parms();
 
   if (omega_matrix == NULL)
     alloc_omega_field();
@@ -148,7 +148,7 @@ static void cycle_smeared_fields(int direction)
   stout_smearing_params_t smear_params;
   su3_dble **sfields;
 
-  smear_params = sout_smearing_parms();
+  smear_params = stout_smearing_parms();
 
   if (direction > 0) {
     begin = 0;
@@ -190,7 +190,7 @@ static void compute_and_apply_smearing(void)
   su3_dble *udb;
   ch_mat_coeff_pair_t **ch_coeffs;
 
-  smear_params = sout_smearing_parms();
+  smear_params = stout_smearing_parms();
   nsmear = smear_params.num_smear;
 
   num_links = 4 * VOLUME + 7 * BNDRY / 4;

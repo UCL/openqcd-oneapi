@@ -70,6 +70,11 @@ static double aslE[N0], aslB[N0];
 static su3_dble *udb;
 static su3_dble wd1, wd2 ALIGNED16;
 
+static double real_trace(su3_dble const *u)
+{
+  return u->c11.re + u->c22.re + u->c33.re;
+}
+
 static double plaq_dble(int n, int ix)
 {
   int ip[4];
@@ -279,4 +284,54 @@ double plaq_action_slices(double *asl)
     A += asl[t];
 
   return A;
+}
+
+double spatial_link_sum(int icom)
+{
+  int ix, mu;
+  double local_link_sum, total_link_sum;
+  su3_dble const *ufld;
+
+  ufld = udfld();
+  local_link_sum = 0.0;
+
+  for (ix = VOLUME / 2; ix < VOLUME; ++ix) {
+    for (mu = 1; mu < 4; ++mu) {
+      local_link_sum += real_trace(ufld + 8 * (ix - VOLUME / 2) + 2 * mu);
+      local_link_sum += real_trace(ufld + 8 * (ix - VOLUME / 2) + 2 * mu + 1);
+    }
+  }
+
+  if ((NPROC > 1) && (icom == 1)) {
+    MPI_Reduce(&local_link_sum, &total_link_sum, 1, MPI_DOUBLE, MPI_SUM, 0,
+               MPI_COMM_WORLD);
+    MPI_Bcast(&total_link_sum, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    local_link_sum = total_link_sum;
+  }
+
+  return local_link_sum;
+}
+
+double temporal_link_sum(int icom)
+{
+  int ix;
+  double local_link_sum, total_link_sum;
+  su3_dble const *ufld;
+
+  ufld = udfld();
+  local_link_sum = 0.0;
+
+  for (ix = VOLUME / 2; ix < VOLUME; ++ix) {
+    local_link_sum += real_trace(ufld + 8 * (ix - VOLUME / 2));
+    local_link_sum += real_trace(ufld + 8 * (ix - VOLUME / 2) + 1);
+  }
+
+  if ((NPROC > 1) && (icom == 1)) {
+    MPI_Reduce(&local_link_sum, &total_link_sum, 1, MPI_DOUBLE, MPI_SUM, 0,
+               MPI_COMM_WORLD);
+    MPI_Bcast(&total_link_sum, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    local_link_sum = total_link_sum;
+  }
+
+  return local_link_sum;
 }

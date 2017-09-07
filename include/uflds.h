@@ -29,6 +29,8 @@ extern void set_bstap(void);
 extern double plaq_sum_dble(int icom);
 extern double plaq_wsum_dble(int icom);
 extern double plaq_action_slices(double *asl);
+extern double spatial_link_sum(int icom);
+extern double temporal_link_sum(int icom);
 
 /* SHIFT_C */
 extern int shift_ud(int *s);

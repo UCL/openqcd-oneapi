@@ -21,7 +21,7 @@ void allocate_smeared_fields(void)
   int nsmear, nlinks, i;
   stout_smearing_params_t smear_params;
 
-  smear_params = sout_smearing_parms();
+  smear_params = stout_smearing_parms();
   nsmear = smear_params.num_smear;
 
   if (nsmear > 0) {
@@ -82,7 +82,7 @@ void allocate_smearing_ch_coeff_fields(void)
   int nsmear, nlinks, i;
   stout_smearing_params_t smear_params;
 
-  smear_params = sout_smearing_parms();
+  smear_params = stout_smearing_parms();
   nsmear = smear_params.num_smear;
 
   if (nsmear > 0) {

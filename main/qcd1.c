@@ -37,6 +37,7 @@
 #include "tcharge.h"
 #include "version.h"
 #include "global.h"
+#include "stout_smearing.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -46,7 +47,9 @@
 typedef struct
 {
   int nt, iac;
-  double dH, avpl;
+  double dH, avpl, avpl_smeared;
+  double average_t_link, average_s_link;
+  double average_stout_t_link, average_stout_s_link;
 } dat_t;
 
 static struct
@@ -67,6 +70,7 @@ static int level, seed;
 static int nth, ntr, dtr_log, dtr_ms, dtr_cnfg;
 static int ipgrd[2], flint;
 static double *Wact, *Yact, *Qtop;
+static double npl, volume;
 
 static char line[NAME_SIZE];
 static char log_dir[NAME_SIZE], dat_dir[NAME_SIZE];
@@ -1540,11 +1544,51 @@ static void print_info(int icnfg)
 
 static void print_log(dat_t *ndat)
 {
+  double average_link, average_stout_link;
+  stout_smearing_params_t smear_params;
+
   if (my_rank == 0) {
     printf("Trajectory no %d\n", (*ndat).nt);
-    printf("dH = %+.1e, ", (*ndat).dH);
+    printf("dH = %+.2e, ", (*ndat).dH);
     printf("iac = %d\n", (*ndat).iac);
-    printf("Average plaquette = %.6f\n", (*ndat).avpl);
+
+    smear_params = stout_smearing_parms();
+
+    if (smear_params.num_smear > 1) {
+      printf("Average plaquette (thin)  = %.15f\n", (*ndat).avpl);
+      printf("Average plaquette (stout) = %.15f\n", (*ndat).avpl_smeared);
+    } else {
+      printf("Average plaquette = %.15f\n", (*ndat).avpl);
+    }
+
+    if (bc_type() == 3) {
+      if ((smear_params.num_smear > 1) && (smear_params.rho_temporal != 0.0)) {
+        printf("Average temporal link (thin)  = %.15f\n",
+               (*ndat).average_t_link);
+        printf("Average temporal link (stout) = %.15f\n",
+               (*ndat).average_stout_t_link);
+      } else {
+        printf("Average temporal link = %.15f\n", (*ndat).average_t_link);
+      }
+
+      average_link = (3 * ndat->average_s_link + ndat->average_t_link) / 4;
+
+      if (smear_params.num_smear > 1) {
+        average_stout_link =
+            (3 * ndat->average_stout_s_link + ndat->average_stout_t_link) / 4;
+
+        printf("Average spatial link (thin)  = %.15f\n",
+               (*ndat).average_s_link);
+        printf("Average spatial link (stout) = %.15f\n",
+               (*ndat).average_stout_s_link);
+        printf("Average link (thin)  = %.15f\n", average_link);
+        printf("Average link (stout) = %.15f\n", average_stout_link);
+      } else {
+        printf("Average spatial link = %.15f\n", (*ndat).average_s_link);
+        printf("Average link = %.15f\n", average_link);
+      }
+    }
+
     print_all_avgstat();
   }
 }
@@ -1667,12 +1711,58 @@ static void remove_cnfg(int icnfg)
   }
 }
 
+static dat_t compute_log_values(double const *act0, double const *act1,
+                                int nact, int iac, int nt)
+{
+  int i;
+  double w0[7], w1[7];
+  dat_t ndat;
+
+  w0[0] = 0.0;
+  for (i = 0; i <= hmc.nact; i++)
+    w0[0] += (act1[i] - act0[i]);
+
+  w0[1] = plaq_wsum_dble(0) / npl;
+
+  if (bc_type() == 3) {
+    w0[2] = temporal_link_sum(0) / volume;
+    w0[3] = spatial_link_sum(0) / (3 * volume);
+  }
+
+  if (stout_smearing_parms().num_smear > 1) {
+    smear_fields();
+    w0[4] = plaq_wsum_dble(0) / npl;
+
+    if (bc_type() == 3) {
+      w0[5] = temporal_link_sum(0) / volume;
+      w0[6] = spatial_link_sum(0) / (3 * volume);
+    }
+    unsmear_fields();
+  }
+
+  mpc_gsum_d(w0, w1, 7);
+
+  ndat.nt = nt;
+  ndat.iac = iac;
+  ndat.dH = w1[0];
+
+  ndat.avpl = w1[1];
+  ndat.average_t_link = w1[2];
+  ndat.average_s_link = w1[3];
+
+  ndat.avpl_smeared = w1[4];
+  ndat.average_stout_t_link = w1[5];
+  ndat.average_stout_s_link = w1[6];
+
+  return ndat;
+}
+
 int main(int argc, char *argv[])
 {
   int nl, icnfg;
   int nwud, nws, nwsd, nwv, nwvd;
-  int n, iend, iac, i;
-  double *act0, *act1, w0[2], w1[2], npl, siac;
+  int n, iend, iac;
+  double *act0, *act1, siac;
   double wt1, wt2, wtcyc, wtall, wtms, wtmsall;
   su3_dble **usv;
   dat_t ndat;
@@ -1712,6 +1802,8 @@ int main(int argc, char *argv[])
   else
     npl = (double)(6 * N0 * N1) * (double)(N2 * N3);
 
+  volume = (double)(N0 * N1) * (double)(N2 * N3);
+
   iend = 0;
   siac = 0.0;
   wtcyc = 0.0;
@@ -1732,20 +1824,7 @@ int main(int argc, char *argv[])
     wtcyc += (wt2 - wt1);
 
     if (((ntr - n - 1) % dtr_log) == 0) {
-      w0[0] = 0.0;
-
-      for (i = 0; i <= hmc.nact; i++)
-        w0[0] += (act1[i] - act0[i]);
-
-      w0[1] = plaq_wsum_dble(0) / npl;
-
-      mpc_gsum_d(w0, w1, 2);
-
-      ndat.nt = nl + n + 1;
-      ndat.iac = iac;
-      ndat.dH = w1[0];
-      ndat.avpl = w1[1];
-
+      ndat = compute_log_values(act0, act1, hmc.nact, iac, nl + n + 1);
       print_log(&ndat);
       wtall += wtcyc;
       save_dat(n, siac, wtcyc, wtall, &ndat);
