@@ -370,6 +370,6 @@ extern wflow_parms_t wflow_parms(void);
 /* SMEARING_PARMS_C */
 extern stout_smearing_params_t set_stout_smearing_parms(int n, double pt,
                                                         double ps);
-extern stout_smearing_params_t sout_smearing_parms(void);
+extern stout_smearing_params_t stout_smearing_parms(void);
 
 #endif

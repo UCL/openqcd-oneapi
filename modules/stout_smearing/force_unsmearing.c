@@ -438,7 +438,7 @@ static void compute_xi_field(su3_alg_dble const *force, su3_dble const *gfield,
   int num_links, plane_id, ix;
   stout_smearing_params_t smear_params;
 
-  smear_params = sout_smearing_parms();
+  smear_params = stout_smearing_parms();
 
   compute_lambda_field(force, gfield, sgfield, ch_coeffs);
 
@@ -505,7 +505,7 @@ void unsmear_force(su3_alg_dble *force)
   ch_mat_coeff_pair_t **ch_coeffs;
   stout_smearing_params_t smear_params;
 
-  smear_params = sout_smearing_parms();
+  smear_params = stout_smearing_parms();
 
   error(smear_params.num_smear == 0, 1, "unsmear_force [force_unsmearing.c]",
         "Stout smearing is not turned on, there is no need to unsmear the MD "

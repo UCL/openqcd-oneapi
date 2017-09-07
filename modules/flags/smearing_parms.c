@@ -49,4 +49,4 @@ stout_smearing_params_t set_stout_smearing_parms(int n, double pt, double ps)
   return ssp;
 }
 
-stout_smearing_params_t sout_smearing_parms() { return ssp; }
+stout_smearing_params_t stout_smearing_parms() { return ssp; }
