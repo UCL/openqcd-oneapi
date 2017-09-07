@@ -219,10 +219,10 @@ typedef struct
   double xi;
   double cR;
   double cT;
-  double us;
-  double ut;
-  double us_tilde;
-  double ut_tilde;
+  double us_gauge;
+  double ut_gauge;
+  double us_fermion;
+  double ut_fermion;
 } ani_params_t;
 
 typedef struct

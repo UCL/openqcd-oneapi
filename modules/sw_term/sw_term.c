@@ -187,9 +187,10 @@ static void set_swd(int vol, int ofs, u3_alg_dble **ft, pauli_dble *sw)
   cs = c2;
 
   if (ani.has_ani) {
-    ct *= ani.cT / (ani.us_tilde * ani.us_tilde * ani.ut_tilde * ani.ut_tilde);
-    cs *= ani.cR /
-          (ani.xi * ani.us_tilde * ani.us_tilde * ani.us_tilde * ani.ut_tilde);
+    ct *= ani.cT /
+          (ani.us_fermion * ani.us_fermion * ani.ut_fermion * ani.ut_fermion);
+    cs *= ani.cR / (ani.xi * ani.us_fermion * ani.us_fermion * ani.us_fermion *
+                    ani.ut_fermion);
   }
 
   bc = bc_type();

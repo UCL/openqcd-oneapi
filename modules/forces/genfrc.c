@@ -81,9 +81,10 @@ void sw_frc(double c)
 
   ani = ani_parms();
 
-  ct = ani.cT / (ani.us_tilde * ani.us_tilde * ani.ut_tilde * ani.ut_tilde);
+  ct = ani.cT /
+       (ani.us_fermion * ani.us_fermion * ani.ut_fermion * ani.ut_fermion);
   cs = ani.cR / ani.xi * 1.0 /
-       (ani.us_tilde * ani.us_tilde * ani.us_tilde * ani.ut_tilde);
+       (ani.us_fermion * ani.us_fermion * ani.us_fermion * ani.ut_fermion);
 
   bc = bc_type();
   swp = sw_parms();

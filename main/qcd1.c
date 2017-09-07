@@ -1000,21 +1000,34 @@ static void read_wflow_parms(void)
 
 static void read_ani_parms(void)
 {
-
   int has_tts;
-  double nu, xi, cR, cT, us, ut, us_tilde, ut_tilde;
+  long section_pos;
+  double nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion, ut_fermion;
 
   if (my_rank == 0) {
-    find_section("Anisotropy parameters");
-    read_line("use_tts", "%d", &has_tts);
-    read_line("nu", "%lf", &nu);
-    read_line("xi", "%lf", &xi);
-    read_line("cR", "%lf", &cR);
-    read_line("cT", "%lf", &cT);
-    read_line("us", "%lf", &us);
-    read_line("ut", "%lf", &ut);
-    read_line("us_tilde", "%lf", &us_tilde);
-    read_line("ut_tilde", "%lf", &ut_tilde);
+    section_pos = find_optional_section("Anisotropy parameters");
+
+    if (section_pos == No_Section_Found) {
+      has_tts = 1;
+      nu = 1.0;
+      xi = 1.0;
+      cR = 1.0;
+      cT = 1.0;
+      us_gauge = 1.0;
+      ut_gauge = 1.0;
+      us_fermion = 1.0;
+      ut_fermion = 1.0;
+    } else {
+      read_optional_line("use_tts", "%d", &has_tts, 1);
+      read_line("nu", "%lf", &nu);
+      read_line("xi", "%lf", &xi);
+      read_line("cR", "%lf", &cR);
+      read_line("cT", "%lf", &cT);
+      read_optional_line("us_gauge", "%lf", &us_gauge, 1.0);
+      read_optional_line("ut_gauge", "%lf", &ut_gauge, 1.0);
+      read_optional_line("us_fermion", "%lf", &us_fermion, 1.0);
+      read_optional_line("ut_fermion", "%lf", &ut_fermion, 1.0);
+    }
   }
 
   mpc_bcast_i(&has_tts, 1);
@@ -1022,12 +1035,13 @@ static void read_ani_parms(void)
   mpc_bcast_d(&xi, 1);
   mpc_bcast_d(&cR, 1);
   mpc_bcast_d(&cT, 1);
-  mpc_bcast_d(&us, 1);
-  mpc_bcast_d(&ut, 1);
-  mpc_bcast_d(&us_tilde, 1);
-  mpc_bcast_d(&ut_tilde, 1);
+  mpc_bcast_d(&us_gauge, 1);
+  mpc_bcast_d(&ut_gauge, 1);
+  mpc_bcast_d(&us_fermion, 1);
+  mpc_bcast_d(&ut_fermion, 1);
 
-  set_ani_parms(has_tts, nu, xi, cR, cT, us, ut, us_tilde, ut_tilde);
+  set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion,
+                ut_fermion);
 }
 
 static void read_infile(int argc, char *argv[])

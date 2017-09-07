@@ -155,8 +155,8 @@ void apply_ani_ud(void)
   if (!ani.has_ani)
     return;
 
-  ani_t = 1.0 / (ani.ut_tilde);
-  ani_s = (ani.nu) / (ani.xi * ani.ut_tilde);
+  ani_t = 1.0 / (ani.ut_fermion);
+  ani_s = (ani.nu) / (ani.xi * ani.ut_fermion);
 
   u = udfld();
   um = u + 4 * VOLUME;
@@ -183,8 +183,8 @@ void remove_ani_ud(void)
   if (!ani.has_ani)
     return;
 
-  ani_inv_t = ani.ut_tilde;
-  ani_inv_s = (ani.xi * ani.ut_tilde) / ani.nu;
+  ani_inv_t = ani.ut_fermion;
+  ani_inv_s = (ani.xi * ani.ut_fermion) / ani.nu;
 
   u = udfld();
   um = u + 4 * VOLUME;

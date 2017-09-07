@@ -681,14 +681,15 @@ tm_parms_t set_tm_parms(int eoflg)
 tm_parms_t tm_parms(void) { return tm; }
 
 ani_params_t set_ani_parms(int use_tts, double nu, double xi, double cR,
-                           double cT, double us, double ut, double us_tilde,
-                           double ut_tilde)
+                           double cT, double us_gauge, double ut_gauge,
+                           double us_fermion, double ut_fermion)
 {
   int iprms[2];
   double dprms[8];
 
-  if ((nu == 1.0) && (xi == 1.0) && (cR == 1.0) && (cT == 1.0) && (us == 1.0) &&
-      (ut == 1.0) && (us_tilde == 1.0) && (ut_tilde == 1.0)) {
+  if ((nu == 1.0) && (xi == 1.0) && (cR == 1.0) && (cT == 1.0) &&
+      (us_gauge == 1.0) && (ut_gauge == 1.0) && (us_fermion == 1.0) &&
+      (ut_fermion == 1.0)) {
     iprms[0] = 0;
   } else {
     iprms[0] = 1;
@@ -704,10 +705,10 @@ ani_params_t set_ani_parms(int use_tts, double nu, double xi, double cR,
   dprms[1] = xi;
   dprms[2] = cR;
   dprms[3] = cT;
-  dprms[4] = us;
-  dprms[5] = ut;
-  dprms[6] = us_tilde;
-  dprms[7] = ut_tilde;
+  dprms[4] = us_gauge;
+  dprms[5] = ut_gauge;
+  dprms[6] = us_fermion;
+  dprms[7] = ut_fermion;
 
   if (NPROC > 1) {
     MPI_Bcast(iprms, 2, MPI_INT, 0, MPI_COMM_WORLD);
@@ -720,10 +721,10 @@ ani_params_t set_ani_parms(int use_tts, double nu, double xi, double cR,
   ani.xi = dprms[1];
   ani.cR = dprms[2];
   ani.cT = dprms[3];
-  ani.us = dprms[4];
-  ani.ut = dprms[5];
-  ani.us_tilde = dprms[6];
-  ani.ut_tilde = dprms[7];
+  ani.us_gauge = dprms[4];
+  ani.ut_gauge = dprms[5];
+  ani.us_fermion = dprms[6];
+  ani.ut_fermion = dprms[7];
 
   return ani;
 }
@@ -747,13 +748,13 @@ void print_ani_parms(void)
     printf("cR = %.*f\n", IMAX(n, 1), ani.cR);
     n = fdigits(ani.cT);
     printf("cT = %.*f\n", IMAX(n, 1), ani.cT);
-    n = fdigits(ani.ut);
-    printf("ut = %.*f\n", IMAX(n, 1), ani.ut);
-    n = fdigits(ani.us);
-    printf("us = %.*f\n", IMAX(n, 1), ani.us);
-    n = fdigits(ani.us_tilde);
-    printf("us_tilde = %.*f\n", IMAX(n, 1), ani.us_tilde);
-    n = fdigits(ani.ut_tilde);
-    printf("ut_tilde = %.*f\n", IMAX(n, 1), ani.ut_tilde);
+    n = fdigits(ani.ut_gauge);
+    printf("ut_gauge = %.*f\n", IMAX(n, 1), ani.ut_gauge);
+    n = fdigits(ani.us_gauge);
+    printf("us_gauge = %.*f\n", IMAX(n, 1), ani.us_gauge);
+    n = fdigits(ani.us_fermion);
+    printf("us_fermion = %.*f\n", IMAX(n, 1), ani.us_fermion);
+    n = fdigits(ani.ut_fermion);
+    printf("ut_fermion = %.*f\n", IMAX(n, 1), ani.ut_fermion);
   }
 }
