@@ -235,9 +235,9 @@ void plaq_frc(void)
   gamma_g = ani.xi;
   one_over_gamma_g = 1.0 / gamma_g;
 
-  ut2 = 1.0 / (ani.ut * ani.ut);
-  us2 = 1.0 / (ani.us * ani.us);
-  us4 = us2 * 1.0 / (ani.us * ani.us);
+  ut2 = 1.0 / (ani.ut_gauge * ani.ut_gauge);
+  us2 = 1.0 / (ani.us_gauge * ani.us_gauge);
+  us4 = us2 * 1.0 / (ani.us_gauge * ani.us_gauge);
 
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
@@ -323,10 +323,10 @@ void force0(double c)
   ani = ani_parms();
   gamma_g = ani.xi;
   one_over_gamma_g = 1.0 / gamma_g;
-  ut2 = 1.0 / (ani.ut * ani.ut);
-  us2 = 1.0 / (ani.us * ani.us);
-  us4 = us2 * 1.0 / (ani.us * ani.us);
-  us6 = us4 * 1.0 / (ani.us * ani.us);
+  ut2 = 1.0 / (ani.ut_gauge * ani.ut_gauge);
+  us2 = 1.0 / (ani.us_gauge * ani.us_gauge);
+  us4 = us2 * 1.0 / (ani.us_gauge * ani.us_gauge);
+  us6 = us4 * 1.0 / (ani.us_gauge * ani.us_gauge);
 
   if (query_flags(UDBUF_UP2DATE) != 1)
     copy_bnd_ud();
@@ -336,7 +336,7 @@ void force0(double c)
 
   if (force_buffer == NULL)
     alloc_force_buffer();
-  
+
   fdb = force_buffer;
   set_alg2zero(4 * VOLUME + 7 * (BNDRY / 4), fdb);
 
@@ -643,10 +643,10 @@ double action0(int icom)
   ani = ani_parms();
   gamma_g = ani.xi;
   one_over_gamma_g = 1.0 / gamma_g;
-  ut2 = 1.0 / (ani.ut * ani.ut);
-  us2 = 1.0 / (ani.us * ani.us);
-  us4 = us2 * 1.0 / (ani.us * ani.us);
-  us6 = us4 * 1.0 / (ani.us * ani.us);
+  ut2 = 1.0 / (ani.ut_gauge * ani.ut_gauge);
+  us2 = 1.0 / (ani.us_gauge * ani.us_gauge);
+  us4 = us2 * 1.0 / (ani.us_gauge * ani.us_gauge);
+  us6 = us4 * 1.0 / (ani.us_gauge * ani.us_gauge);
 
   if (!ani.has_tts) {
     tts_weight = 0.0;

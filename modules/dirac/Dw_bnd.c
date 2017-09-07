@@ -81,11 +81,11 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
   block_t *b;
   bndry_t *bb;
   ani_params_t ani;
-  float ut_tilde;
+  float ut_fermion;
 
   ani = ani_parms();
   one_over_gammaf = (float)(ani.nu / ani.xi);
-  ut_tilde = (float)(1.0 / ani.ut_tilde);
+  ut_fermion = (float)(1.0 / ani.ut_fermion);
 
   b = blk_list(grid, &nb, &isw);
 
@@ -107,7 +107,7 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
 
   bc = bc_type();
   moh = -0.5f;
-  moh *= ut_tilde;
+  moh *= ut_fermion;
 
   s = (*b).s[k];
 

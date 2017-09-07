@@ -116,7 +116,7 @@ typedef union
 
 static double coe, ceo;
 static double gamma_f, one_over_gammaf;
-static double one_over_ut_tilde;
+static double one_over_ut_fermion;
 static const spinor_dble sd0 = {{{0.0}}};
 static spin_t rs ALIGNED32;
 
@@ -1823,7 +1823,7 @@ void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
   ani = ani_parms();
   gamma_f = ani.xi / ani.nu;
   one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+  one_over_ut_fermion = 1.0 / ani.ut_fermion;
 
   if (tm.eoflg == 1)
     mu = 0.0;
@@ -1831,8 +1831,8 @@ void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
   coe = -0.5;
   ceo = -0.5;
 
-  coe *= one_over_ut_tilde;
-  ceo *= one_over_ut_tilde;
+  coe *= one_over_ut_fermion;
+  ceo *= one_over_ut_fermion;
 
   bc = bc_type();
   piup = iup[VOLUME / 2];
@@ -2021,10 +2021,10 @@ void Dwoe_dble(spinor_dble *s, spinor_dble *r)
   ani = ani_parms();
   gamma_f = ani.xi / ani.nu;
   one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+  one_over_ut_fermion = 1.0 / ani.ut_fermion;
 
   coe = -0.5;
-  coe *= one_over_ut_tilde;
+  coe *= one_over_ut_fermion;
 
   bc = bc_type();
   piup = iup[VOLUME / 2];
@@ -2086,10 +2086,10 @@ void Dweo_dble(spinor_dble *s, spinor_dble *r)
   ani = ani_parms();
   gamma_f = ani.xi / ani.nu;
   one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+  one_over_ut_fermion = 1.0 / ani.ut_fermion;
 
   ceo = 0.5;
-  ceo *= one_over_ut_tilde;
+  ceo *= one_over_ut_fermion;
 
   bc = bc_type();
   piup = iup[VOLUME / 2];
@@ -2156,13 +2156,13 @@ void Dwhat_dble(double mu, spinor_dble *s, spinor_dble *r)
   ani = ani_parms();
   gamma_f = ani.xi / ani.nu;
   one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+  one_over_ut_fermion = 1.0 / ani.ut_fermion;
 
   coe = -0.5;
   ceo = 0.5;
 
-  coe *= one_over_ut_tilde;
-  ceo *= one_over_ut_tilde;
+  coe *= one_over_ut_fermion;
+  ceo *= one_over_ut_fermion;
 
   bc = bc_type();
   piup = iup[VOLUME / 2];
@@ -2263,7 +2263,7 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   ani = ani_parms();
   gamma_f = ani.xi / ani.nu;
   one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+  one_over_ut_fermion = 1.0 / ani.ut_fermion;
 
   if (tm.eoflg == 1)
     mu = 0.0;
@@ -2271,8 +2271,8 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   coe = -0.5;
   ceo = -0.5;
 
-  coe *= one_over_ut_tilde;
-  ceo *= one_over_ut_tilde;
+  coe *= one_over_ut_fermion;
+  ceo *= one_over_ut_fermion;
 
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
@@ -2534,10 +2534,10 @@ void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l)
   ani = ani_parms();
   gamma_f = ani.xi / ani.nu;
   one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+  one_over_ut_fermion = 1.0 / ani.ut_fermion;
 
   coe = -0.5;
-  coe *= one_over_ut_tilde;
+  coe *= one_over_ut_fermion;
 
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
@@ -2622,10 +2622,10 @@ void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l)
   ani = ani_parms();
   gamma_f = ani.xi / ani.nu;
   one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+  one_over_ut_fermion = 1.0 / ani.ut_fermion;
 
   ceo = 0.5;
-  ceo *= one_over_ut_tilde;
+  ceo *= one_over_ut_fermion;
 
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
@@ -2715,13 +2715,13 @@ void Dwhat_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   ani = ani_parms();
   gamma_f = ani.xi / ani.nu;
   one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_tilde = 1.0 / ani.ut_tilde;
+  one_over_ut_fermion = 1.0 / ani.ut_fermion;
 
   coe = -0.5;
   ceo = 0.5;
 
-  coe *= one_over_ut_tilde;
-  ceo *= one_over_ut_tilde;
+  coe *= one_over_ut_fermion;
+  ceo *= one_over_ut_fermion;
 
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
