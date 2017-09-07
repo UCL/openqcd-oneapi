@@ -63,6 +63,11 @@
 *     of the file and positions the file pointer to the next line. On
 *     processes other than 0, the program does nothing and returns -1L.
 *
+*   long read_optional_line(char *tag, char *format, ...)
+*     Same behaviour as read_line(), however you may specify a second argument
+*     for every argument that gives an optional value which will be used if the
+*     tag cannot be found.
+*
 *   int count_tokens(char *tag)
 *     On process 0, this program finds and reads a line from stdin, exactly
 *     as read_line(tag,..) does, and returns the number of tokens found on
@@ -140,6 +145,8 @@
 #include "mpi.h"
 #include "utils.h"
 #include "global.h"
+
+long const No_Section_Found = -1L;
 
 static char text[512];
 static char line[NAME_SIZE + 1];
@@ -362,7 +369,7 @@ static char *get_line(void)
   return s;
 }
 
-long find_section(char *title)
+static long find_section_impl(char *title, int optional)
 {
   int my_rank, ie;
   long ofs, sofs;
@@ -395,16 +402,32 @@ long find_section(char *title)
       s = get_line();
     }
 
-    error_root(sofs == -1L, 1, "find_section [mutils.c]",
+    error_root(!optional && (sofs == -1L), 1, "find_section [mutils.c]",
                "Section [%s] not found", title);
-    ie = fseek(stdin, sofs, SEEK_SET);
-    error_root(ie != 0, 1, "find_section [mutils.c]",
-               "Unable to go to section [%s]", title);
-    get_line();
+
+    if (sofs != -1L) {
+      ie = fseek(stdin, sofs, SEEK_SET);
+      error_root(ie != 0, 1, "find_section [mutils.c]",
+                 "Unable to go to section [%s]", title);
+      get_line();
+    } else {
+      fseek(stdin, ofs, SEEK_SET);
+    }
 
     return sofs;
-  } else
+  } else {
     return -1L;
+  }
+}
+
+long find_section(char *title)
+{
+  return find_section_impl(title, 0);
+}
+
+long find_optional_section(char *title)
+{
+  return find_section_impl(title, 1);
 }
 
 static void check_tag(char *tag)
@@ -417,7 +440,7 @@ static void check_tag(char *tag)
              1, "check_tag [mutils.c]", "Improper tag %s", tag);
 }
 
-static long find_tag(char *tag)
+static long find_tag_impl(char *tag, int optional)
 {
   int ie;
   long tofs, lofs, ofs;
@@ -438,8 +461,9 @@ static long find_tag(char *tag)
       if (ofs < lofs) {
         ie = 0;
         tofs = -1L;
-      } else
+      } else {
         break;
+      }
     } else {
       pl = line + strspn(line, " \t");
       pr = pl + strcspn(pl, " \t\n");
@@ -456,74 +480,133 @@ static long find_tag(char *tag)
     s = get_line();
   }
 
-  error_root(tofs == -1L, 1, "find_tag [mutils.c]", "Tag %s not found", tag);
+  error_root(!optional && (tofs == -1L), 1, "find_tag [mutils.c]",
+             "Tag %s not found", tag);
+
   error_root(ie != 0, 1, "find_tag [mutils.c]",
              "Tag %s occurs more than once in the current section", tag);
+  
+  if (tofs != -1L) {
+    ie = fseek(stdin, tofs, SEEK_SET);
+    error_root(ie != 0, 1, "find_tag [mutils.c]",
+               "Unable to go to line with tag %s", tag);
+  } else {
+    ie = fseek(stdin, lofs, SEEK_SET);
+  }
 
-  ie = fseek(stdin, tofs, SEEK_SET);
-  error_root(ie != 0, 1, "find_tag [mutils.c]",
-             "Unable to go to line with tag %s", tag);
+  return tofs;
+}
+
+static long find_tag(char *tag) { return find_tag_impl(tag, 0); }
+
+static long read_line_impl(int optional, char *tag, char *format, va_list args)
+{
+  int is, ic, use_optional;
+  long tofs;
+  char *pl, *p, *str_src;
+
+  check_tag(tag);
+
+  use_optional = 0;
+
+  if (tag[0] != '\0') {
+    tofs = find_tag_impl(tag, optional);
+
+    if (tofs == -1L) {
+      use_optional = 1;
+      pl = NULL;
+    } else {
+      get_line();
+      pl = line + strspn(line, " \t");
+      pl += strcspn(pl, " \t\n");
+    }
+  } else {
+    p = format;
+    p += strspn(p, " ");
+    error_root(strstr(p, "%s") == p, 1, "read_line [mutils.c]",
+               "String data after empty tag");
+    tofs = ftell(stdin);
+    pl = get_line();
+  }
+
+  for (p = format;;) {
+    p += strspn(p, " ");
+    ic = 0;
+    is = 2;
+
+    if ((p[0] == '\0') || (p[0] == '\n')) {
+      break;
+    } else if (p == strstr(p, "%s")) {
+      if (use_optional == 0) {
+        ic = sscanf(pl, "%s", va_arg(args, char *));
+      } else {
+        str_src = va_arg(args, char*);
+        strcpy(str_src, va_arg(args, char *));
+      }
+    } else if (p == strstr(p, "%d")) {
+      if (use_optional == 0)
+        ic = sscanf(pl, "%d", va_arg(args, int *));
+      else
+        (*va_arg(args, int *)) = va_arg(args, int);
+    } else if (p == strstr(p, "%f")) {
+      if (use_optional == 0)
+        ic = sscanf(pl, "%f", va_arg(args, float *));
+      else
+        (*va_arg(args, float *)) = (float)va_arg(args, double);
+    } else if (p == strstr(p, "%lf")) {
+      is = 3;
+      if (use_optional == 0)
+        ic = sscanf(pl, "%lf", va_arg(args, double *));
+      else
+        (*va_arg(args, double *)) = va_arg(args, double);
+    } else {
+      error_root(1, 1, "read_line [mutils.c]",
+                 "Incorrect format string %s on line with tag %s", format, tag);
+    }
+
+    if (use_optional == 0)
+      error_root(ic != 1, 1, "read_line [mutils.c]",
+                 "Missing data item(s) on line with tag %s", tag);
+
+    p += is;
+    if (use_optional == 0) {
+      pl += strspn(pl, " \t");
+      pl += strcspn(pl, " \t\n");
+    }
+  }
 
   return tofs;
 }
 
 long read_line(char *tag, char *format, ...)
 {
-  int my_rank, is, ic;
+  int my_rank;
   long tofs;
-  char *pl, *p;
   va_list args;
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
   if (my_rank == 0) {
-    check_tag(tag);
-
-    if (tag[0] != '\0') {
-      tofs = find_tag(tag);
-      get_line();
-      pl = line + strspn(line, " \t");
-      pl += strcspn(pl, " \t\n");
-    } else {
-      p = format;
-      p += strspn(p, " ");
-      error_root(strstr(p, "%s") == p, 1, "read_line [mutils.c]",
-                 "String data after empty tag");
-      tofs = ftell(stdin);
-      pl = get_line();
-    }
-
     va_start(args, format);
+    tofs = read_line_impl(0, tag, format, args);
+    va_end(args);
 
-    for (p = format;;) {
-      p += strspn(p, " ");
-      ic = 0;
-      is = 2;
+    return tofs;
+  } else
+    return -1L;
+}
 
-      if ((p[0] == '\0') || (p[0] == '\n'))
-        break;
-      else if (p == strstr(p, "%s"))
-        ic = sscanf(pl, "%s", va_arg(args, char *));
-      else if (p == strstr(p, "%d"))
-        ic = sscanf(pl, "%d", va_arg(args, int *));
-      else if (p == strstr(p, "%f"))
-        ic = sscanf(pl, "%f", va_arg(args, float *));
-      else if (p == strstr(p, "%lf")) {
-        is = 3;
-        ic = sscanf(pl, "%lf", va_arg(args, double *));
-      } else
-        error_root(1, 1, "read_line [mutils.c]",
-                   "Incorrect format string %s on line with tag %s", format,
-                   tag);
+long read_optional_line(char *tag, char *format, ...)
+{
+  int my_rank;
+  long tofs;
+  va_list args;
 
-      error_root(ic != 1, 1, "read_line [mutils.c]",
-                 "Missing data item(s) on line with tag %s", tag);
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-      p += is;
-      pl += strspn(pl, " \t");
-      pl += strcspn(pl, " \t\n");
-    }
-
+  if (my_rank == 0) {
+    va_start(args, format);
+    tofs = read_line_impl(1, tag, format, args);
     va_end(args);
 
     return tofs;

@@ -29,7 +29,7 @@ DFL = dfl_geometry dfl_subspace ltl_gcr dfl_sap_gcr dfl_modes
 DIRAC = Dw_dble Dw Dw_bnd
 
 FLAGS = flags action_parms dfl_parms force_parms hmc_parms lat_parms \
-        mdint_parms rat_parms rw_parms sap_parms solver_parms
+        mdint_parms rat_parms rw_parms sap_parms solver_parms smearing_parms
 
 FORCES = force0 force1 force2 force3 force4 force5 \
          frcfcts genfrc tmcg tmcgm xtensor
@@ -52,6 +52,9 @@ SAP = sap_com sap_gcr sap blk_solv
 
 SFLDS = sflds scom sdcom Pbnd Pbnd_dble
 
+SMEARING = force_unsmearing smeared_fields smeared_fields_communication \
+					 stout_smearing
+
 SU3FCTS = chexp su3prod su3ren cm3x3 random_su3
 
 SW_TERM = pauli pauli_dble swflds sw_term
@@ -70,8 +73,8 @@ WFLOW = wflow
 
 MODULES = $(ARCHIVE) $(BLOCK) $(DFL) $(DIRAC) $(FLAGS) $(FORCES) \
           $(LATTICE) $(LINALG) $(LINSOLV) $(LITTLE) $(MDFLDS) $(RANDOM) \
-          $(RATFCTS) $(SAP) $(SFLDS) $(SU3FCTS) $(SW_TERM) $(TCHARGE) \
-          $(UFLDS) $(UPDATE) $(UTILS) $(VFLDS) $(WFLOW)
+          $(RATFCTS) $(SAP) $(SFLDS) $(SMEARING) $(SU3FCTS) $(SW_TERM) \
+					$(TCHARGE) $(UFLDS) $(UPDATE) $(UTILS) $(VFLDS) $(WFLOW)
 
 
 # Logging option (-mpilog or -mpitrace or -mpianim)
@@ -85,9 +88,9 @@ MDIR = ../modules
 
 VPATH = .:$(MDIR)/flags:$(MDIR)/lattice:$(MDIR)/archive:$(MDIR)/linalg:\
           $(MDIR)/random:$(MDIR)/uflds:$(MDIR)/mdflds:$(MDIR)/su3fcts:\
-          $(MDIR)/utils:$(MDIR)/forces:$(MDIR)/sflds:$(MDIR)/dirac:\
-	  $(MDIR)/sw_term:$(MDIR)/tcharge:$(MDIR)/block:$(MDIR)/sap:\
-	  $(MDIR)/linsolv:$(MDIR)/dfl:$(MDIR)/vflds:$(MDIR)/little:\
+					$(MDIR)/utils:$(MDIR)/forces:$(MDIR)/sflds:$(MDIR)/stout_smearing:\
+					$(MDIR)/dirac:$(MDIR)/sw_term:$(MDIR)/tcharge:$(MDIR)/block:\
+					$(MDIR)/sap:$(MDIR)/linsolv:$(MDIR)/dfl:$(MDIR)/vflds:$(MDIR)/little:\
           $(MDIR)/update:$(MDIR)/wflow:$(MDIR)/ratfcts
 
 

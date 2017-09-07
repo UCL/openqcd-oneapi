@@ -25,7 +25,9 @@ typedef struct
 } mdflds_t;
 
 /* FCOM_C */
+extern void copy_boundaries_forces(su3_alg_dble *force);
 extern void copy_bnd_frc(void);
+extern void add_boundaries_force(su3_alg_dble *force);
 extern void add_bnd_frc(void);
 extern void free_fcom_bufs(void);
 

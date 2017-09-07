@@ -327,3 +327,10 @@ void assign_ud2u(void)
 
   set_flags(ASSIGNED_UD2U);
 }
+
+extern void swap_udfld(su3_dble **new_field)
+{
+  su3_dble *tmp = udb;
+  udb = (*new_field);
+  (*new_field) = tmp;
+}

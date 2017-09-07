@@ -13,11 +13,16 @@
 *
 * The externally accessible function is
 *
+*   void copy_boundaries_udfield(su3_dble* ud_field, event_t event)
+*     Copies the double-precision link variables stored in ud_field from the
+*     neighbouring MPI processes to the exterior boundaries of the local
+*     lattice. The field variables on the spatial links at the time NPROC*L0 are
+*     fetched only in the case of periodic boundary conditions.
+*
 *   void copy_bnd_ud(void)
-*     Copies the double-precision link variables from the neighbouring MPI
-*     processes to the exterior boundaries of the local lattice. The field
-*     variables on the spatial links at time NPROC0*L0 are fetched only in
-*     the case of periodic boundary conditions.
+*     Calls "copy_boundaries_udfield" with the global gauge field udfld() as the
+*     gauge field and "COPIED_BND_UD" as the event. Same as the legacy call (in
+*     openqcd 1.4).
 *
 * Notes:
 *
@@ -69,12 +74,11 @@ static void alloc_sbuf(void)
         "Unable to allocate send buffer");
 }
 
-static void pack_ud0(int mu)
+static void pack_ud0(su3_dble *udb, int mu)
 {
   int nu0, *iu, *ium;
-  su3_dble *u, *udb;
+  su3_dble *u;
 
-  udb = udfld();
   nu0 = idx[mu].nu0;
 
   if (nu0 > 0) {
@@ -89,12 +93,11 @@ static void pack_ud0(int mu)
   }
 }
 
-static void pack_udk(int mu)
+static void pack_udk(su3_dble *udb, int mu)
 {
   int nuk, *iu, *ium;
-  su3_dble *u, *udb;
+  su3_dble *u;
 
-  udb = udfld();
   nuk = idx[mu].nuk;
 
   if ((nuk > 0) && ((mu > 0) || (cpr[0] > 0) || (bc == 3))) {
@@ -165,7 +168,7 @@ static void send_udk(int mu)
   }
 }
 
-void copy_bnd_ud(void)
+void copy_boundaries_udfield(su3_dble *ud_field)
 {
   int mu;
 
@@ -173,18 +176,22 @@ void copy_bnd_ud(void)
     if (sbuf == NULL)
       alloc_sbuf();
 
-    rbuf = udfld() + 4 * VOLUME;
+    rbuf = ud_field + 4 * VOLUME;
 
     for (mu = 0; mu < 4; mu++) {
-      pack_ud0(mu);
+      pack_ud0(ud_field, mu);
       send_ud0(mu);
     }
 
     for (mu = 0; mu < 4; mu++) {
-      pack_udk(mu);
+      pack_udk(ud_field, mu);
       send_udk(mu);
     }
   }
+}
 
+void copy_bnd_ud(void)
+{
+  copy_boundaries_udfield(udfld());
   set_flags(COPIED_BND_UD);
 }

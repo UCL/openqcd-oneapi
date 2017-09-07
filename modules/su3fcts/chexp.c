@@ -92,9 +92,10 @@
 #define ALIGN 6
 #endif
 
-static void mapX2v(su3_alg_dble *X);
-static void eval_td(su3_alg_dble *X);
+static void mapX2v(su3_alg_dble const *X);
+static void eval_td(su3_alg_dble const *X);
 static void ch_init(void);
+static void square_ch_drv0_coeffs(ch_drv0_t *s_in);
 
 static int N, init_flag = 0;
 static double *c, t, d;
@@ -106,7 +107,7 @@ static const ch_drv0_t sp0 ALIGNED16 = {0.0};
 static const ch_drv1_t sp1 ALIGNED16 = {0.0};
 static const ch_drv2_t sp2 ALIGNED16 = {0.0};
 
-static void eval_td(su3_alg_dble *X)
+static void eval_td(su3_alg_dble const *X)
 {
   t = 3.0 * ((*X).c1 * (*X).c1 + (*X).c2 * (*X).c2 - (*X).c1 * (*X).c2) +
       (*X).c3 * (*X).c3 + (*X).c4 * (*X).c4 + (*X).c5 * (*X).c5 +
@@ -145,6 +146,42 @@ static void ch_init(void)
     init_flag = 1;
   } else
     init_flag = 2;
+}
+
+/* Summary:
+ *  Takes a set of CH coefficients and computes its square, meaning
+ *    (p0 + p1 X + p2 X^2)^2 = (p0' + p1' X + p2' X^2)
+ *  using the CH equations.
+ */
+static void square_ch_drv0_coeffs(ch_drv0_t *s_in)
+{
+  complex_dble p0, p1, p2;
+  double d_in, t_in;
+
+  p0 = (*s_in).p[0];
+  p1 = (*s_in).p[1];
+  p2 = (*s_in).p[2];
+
+  d_in = (*s_in).d;
+  t_in = (*s_in).t;
+
+  (*s_in).p[0].re = 2 * d_in * (p1.re * p2.im + p1.im * p2.re) + p0.re * p0.re -
+                    p0.im * p0.im;
+
+  (*s_in).p[0].im =
+      2 * (p0.im * p0.re + d_in * (p1.im * p2.im - p1.re * p2.re));
+
+  (*s_in).p[1].re = 2 * (p0.re * p1.re - p0.im * p1.im + d_in * p2.im * p2.re +
+                         t_in * p1.im * p2.im - t_in * p1.re * p2.re);
+  (*s_in).p[1].im = 2 * (p0.re * p1.im + p0.im * p1.re - t_in * p1.re * p2.im -
+                         t_in * p1.im * p2.re) +
+                    d_in * (p2.im * p2.im - p2.re * p2.re);
+
+  (*s_in).p[2].re = p1.re * p1.re - p1.im * p1.im +
+                    2 * (p0.re * p2.re - p0.im * p2.im) +
+                    t_in * (p2.im * p2.im - p2.re * p2.re);
+  (*s_in).p[2].im = 2 * (p1.re * p1.im + p0.re * p2.im + p0.im * p2.re -
+                         t_in * p2.re * p2.im);
 }
 
 void expXsu3(double eps, su3_alg_dble *X, su3_dble *u)
@@ -192,10 +229,71 @@ void expXsu3(double eps, su3_alg_dble *X, su3_dble *u)
   su3xsu3(u2, u, u);
 }
 
+void expXsu3_w_factors(double eps, su3_alg_dble *X, su3_dble *u,
+                       ch_drv0_t *s_in)
+{
+  int k, n;
+  double nfrb;
+  su3_dble *u1;
+
+  /* Compute the matrix norm using the ||X|| definition for su(3) matrices */
+  nfrb =
+      4.0 * (3.0 * ((*X).c1 * (*X).c1 + (*X).c2 * (*X).c2 - (*X).c1 * (*X).c2) +
+             (*X).c3 * (*X).c3 + (*X).c4 * (*X).c4 + (*X).c5 * (*X).c5 +
+             (*X).c6 * (*X).c6 + (*X).c7 * (*X).c7 + (*X).c8 * (*X).c8);
+
+  nfrb *= eps * eps;
+  n = 0;
+
+  /* Halv eps until the matrix norm us < 3 */
+  while (nfrb > 3.0) {
+    nfrb *= 0.25;
+    eps *= 0.5;
+    n++;
+  }
+
+  Y.c1 = eps * (*X).c1;
+  Y.c2 = eps * (*X).c2;
+  Y.c3 = eps * (*X).c3;
+  Y.c4 = eps * (*X).c4;
+  Y.c5 = eps * (*X).c5;
+  Y.c6 = eps * (*X).c6;
+  Y.c7 = eps * (*X).c7;
+  Y.c8 = eps * (*X).c8;
+
+  chexp_drv0(&Y, s_in);
+
+  /* Using coeffs p_i computes for the normalised matrix, compute the coeffs for
+   * a matrix ^2 using the CH theorem */
+  for (k = 0; k < n; ++k)
+    square_ch_drv0_coeffs(s_in);
+
+  /* Note! You cannot use umat1 for this, the SSE2 variant of ch2mat uses this
+   * for intrinsic storage */
+  u1 = &umat2;
+  ch2mat((*s_in).p, &Y, u1);
+
+  su3xsu3(u1, u, u);
+
+  /* The factors in s_in refer to the scaled matrix Y, they must therefore be
+   * rescaled in order to apply to X. */
+  if (n > 0) {
+    (*s_in).p[1].re *= pow(0.5, n);
+    (*s_in).p[1].im *= pow(0.5, n);
+
+    (*s_in).p[2].re *= pow(0.25, n);
+    (*s_in).p[2].im *= pow(0.25, n);
+
+    (*s_in).d *= pow(8., n);
+    (*s_in).t *= pow(4., n);
+  }
+
+}
+
 #if (defined x64)
 #include "sse2.h"
 
-static void mapX2v(su3_alg_dble *X)
+static void mapX2v(su3_alg_dble const *X)
 {
   __asm__ __volatile__("movsd %3, %%xmm0 \n\t"
                        "movsd %4, %%xmm1 \n\t"
@@ -238,7 +336,7 @@ static void mapX2v(su3_alg_dble *X)
                        : "xmm8", "xmm9", "xmm10");
 }
 
-void ch2mat(complex_dble *p, su3_alg_dble *X, su3_dble *u)
+void ch2mat(complex_dble const *p, su3_alg_dble const *X, su3_dble *u)
 {
   __asm__ __volatile__("movsd %3, %%xmm0 \n\t"
                        "movsd %4, %%xmm1 \n\t"
@@ -297,7 +395,7 @@ void ch2mat(complex_dble *p, su3_alg_dble *X, su3_dble *u)
                        : "xmm0", "xmm1", "xmm2");
 }
 
-void chexp_drv0(su3_alg_dble *X, ch_drv0_t *s)
+void chexp_drv0(su3_alg_dble const *X, ch_drv0_t *s)
 {
   int n;
 
@@ -352,7 +450,7 @@ void chexp_drv0(su3_alg_dble *X, ch_drv0_t *s)
                        : "=m"((*s).p[0]), "=m"((*s).p[1]), "=m"((*s).p[2]));
 }
 
-void chexp_drv1(su3_alg_dble *X, ch_drv1_t *s)
+void chexp_drv1(su3_alg_dble const *X, ch_drv1_t *s)
 {
   int n;
 
@@ -436,7 +534,7 @@ void chexp_drv1(su3_alg_dble *X, ch_drv1_t *s)
   (*s).pt[2].im = -(*s).pd[1].re;
 }
 
-void chexp_drv2(su3_alg_dble *X, ch_drv2_t *s)
+void chexp_drv2(su3_alg_dble const *X, ch_drv2_t *s)
 {
   int n;
 
@@ -572,7 +670,7 @@ void chexp_drv2(su3_alg_dble *X, ch_drv2_t *s)
 
 #else
 
-static void mapX2v(su3_alg_dble *X)
+static void mapX2v(su3_alg_dble const *X)
 {
   v1.c1.re = 0.0;
   v1.c1.im = (*X).c1 + (*X).c2;
@@ -596,7 +694,7 @@ static void mapX2v(su3_alg_dble *X)
   v3.c3.im = (*X).c1 - 2.0 * (*X).c2;
 }
 
-void ch2mat(complex_dble *p, su3_alg_dble *X, su3_dble *u)
+void ch2mat(complex_dble const *p, su3_alg_dble const *X, su3_dble *u)
 {
   complex_dble z;
 
@@ -657,7 +755,7 @@ void ch2mat(complex_dble *p, su3_alg_dble *X, su3_dble *u)
   (*u).c32.im -= p[2].im * z.re + p[2].re * z.im;
 }
 
-void chexp_drv0(su3_alg_dble *X, ch_drv0_t *s)
+void chexp_drv0(su3_alg_dble const *X, ch_drv0_t *s)
 {
   int n;
   complex_dble q0, q1, q2;
@@ -691,7 +789,7 @@ void chexp_drv0(su3_alg_dble *X, ch_drv0_t *s)
   }
 }
 
-void chexp_drv1(su3_alg_dble *X, ch_drv1_t *s)
+void chexp_drv1(su3_alg_dble const *X, ch_drv1_t *s)
 {
   int n;
   complex_dble q0, q1, q2;
@@ -744,7 +842,7 @@ void chexp_drv1(su3_alg_dble *X, ch_drv1_t *s)
   (*s).pt[2].im = -(*s).pd[1].re;
 }
 
-void chexp_drv2(su3_alg_dble *X, ch_drv2_t *s)
+void chexp_drv2(su3_alg_dble const *X, ch_drv2_t *s)
 {
   int n;
   complex_dble q0, q1, q2;

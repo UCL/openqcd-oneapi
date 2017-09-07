@@ -310,6 +310,10 @@ void read_rw_parms(int irw)
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
+  /* Default values to appease compiler */
+  idr = 5;
+  nfct = 0;
+
   if (my_rank == 0) {
     sprintf(line, "Reweighting factor %d", irw);
     find_section(line);

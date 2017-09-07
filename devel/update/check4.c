@@ -48,7 +48,7 @@ static void set_psi(spinor_dble **chi, spinor_dble *psi)
 int main(int argc, char *argv[])
 {
   int my_rank, i;
-  int nop, iop, itu;
+  int nop, ismear, iunsmear, iop, itu;
   int ncr, ifr, zero;
   double phi[2], phi_prime[2];
   double kappa, mu, eps, dev;
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 
   setup_chrono();
   set_mdsteps();
-  s = mdsteps(&nop, &itu);
+  s = mdsteps(&nop, &ismear, &iunsmear, &itu);
   sm = s + nop;
 
   for (i = 0; i < 4; i++)

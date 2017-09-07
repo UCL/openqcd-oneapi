@@ -19,7 +19,9 @@ all: rmxeq mkdep mkxeq
 
 # main programs and modules to be compiled
 
-MAIN = check1 check2 check3 check4 check5 check6
+MAIN = check1 check2 check3 check4 check5 check6 \
+			 test01_mdsteps_no_smearing test02_mdsteps_smearing \
+			 test03_mdsteps_intrinsics
 
 ARCHIVE = archive
 
@@ -30,7 +32,7 @@ DFL = dfl_geometry dfl_subspace ltl_gcr dfl_sap_gcr dfl_modes
 DIRAC = Dw_dble Dw Dw_bnd
 
 FLAGS = flags action_parms dfl_parms force_parms hmc_parms lat_parms \
-        mdint_parms rat_parms sap_parms solver_parms
+        mdint_parms rat_parms sap_parms solver_parms smearing_parms
 
 FORCES = force0 force1 force2 force3 force4 force5 \
          frcfcts genfrc tmcg tmcgm xtensor
@@ -67,11 +69,17 @@ UTILS = endian mutils utils wspace
 
 VFLDS = vflds vinit vcom vdcom
 
+SMEARING = smeared_fields smeared_fields_communication stout_smearing \
+					 force_unsmearing
+
 MODULES = $(ARCHIVE) $(BLOCK) $(DFL) $(DIRAC) $(FLAGS) $(FORCES) \
           $(LATTICE) $(LINALG) $(LINSOLV) $(LITTLE) $(MDFLDS) $(RANDOM) \
           $(RATFCTS) $(SAP) $(SFLDS) $(SU3FCTS) $(SW_TERM) $(TCHARGE) \
-          $(UFLDS) $(UPDATE) $(UTILS) $(VFLDS)
+          $(UFLDS) $(UPDATE) $(UTILS) $(VFLDS) $(SMEARING)
 
+# Dependency filters for the executables
+
+test03_mdsteps_intrinsics_filter = mdsteps
 
 # Logging option (-mpilog or -mpitrace or -mpianim)
 
@@ -83,24 +91,22 @@ LOGOPTION =
 MDIR = ../../modules
 
 VPATH = .:$(MDIR)/flags:$(MDIR)/lattice:$(MDIR)/archive:$(MDIR)/linalg:\
-          $(MDIR)/random:$(MDIR)/uflds:$(MDIR)/mdflds:$(MDIR)/su3fcts:\
-          $(MDIR)/utils:$(MDIR)/forces:$(MDIR)/sflds:$(MDIR)/dirac:\
-	  $(MDIR)/sw_term:$(MDIR)/tcharge:$(MDIR)/block:$(MDIR)/sap:\
-	  $(MDIR)/linsolv:$(MDIR)/dfl:$(MDIR)/vflds:$(MDIR)/little:\
-          $(MDIR)/update:$(MDIR)/ratfcts
+					$(MDIR)/random:$(MDIR)/uflds:$(MDIR)/mdflds:$(MDIR)/su3fcts:\
+					$(MDIR)/utils:$(MDIR)/forces:$(MDIR)/sflds:$(MDIR)/dirac:\
+					$(MDIR)/sw_term:$(MDIR)/tcharge:$(MDIR)/block:$(MDIR)/sap:\
+					$(MDIR)/linsolv:$(MDIR)/dfl:$(MDIR)/vflds:$(MDIR)/little:\
+					$(MDIR)/update:$(MDIR)/ratfcts:$(MDIR)/stout_smearing
 
 
 # additional include directories
 
-INCPATH = $(MPI_INCLUDE) ../../include
-
+INCPATH = $(MPI_INCLUDE) ../../include ../..
 
 # additional libraries
 
 LIBS = m
 
 LIBPATH = $(MPI_HOME)/lib
-
 
 # scheduling and optimization options
 
@@ -117,10 +123,9 @@ SHELL=/bin/bash
 CC=$(MPI_HOME)/bin/mpicc
 CLINKER=$(CC)
 
-PGMS= $(MAIN) $(MODULES)
+PGMS= $(MAIN) $(SPECIALMAIN) $(MODULES)
 
 -include $(addsuffix .d,$(PGMS))
-
 
 # rule to make dependencies
 
@@ -137,9 +142,8 @@ $(addsuffix .o,$(PGMS)): %.o: %.c Makefile
 # rule to link object files
 
 $(MAIN): %: %.o $(addsuffix .o,$(MODULES)) Makefile
-	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(CFLAGS) $(LOGOPTION) \
-        $(addprefix -L,$(LIBPATH)) $(addprefix -l,$(LIBS)) -o $@
-
+	$(CLINKER) $< $(addsuffix .o,$(filter-out $($@_filter),$(MODULES))) $(CFLAGS)  \
+		$(LOGOPTION) $(addprefix -L,$(LIBPATH)) $(addprefix -l,$(LIBS)) -o $@
 
 # produce executables
 

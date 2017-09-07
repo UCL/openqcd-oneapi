@@ -81,6 +81,7 @@
 #include "forces.h"
 #include "update.h"
 #include "global.h"
+#include "stout_smearing.h"
 
 #define MAX(n, m)                                                              \
   if ((n) < (m))                                                               \
@@ -527,21 +528,31 @@ static void start_hmc(double *act0, su3_dble *uold)
   mu = hmc.mu;
   n = 2;
 
+  if (query_flags(UDBUF_UP2DATE) != 1)
+    copy_bnd_ud();
+
+  /* Compute the contrib from think link actions first */
   for (i = 0; i < nact; i++) {
     ap = action_parms(iact[i]);
 
-    if (ap.action == ACG)
+    if (ap.smear) {
+      smear_fields();
+    } else {
+      unsmear_fields();
+    }
+
+    if (ap.action == ACG) {
       act0[1] = action0(0);
-    else {
+    } else {
       set_sw_parms(sea_quark_mass(ap.im0));
 
-      if (ap.action == ACF_TM1)
+      if (ap.action == ACF_TM1) {
         act0[n] = setpf1(mu[ap.imu[0]], ap.ipf, 0);
-      else if (ap.action == ACF_TM1_EO)
+      } else if (ap.action == ACF_TM1_EO) {
         act0[n] = setpf4(mu[ap.imu[0]], ap.ipf, 0, 0);
-      else if (ap.action == ACF_TM1_EO_SDET)
+      } else if (ap.action == ACF_TM1_EO_SDET) {
         act0[n] = setpf4(mu[ap.imu[0]], ap.ipf, 1, 0);
-      else if (ap.action == ACF_TM2) {
+      } else if (ap.action == ACF_TM2) {
         status[2] = 0;
         act0[n] =
             setpf2(mu[ap.imu[0]], mu[ap.imu[1]], ap.ipf, ap.isp[1], 0, status);
@@ -563,12 +574,17 @@ static void start_hmc(double *act0, su3_dble *uold)
         act0[n] = setpf3(ap.irat, ap.ipf, 1, ap.isp[0], 0, status);
         chk_mode_regen(ap.isp[0], status);
         add2counter("field", ap.ipf, status);
-      } else
+      } else {
         error_root(1, 1, "start_hmc [hmc.c]", "Unknown action");
+      }
+    }
 
+    if (ap.action != ACG) {
       n += 1;
     }
   }
+
+  unsmear_fields();
 }
 
 static void end_hmc(double *act1)
@@ -587,37 +603,49 @@ static void end_hmc(double *act1)
   mu = hmc.mu;
   n = 2;
 
+  if (query_flags(UDBUF_UP2DATE) != 1)
+    copy_bnd_ud();
+
   for (i = 0; i < nact; i++) {
     ap = action_parms(iact[i]);
 
-    if (ap.action == ACG)
+    if (ap.smear) {
+      smear_fields();
+    } else {
+      unsmear_fields();
+    }
+
+    if (ap.action == ACG) {
       act1[1] = action0(0);
-    else {
+    } else {
       set_sw_parms(sea_quark_mass(ap.im0));
       status[2] = 0;
 
-      if (ap.action == ACF_TM1)
+      if (ap.action == ACF_TM1) {
         act1[n] = action1(mu[ap.imu[0]], ap.ipf, ap.isp[0], 0, status);
-      else if (ap.action == ACF_TM1_EO)
+      } else if (ap.action == ACF_TM1_EO) {
         act1[n] = action4(mu[ap.imu[0]], ap.ipf, 0, ap.isp[0], 0, status);
-      else if (ap.action == ACF_TM1_EO_SDET)
+      } else if (ap.action == ACF_TM1_EO_SDET) {
         act1[n] = action4(mu[ap.imu[0]], ap.ipf, 1, ap.isp[0], 0, status);
-      else if (ap.action == ACF_TM2)
+      } else if (ap.action == ACF_TM2) {
         act1[n] =
             action2(mu[ap.imu[0]], mu[ap.imu[1]], ap.ipf, ap.isp[0], 0, status);
-      else if (ap.action == ACF_TM2_EO)
+      } else if (ap.action == ACF_TM2_EO) {
         act1[n] =
             action5(mu[ap.imu[0]], mu[ap.imu[1]], ap.ipf, ap.isp[0], 0, status);
-      else if (ap.action == ACF_RAT)
+      } else if (ap.action == ACF_RAT) {
         act1[n] = action3(ap.irat, ap.ipf, 0, ap.isp[0], 0, status);
-      else if (ap.action == ACF_RAT_SDET)
+      } else if (ap.action == ACF_RAT_SDET) {
         act1[n] = action3(ap.irat, ap.ipf, 1, ap.isp[0], 0, status);
+      }
 
       chk_mode_regen(ap.isp[0], status);
       add2counter("action", iact[i], status);
       n += 1;
     }
   }
+
+  unsmear_fields();
 }
 
 static int accept_hmc(double *act0, double *act1, su3_dble *uold)

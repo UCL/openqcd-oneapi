@@ -41,7 +41,7 @@ extern void print_all_avgstat(void);
 
 /* MDSTEPS_C */
 extern void set_mdsteps(void);
-extern mdstep_t *mdsteps(int *nop, int *itu);
+extern mdstep_t *mdsteps(int *nop, int *ismear, int *iunsmear, int *itu);
 extern void print_mdsteps(int ipr);
 
 /* MDINT_C */

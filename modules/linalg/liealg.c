@@ -37,6 +37,16 @@
 *   void muladd_assign_alg(int vol,double r,su3_alg_dble *X,su3_alg_dble *Y)
 *     Adds r*X to Y.
 *
+*   void project_to_su3alg(const su3_dble *u, su3_alg_dble *X)
+*     Projects an arbitrary 3x3 complex matrix in u to the su3 algebra and
+*     stores the result in X. The projection formula is
+*
+*     X = P{U} = 1/2 (U - U^dag) - 1/6 tr (U - U^dag)
+*   
+*   void su3alg_to_cm3x3(su3_alg_dble const *X, su3_dble *u)
+*     Computes the corresponding complex 3x3 matrix from the generator
+*     representation of an su3 algebra object.
+*
 * Notes:
 *
 * Lie algebra elements X are traceless antihermitian 3x3 matrices that
@@ -226,9 +236,9 @@ void set_ualg2zero(int vol, u3_alg_dble *X)
   }
 }
 
-void assign_alg2alg(int vol, su3_alg_dble *X, su3_alg_dble *Y)
+void assign_alg2alg(int vol, su3_alg_dble const *X, su3_alg_dble *Y)
 {
-  su3_alg_dble *Xm;
+  su3_alg_dble const *Xm;
 
   Xm = X + vol;
 
@@ -290,9 +300,30 @@ void swap_alg(int vol, su3_alg_dble *X, su3_alg_dble *Y)
   }
 }
 
-void muladd_assign_alg(int vol, double r, su3_alg_dble *X, su3_alg_dble *Y)
+void add_alg(int vol, su3_alg_dble const *X, su3_alg_dble *Y)
 {
-  su3_alg_dble *Xm;
+  su3_alg_dble const *Xm;
+
+  Xm = X + vol;
+
+  for (; X < Xm; X++) {
+    (*Y).c1 += (*X).c1;
+    (*Y).c2 += (*X).c2;
+    (*Y).c3 += (*X).c3;
+    (*Y).c4 += (*X).c4;
+    (*Y).c5 += (*X).c5;
+    (*Y).c6 += (*X).c6;
+    (*Y).c7 += (*X).c7;
+    (*Y).c8 += (*X).c8;
+
+    Y += 1;
+  }
+
+}
+
+void muladd_assign_alg(int vol, double r, su3_alg_dble const *X, su3_alg_dble *Y)
+{
+  su3_alg_dble const *Xm;
 
   Xm = X + vol;
 
@@ -308,4 +339,38 @@ void muladd_assign_alg(int vol, double r, su3_alg_dble *X, su3_alg_dble *Y)
 
     Y += 1;
   }
+}
+
+void project_to_su3alg(su3_dble const *u, su3_alg_dble *X)
+{
+  (*X).c1 = ((*u).c11.im - (*u).c22.im) / 3.;
+  (*X).c2 = ((*u).c11.im - (*u).c33.im) / 3.;
+  (*X).c3 = ((*u).c12.re - (*u).c21.re) / 2.;
+  (*X).c4 = ((*u).c21.im + (*u).c12.im) / 2.;
+  (*X).c5 = ((*u).c13.re - (*u).c31.re) / 2.;
+  (*X).c6 = ((*u).c31.im + (*u).c13.im) / 2.;
+  (*X).c7 = ((*u).c23.re - (*u).c32.re) / 2.;
+  (*X).c8 = ((*u).c32.im + (*u).c23.im) / 2.;
+}
+
+void su3alg_to_cm3x3(su3_alg_dble const *X, su3_dble *u)
+{
+  (*u).c11.re = 0;
+  (*u).c11.im = (*X).c1 + (*X).c2;
+  (*u).c12.re = (*X).c3;
+  (*u).c12.im = (*X).c4;
+  (*u).c13.re = (*X).c5;
+  (*u).c13.im = (*X).c6;
+  (*u).c21.re = -(*X).c3;
+  (*u).c21.im = (*X).c4;
+  (*u).c22.re = 0;
+  (*u).c22.im = -2 * (*X).c1 + (*X).c2;
+  (*u).c23.re = (*X).c7;
+  (*u).c23.im = (*X).c8;
+  (*u).c31.re = -(*X).c5;
+  (*u).c31.im = (*X).c6;
+  (*u).c32.re = -(*X).c7;
+  (*u).c32.im = (*X).c8;
+  (*u).c33.re = 0;
+  (*u).c33.im = (*X).c1 - 2 * (*X).c2;
 }

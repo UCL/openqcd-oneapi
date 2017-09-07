@@ -52,7 +52,6 @@
 static int bc, np;
 static const su3_alg_dble fd0 = {0.0};
 static su3_alg_dble *sbuf_f0 = NULL, *sbuf_fk, *rbuf_f0, *rbuf_fk;
-static mdflds_t *mdfs;
 static uidx_t *idx;
 
 static void alloc_frcbufs(void)
@@ -61,7 +60,6 @@ static void alloc_frcbufs(void)
 
   bc = bc_type();
   np = (cpr[0] + cpr[1] + cpr[2] + cpr[3]) & 0x1;
-  mdfs = mdflds();
   idx = uidx();
 
   sbuf_f0 = amalloc(7 * (BNDRY / 4) * sizeof(*sbuf_f0), ALIGN);
@@ -69,20 +67,25 @@ static void alloc_frcbufs(void)
         "Unable to allocate communication buffers");
 
   sbuf_fk = sbuf_f0 + (BNDRY / 4);
-  rbuf_f0 = (*mdfs).frc + 4 * VOLUME;
-  rbuf_fk = rbuf_f0 + (BNDRY / 4);
 
   for (ib = 0; ib < (7 * (BNDRY / 4)); ib++)
     sbuf_f0[ib] = fd0;
 }
 
-static void pack_f0(void)
+static void set_recieve_buffers(su3_alg_dble *force)
+{
+  rbuf_f0 = force + 4 * VOLUME;
+  rbuf_fk = rbuf_f0 + (BNDRY / 4);
+}
+
+static void pack_f0(su3_alg_dble const *force)
 {
   int mu, nu0;
   int *iu, *ium;
-  su3_alg_dble *f, *fb;
+  su3_alg_dble *f;
+  su3_alg_dble const *fb;
 
-  fb = (*mdfs).frc;
+  fb = force;
   f = sbuf_f0;
 
   for (mu = 0; mu < 4; mu++) {
@@ -100,13 +103,14 @@ static void pack_f0(void)
   }
 }
 
-static void pack_fk(void)
+static void pack_fk(su3_alg_dble const *force)
 {
   int mu, nuk;
   int *iu, *ium;
-  su3_alg_dble *f, *fb;
+  su3_alg_dble *f;
+  su3_alg_dble const *fb;
 
-  fb = (*mdfs).frc;
+  fb = force;
   f = sbuf_fk;
 
   for (mu = 0; mu < 4; mu++) {
@@ -194,17 +198,24 @@ static void fwd_send_fk(void)
   }
 }
 
-void copy_bnd_frc(void)
+void copy_boundaries_forces(su3_alg_dble *force)
 {
   if (NPROC > 1) {
     if (sbuf_f0 == NULL)
       alloc_frcbufs();
 
-    pack_f0();
+    set_recieve_buffers(force);
+
+    pack_f0(force);
     fwd_send_f0();
-    pack_fk();
+    pack_fk(force);
     fwd_send_fk();
   }
+}
+
+void copy_bnd_frc(void)
+{
+  copy_boundaries_forces((*mdflds()).frc);
 }
 
 static void bck_send_f0(void)
@@ -277,13 +288,13 @@ static void bck_send_fk(void)
   }
 }
 
-static void add_f0(void)
+static void add_f0(su3_alg_dble *force)
 {
   int mu, nu0;
   int *iu, *ium;
   su3_alg_dble *f, *fb, *frc;
 
-  fb = (*mdfs).frc;
+  fb = force;
   f = sbuf_f0;
 
   for (mu = 0; mu < 4; mu++) {
@@ -311,13 +322,13 @@ static void add_f0(void)
   }
 }
 
-static void add_fk(void)
+static void add_fk(su3_alg_dble *force)
 {
   int mu, nuk;
   int *iu, *ium;
   su3_alg_dble *f, *fb, *frc;
 
-  fb = (*mdfs).frc;
+  fb = force;
   f = sbuf_fk;
 
   for (mu = 0; mu < 4; mu++) {
@@ -348,15 +359,23 @@ static void add_fk(void)
   }
 }
 
-void add_bnd_frc(void)
+void add_boundaries_force(su3_alg_dble *force)
 {
   if (NPROC > 1) {
     if (sbuf_f0 == NULL)
       alloc_frcbufs();
 
+    set_recieve_buffers(force);
+
     bck_send_fk();
-    add_fk();
+    add_fk(force);
     bck_send_f0();
-    add_f0();
+    add_f0(force);
   }
+
+}
+
+void add_bnd_frc(void)
+{
+  add_boundaries_force((*mdflds()).frc);
 }

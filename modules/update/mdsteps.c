@@ -76,7 +76,9 @@
 #include "flags.h"
 #include "update.h"
 #include "global.h"
+#include "stout_smearing.h"
 
+/* TODO: Make these counters size_t to prevent possible (?) overflow */
 static int nsmx, nmds = 0, iend = 1;
 static mdstep_t *mds = NULL, *mdw[3];
 
@@ -92,14 +94,15 @@ static void set_nsmx(int nlv)
   for (ilv = 0; ilv < nlv; ilv++) {
     mdp = mdint_parms(ilv);
 
-    if (mdp.integrator == LPFR)
+    if (mdp.integrator == LPFR) {
       ntu *= mdp.nstep;
-    else if (mdp.integrator == OMF2)
+    } else if (mdp.integrator == OMF2) {
       ntu *= 2 * mdp.nstep;
-    else if (mdp.integrator == OMF4)
+    } else if (mdp.integrator == OMF4) {
       ntu *= 5 * mdp.nstep;
-    else
+    } else {
       error_root(1, 1, "set_nsmx [mdsteps.c]", "Unknown integrator");
+    }
 
     nfr = mdp.nfr;
     ifr = mdp.ifr;
@@ -110,8 +113,8 @@ static void set_nsmx(int nlv)
     }
   }
 
-  iend += 2;
-  nsmx = (ntu + 1) * iend;
+  iend += 4;
+  nsmx = (3 * ntu + 1) * iend;
 }
 
 static void alloc_mds(void)
@@ -139,38 +142,7 @@ static void set_steps2zero(int n, mdstep_t *s)
   }
 }
 
-static void copy_steps(int n, double c, mdstep_t *s, mdstep_t *r)
-{
-  int i;
-
-  for (i = 0; i < n; i++) {
-    r[i].iop = s[i].iop;
-    r[i].eps = c * s[i].eps;
-  }
-}
-
-static void add_steps(int n, double c, mdstep_t *s, mdstep_t *r)
-{
-  int itu, i, j;
-
-  itu = iend - 1;
-
-  for (i = 0; i < n; i++) {
-    for (j = 0; r[j].iop < itu; j++) {
-      if (r[j].iop == s[i].iop) {
-        r[j].eps += c * s[i].eps;
-        break;
-      }
-    }
-
-    if (r[j].iop >= itu) {
-      r[j].iop = s[i].iop;
-      r[j].eps = c * s[i].eps;
-    }
-  }
-}
-
-static int nfrc_steps(mdstep_t *s)
+static int nfrc_steps(mdstep_t const *s)
 {
   int itu, n;
 
@@ -183,7 +155,7 @@ static int nfrc_steps(mdstep_t *s)
   return n;
 }
 
-static int nall_steps(mdstep_t *s)
+static int nall_steps(mdstep_t const *s)
 {
   int n;
 
@@ -195,10 +167,209 @@ static int nall_steps(mdstep_t *s)
   return n;
 }
 
+/* Returns the distance to the first element in a smearing block. Returns 0 if
+ * no such smearing block exists */
+static int smear_block_begin(mdstep_t const *s)
+{
+  int itu, ismear, iunsmear, n;
+
+  ismear = iend - 3;
+  iunsmear = iend - 2;
+  itu = iend - 1;
+
+  n = 0;
+
+  while (s[n].iop < itu) {
+
+    if (s[n].iop == ismear)
+      return n + 1;
+
+    error(s[n].iop == iunsmear, 1, "smear_block_begin [mdsteps.c]",
+          "Unsmear step appears before smearing step.");
+
+    n += 1;
+  }
+
+  return 0;
+}
+
+/* Returns the distance to the nest unsmearing block.
+ * The routine will fail if there is a smearing block starting before an
+ * unsmearing block have been found.
+ * It will also fail if no unsmearing block is found in the current block as it
+ * assumes that the start of a smearing block has already been found. */
+static int smear_block_end(mdstep_t const *s)
+{
+  int itu, ismear, iunsmear, n;
+
+  ismear = iend - 3;
+  iunsmear = iend - 2;
+  itu = iend - 1;
+
+  n = 0;
+
+  while (s[n].iop < iend) {
+
+    if (s[n].iop == iunsmear)
+      return n;
+
+    error(s[n].iop == ismear, 1, "smear_block_end [mdsteps.c]",
+          "Another smearing step appears before the last one is completed.");
+
+    error(s[n].iop == itu, 1, "smear_block_end [mdsteps.c]",
+          "Smearing block not closed before the MD update step.");
+
+    n += 1;
+  }
+
+  return n;
+}
+
+static void copy_steps(int n, double c, mdstep_t *s, mdstep_t *r)
+{
+  int i;
+
+  for (i = 0; i < n; i++) {
+    r[i].iop = s[i].iop;
+    r[i].eps = c * s[i].eps;
+  }
+}
+
+static void swap_steps(mdstep_t *s, mdstep_t *r)
+{
+  int is;
+  double rs;
+
+  is = (*s).iop;
+  (*s).iop = (*r).iop;
+  (*r).iop = is;
+
+  rs = (*s).eps;
+  (*s).eps = (*r).eps;
+  (*r).eps = rs;
+}
+
+/* Takes a full block and an index and determines whether the element at the
+ * index is inside of a smearing block, in which case it is a smearing step. */
+static int is_smeared_step(int i, mdstep_t const *s)
+{
+  int s_begin, s_end;
+
+  s_begin = smear_block_begin(s);
+
+  /* No smearing block in update */
+  if (s_begin == 0)
+    return 0;
+
+  s_end = smear_block_end(s + s_begin) + s_begin;
+
+  return (i >= s_begin) && (i < s_end);
+}
+
+/* Adds a step to a range of steps. It first checks if the same step already
+ * exists in the target range, if it does its eps is appended with a prefactor.
+ * If no such term is found every step from end (inclusive) to end + nfrc_steps
+ * is shifted by 1, and the step is added where end used to be */
+static void add_step_in_range(double c, mdstep_t const *s, mdstep_t *begin,
+                              mdstep_t *end)
+{
+  int i, endend, is_existing_step;
+
+  is_existing_step = 0;
+  for (; begin < end; ++begin) {
+    if ((*s).iop == (*begin).iop) {
+      is_existing_step = 1;
+      (*begin).eps += c * (*s).eps;
+      break;
+    }
+  }
+
+  if (is_existing_step == 0) {
+    endend = nfrc_steps(end);
+
+    for (i = endend; i >= 0; --i) {
+      swap_steps(end + i + 1, end + i);
+    }
+
+    (*end).iop = (*s).iop;
+    (*end).eps = c * (*s).eps;
+  }
+}
+
+/* Adds a step that is itself in a smeared block. If the target range does not
+ * have a smearing block of itself, one will be created and prepended to the
+ * range, then add_step_in_range will be called with the interior of the
+ * smearing block as its range */
+static void add_smeared_step(double c, mdstep_t const *s, mdstep_t *r)
+{
+  int i, r_begin, r_end, r_nfrc;
+  int ismear, iunsmear;
+
+  ismear = iend - 3;
+  iunsmear = iend - 2;
+
+  r_begin = smear_block_begin(r);
+  r_nfrc = nfrc_steps(r);
+
+  /* Add a smearing block to the front of r if it doesn't exist */
+  if (r_begin == 0) {
+    for (i = r_nfrc; i >= 0; --i) {
+      swap_steps(r + i + 2, r + i);
+    }
+
+    r[0].iop = ismear;
+    r[1].iop = iunsmear;
+
+    r_begin = 1;
+  }
+
+  r_end = smear_block_end(r + r_begin) + r_begin;
+
+  /* Add a step as usual between the smearing block */
+  add_step_in_range(c, s, r + r_begin, r + r_end);
+}
+
+/* Adds a step to an output range. The functions will first check whether the
+ * target range contains a smearing range, in which case the step will be
+ * appended to this. */
+static void add_normal_step(double c, mdstep_t const *s, mdstep_t *r)
+{
+  int r_begin, r_end;
+
+  r_begin = smear_block_begin(r);
+  r_end = nfrc_steps(r);
+
+  /* Check if a smearing block exist in the target area,
+   * if it does we have to append the normal step to that */
+  if (r_begin != 0)
+    r_begin += smear_block_end(r + r_begin);
+
+  add_step_in_range(c, s, r + r_begin, r + r_end);
+}
+
+static void add_steps(int n, double c, mdstep_t *s, mdstep_t *r)
+{
+  int ismear, iunsmear, i;
+
+  ismear = iend - 3;
+  iunsmear = iend - 2;
+
+  for (i = 0; i < n; i++) {
+    if ((s[i].iop == ismear) || (s[i].iop == iunsmear))
+      continue;
+
+    if (is_smeared_step(i, s))
+      add_smeared_step(c, s + i, r);
+    else
+      add_normal_step(c, s + i, r);
+  }
+}
+
 static void expand_level(int ilv, double tau, mdstep_t *s, mdstep_t *ws)
 {
   int nstep, nfr, *ifr;
-  int itu, n, i, j;
+  int itu, ismear, iunsmear, n, i, j;
+  int is_smearing_step;
   double r0, r1, r2, r3, r4, eps;
   mdint_parms_t mdp;
 
@@ -207,6 +378,8 @@ static void expand_level(int ilv, double tau, mdstep_t *s, mdstep_t *ws)
   nfr = mdp.nfr;
   ifr = mdp.ifr;
 
+  ismear = iend - 3;
+  iunsmear = iend - 2;
   itu = iend - 1;
   n = 0;
   r0 = mdp.lambda;
@@ -219,7 +392,49 @@ static void expand_level(int ilv, double tau, mdstep_t *s, mdstep_t *ws)
   set_steps2zero(nsmx, s);
   set_steps2zero(nsmx, ws);
 
+  /* Create the basis step */
+
+  /* Forces for smeared steps first */
+
+  is_smearing_step = 0;
+  for (i = 0; i < nfr; ++i) {
+    if (action_parms(ifr[i]).smear > 0) {
+      is_smearing_step = 1;
+      break;
+    }
+  }
+
+  if (is_smearing_step == 1) {
+    ws[n].iop = ismear;
+    ws[n++].eps = 0.;
+
+    for (i = 0; i < nfr; i++) {
+      if (action_parms(ifr[i]).smear == 0)
+        continue;
+
+      for (j = 0; j < n; j++) {
+        if (ifr[i] == ws[j].iop) {
+          ws[j].eps += eps;
+          break;
+        }
+      }
+
+      if (j == n) {
+        ws[n].iop = ifr[i];
+        ws[n].eps = eps;
+        n += 1;
+      }
+    }
+
+    ws[n].iop = iunsmear;
+    ws[n++].eps = 0.;
+  }
+
+  /* Then the unsmeared forces */
   for (i = 0; i < nfr; i++) {
+    if (action_parms(ifr[i]).smear != 0)
+      continue;
+
     for (j = 0; j < n; j++) {
       if (ifr[i] == ws[j].iop) {
         ws[j].eps += eps;
@@ -338,63 +553,76 @@ static void insert_level(mdstep_t *s1, mdstep_t *s2, mdstep_t *r)
   }
 }
 
-static void swap_steps(mdstep_t *s, mdstep_t *r)
+static int sort_force_block(mdstep_t *start, mdstep_t *end)
 {
-  int is;
-  double rs;
+  int i, j, n, k, imn;
+  int gauge_pos;
+  force_parms_t fp;
 
-  is = (*s).iop;
-  (*s).iop = (*r).iop;
-  (*r).iop = is;
+  k = 0;
+  n = end - start;
 
-  rs = (*s).eps;
-  (*s).eps = (*r).eps;
-  (*r).eps = rs;
+  for (i = 0; i < n; i++) {
+    fp = force_parms(start[i].iop);
+
+    if (fp.force == FRG) {
+      if (i > 0)
+        swap_steps(start, start + i);
+      k += 1;
+    }
+  }
+
+  gauge_pos = k;
+
+  for (i = (k == 1); i < n; i++) {
+    imn = start[i].iop;
+    k = i;
+
+    for (j = (i + 1); j < n; j++) {
+      if (start[j].iop < imn) {
+        imn = start[j].iop;
+        k = j;
+      }
+    }
+
+    if (k != i)
+      swap_steps(start + i, start + k);
+  }
+
+  return gauge_pos;
 }
 
 static void sort_forces(void)
 {
-  int itu, n;
-  int i, j, k, imn;
+  int begin, end, itu, gauge_pos;
   mdstep_t *s;
-  force_parms_t fp;
 
   itu = iend - 1;
   s = mds;
 
   while ((*s).iop < iend) {
-    n = nfrc_steps(s);
-    k = 0;
+    begin = smear_block_begin(s);
 
-    for (i = 0; i < n; i++) {
-      fp = force_parms(s[i].iop);
+    gauge_pos = 0;
 
-      if (fp.force == FRG) {
-        if (i > 0)
-          swap_steps(s, s + i);
-        k += 1;
-      }
+    if (begin != 0) {
+      error(begin != 1, 1, "sort_forces [mdsteps.c]",
+          "The smearing operations is not ordered correctly in the integrator");
+
+      end = smear_block_end(s + begin) + begin;
+
+      gauge_pos = (sort_force_block(s + begin, s + end) == 1);
+
+      begin = end + 1;
     }
 
-    error_root(k != 1, 1, "sort_forces [mdsteps.c]",
+    end = nfrc_steps(s);
+    gauge_pos |= (sort_force_block(s + begin, s + end) == 1);
+
+    error_root(gauge_pos == 0, 1, "sort_forces [mdsteps.c]",
                "Incorrect gauge force count");
 
-    for (i = 1; i < n; i++) {
-      imn = s[i].iop;
-      k = i;
-
-      for (j = (i + 1); j < n; j++) {
-        if (s[j].iop < imn) {
-          imn = s[j].iop;
-          k = j;
-        }
-      }
-
-      if (k != i)
-        swap_steps(s + i, s + k);
-    }
-
-    s += n;
+    s += end;
     if ((*s).iop == itu)
       s += 1;
   }
@@ -425,9 +653,11 @@ void set_mdsteps(void)
   nmds = nall_steps(mds) + 1;
 }
 
-mdstep_t *mdsteps(int *nop, int *itu)
+mdstep_t *mdsteps(int *nop, int *ismear, int *iunsmear, int *itu)
 {
   (*nop) = nmds;
+  (*ismear) = iend - 3;
+  (*iunsmear) = iend - 2;
   (*itu) = iend - 1;
 
   return mds;
@@ -435,28 +665,41 @@ mdstep_t *mdsteps(int *nop, int *itu)
 
 static void print_ops(void)
 {
-  int i, itu;
+  int i, itu, ismear, iunsmear;
 
   printf("List of elementary operations:\n");
 
+  ismear = iend - 3;
+  iunsmear = iend - 2;
   itu = iend - 1;
 
   for (i = 0; i < nmds; i++) {
-    if (mds[i].iop < itu)
-      printf("TP: force %2d, eps = % .2e\n", mds[i].iop, mds[i].eps);
-    else if (mds[i].iop == itu)
-      printf("TU:           eps = % .2e\n", mds[i].eps);
-    else if (mds[i].iop == iend)
+    if (mds[i].iop < ismear) {
+      printf("TP: force %2d,                  eps = % .2e\n", mds[i].iop,
+             mds[i].eps);
+    } else if (mds[i].iop == ismear) {
+      printf("TS: smear fields,              eps = %.2e\n", mds[i].eps);
+    } else if (mds[i].iop == iunsmear) {
+      printf("TS: unsmear fields and forces, eps = %.2e\n", mds[i].eps);
+    } else if (mds[i].iop == itu) {
+      printf("TU:                            eps = % .2e\n", mds[i].eps);
+    } else if (mds[i].iop == iend) {
       printf("END\n\n");
-    else
+    } else {
       error_root(1, 1, "print_ops [mdsteps.c]", "Unkown operation");
+    }
   }
 }
 
 static void print_times(double tau)
 {
   int i, j, it;
+  int itu, ismear, iunsmear;
   double seps;
+
+  ismear = iend - 3;
+  iunsmear = iend - 2;
+  itu = iend - 1;
 
   printf("Total integration times:\n");
 
@@ -473,10 +716,15 @@ static void print_times(double tau)
 
     seps /= tau;
 
-    if (i == (iend - 1))
-      printf("TU:       sum(eps)/tau = %.3e\n", seps);
-    else if (it == 1)
-      printf("Force %2d: sum(eps)/tau = %.3e\n", i, seps);
+    if (i == (ismear)) {
+      printf("TS: smear   sum(eps)/tau = %.3e\n", seps);
+    } else if (i == (iunsmear)) {
+      printf("TS: unsmear sum(eps)/tau = %.3e\n", seps);
+    } else if (i == (itu)) {
+      printf("TU:         sum(eps)/tau = %.3e\n", seps);
+    } else if (it == 1) {
+      printf("Force %2d:   sum(eps)/tau = %.3e\n", i, seps);
+    }
   }
 
   printf("\n");

@@ -464,3 +464,55 @@ void mpc_gsum_d(double *src, double *dst, int num)
   mpc_bcast_d(dst, num);
 #endif
 }
+
+/* Generic mathematical functions */
+
+double square_dble(double d)
+{
+  return d*d;
+}
+
+double sinc_dble(double d)
+{
+  double dd;
+
+  if (fabs(d) < 0.05) {
+    dd = square_dble(d);
+    return 1. - dd/6*(1. - dd/20*(1.-dd/42));
+  } else {
+    return sin(d)/d;
+  }
+}
+
+double smear_xi0_dble(double d)
+{
+  return sinc_dble(d);
+}
+
+double smear_xi1_dble(double d)
+{
+  double dd;
+  dd = square_dble(d);
+
+  if (fabs(d) < 0.05) {
+    return -(1. - dd/10 *(1. - dd/28 * (1. - dd/54)))/3;
+  } else {
+    return (cos(d) - sinc_dble(d))/dd;
+  }
+}
+
+void mul_icomplex(complex_dble *c)
+{
+  double tmp;
+
+  tmp = (*c).re;
+
+  (*c).re = -(*c).im;
+  (*c).im = tmp;
+}
+
+void mul_assign_scalar_complex(double d, complex_dble *c)
+{
+  (*c).re = d * (*c).re;
+  (*c).im = d * (*c).im;
+}

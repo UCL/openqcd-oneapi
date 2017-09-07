@@ -126,7 +126,7 @@ static int init = 0;
 static action_t action[] = {ACG,     ACF_TM1,    ACF_TM1_EO, ACF_TM1_EO_SDET,
                             ACF_TM2, ACF_TM2_EO, ACF_RAT,    ACF_RAT_SDET};
 static action_parms_t ap[IACMAX + 1] = {
-    {ACTIONS, 0, 0, {0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}};
+    {ACTIONS, 0, 0, {0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, 0}};
 
 static void init_ap(void)
 {
@@ -139,9 +139,9 @@ static void init_ap(void)
 }
 
 action_parms_t set_action_parms(int iact, action_t action, int ipf, int im0,
-                                int *irat, int *imu, int *isp)
+                                int *irat, int *imu, int *isp, int smear)
 {
-  int iprms[15], i, ie;
+  int iprms[16], i, ie;
   int rat[3], mu[4], sp[4];
 
   if (init == 0)
@@ -188,7 +188,9 @@ action_parms_t set_action_parms(int iact, action_t action, int ipf, int im0,
       iprms[11 + i] = sp[i];
     }
 
-    MPI_Bcast(iprms, 15, MPI_INT, 0, MPI_COMM_WORLD);
+    iprms[15] = smear;
+
+    MPI_Bcast(iprms, 16, MPI_INT, 0, MPI_COMM_WORLD);
 
     ie = 0;
     ie |= (iprms[0] != iact);
@@ -203,6 +205,8 @@ action_parms_t set_action_parms(int iact, action_t action, int ipf, int im0,
       ie |= (iprms[7 + i] != mu[i]);
       ie |= (iprms[11 + i] != sp[i]);
     }
+
+    ie |= (iprms[15] != smear);
 
     error(ie != 0, 1, "set_action_parms [action_parms.c]",
           "Parameters are not global");
@@ -237,6 +241,8 @@ action_parms_t set_action_parms(int iact, action_t action, int ipf, int im0,
     ap[iact].isp[i] = sp[i];
   }
 
+  ap[iact].smear = smear;
+
   return ap[iact];
 }
 
@@ -257,7 +263,7 @@ action_parms_t action_parms(int iact)
 void read_action_parms(int iact)
 {
   int my_rank, i, ida;
-  int ipf, im0, irat[3], imu[4], isp[4];
+  int ipf, im0, irat[3], imu[4], isp[4], smear;
   char line[NAME_SIZE];
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
@@ -278,6 +284,7 @@ void read_action_parms(int iact)
     find_section(line);
 
     read_line("action", "%s", line);
+    read_optional_line("smear", "%d", &smear, 0);
 
     if (strcmp(line, "ACF_TM1") == 0) {
       ida = 1;
@@ -327,6 +334,7 @@ void read_action_parms(int iact)
   }
 
   if (NPROC > 1) {
+    MPI_Bcast(&smear, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&ida, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&ipf, 1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&im0, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -335,7 +343,7 @@ void read_action_parms(int iact)
     MPI_Bcast(isp, 4, MPI_INT, 0, MPI_COMM_WORLD);
   }
 
-  set_action_parms(iact, action[ida], ipf, im0, irat, imu, isp);
+  set_action_parms(iact, action[ida], ipf, im0, irat, imu, isp, smear);
 }
 
 void print_action_parms(void)
@@ -350,53 +358,56 @@ void print_action_parms(void)
         printf("Action %d:\n", i);
 
         if (ap[i].action == ACG)
-          printf("ACG action\n\n");
+          printf("ACG action\n");
         else if (ap[i].action == ACF_TM1) {
           printf("ACF_TM1 action\n");
           printf("ipf = %d\n", ap[i].ipf);
           printf("im0 = %d\n", ap[i].im0);
           printf("imu = %d\n", ap[i].imu[0]);
-          printf("isp = %d\n\n", ap[i].isp[0]);
+          printf("isp = %d\n", ap[i].isp[0]);
         } else if (ap[i].action == ACF_TM1_EO) {
           printf("ACF_TM1_EO action\n");
           printf("ipf = %d\n", ap[i].ipf);
           printf("im0 = %d\n", ap[i].im0);
           printf("imu = %d\n", ap[i].imu[0]);
-          printf("isp = %d\n\n", ap[i].isp[0]);
+          printf("isp = %d\n", ap[i].isp[0]);
         } else if (ap[i].action == ACF_TM1_EO_SDET) {
           printf("ACF_TM1_EO_SDET action\n");
           printf("ipf = %d\n", ap[i].ipf);
           printf("im0 = %d\n", ap[i].im0);
           printf("imu = %d\n", ap[i].imu[0]);
-          printf("isp = %d\n\n", ap[i].isp[0]);
+          printf("isp = %d\n", ap[i].isp[0]);
         } else if (ap[i].action == ACF_TM2) {
           printf("ACF_TM2 action\n");
           printf("ipf = %d\n", ap[i].ipf);
           printf("im0 = %d\n", ap[i].im0);
           printf("imu = %d %d\n", ap[i].imu[0], ap[i].imu[1]);
-          printf("isp = %d %d\n\n", ap[i].isp[0], ap[i].isp[1]);
+          printf("isp = %d %d\n", ap[i].isp[0], ap[i].isp[1]);
         } else if (ap[i].action == ACF_TM2_EO) {
           printf("ACF_TM2_EO action\n");
           printf("ipf = %d\n", ap[i].ipf);
           printf("im0 = %d\n", ap[i].im0);
           printf("imu = %d %d\n", ap[i].imu[0], ap[i].imu[1]);
-          printf("isp = %d %d\n\n", ap[i].isp[0], ap[i].isp[1]);
+          printf("isp = %d %d\n", ap[i].isp[0], ap[i].isp[1]);
         } else if (ap[i].action == ACF_RAT) {
           printf("ACF_RAT action\n");
           printf("ipf = %d\n", ap[i].ipf);
           printf("im0 = %d\n", ap[i].im0);
           printf("irat = %d %d %d\n", ap[i].irat[0], ap[i].irat[1],
                  ap[i].irat[2]);
-          printf("isp = %d\n\n", ap[i].isp[0]);
+          printf("isp = %d\n", ap[i].isp[0]);
         } else if (ap[i].action == ACF_RAT_SDET) {
           printf("ACF_RAT_SDET action\n");
           printf("ipf = %d\n", ap[i].ipf);
           printf("im0 = %d\n", ap[i].im0);
           printf("irat = %d %d %d\n", ap[i].irat[0], ap[i].irat[1],
                  ap[i].irat[2]);
-          printf("isp = %d\n\n", ap[i].isp[0]);
-        } else
-          printf("UNKNOWN action\n\n");
+          printf("isp = %d\n", ap[i].isp[0]);
+        } else {
+          printf("UNKNOWN action\n");
+        }
+
+        printf("smear = %d\n\n", ap[i].smear);
       }
     }
   }
@@ -406,7 +417,7 @@ void write_action_parms(FILE *fdat)
 {
   int my_rank, endian;
   int iw, i, j;
-  stdint_t istd[15];
+  stdint_t istd[16];
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
   endian = endianness();
@@ -427,11 +438,13 @@ void write_action_parms(FILE *fdat)
           istd[11 + j] = (stdint_t)(ap[i].isp[j]);
         }
 
-        if (endian == BIG_ENDIAN)
-          bswap_int(15, istd);
+        istd[15] = (stdint_t)(ap[i].smear);
 
-        iw = fwrite(istd, sizeof(stdint_t), 15, fdat);
-        error_root(iw != 15, 1, "write_action_parms [action_parms.c]",
+        if (endian == BIG_ENDIAN)
+          bswap_int(16, istd);
+
+        iw = fwrite(istd, sizeof(stdint_t), 16, fdat);
+        error_root(iw != 16, 1, "write_action_parms [action_parms.c]",
                    "Incorrect write count");
       }
     }
@@ -442,7 +455,7 @@ void check_action_parms(FILE *fdat)
 {
   int my_rank, endian;
   int ir, ie, i, j;
-  stdint_t istd[15];
+  stdint_t istd[16];
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
   endian = endianness();
@@ -452,12 +465,12 @@ void check_action_parms(FILE *fdat)
 
     for (i = 0; i < IACMAX; i++) {
       if (ap[i].action != ACTIONS) {
-        ir = fread(istd, sizeof(stdint_t), 15, fdat);
-        error_root(ir != 15, 1, "check_action_parms [action_parms.c]",
+        ir = fread(istd, sizeof(stdint_t), 16, fdat);
+        error_root(ir != 16, 1, "check_action_parms [action_parms.c]",
                    "Incorrect read count");
 
         if (endian == BIG_ENDIAN)
-          bswap_int(15, istd);
+          bswap_int(16, istd);
 
         ie |= (istd[0] != (stdint_t)(i));
         ie |= (istd[1] != (stdint_t)(ap[i].action));
@@ -471,6 +484,8 @@ void check_action_parms(FILE *fdat)
           ie |= (istd[7 + j] != (stdint_t)(ap[i].imu[j]));
           ie |= (istd[11 + j] != (stdint_t)(ap[i].isp[j]));
         }
+
+        ie |= (istd[15] != (stdint_t)(ap[i].smear));
       }
     }
 

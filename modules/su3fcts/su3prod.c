@@ -85,18 +85,18 @@ static const sse_double c0 = {0.5, 0.5}, c1 = {-1.0 / 3.0, -1.0 / 3.0};
 static su3_dble uX ALIGNED16;
 static double tr ALIGNED8;
 
-static void su3xsu3vec(su3_dble *u) { _sse_su3_multiply_dble(*u); }
+static void su3xsu3vec(su3_dble const *u) { _sse_su3_multiply_dble(*u); }
 
-static void su3xsu3vec_pair(su3_dble *u) { _avx_su3_multiply_pair_dble(*u); }
+static void su3xsu3vec_pair(su3_dble const *u) { _avx_su3_multiply_pair_dble(*u); }
 
-static void su3dagxsu3vec(su3_dble *u) { _sse_su3_inverse_multiply_dble(*u); }
+static void su3dagxsu3vec(su3_dble const *u) { _sse_su3_inverse_multiply_dble(*u); }
 
-static void su3dagxsu3vec_pair(su3_dble *u)
+static void su3dagxsu3vec_pair(su3_dble const *u)
 {
   _avx_su3_inverse_multiply_pair_dble(*u);
 }
 
-void su3xsu3(su3_dble *u, su3_dble *v, su3_dble *w)
+void su3xsu3(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   __asm__ __volatile__("vmovapd %0, %%xmm0 \n\t"
                        "vmovapd %1, %%xmm1 \n\t"
@@ -137,7 +137,7 @@ void su3xsu3(su3_dble *u, su3_dble *v, su3_dble *w)
                        : "=m"((*w).c13), "=m"((*w).c23), "=m"((*w).c33));
 }
 
-void su3dagxsu3(su3_dble *u, su3_dble *v, su3_dble *w)
+void su3dagxsu3(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   __asm__ __volatile__("vmovapd %0, %%xmm0 \n\t"
                        "vmovapd %1, %%xmm1 \n\t"
@@ -178,7 +178,7 @@ void su3dagxsu3(su3_dble *u, su3_dble *v, su3_dble *w)
                        : "=m"((*w).c13), "=m"((*w).c23), "=m"((*w).c33));
 }
 
-void su3xsu3dag(su3_dble *u, su3_dble *v, su3_dble *w)
+void su3xsu3dag(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   __asm__ __volatile__("vbroadcastf128 %0, %%ymm3 \n\t"
                        "vmovapd %1, %%xmm0 \n\t"
@@ -228,7 +228,7 @@ void su3xsu3dag(su3_dble *u, su3_dble *v, su3_dble *w)
                        : "=m"((*w).c13), "=m"((*w).c23), "=m"((*w).c33));
 }
 
-void su3dagxsu3dag(su3_dble *u, su3_dble *v, su3_dble *w)
+void su3dagxsu3dag(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   __asm__ __volatile__("vbroadcastf128 %0, %%ymm3 \n\t"
                        "vmovapd %1, %%xmm0 \n\t"
@@ -278,7 +278,7 @@ void su3dagxsu3dag(su3_dble *u, su3_dble *v, su3_dble *w)
                        : "=m"((*w).c13), "=m"((*w).c23), "=m"((*w).c33));
 }
 
-void su3xu3alg(su3_dble *u, u3_alg_dble *X, su3_dble *v)
+void su3xu3alg(su3_dble const *u, u3_alg_dble const *X, su3_dble *v)
 {
   __asm__ __volatile__("vxorpd %%ymm5, %%ymm5, %%ymm5 \n\t"
                        "vbroadcastf128 %8, %%ymm6 \n\t"
@@ -327,7 +327,7 @@ void su3xu3alg(su3_dble *u, u3_alg_dble *X, su3_dble *v)
                        : "=m"((*v).c13), "=m"((*v).c23), "=m"((*v).c33));
 }
 
-void su3dagxu3alg(su3_dble *u, u3_alg_dble *X, su3_dble *v)
+void su3dagxu3alg(su3_dble const *u, u3_alg_dble const *X, su3_dble *v)
 {
   __asm__ __volatile__("vxorpd %%ymm5, %%ymm5, %%ymm5 \n\t"
                        "vbroadcastf128 %8, %%ymm6 \n\t"
@@ -376,7 +376,7 @@ void su3dagxu3alg(su3_dble *u, u3_alg_dble *X, su3_dble *v)
                        : "=m"((*v).c13), "=m"((*v).c23), "=m"((*v).c33));
 }
 
-void u3algxsu3(u3_alg_dble *X, su3_dble *u, su3_dble *v)
+void u3algxsu3(u3_alg_dble const *X, su3_dble const *u, su3_dble *v)
 {
   __asm__ __volatile__("vxorpd %%ymm5, %%ymm5, %%ymm5 \n\t"
                        "vbroadcastf128 %8, %%ymm6 \n\t"
@@ -436,7 +436,7 @@ void u3algxsu3(u3_alg_dble *X, su3_dble *u, su3_dble *v)
                        : "xmm3", "xmm4", "xmm5");
 }
 
-void u3algxsu3dag(u3_alg_dble *X, su3_dble *u, su3_dble *v)
+void u3algxsu3dag(u3_alg_dble const *X, su3_dble const *u, su3_dble *v)
 {
   __asm__ __volatile__("vxorpd %%ymm5, %%ymm5, %%ymm5 \n\t"
                        "vbroadcastf128 %8, %%ymm6 \n\t"
@@ -496,7 +496,7 @@ void u3algxsu3dag(u3_alg_dble *X, su3_dble *u, su3_dble *v)
                        : "xmm3", "xmm4", "xmm5");
 }
 
-double prod2su3alg(su3_dble *u, su3_dble *v, su3_alg_dble *X)
+double prod2su3alg(su3_dble const *u, su3_dble const *v, su3_alg_dble *X)
 {
   __asm__ __volatile__("vmovapd %0, %%xmm0 \n\t"
                        "vmovapd %1, %%xmm1 \n\t"
@@ -571,7 +571,7 @@ double prod2su3alg(su3_dble *u, su3_dble *v, su3_alg_dble *X)
   return tr;
 }
 
-void prod2u3alg(su3_dble *u, su3_dble *v, u3_alg_dble *X)
+void prod2u3alg(su3_dble const *u, su3_dble const *v, u3_alg_dble *X)
 {
   __asm__ __volatile__("vmovapd %0, %%xmm0 \n\t"
                        "vmovapd %1, %%xmm1 \n\t"
@@ -631,7 +631,7 @@ void prod2u3alg(su3_dble *u, su3_dble *v, u3_alg_dble *X)
                          "=m"((*X).c8), "=m"((*X).c9));
 }
 
-void rotate_su3alg(su3_dble *u, su3_alg_dble *X)
+void rotate_su3alg(su3_dble const *u, su3_alg_dble *X)
 {
   __asm__ __volatile__("vxorpd %%xmm5, %%xmm5, %%xmm5 \n\t"
                        "vmovsd %0, %%xmm0 \n\t"
@@ -729,11 +729,11 @@ static const sse_double c0 = {0.5, 0.5}, c1 = {-1.0 / 3.0, -1.0 / 3.0};
 static su3_dble uX ALIGNED16;
 static double tr ALIGNED8;
 
-static void su3xsu3vec(su3_dble *u) { _sse_su3_multiply_dble(*u); }
+static void su3xsu3vec(su3_dble const *u) { _sse_su3_multiply_dble(*u); }
 
-static void su3dagxsu3vec(su3_dble *u) { _sse_su3_inverse_multiply_dble(*u); }
+static void su3dagxsu3vec(su3_dble const *u) { _sse_su3_inverse_multiply_dble(*u); }
 
-void su3xsu3(su3_dble *u, su3_dble *v, su3_dble *w)
+void su3xsu3(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %1, %%xmm1 \n\t"
@@ -772,7 +772,7 @@ void su3xsu3(su3_dble *u, su3_dble *v, su3_dble *w)
                        : "=m"((*w).c13), "=m"((*w).c23), "=m"((*w).c33));
 }
 
-void su3dagxsu3(su3_dble *u, su3_dble *v, su3_dble *w)
+void su3dagxsu3(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %1, %%xmm1 \n\t"
@@ -811,7 +811,7 @@ void su3dagxsu3(su3_dble *u, su3_dble *v, su3_dble *w)
                        : "=m"((*w).c13), "=m"((*w).c23), "=m"((*w).c33));
 }
 
-void su3xsu3dag(su3_dble *u, su3_dble *v, su3_dble *w)
+void su3xsu3dag(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %1, %%xmm1 \n\t"
@@ -862,7 +862,7 @@ void su3xsu3dag(su3_dble *u, su3_dble *v, su3_dble *w)
                        : "=m"((*w).c13), "=m"((*w).c23), "=m"((*w).c33));
 }
 
-void su3dagxsu3dag(su3_dble *u, su3_dble *v, su3_dble *w)
+void su3dagxsu3dag(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %1, %%xmm1 \n\t"
@@ -913,7 +913,7 @@ void su3dagxsu3dag(su3_dble *u, su3_dble *v, su3_dble *w)
                        : "=m"((*w).c13), "=m"((*w).c23), "=m"((*w).c33));
 }
 
-void su3xu3alg(su3_dble *u, u3_alg_dble *X, su3_dble *v)
+void su3xu3alg(su3_dble const *u, u3_alg_dble const *X, su3_dble *v)
 {
   __asm__ __volatile__("xorpd %%xmm0, %%xmm0\n\t"
                        "movhpd %0, %%xmm0 \n\t"
@@ -960,7 +960,7 @@ void su3xu3alg(su3_dble *u, u3_alg_dble *X, su3_dble *v)
                        : "=m"((*v).c13), "=m"((*v).c23), "=m"((*v).c33));
 }
 
-void su3dagxu3alg(su3_dble *u, u3_alg_dble *X, su3_dble *v)
+void su3dagxu3alg(su3_dble const *u, u3_alg_dble const *X, su3_dble *v)
 {
   __asm__ __volatile__("xorpd %%xmm0, %%xmm0\n\t"
                        "movhpd %0, %%xmm0 \n\t"
@@ -1008,7 +1008,7 @@ void su3dagxu3alg(su3_dble *u, u3_alg_dble *X, su3_dble *v)
                        : "=m"((*v).c13), "=m"((*v).c23), "=m"((*v).c33));
 }
 
-void u3algxsu3(u3_alg_dble *X, su3_dble *u, su3_dble *v)
+void u3algxsu3(u3_alg_dble const *X, su3_dble const *u, su3_dble *v)
 {
   __asm__ __volatile__("xorpd %%xmm0, %%xmm0\n\t"
                        "movhpd %0, %%xmm0 \n\t"
@@ -1071,7 +1071,7 @@ void u3algxsu3(u3_alg_dble *X, su3_dble *u, su3_dble *v)
                        : "xmm3", "xmm4", "xmm5");
 }
 
-void u3algxsu3dag(u3_alg_dble *X, su3_dble *u, su3_dble *v)
+void u3algxsu3dag(u3_alg_dble const *X, su3_dble const *u, su3_dble *v)
 {
   __asm__ __volatile__("xorpd %%xmm0, %%xmm0\n\t"
                        "movhpd %0, %%xmm0 \n\t"
@@ -1134,7 +1134,7 @@ void u3algxsu3dag(u3_alg_dble *X, su3_dble *u, su3_dble *v)
                        : "xmm3", "xmm4", "xmm5");
 }
 
-double prod2su3alg(su3_dble *u, su3_dble *v, su3_alg_dble *X)
+double prod2su3alg(su3_dble const *u, su3_dble const *v, su3_alg_dble *X)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %1, %%xmm1 \n\t"
@@ -1217,7 +1217,7 @@ double prod2su3alg(su3_dble *u, su3_dble *v, su3_alg_dble *X)
   return tr;
 }
 
-void prod2u3alg(su3_dble *u, su3_dble *v, u3_alg_dble *X)
+void prod2u3alg(su3_dble const *u, su3_dble const *v, u3_alg_dble *X)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %1, %%xmm1 \n\t"
@@ -1286,7 +1286,7 @@ void prod2u3alg(su3_dble *u, su3_dble *v, u3_alg_dble *X)
                          "=m"((*X).c9), "=m"((*X).c3));
 }
 
-void rotate_su3alg(su3_dble *u, su3_alg_dble *X)
+void rotate_su3alg(su3_dble const *u, su3_alg_dble *X)
 {
   __asm__ __volatile__("movapd %0, %%xmm0 \n\t"
                        "movapd %2, %%xmm3 \n\t"
@@ -1399,11 +1399,11 @@ void rotate_su3alg(su3_dble *u, su3_alg_dble *X)
 static su3_vector_dble psi, chi;
 static su3_dble uX;
 
-static void su3xsu3vec(su3_dble *u) { _su3_multiply(chi, *u, psi); }
+static void su3xsu3vec(su3_dble const *u) { _su3_multiply(chi, *u, psi); }
 
-static void su3dagxsu3vec(su3_dble *u) { _su3_inverse_multiply(chi, *u, psi); }
+static void su3dagxsu3vec(su3_dble const *u) { _su3_inverse_multiply(chi, *u, psi); }
 
-void su3xsu3(su3_dble *u, su3_dble *v, su3_dble *w)
+void su3xsu3(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   psi.c1 = (*v).c11;
   psi.c2 = (*v).c21;
@@ -1430,7 +1430,7 @@ void su3xsu3(su3_dble *u, su3_dble *v, su3_dble *w)
   (*w).c33 = chi.c3;
 }
 
-void su3dagxsu3(su3_dble *u, su3_dble *v, su3_dble *w)
+void su3dagxsu3(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   psi.c1 = (*v).c11;
   psi.c2 = (*v).c21;
@@ -1457,7 +1457,7 @@ void su3dagxsu3(su3_dble *u, su3_dble *v, su3_dble *w)
   (*w).c33 = chi.c3;
 }
 
-void su3xsu3dag(su3_dble *u, su3_dble *v, su3_dble *w)
+void su3xsu3dag(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   psi.c1.re = (*v).c11.re;
   psi.c1.im = -(*v).c11.im;
@@ -1493,7 +1493,7 @@ void su3xsu3dag(su3_dble *u, su3_dble *v, su3_dble *w)
   (*w).c33 = chi.c3;
 }
 
-void su3dagxsu3dag(su3_dble *u, su3_dble *v, su3_dble *w)
+void su3dagxsu3dag(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
   psi.c1.re = (*v).c11.re;
   psi.c1.im = -(*v).c11.im;
@@ -1529,7 +1529,7 @@ void su3dagxsu3dag(su3_dble *u, su3_dble *v, su3_dble *w)
   (*w).c33 = chi.c3;
 }
 
-void su3xu3alg(su3_dble *u, u3_alg_dble *X, su3_dble *v)
+void su3xu3alg(su3_dble const *u, u3_alg_dble const *X, su3_dble *v)
 {
   psi.c1.re = 0.0;
   psi.c1.im = (*X).c1;
@@ -1565,7 +1565,7 @@ void su3xu3alg(su3_dble *u, u3_alg_dble *X, su3_dble *v)
   (*v).c33 = chi.c3;
 }
 
-void su3dagxu3alg(su3_dble *u, u3_alg_dble *X, su3_dble *v)
+void su3dagxu3alg(su3_dble const *u, u3_alg_dble const *X, su3_dble *v)
 {
   psi.c1.re = 0.0;
   psi.c1.im = (*X).c1;
@@ -1601,7 +1601,7 @@ void su3dagxu3alg(su3_dble *u, u3_alg_dble *X, su3_dble *v)
   (*v).c33 = chi.c3;
 }
 
-void u3algxsu3(u3_alg_dble *X, su3_dble *u, su3_dble *v)
+void u3algxsu3(u3_alg_dble const *X, su3_dble const *u, su3_dble *v)
 {
   psi.c1.re = 0.0;
   psi.c1.im = (*X).c1;
@@ -1646,7 +1646,7 @@ void u3algxsu3(u3_alg_dble *X, su3_dble *u, su3_dble *v)
   (*v).c33.im = chi.c3.im;
 }
 
-void u3algxsu3dag(u3_alg_dble *X, su3_dble *u, su3_dble *v)
+void u3algxsu3dag(u3_alg_dble const *X, su3_dble const *u, su3_dble *v)
 {
   psi.c1.re = 0.0;
   psi.c1.im = (*X).c1;
@@ -1691,7 +1691,7 @@ void u3algxsu3dag(u3_alg_dble *X, su3_dble *u, su3_dble *v)
   (*v).c33.im = chi.c3.im;
 }
 
-double prod2su3alg(su3_dble *u, su3_dble *v, su3_alg_dble *X)
+double prod2su3alg(su3_dble const *u, su3_dble const *v, su3_alg_dble *X)
 {
   double tr;
 
@@ -1741,7 +1741,7 @@ double prod2su3alg(su3_dble *u, su3_dble *v, su3_alg_dble *X)
   return tr;
 }
 
-void prod2u3alg(su3_dble *u, su3_dble *v, u3_alg_dble *X)
+void prod2u3alg(su3_dble const *u, su3_dble const *v, u3_alg_dble *X)
 {
   psi.c1 = (*v).c11;
   psi.c2 = (*v).c21;
@@ -1774,7 +1774,7 @@ void prod2u3alg(su3_dble *u, su3_dble *v, u3_alg_dble *X)
   (*X).c3 = chi.c3.im + chi.c3.im;
 }
 
-void rotate_su3alg(su3_dble *u, su3_alg_dble *X)
+void rotate_su3alg(su3_dble const *u, su3_alg_dble *X)
 {
   uX.c11.re = 0.0;
   uX.c11.im = (*X).c1 + (*X).c2;
@@ -1833,3 +1833,292 @@ void rotate_su3alg(su3_dble *u, su3_alg_dble *X)
 }
 
 #endif
+
+/* Summary:
+ *   computes v = u * X where u is an arbitrary complex 3x3 matrix and X is a
+ *   matrix in the su(3) algebra.
+ */
+void su3xsu3alg(su3_dble const *u, su3_alg_dble const *X, su3_dble *v)
+{
+  (*v).c11.re = -(((*X).c1 + (*X).c2) * (*u).c11.im) - (*X).c4 * (*u).c12.im -
+                (*X).c3 * (*u).c12.re - (*X).c6 * (*u).c13.im -
+                (*X).c5 * (*u).c13.re;
+  (*v).c11.im = ((*X).c1 + (*X).c2) * (*u).c11.re - (*X).c3 * (*u).c12.im +
+                (*X).c4 * (*u).c12.re - (*X).c5 * (*u).c13.im +
+                (*X).c6 * (*u).c13.re;
+
+  (*v).c12.re = -((*X).c4 * (*u).c11.im) + (*X).c3 * (*u).c11.re +
+                2 * (*X).c1 * (*u).c12.im - (*X).c2 * (*u).c12.im -
+                (*X).c8 * (*u).c13.im - (*X).c7 * (*u).c13.re;
+  (*v).c12.im = (*X).c3 * (*u).c11.im + (*X).c4 * (*u).c11.re -
+                2 * (*X).c1 * (*u).c12.re + (*X).c2 * (*u).c12.re -
+                (*X).c7 * (*u).c13.im + (*X).c8 * (*u).c13.re;
+
+  (*v).c13.re = -((*X).c6 * (*u).c11.im) + (*X).c5 * (*u).c11.re -
+                (*X).c8 * (*u).c12.im + (*X).c7 * (*u).c12.re -
+                (*X).c1 * (*u).c13.im + 2 * (*X).c2 * (*u).c13.im;
+  (*v).c13.im = (*X).c5 * (*u).c11.im + (*X).c6 * (*u).c11.re +
+                (*X).c7 * (*u).c12.im + (*X).c8 * (*u).c12.re +
+                (*X).c1 * (*u).c13.re - 2 * (*X).c2 * (*u).c13.re;
+
+  (*v).c21.re = -(((*X).c1 + (*X).c2) * (*u).c21.im) - (*X).c4 * (*u).c22.im -
+                (*X).c3 * (*u).c22.re - (*X).c6 * (*u).c23.im -
+                (*X).c5 * (*u).c23.re;
+  (*v).c21.im = ((*X).c1 + (*X).c2) * (*u).c21.re - (*X).c3 * (*u).c22.im +
+                (*X).c4 * (*u).c22.re - (*X).c5 * (*u).c23.im +
+                (*X).c6 * (*u).c23.re;
+
+  (*v).c22.re = -((*X).c4 * (*u).c21.im) + (*X).c3 * (*u).c21.re +
+                2 * (*X).c1 * (*u).c22.im - (*X).c2 * (*u).c22.im -
+                (*X).c8 * (*u).c23.im - (*X).c7 * (*u).c23.re;
+  (*v).c22.im = (*X).c3 * (*u).c21.im + (*X).c4 * (*u).c21.re -
+                2 * (*X).c1 * (*u).c22.re + (*X).c2 * (*u).c22.re -
+                (*X).c7 * (*u).c23.im + (*X).c8 * (*u).c23.re;
+
+  (*v).c23.re = -((*X).c6 * (*u).c21.im) + (*X).c5 * (*u).c21.re -
+                (*X).c8 * (*u).c22.im + (*X).c7 * (*u).c22.re -
+                (*X).c1 * (*u).c23.im + 2 * (*X).c2 * (*u).c23.im;
+  (*v).c23.im = (*X).c5 * (*u).c21.im + (*X).c6 * (*u).c21.re +
+                (*X).c7 * (*u).c22.im + (*X).c8 * (*u).c22.re +
+                (*X).c1 * (*u).c23.re - 2 * (*X).c2 * (*u).c23.re;
+
+  (*v).c31.re = -(((*X).c1 + (*X).c2) * (*u).c31.im) - (*X).c4 * (*u).c32.im -
+                (*X).c3 * (*u).c32.re - (*X).c6 * (*u).c33.im -
+                (*X).c5 * (*u).c33.re;
+  (*v).c31.im = ((*X).c1 + (*X).c2) * (*u).c31.re - (*X).c3 * (*u).c32.im +
+                (*X).c4 * (*u).c32.re - (*X).c5 * (*u).c33.im +
+                (*X).c6 * (*u).c33.re;
+
+  (*v).c32.re = -((*X).c4 * (*u).c31.im) + (*X).c3 * (*u).c31.re +
+                2 * (*X).c1 * (*u).c32.im - (*X).c2 * (*u).c32.im -
+                (*X).c8 * (*u).c33.im - (*X).c7 * (*u).c33.re;
+  (*v).c32.im = (*X).c3 * (*u).c31.im + (*X).c4 * (*u).c31.re -
+                2 * (*X).c1 * (*u).c32.re + (*X).c2 * (*u).c32.re -
+                (*X).c7 * (*u).c33.im + (*X).c8 * (*u).c33.re;
+
+  (*v).c33.re = -((*X).c6 * (*u).c31.im) + (*X).c5 * (*u).c31.re -
+                (*X).c8 * (*u).c32.im + (*X).c7 * (*u).c32.re -
+                (*X).c1 * (*u).c33.im + 2 * (*X).c2 * (*u).c33.im;
+  (*v).c33.im = (*X).c5 * (*u).c31.im + (*X).c6 * (*u).c31.re +
+                (*X).c7 * (*u).c32.im + (*X).c8 * (*u).c32.re +
+                (*X).c1 * (*u).c33.re - 2 * (*X).c2 * (*u).c33.re;
+}
+
+/* Summary:
+ *   computes v = X * u where u is an arbitrary complex 3x3 matrix and X is a
+ *   matrix in the su(3) algebra.
+ */
+void su3algxsu3(su3_alg_dble const *X, su3_dble const *u, su3_dble *v)
+{
+  (*v).c11.re = -(((*X).c1 + (*X).c2) * (*u).c11.im) - (*X).c4 * (*u).c21.im +
+                (*X).c3 * (*u).c21.re - (*X).c6 * (*u).c31.im +
+                (*X).c5 * (*u).c31.re;
+  (*v).c11.im = ((*X).c1 + (*X).c2) * (*u).c11.re + (*X).c3 * (*u).c21.im +
+                (*X).c4 * (*u).c21.re + (*X).c5 * (*u).c31.im +
+                (*X).c6 * (*u).c31.re;
+
+  (*v).c12.re = -(((*X).c1 + (*X).c2) * (*u).c12.im) - (*X).c4 * (*u).c22.im +
+                (*X).c3 * (*u).c22.re - (*X).c6 * (*u).c32.im +
+                (*X).c5 * (*u).c32.re;
+  (*v).c12.im = ((*X).c1 + (*X).c2) * (*u).c12.re + (*X).c3 * (*u).c22.im +
+                (*X).c4 * (*u).c22.re + (*X).c5 * (*u).c32.im +
+                (*X).c6 * (*u).c32.re;
+
+  (*v).c13.re = -(((*X).c1 + (*X).c2) * (*u).c13.im) - (*X).c4 * (*u).c23.im +
+                (*X).c3 * (*u).c23.re - (*X).c6 * (*u).c33.im +
+                (*X).c5 * (*u).c33.re;
+  (*v).c13.im = ((*X).c1 + (*X).c2) * (*u).c13.re + (*X).c3 * (*u).c23.im +
+                (*X).c4 * (*u).c23.re + (*X).c5 * (*u).c33.im +
+                (*X).c6 * (*u).c33.re;
+
+  (*v).c21.re = -((*X).c4 * (*u).c11.im) - (*X).c3 * (*u).c11.re +
+                2 * (*X).c1 * (*u).c21.im - (*X).c2 * (*u).c21.im -
+                (*X).c8 * (*u).c31.im + (*X).c7 * (*u).c31.re;
+  (*v).c21.im = -((*X).c3 * (*u).c11.im) + (*X).c4 * (*u).c11.re -
+                2 * (*X).c1 * (*u).c21.re + (*X).c2 * (*u).c21.re +
+                (*X).c7 * (*u).c31.im + (*X).c8 * (*u).c31.re;
+
+  (*v).c22.re = -((*X).c4 * (*u).c12.im) - (*X).c3 * (*u).c12.re +
+                2 * (*X).c1 * (*u).c22.im - (*X).c2 * (*u).c22.im -
+                (*X).c8 * (*u).c32.im + (*X).c7 * (*u).c32.re;
+  (*v).c22.im = -((*X).c3 * (*u).c12.im) + (*X).c4 * (*u).c12.re -
+                2 * (*X).c1 * (*u).c22.re + (*X).c2 * (*u).c22.re +
+                (*X).c7 * (*u).c32.im + (*X).c8 * (*u).c32.re;
+
+  (*v).c23.re = -((*X).c4 * (*u).c13.im) - (*X).c3 * (*u).c13.re +
+                2 * (*X).c1 * (*u).c23.im - (*X).c2 * (*u).c23.im -
+                (*X).c8 * (*u).c33.im + (*X).c7 * (*u).c33.re;
+  (*v).c23.im = -((*X).c3 * (*u).c13.im) + (*X).c4 * (*u).c13.re -
+                2 * (*X).c1 * (*u).c23.re + (*X).c2 * (*u).c23.re +
+                (*X).c7 * (*u).c33.im + (*X).c8 * (*u).c33.re;
+
+  (*v).c31.re = -((*X).c6 * (*u).c11.im) - (*X).c5 * (*u).c11.re -
+                (*X).c8 * (*u).c21.im - (*X).c7 * (*u).c21.re -
+                (*X).c1 * (*u).c31.im + 2 * (*X).c2 * (*u).c31.im;
+  (*v).c31.im = -((*X).c5 * (*u).c11.im) + (*X).c6 * (*u).c11.re -
+                (*X).c7 * (*u).c21.im + (*X).c8 * (*u).c21.re +
+                (*X).c1 * (*u).c31.re - 2 * (*X).c2 * (*u).c31.re;
+
+  (*v).c32.re = -((*X).c6 * (*u).c12.im) - (*X).c5 * (*u).c12.re -
+                (*X).c8 * (*u).c22.im - (*X).c7 * (*u).c22.re -
+                (*X).c1 * (*u).c32.im + 2 * (*X).c2 * (*u).c32.im;
+  (*v).c32.im = -((*X).c5 * (*u).c12.im) + (*X).c6 * (*u).c12.re -
+                (*X).c7 * (*u).c22.im + (*X).c8 * (*u).c22.re +
+                (*X).c1 * (*u).c32.re - 2 * (*X).c2 * (*u).c32.re;
+
+  (*v).c33.re = -((*X).c6 * (*u).c13.im) - (*X).c5 * (*u).c13.re -
+                (*X).c8 * (*u).c23.im - (*X).c7 * (*u).c23.re -
+                (*X).c1 * (*u).c33.im + 2 * (*X).c2 * (*u).c33.im;
+  (*v).c33.im = -((*X).c5 * (*u).c13.im) + (*X).c6 * (*u).c13.re -
+                (*X).c7 * (*u).c23.im + (*X).c8 * (*u).c23.re +
+                (*X).c1 * (*u).c33.re - 2 * (*X).c2 * (*u).c33.re;
+}
+
+/* Summary:
+ *   computes v = u^dag * X where u is an arbitrary complex 3x3 matrix and X is
+ *   a matrix in the su(3) algebra.
+ */
+void su3dagxsu3alg(su3_dble const *u, su3_alg_dble const *X, su3_dble *v)
+{
+  (*v).c11.re = ((*X).c1 + (*X).c2) * (*u).c11.im + (*X).c4 * (*u).c21.im -
+                (*X).c3 * (*u).c21.re + (*X).c6 * (*u).c31.im -
+                (*X).c5 * (*u).c31.re;
+  (*v).c11.im = ((*X).c1 + (*X).c2) * (*u).c11.re + (*X).c3 * (*u).c21.im +
+                (*X).c4 * (*u).c21.re + (*X).c5 * (*u).c31.im +
+                (*X).c6 * (*u).c31.re;
+  (*v).c12.re = (*X).c4 * (*u).c11.im + (*X).c3 * (*u).c11.re -
+                2 * (*X).c1 * (*u).c21.im + (*X).c2 * (*u).c21.im +
+                (*X).c8 * (*u).c31.im - (*X).c7 * (*u).c31.re;
+  (*v).c12.im = -((*X).c3 * (*u).c11.im) + (*X).c4 * (*u).c11.re -
+                2 * (*X).c1 * (*u).c21.re + (*X).c2 * (*u).c21.re +
+                (*X).c7 * (*u).c31.im + (*X).c8 * (*u).c31.re;
+  (*v).c13.re = (*X).c6 * (*u).c11.im + (*X).c5 * (*u).c11.re +
+                (*X).c8 * (*u).c21.im + (*X).c7 * (*u).c21.re +
+                (*X).c1 * (*u).c31.im - 2 * (*X).c2 * (*u).c31.im;
+  (*v).c13.im = -((*X).c5 * (*u).c11.im) + (*X).c6 * (*u).c11.re -
+                (*X).c7 * (*u).c21.im + (*X).c8 * (*u).c21.re +
+                (*X).c1 * (*u).c31.re - 2 * (*X).c2 * (*u).c31.re;
+  (*v).c21.re = ((*X).c1 + (*X).c2) * (*u).c12.im + (*X).c4 * (*u).c22.im -
+                (*X).c3 * (*u).c22.re + (*X).c6 * (*u).c32.im -
+                (*X).c5 * (*u).c32.re;
+  (*v).c21.im = ((*X).c1 + (*X).c2) * (*u).c12.re + (*X).c3 * (*u).c22.im +
+                (*X).c4 * (*u).c22.re + (*X).c5 * (*u).c32.im +
+                (*X).c6 * (*u).c32.re;
+  (*v).c22.re = (*X).c4 * (*u).c12.im + (*X).c3 * (*u).c12.re -
+                2 * (*X).c1 * (*u).c22.im + (*X).c2 * (*u).c22.im +
+                (*X).c8 * (*u).c32.im - (*X).c7 * (*u).c32.re;
+  (*v).c22.im = -((*X).c3 * (*u).c12.im) + (*X).c4 * (*u).c12.re -
+                2 * (*X).c1 * (*u).c22.re + (*X).c2 * (*u).c22.re +
+                (*X).c7 * (*u).c32.im + (*X).c8 * (*u).c32.re;
+  (*v).c23.re = (*X).c6 * (*u).c12.im + (*X).c5 * (*u).c12.re +
+                (*X).c8 * (*u).c22.im + (*X).c7 * (*u).c22.re +
+                (*X).c1 * (*u).c32.im - 2 * (*X).c2 * (*u).c32.im;
+  (*v).c23.im = -((*X).c5 * (*u).c12.im) + (*X).c6 * (*u).c12.re -
+                (*X).c7 * (*u).c22.im + (*X).c8 * (*u).c22.re +
+                (*X).c1 * (*u).c32.re - 2 * (*X).c2 * (*u).c32.re;
+  (*v).c31.re = ((*X).c1 + (*X).c2) * (*u).c13.im + (*X).c4 * (*u).c23.im -
+                (*X).c3 * (*u).c23.re + (*X).c6 * (*u).c33.im -
+                (*X).c5 * (*u).c33.re;
+  (*v).c31.im = ((*X).c1 + (*X).c2) * (*u).c13.re + (*X).c3 * (*u).c23.im +
+                (*X).c4 * (*u).c23.re + (*X).c5 * (*u).c33.im +
+                (*X).c6 * (*u).c33.re;
+  (*v).c32.re = (*X).c4 * (*u).c13.im + (*X).c3 * (*u).c13.re -
+                2 * (*X).c1 * (*u).c23.im + (*X).c2 * (*u).c23.im +
+                (*X).c8 * (*u).c33.im - (*X).c7 * (*u).c33.re;
+  (*v).c32.im = -((*X).c3 * (*u).c13.im) + (*X).c4 * (*u).c13.re -
+                2 * (*X).c1 * (*u).c23.re + (*X).c2 * (*u).c23.re +
+                (*X).c7 * (*u).c33.im + (*X).c8 * (*u).c33.re;
+  (*v).c33.re = (*X).c6 * (*u).c13.im + (*X).c5 * (*u).c13.re +
+                (*X).c8 * (*u).c23.im + (*X).c7 * (*u).c23.re +
+                (*X).c1 * (*u).c33.im - 2 * (*X).c2 * (*u).c33.im;
+  (*v).c33.im = -((*X).c5 * (*u).c13.im) + (*X).c6 * (*u).c13.re -
+                (*X).c7 * (*u).c23.im + (*X).c8 * (*u).c23.re +
+                (*X).c1 * (*u).c33.re - 2 * (*X).c2 * (*u).c33.re;
+}
+
+/* Summary:
+ *   computes v = X * u^dag where u is an arbitrary complex 3x3 matrix and X is
+ *   a matrix in the su(3) algebra.
+ */
+void su3algxsu3dag(su3_alg_dble const *X, su3_dble const *u, su3_dble *v)
+{
+  (*v).c11.re = ((*X).c1 + (*X).c2) * (*u).c11.im + (*X).c4 * (*u).c12.im +
+                (*X).c3 * (*u).c12.re + (*X).c6 * (*u).c13.im +
+                (*X).c5 * (*u).c13.re;
+  (*v).c11.im = ((*X).c1 + (*X).c2) * (*u).c11.re - (*X).c3 * (*u).c12.im +
+                (*X).c4 * (*u).c12.re - (*X).c5 * (*u).c13.im +
+                (*X).c6 * (*u).c13.re;
+  (*v).c12.re = ((*X).c1 + (*X).c2) * (*u).c21.im + (*X).c4 * (*u).c22.im +
+                (*X).c3 * (*u).c22.re + (*X).c6 * (*u).c23.im +
+                (*X).c5 * (*u).c23.re;
+  (*v).c12.im = ((*X).c1 + (*X).c2) * (*u).c21.re - (*X).c3 * (*u).c22.im +
+                (*X).c4 * (*u).c22.re - (*X).c5 * (*u).c23.im +
+                (*X).c6 * (*u).c23.re;
+  (*v).c13.re = ((*X).c1 + (*X).c2) * (*u).c31.im + (*X).c4 * (*u).c32.im +
+                (*X).c3 * (*u).c32.re + (*X).c6 * (*u).c33.im +
+                (*X).c5 * (*u).c33.re;
+  (*v).c13.im = ((*X).c1 + (*X).c2) * (*u).c31.re - (*X).c3 * (*u).c32.im +
+                (*X).c4 * (*u).c32.re - (*X).c5 * (*u).c33.im +
+                (*X).c6 * (*u).c33.re;
+  (*v).c21.re = (*X).c4 * (*u).c11.im - (*X).c3 * (*u).c11.re -
+                2 * (*X).c1 * (*u).c12.im + (*X).c2 * (*u).c12.im +
+                (*X).c8 * (*u).c13.im + (*X).c7 * (*u).c13.re;
+  (*v).c21.im = (*X).c3 * (*u).c11.im + (*X).c4 * (*u).c11.re -
+                2 * (*X).c1 * (*u).c12.re + (*X).c2 * (*u).c12.re -
+                (*X).c7 * (*u).c13.im + (*X).c8 * (*u).c13.re;
+  (*v).c22.re = (*X).c4 * (*u).c21.im - (*X).c3 * (*u).c21.re -
+                2 * (*X).c1 * (*u).c22.im + (*X).c2 * (*u).c22.im +
+                (*X).c8 * (*u).c23.im + (*X).c7 * (*u).c23.re;
+  (*v).c22.im = (*X).c3 * (*u).c21.im + (*X).c4 * (*u).c21.re -
+                2 * (*X).c1 * (*u).c22.re + (*X).c2 * (*u).c22.re -
+                (*X).c7 * (*u).c23.im + (*X).c8 * (*u).c23.re;
+  (*v).c23.re = (*X).c4 * (*u).c31.im - (*X).c3 * (*u).c31.re -
+                2 * (*X).c1 * (*u).c32.im + (*X).c2 * (*u).c32.im +
+                (*X).c8 * (*u).c33.im + (*X).c7 * (*u).c33.re;
+  (*v).c23.im = (*X).c3 * (*u).c31.im + (*X).c4 * (*u).c31.re -
+                2 * (*X).c1 * (*u).c32.re + (*X).c2 * (*u).c32.re -
+                (*X).c7 * (*u).c33.im + (*X).c8 * (*u).c33.re;
+  (*v).c31.re = (*X).c6 * (*u).c11.im - (*X).c5 * (*u).c11.re +
+                (*X).c8 * (*u).c12.im - (*X).c7 * (*u).c12.re +
+                (*X).c1 * (*u).c13.im - 2 * (*X).c2 * (*u).c13.im;
+  (*v).c31.im = (*X).c5 * (*u).c11.im + (*X).c6 * (*u).c11.re +
+                (*X).c7 * (*u).c12.im + (*X).c8 * (*u).c12.re +
+                (*X).c1 * (*u).c13.re - 2 * (*X).c2 * (*u).c13.re;
+  (*v).c32.re = (*X).c6 * (*u).c21.im - (*X).c5 * (*u).c21.re +
+                (*X).c8 * (*u).c22.im - (*X).c7 * (*u).c22.re +
+                (*X).c1 * (*u).c23.im - 2 * (*X).c2 * (*u).c23.im;
+  (*v).c32.im = (*X).c5 * (*u).c21.im + (*X).c6 * (*u).c21.re +
+                (*X).c7 * (*u).c22.im + (*X).c8 * (*u).c22.re +
+                (*X).c1 * (*u).c23.re - 2 * (*X).c2 * (*u).c23.re;
+  (*v).c33.re = (*X).c6 * (*u).c31.im - (*X).c5 * (*u).c31.re +
+                (*X).c8 * (*u).c32.im - (*X).c7 * (*u).c32.re +
+                (*X).c1 * (*u).c33.im - 2 * (*X).c2 * (*u).c33.im;
+  (*v).c33.im = (*X).c5 * (*u).c31.im + (*X).c6 * (*u).c31.re +
+                (*X).c7 * (*u).c32.im + (*X).c8 * (*u).c32.re +
+                (*X).c1 * (*u).c33.re - 2 * (*X).c2 * (*u).c33.re;
+}
+
+/* Summary:
+ *   Returns tr (X * u) where u is an arbitrary complex 3x3 matrix and X is a
+ *   matrix in the su(3) algebra.
+ */
+void su3algxsu3_tr(su3_alg_dble const *X, su3_dble const *u, complex_dble *tr)
+{
+  (*tr).re = -((*X).c4 * ((*u).c12.im + (*u).c21.im)) +
+             (*X).c3 * (-(*u).c12.re + (*u).c21.re) -
+             (*X).c6 * ((*u).c13.im + (*u).c31.im) +
+             (*X).c5 * (-(*u).c13.re + (*u).c31.re) -
+             (*X).c8 * ((*u).c23.im + (*u).c32.im) +
+             (*X).c7 * (-(*u).c23.re + (*u).c32.re) -
+             (*X).c2 * ((*u).c11.im + (*u).c22.im - 2 * (*u).c33.im) -
+             (*X).c1 * ((*u).c11.im - 2 * (*u).c22.im + (*u).c33.im);
+
+  (*tr).im = (*X).c3 * (-(*u).c12.im + (*u).c21.im) +
+             (*X).c4 * ((*u).c12.re + (*u).c21.re) +
+             (*X).c5 * (-(*u).c13.im + (*u).c31.im) +
+             (*X).c6 * ((*u).c13.re + (*u).c31.re) +
+             (*X).c7 * (-(*u).c23.im + (*u).c32.im) +
+             (*X).c8 * ((*u).c23.re + (*u).c32.re) +
+             (*X).c2 * ((*u).c11.re + (*u).c22.re - 2 * (*u).c33.re) +
+             (*X).c1 * ((*u).c11.re - 2 * (*u).c22.re + (*u).c33.re);
+}

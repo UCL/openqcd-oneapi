@@ -23,7 +23,7 @@ MAIN = check1 check2
 
 FLAGS = flags lat_parms dfl_parms
 
-LATTICE = bcnds geometry
+LATTICE = bcnds geometry uidx
 
 RANDOM = ranlux ranlxs ranlxd gauss
 
@@ -31,7 +31,7 @@ LINALG = cmatrix_dble liealg salg salg_dble
 
 UTILS = endian mutils utils wspace
 
-UFLDS = uflds
+UFLDS = uflds udcom
 
 SFLDS = sflds Pbnd Pbnd_dble scom sdcom
 

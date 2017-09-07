@@ -19,7 +19,7 @@ all: rmxeq mkdep mkxeq
 
 # main programs and modules to be compiled
 
-MAIN = check1 check2 check3
+MAIN = check1 check2 check3 test01_chs_bcnd_boundaries
 
 FLAGS = flags lat_parms dfl_parms
 
@@ -54,7 +54,7 @@ VPATH = .:$(MDIR)/flags:$(MDIR)/lattice:$(MDIR)/random:$(MDIR)/uflds:\
 
 # additional include directories
 
-INCPATH = $(MPI_INCLUDE) ../../include
+INCPATH = $(MPI_INCLUDE) ../../include ../..
 
 
 # additional libraries
@@ -67,7 +67,7 @@ LIBPATH = $(MPI_HOME)/lib
 # scheduling and optimization options
 
 CFLAGS = -std=c89 -pedantic -fstrict-aliasing \
-         -Wall -Wno-long-long -Wstrict-prototypes -Werror \
+         -Wall -Wno-long-long -Wstrict-prototypes \
          -O -mno-avx -Dx64 -DPM
 
 

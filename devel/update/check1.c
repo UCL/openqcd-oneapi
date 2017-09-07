@@ -114,7 +114,7 @@ static void read_integrator(void)
 int main(int argc, char *argv[])
 {
   int i, ie;
-  int nop, itu, *iop;
+  int nop, ismear, iunsmear, itu, *iop;
   double phi[2], phi_prime[2];
   double kappa, *eps;
   mdstep_t *mds;
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
   set_mdsteps();
   print_mdsteps(0x6);
 
-  mds = mdsteps(&nop, &itu);
+  mds = mdsteps(&nop, &ismear, &iunsmear, &itu);
   i = 0;
 
   while (mds[i].iop <= itu)

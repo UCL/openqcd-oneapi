@@ -78,14 +78,6 @@ typedef union
 #define _re(z, w) ((z).re * (w).re + (z).im * (w).im)
 #define _im(z, w) ((z).im * (w).re - (z).re * (w).im)
 
-#define _vector_mul_assign(r, c)                                               \
-  (r).c1.re *= (c);                                                            \
-  (r).c1.im *= (c);                                                            \
-  (r).c2.re *= (c);                                                            \
-  (r).c2.im *= (c);                                                            \
-  (r).c3.re *= (c);                                                            \
-  (r).c3.im *= (c)
-
 void det2xt(pauli_dble *m, u3_alg_dble *X)
 {
   double x, *up, *um;

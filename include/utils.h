@@ -62,11 +62,15 @@ extern void check_dir(char *dir);
 extern void check_dir_root(char *dir);
 extern int name_size(char *format, ...);
 extern long find_section(char *title);
+extern long find_optional_section(char *title);
 extern long read_line(char *tag, char *format, ...);
+extern long read_optional_line(char *tag, char *format, ...);
 extern int count_tokens(char *tag);
 extern void read_iprms(char *tag, int n, int *iprms);
 extern void read_dprms(char *tag, int n, double *dprms);
 extern int copy_file(char *in, char *out);
+
+extern long const No_Section_Found;
 
 /* UTILS_C */
 extern int safe_mod(int x, int y);
@@ -86,6 +90,12 @@ extern void mpc_bcast_d(double *buf, int num);
 extern void mpc_bcast_i(int *buf, int num);
 extern void mpc_gsum_d(double *src, double *dst, int num);
 extern void mpc_print_info(void);
+extern double square_dble(double);
+extern double sinc_dble(double);
+extern double smear_xi0_dble(double);
+extern double smear_xi1_dble(double);
+extern void mul_icomplex(complex_dble*);
+extern void mul_assign_scalar_complex(double, complex_dble*);
 
 /* WSPACE_C */
 extern void alloc_wud(int n);
