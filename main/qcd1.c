@@ -653,37 +653,35 @@ static void read_actions(void)
 
 static void read_smearing(void)
 {
-  int i, use_smearing;
-  action_parms_t ap;
-  int n_smear;
+  long section_pos;
+  int n_smear, smear_gauge, smear_fermion;
   double rho_t, rho_s;
 
-  use_smearing = 0;
-  for (i = 0; i < hmc.nact; ++i) {
-    ap = action_parms(i);
-
-    if (ap.smear) {
-      use_smearing = 1;
-      break;
-    }
-  }
-
-  /* If none of the actions use smearing, the section need not be specified */
-  if (use_smearing == 0)
-    return;
-
   if (my_rank == 0) {
-    find_section("Smearing parameters");
-    read_line("n_smear", "%d", &n_smear);
-    read_line("rho_t", "%lf", &rho_t);
-    read_line("rho_s", "%lf", &rho_s);
+    section_pos = find_optional_section("Smearing parameters");
+
+    if (section_pos == No_Section_Found) {
+      n_smear = 0;
+      rho_t = 0.0;
+      rho_s = 0.0;
+      smear_gauge = 0;
+      smear_fermion = 0;
+    } else {
+      read_line("n_smear", "%d", &n_smear);
+      read_line("rho_t", "%lf", &rho_t);
+      read_line("rho_s", "%lf", &rho_s);
+      read_line("gauge", "%d", &smear_gauge);
+      read_line("fermion", "%d", &smear_fermion);
+    }
   }
 
   mpc_bcast_i(&n_smear, 1);
   mpc_bcast_d(&rho_t, 1);
   mpc_bcast_d(&rho_s, 1);
+  mpc_bcast_i(&smear_gauge, 1);
+  mpc_bcast_i(&smear_fermion, 1);
 
-  set_stout_smearing_parms(n_smear, rho_t, rho_s);
+  set_stout_smearing_parms(n_smear, rho_t, rho_s, smear_gauge, smear_fermion);
 }
 
 static void read_integrator(void)
@@ -1022,7 +1020,7 @@ static void read_ani_parms(void)
       us_fermion = 1.0;
       ut_fermion = 1.0;
     } else {
-      read_optional_line("use_tts", "%d", &has_tts, 1);
+      read_line("use_tts", "%d", &has_tts);
       read_line("nu", "%lf", &nu);
       read_line("xi", "%lf", &xi);
       read_line("cR", "%lf", &cR);
@@ -1121,11 +1119,11 @@ static void read_infile(int argc, char *argv[])
   }
 
   read_ani_parms();
+  read_smearing();
   read_lat_parms();
   read_bc_parms();
   read_schedule();
   read_actions();
-  read_smearing();
   read_integrator();
   read_solvers();
   read_wflow_parms();
@@ -1472,6 +1470,7 @@ static void print_info(int icnfg)
     if (append == 0) {
       print_lat_parms();
       print_ani_parms();
+      print_smearing_parms();
       print_bc_parms();
     }
 

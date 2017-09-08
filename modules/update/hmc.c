@@ -220,6 +220,8 @@ void hmc_sanity_check(void)
   action_parms_t ap;
   force_parms_t fp;
   rat_parms_t rp;
+  ani_params_t ani;
+  stout_smearing_params_t smear;
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
@@ -355,6 +357,31 @@ void hmc_sanity_check(void)
     ie = check_rat_actions();
     error_root(ie != 0, 1, "hmc_sanity_check [hmc.c]",
                "Inconsistent rational function actions");
+
+    ani = ani_parms();
+
+    ie = (ani.has_ani == 1) && (bc_type() != 3);
+    error_root(ie != 0, 1, "hmc_sanity_check [hmc.c]",
+        "Anisotropy not implemented for non-periodic boundaries");
+
+    smear = stout_smearing_parms();
+
+    ie = (smear.num_smear != 0) && (bc_type() != 3);
+    error_root(ie != 0, 1, "hmc_sanity_check [hmc.c]",
+        "Stout smearing not implemented for non-periodic boundaries");
+
+    for (k = 0; k < nact; k++) {
+      ap = action_parms(iact[k]);
+
+      if (ap.action == ACG) {
+        ie = (smear.smear_gauge != ap.smear);
+      } else {
+        ie = (smear.smear_fermion != ap.smear);
+      }
+
+      error_root(ie != 0, 1, "hmc_sanity_check [hmc.c]",
+          "Inconsistent individual action smearing settings (internal error)");
+    }
   }
 
   error_chk();
@@ -499,6 +526,7 @@ static void start_hmc(double *act0, su3_dble *uold)
   dfl_parms_t dfl;
   hmc_parms_t hmc;
   action_parms_t ap;
+  stout_smearing_params_t smear_params;
 
   clear_counters();
   udb = udfld();
@@ -508,8 +536,12 @@ static void start_hmc(double *act0, su3_dble *uold)
   act0[0] = momentum_action(0);
 
   dfl = dfl_parms();
+  smear_params = stout_smearing_parms();
 
   if (dfl.Ns) {
+    if (smear_params.smear_fermion == 1)
+      smear_fields();
+
     dfl_modes2(status);
     error_root((status[1] < 0) || ((status[1] == 0) && (status[0] < 0)), 1,
                "start_hmc [hmc.c]", "Deflation subspace generation "
@@ -520,6 +552,9 @@ static void start_hmc(double *act0, su3_dble *uold)
       add2counter("modes", 0, status);
     else
       add2counter("modes", 2, status + 1);
+
+    if (smear_params.smear_fermion == 1)
+      unsmear_fields();
   }
 
   hmc = hmc_parms();
@@ -531,7 +566,6 @@ static void start_hmc(double *act0, su3_dble *uold)
   if (query_flags(UDBUF_UP2DATE) != 1)
     copy_bnd_ud();
 
-  /* Compute the contrib from think link actions first */
   for (i = 0; i < nact; i++) {
     ap = action_parms(iact[i]);
 
