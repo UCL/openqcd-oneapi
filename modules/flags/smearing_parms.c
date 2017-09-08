@@ -9,16 +9,21 @@
 #include "flags.h"
 #include "global.h"
 
-static stout_smearing_params_t ssp = {0, 0, 0., 0, 0.};
+static stout_smearing_params_t ssp = {0, 0, 0., 0, 0., 0, 0};
 
-stout_smearing_params_t set_stout_smearing_parms(int n, double pt, double ps)
+stout_smearing_params_t set_stout_smearing_parms(int n, double pt, double ps,
+                                                 int smear_gauge,
+                                                 int smear_fermion)
 {
-  int nprm[3];
+  int nprm[5];
   double ssprms[2];
 
   nprm[0] = n;
   nprm[1] = !(pt == 0.);
   nprm[2] = !(ps == 0.);
+  nprm[3] = (smear_gauge) ? 1 : 0;
+  nprm[4] = (smear_fermion) ? 1 : 0;
+
   ssprms[0] = pt;
   ssprms[1] = ps;
 
@@ -30,11 +35,15 @@ stout_smearing_params_t set_stout_smearing_parms(int n, double pt, double ps)
         "off is probably not what you want to do.");
 
   /* Turn off smearing if both rho's are zero */
-  if ((nprm[1] == 0) && (nprm[2] == 0))
+  if ((nprm[1] == 0) && (nprm[2] == 0)) {
     nprm[0] = 0;
+    /* or if neither smear_gauge nor smear_fermion is on */
+  } else if ((nprm[3] == 0) && (nprm[4] == 0)) {
+    nprm[0] = 0;
+  }
 
   if (NPROC > 1) {
-    MPI_Bcast(nprm, 3, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(nprm, 5, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(ssprms, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   }
 
@@ -46,7 +55,28 @@ stout_smearing_params_t set_stout_smearing_parms(int n, double pt, double ps)
   ssp.smear_spatial = nprm[2];
   ssp.rho_spatial = ssprms[1];
 
+  ssp.smear_gauge = nprm[3];
+  ssp.smear_fermion = nprm[4];
+
   return ssp;
 }
 
 stout_smearing_params_t stout_smearing_parms() { return ssp; }
+
+void print_smearing_parms(void)
+{
+  int my_rank, n;
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+
+  if (my_rank == 0) {
+    printf("Smearing parameters:\n");
+    printf("n_smear = %d\n", ssp.num_smear);
+    n = fdigits(ssp.rho_temporal);
+    printf("rho_t = %.*f\n", IMAX(n,1), ssp.rho_temporal);
+    n = fdigits(ssp.rho_spatial);
+    printf("rho_s = %.*f\n", IMAX(n,1), ssp.rho_spatial);
+    printf("gauge = %s\n", (ssp.smear_gauge == 1) ? "true" : "false");
+    printf("fermion = %s\n\n", (ssp.smear_fermion == 1) ? "true" : "false");
+  }
+}

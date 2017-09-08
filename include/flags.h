@@ -240,6 +240,9 @@ typedef struct
 
   int smear_spatial;
   double rho_spatial;
+
+  int smear_gauge;
+  int smear_fermion;
 } stout_smearing_params_t;
 
 /* FLAGS_C */
@@ -369,7 +372,10 @@ extern wflow_parms_t wflow_parms(void);
 
 /* SMEARING_PARMS_C */
 extern stout_smearing_params_t set_stout_smearing_parms(int n, double pt,
-                                                        double ps);
+                                                        double ps,
+                                                        int smear_gauge,
+                                                        int smear_fermion);
 extern stout_smearing_params_t stout_smearing_parms(void);
+extern void print_smearing_parms(void);
 
 #endif

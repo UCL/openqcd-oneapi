@@ -755,6 +755,6 @@ void print_ani_parms(void)
     n = fdigits(ani.us_fermion);
     printf("us_fermion = %.*f\n", IMAX(n, 1), ani.us_fermion);
     n = fdigits(ani.ut_fermion);
-    printf("ut_fermion = %.*f\n", IMAX(n, 1), ani.ut_fermion);
+    printf("ut_fermion = %.*f\n\n", IMAX(n, 1), ani.ut_fermion);
   }
 }

@@ -400,21 +400,32 @@ static void setup_files(void)
 
 static void read_smearing(void)
 {
-  int n_smear;
+  long section_pos;
+  int n_smear, smear_gauge;
   double rho_t, rho_s;
 
   if (my_rank == 0) {
-    find_section("Smearing parameters");
-    read_line("n_smear", "%d", &n_smear);
-    read_line("rho_t", "%lf", &rho_t);
-    read_line("rho_s", "%lf", &rho_s);
+    section_pos = find_optional_section("Smearing parameters");
+
+    if (section_pos == No_Section_Found) {
+      n_smear = 0;
+      rho_t = 0.0;
+      rho_s = 0.0;
+      smear_gauge = 0;
+    } else {
+      read_line("n_smear", "%d", &n_smear);
+      read_line("rho_t", "%lf", &rho_t);
+      read_line("rho_s", "%lf", &rho_s);
+      read_line("gauge", "%d", &smear_gauge);
+    }
   }
 
   mpc_bcast_i(&n_smear, 1);
   mpc_bcast_d(&rho_t, 1);
   mpc_bcast_d(&rho_s, 1);
+  mpc_bcast_i(&smear_gauge, 1);
 
-  set_stout_smearing_parms(n_smear, rho_t, rho_s);
+  set_stout_smearing_parms(n_smear, rho_t, rho_s, smear_gauge, 0);
 }
 
 static void read_lat_parms(void)
@@ -465,7 +476,7 @@ static void read_ani_parms(void)
       us_fermion = 1.0;
       ut_fermion = 1.0;
     } else {
-      read_optional_line("use_tts", "%d", &has_tts, 1);
+      read_line("use_tts", "%d", &has_tts);
       read_line("nu", "%lf", &nu);
       read_line("xi", "%lf", &xi);
       read_line("cR", "%lf", &cR);
@@ -594,7 +605,7 @@ static void read_integrator(void)
 
   smear_parms = stout_smearing_parms();
 
-  if (smear_parms.num_smear > 0) {
+  if ((smear_parms.num_smear > 0) && (smear_parms.smear_gauge == 1)) {
     set_action_parms(0, ACG, 0, 0, NULL, NULL, NULL, 1);
   } else {
     set_action_parms(0, ACG, 0, 0, NULL, NULL, NULL, 0);

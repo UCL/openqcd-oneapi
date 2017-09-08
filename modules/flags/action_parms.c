@@ -265,11 +265,16 @@ void read_action_parms(int iact)
   int my_rank, i, ida;
   int ipf, im0, irat[3], imu[4], isp[4], smear;
   char line[NAME_SIZE];
+  stout_smearing_params_t smear_params;
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+
+  smear_params = stout_smearing_parms();
+
   ida = 0;
   ipf = 0;
   im0 = 0;
+  smear = 0;
 
   for (i = 0; i < 3; i++)
     irat[i] = 0;
@@ -284,7 +289,6 @@ void read_action_parms(int iact)
     find_section(line);
 
     read_line("action", "%s", line);
-    read_optional_line("smear", "%d", &smear, 0);
 
     if (strcmp(line, "ACF_TM1") == 0) {
       ida = 1;
@@ -331,6 +335,12 @@ void read_action_parms(int iact)
     } else if (strcmp(line, "ACG") != 0)
       error_root(1, 1, "read_action_parms [action_parms.c]",
                  "Unknown action %s", line);
+
+    if ((ida == 0) && (smear_params.smear_gauge == 1)) {
+      smear = 1;
+    } else if ((ida !=0) && (smear_params.smear_fermion == 1)) {
+      smear = 1;
+    }
   }
 
   if (NPROC > 1) {
