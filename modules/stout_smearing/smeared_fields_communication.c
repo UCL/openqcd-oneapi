@@ -47,8 +47,8 @@ static void send_su3_type_two(int mu)
 
   if (nuk > 0) {
     tag = mpi_tag();
-    saddr = npr[2 * mu];
-    raddr = npr[2 * mu + 1];
+    saddr = npr[2 * mu + 1];
+    raddr = npr[2 * mu];
     nbf = 18 * nuk;
 
     if (np == 0) {
@@ -73,8 +73,8 @@ static void send_su3_type_one(int mu)
 
   if (nu0 > 0) {
     tag = mpi_tag();
-    saddr = npr[2 * mu];
-    raddr = npr[2 * mu + 1];
+    saddr = npr[2 * mu + 1];
+    raddr = npr[2 * mu];
     nbf = 18 * nu0;
 
     if (np == 0) {
