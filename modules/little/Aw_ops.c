@@ -342,6 +342,8 @@ void set_Aw(double mu)
   b2b_flds_t *b2b;
   sw_parms_t sw;
   tm_parms_t tm;
+  ani_params_t ani;
+  double ani_factor;
 
   if (NPROC > 1) {
     dprms[0] = mu;
@@ -356,6 +358,7 @@ void set_Aw(double mu)
   m0 = sw.m0;
   tm = tm_parms();
   eo = tm.eoflg;
+  ani = ani_parms();
 
   if (query_flags(AW_UP2DATE) == 1) {
     if ((m0 != old_m0[0]) || (mu != old_mu[0]) || (eo != old_eo[0]))
@@ -408,15 +411,25 @@ void set_Aw(double mu)
         w = Awd.Aeo[8 * (nsw - nbh) + ifc];
       }
 
+      if (ani.has_ani == 1) {
+        if (nu == 0) {
+          ani_factor = 1.0 / (ani.ut_fermion);
+        } else {
+          ani_factor = ani.nu / (ani.xi * ani.ut_fermion);
+        }
+      } else {
+        ani_factor = 1.0;
+      }
+
       for (k = 0; k < Ns; k++) {
         for (l = 0; l < Ns; l++) {
           spinor_prod_gamma[nu](vol, sde[k], sdo[l], sp);
 
-          z[k * Ns + l].re = (-0.5) * (sp[0].re - sp[1].re);
-          z[k * Ns + l].im = (-0.5) * (sp[0].im - sp[1].im);
+          z[k * Ns + l].re = (-0.5) * (ani_factor) * (sp[0].re - sp[1].re);
+          z[k * Ns + l].im = (-0.5) * (ani_factor) * (sp[0].im - sp[1].im);
 
-          w[l * Ns + k].re = (-0.5) * (sp[0].re + sp[1].re);
-          w[l * Ns + k].im = (0.5) * (sp[0].im + sp[1].im);
+          w[l * Ns + k].re = (-0.5) * (ani_factor) * (sp[0].re + sp[1].re);
+          w[l * Ns + k].im = (0.5) * (ani_factor) * (sp[0].im + sp[1].im);
         }
       }
 
@@ -440,17 +453,17 @@ void set_Aw(double mu)
           spinor_prod_gamma[nu](vol, sdo[k], sde[l], sp);
 
           if (ibn) {
-            z[k * Ns + l].re = (-0.5) * (sp[0].re - sp[1].re);
-            z[k * Ns + l].im = (-0.5) * (sp[0].im - sp[1].im);
+            z[k * Ns + l].re =  (-0.5) * (ani_factor) * (sp[0].re - sp[1].re);
+            z[k * Ns + l].im =  (-0.5) * (ani_factor) * (sp[0].im - sp[1].im);
 
-            w[l * Ns + k].re = (-0.5) * (sp[0].re + sp[1].re);
-            w[l * Ns + k].im = (0.5) * (sp[0].im + sp[1].im);
+            w[l * Ns + k].re =  (-0.5) * (ani_factor) * (sp[0].re + sp[1].re);
+            w[l * Ns + k].im =  (0.5) *  (ani_factor) * (sp[0].im + sp[1].im);
           } else {
-            z[k * Ns + l].re += (-0.5) * (sp[0].re - sp[1].re);
-            z[k * Ns + l].im += (-0.5) * (sp[0].im - sp[1].im);
+            z[k * Ns + l].re += (-0.5) * (ani_factor) * (sp[0].re - sp[1].re);
+            z[k * Ns + l].im += (-0.5) * (ani_factor) * (sp[0].im - sp[1].im);
 
-            w[l * Ns + k].re += (-0.5) * (sp[0].re + sp[1].re);
-            w[l * Ns + k].im += (0.5) * (sp[0].im + sp[1].im);
+            w[l * Ns + k].re += (-0.5) * (ani_factor) * (sp[0].re + sp[1].re);
+            w[l * Ns + k].im += (0.5) *  (ani_factor) * (sp[0].im + sp[1].im);
           }
         }
       }
