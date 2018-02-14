@@ -62,7 +62,7 @@ UFLDS = plaq_sum uflds udcom bstap
 
 UPDATE = chrono mdsteps counters mdint hmc rwtm rwtmeo rwrat
 
-UTILS = endian mutils utils wspace
+UTILS = endian error hsum mutils utils wspace
 
 VFLDS = vflds vinit vcom vdcom
 
@@ -109,17 +109,22 @@ CFLAGS = -std=c89 -pedantic -fstrict-aliasing \
          -Wall -Wno-long-long -Wstrict-prototypes -Werror \
          -O -mno-avx -Dx64 -DPM
 
+LFLAGS =
 
-# debugging flags (add to CFLAGS if needed)
-
+# See the README in the top directory for alternative choices of the
+# optimization options -O -mno-avx -Dx64 -DPM.
+#
+# The available debugging flags are
+#
 # -DCGNE_DBG -DFGCR_DBG -FGCR4VD_DBG -DMSCG_DBG
 # -DDFL_MODES_DBG -DMDINT_DBG -DRWRAT_DBG
-
+#
+# Add these (or some of these) to CFLAGS if debugging output is desired.
 
 ############################## do not change ###################################
 
 SHELL=/bin/bash
-CC=$(MPI_HOME)/bin/mpicc
+CC=mpicc
 CLINKER=$(CC)
 
 PGMS= $(MAIN) $(MODULES)
@@ -142,7 +147,7 @@ $(addsuffix .o,$(PGMS)): %.o: %.c Makefile
 # rule to link object files
 
 $(MAIN): %: %.o $(addsuffix .o,$(MODULES)) Makefile
-	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(CFLAGS) $(LOGOPTION) \
+	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(LFLAGS) $(LOGOPTION) \
         $(addprefix -L,$(LIBPATH)) $(addprefix -l,$(LIBS)) -o $@
 
 

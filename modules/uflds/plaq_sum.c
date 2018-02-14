@@ -3,7 +3,7 @@
 *
 * File plaq_sum.c
 *
-* Copyright (C) 2005, 2011, 2012, 2013 Martin Luescher
+* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -61,14 +61,12 @@
 #include "global.h"
 
 #define N0 (NPROC0 * L0)
-#define MAX_LEVELS 8
-#define BLK_LENGTH 8
 
-static int cnt[L0][MAX_LEVELS];
-static double smE[L0][MAX_LEVELS], smB[L0][MAX_LEVELS];
+static int isA, isE[L0], isB[L0], init = 0;
 static double aslE[N0], aslB[N0];
 static su3_dble *udb;
-static su3_dble wd1, wd2 ALIGNED16;
+static su3_dble wd1 ALIGNED16;
+static su3_dble wd2 ALIGNED16;
 
 static double plaq_dble(int n, int ix)
 {
@@ -84,10 +82,15 @@ static double plaq_dble(int n, int ix)
   return sm;
 }
 
-static double local_plaq_sum_dble(int iw)
+static void local_plaq_sum_dble(int iw)
 {
-  int bc, n, ix, t, *cnt0;
-  double wp, pa, *smx0;
+  int bc, ix, t, n;
+  double wp, pa;
+
+  if (init < 1) {
+    isA = init_hsum(1);
+    init = 1;
+  }
 
   bc = bc_type();
 
@@ -97,13 +100,7 @@ static double local_plaq_sum_dble(int iw)
     wp = 0.5;
 
   udb = udfld();
-  cnt0 = cnt[0];
-  smx0 = smE[0];
-
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt0[n] = 0;
-    smx0[n] = 0.0;
-  }
+  reset_hsum(isA);
 
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
@@ -125,64 +122,61 @@ static double local_plaq_sum_dble(int iw)
     if ((t == (N0 - 1)) && ((bc == 1) || (bc == 2)))
       pa += 9.0 * wp;
 
-    cnt0[0] += 1;
-    smx0[0] += pa;
-
-    for (n = 1; (cnt0[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt0[n] += 1;
-      smx0[n] += smx0[n - 1];
-
-      cnt0[n - 1] = 0;
-      smx0[n - 1] = 0.0;
-    }
+    if (pa != 0.0)
+      add_to_hsum(isA, &pa);
   }
-
-  for (n = 1; n < MAX_LEVELS; n++)
-    smx0[0] += smx0[n];
-
-  return smx0[0];
 }
 
 double plaq_sum_dble(int icom)
 {
-  double p, pa;
+  double p;
 
   if (query_flags(UDBUF_UP2DATE) != 1)
     copy_bnd_ud();
 
-  p = local_plaq_sum_dble(0);
+  local_plaq_sum_dble(0);
 
-  if ((NPROC > 1) && (icom == 1)) {
-    MPI_Reduce(&p, &pa, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&pa, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    p = pa;
-  }
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isA, &p);
+  else
+    local_hsum(isA, &p);
 
   return p;
 }
 
 double plaq_wsum_dble(int icom)
 {
-  double p, pa;
+  double p;
 
   if (query_flags(UDBUF_UP2DATE) != 1)
     copy_bnd_ud();
 
-  p = local_plaq_sum_dble(1);
+  local_plaq_sum_dble(1);
 
-  if ((NPROC > 1) && (icom == 1)) {
-    MPI_Reduce(&p, &pa, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&pa, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    p = pa;
-  }
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isA, &p);
+  else
+    local_hsum(isA, &p);
 
   return p;
 }
 
 double plaq_action_slices(double *asl)
 {
-  int bc, n, ix, t, t0;
-  double sE, sB, A;
+  int bc, ix, t, t0, n;
+  double A, smE, smB;
+
+  if (init < 2) {
+    if (init < 1)
+      isA = init_hsum(1);
+
+    for (t = 0; t < L0; t++) {
+      isE[t] = init_hsum(1);
+      isB[t] = init_hsum(1);
+    }
+
+    init = 2;
+  }
 
   if (query_flags(UDBUF_UP2DATE) != 1)
     copy_bnd_ud();
@@ -192,68 +186,64 @@ double plaq_action_slices(double *asl)
   udb = udfld();
 
   for (t = 0; t < L0; t++) {
-    for (n = 0; n < MAX_LEVELS; n++) {
-      cnt[t][n] = 0;
-      smE[t][n] = 0.0;
-      smB[t][n] = 0.0;
-    }
+    reset_hsum(isE[t]);
+    reset_hsum(isB[t]);
   }
 
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
-    sE = 0.0;
-    sB = 0.0;
+    smE = 0.0;
+    smB = 0.0;
 
     if ((t < (N0 - 1)) || (bc != 0)) {
       for (n = 0; n < 3; n++)
-        sE += (3.0 - plaq_dble(n, ix));
+        smE += (3.0 - plaq_dble(n, ix));
     }
 
     if ((t > 0) || (bc != 1)) {
       for (n = 3; n < 6; n++)
-        sB += (3.0 - plaq_dble(n, ix));
+        smB += (3.0 - plaq_dble(n, ix));
     }
 
     t -= t0;
-    smE[t][0] += sE;
-    smB[t][0] += sB;
-    cnt[t][0] += 1;
 
-    for (n = 1; (cnt[t][n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[t][n] += 1;
-      smE[t][n] += smE[t][n - 1];
-      smB[t][n] += smB[t][n - 1];
-
-      cnt[t][n - 1] = 0;
-      smE[t][n - 1] = 0.0;
-      smB[t][n - 1] = 0.0;
-    }
+    if (smE != 0.0)
+      add_to_hsum(isE[t], &smE);
+    if (smB != 0.0)
+      add_to_hsum(isB[t], &smB);
   }
+
+  for (t = 0; t < N0; t++)
+    asl[t] = 0.0;
 
   for (t = 0; t < L0; t++) {
-    for (n = 1; n < MAX_LEVELS; n++) {
-      smE[t][0] += smE[t][n];
-      smB[t][0] += smB[t][n];
-    }
+    local_hsum(isE[t], &smE);
+    asl[t + t0] = smE;
+  }
+
+  if (NPROC > 1) {
+    MPI_Reduce(asl, aslE, N0, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Bcast(aslE, N0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  } else {
+    for (t = 0; t < N0; t++)
+      aslE[t] = asl[t];
   }
 
   for (t = 0; t < N0; t++)
     asl[t] = 0.0;
 
-  for (t = 0; t < L0; t++)
-    asl[t + t0] = smE[t][0];
+  for (t = 0; t < L0; t++) {
+    local_hsum(isB[t], &smB);
+    asl[t + t0] = smB;
+  }
 
-  MPI_Reduce(asl, aslE, N0, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  MPI_Bcast(aslE, N0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-  for (t = 0; t < N0; t++)
-    asl[t] = 0.0;
-
-  for (t = 0; t < L0; t++)
-    asl[t + t0] = smB[t][0];
-
-  MPI_Reduce(asl, aslB, N0, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  MPI_Bcast(aslB, N0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  if (NPROC > 1) {
+    MPI_Reduce(asl, aslB, N0, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Bcast(aslB, N0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  } else {
+    for (t = 0; t < N0; t++)
+      aslB[t] = asl[t];
+  }
 
   if (bc != 3)
     asl[0] = aslE[0] + aslB[0];
@@ -270,13 +260,15 @@ double plaq_action_slices(double *asl)
       asl[t] = aslE[t - 1] + aslE[t] + 2.0 * aslB[t];
   }
 
+  reset_hsum(isA);
+
   if ((bc == 1) || (bc == 2))
-    A = aslE[N0 - 1];
-  else
-    A = 0.0;
+    add_to_hsum(isA, aslE + N0 - 1);
 
   for (t = 0; t < N0; t++)
-    A += asl[t];
+    add_to_hsum(isA, asl + t);
+
+  local_hsum(isA, &A);
 
   return A;
 }

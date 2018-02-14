@@ -25,6 +25,7 @@ csw          1.90952
 type         0
 cG           1.0
 cF           1.0
+theta        0.0 0.0 0.0
 
 [Random number generator]
 level        0

@@ -3,7 +3,7 @@
 *
 * File check6.c
 *
-* Copyright (C) 2009, 2011 Filippo Palombi, Martin Luescher
+* Copyright (C) 2009, 2011, 2016 Filippo Palombi, Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "su3.h"
 #include "utils.h"
 #include "random.h"
 #include "su3fcts.h"
@@ -26,7 +25,6 @@
 static double mu[3];
 static su3_alg_dble *X;
 static su3_dble *r, *u, *v, *w;
-static const su3_dble u0 = {{0.0}};
 static ch_drv0_t *sp;
 
 static void alloc_Xu(void)
@@ -55,7 +53,7 @@ static void random_Xu(void)
       break;
   }
 
-  (*u) = u0;
+  cm3x3_zero(1, u);
   (*u).c11.im = mu[0];
   (*u).c22.im = mu[1];
   (*u).c33.im = mu[2];
@@ -155,10 +153,7 @@ int main(void)
     chexp_drv0(X, sp);
     ch2mat((*sp).p, X, w);
     su3xsu3(u, w, v);
-    (*u) = u0;
-    (*u).c11.re = 1.0;
-    (*u).c22.re = 1.0;
-    (*u).c33.re = 1.0;
+    cm3x3_unity(1, u);
 
     dev = dev_uv();
     if (dev > dmax2)

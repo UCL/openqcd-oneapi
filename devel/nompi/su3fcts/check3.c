@@ -26,7 +26,6 @@
 static double mu[3], t, d;
 static su3_alg_dble *X;
 static su3_dble *r, *u, *v, *w;
-static const su3_dble u0 = {{0.0}};
 static ch_drv0_t *sp;
 
 static void alloc_Xu(void)
@@ -58,7 +57,7 @@ static void random_Xu(void)
   t = 0.5 * (mu[0] * mu[0] + mu[1] * mu[1] + mu[2] * mu[2]);
   d = mu[0] * mu[1] * mu[2];
 
-  (*u) = u0;
+  cm3x3_zero(1, u);
   (*u).c11.im = mu[0];
   (*u).c22.im = mu[1];
   (*u).c33.im = mu[2];
@@ -76,7 +75,7 @@ static void random_Xu(void)
   (*X).c7 = (*u).c23.re;
   (*X).c8 = (*u).c23.im;
 
-  (*u) = u0;
+  cm3x3_zero(1, u);
   (*u).c11.re = cos(mu[0]);
   (*u).c22.re = cos(mu[1]);
   (*u).c33.re = cos(mu[2]);

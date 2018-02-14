@@ -34,7 +34,6 @@ extern int *bnd_lks(int *n);
 extern int *bnd_pts(int *n);
 extern void set_bc(void);
 extern int check_bc(double tol);
-extern int chs_ubnd(int ibc);
 extern void bnd_s2zero(ptset_t set, spinor *s);
 extern void bnd_sd2zero(ptset_t set, spinor_dble *sd);
 

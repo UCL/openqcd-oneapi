@@ -3,7 +3,7 @@
 *
 * File check1.c
 *
-* Copyright (C) 2007, 2011-2013 Martin Luescher
+* Copyright (C) 2007, 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -31,7 +31,8 @@
 #define NPTS 2048
 
 static int imb[NPTS];
-static su3_dble ud[NPTS], vd[NPTS] ALIGNED16;
+static su3_dble ud[NPTS] ALIGNED16;
+static su3_dble vd[NPTS] ALIGNED16;
 static spinor_dble sd[3][NPTS] ALIGNED16;
 
 static void random_imb(int vol)
@@ -265,8 +266,6 @@ int main(int argc, char *argv[])
       }
     }
   }
-
-  error_chk();
 
   if (my_rank == 0) {
     printf("\n");

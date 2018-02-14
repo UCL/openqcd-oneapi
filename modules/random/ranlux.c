@@ -77,7 +77,12 @@ static stdint_t *state;
 
 static int check_machine(void)
 {
-  int ie;
+  int np, ie;
+
+  MPI_Comm_size(MPI_COMM_WORLD, &np);
+
+  error_root(np != NPROC, 1, "check_machine [ranlux.c]",
+             "Actual number of processes does not match NPROC");
 
   error_root(sizeof(stdint_t) != 4, 1, "check_machine [ranlux.c]",
              "Size of a stdint_t integer is not 4");
@@ -165,8 +170,6 @@ void start_ranlux(int level, int seed)
 
   rlxs_init(level, loc_seed);
   rlxd_init(level + 1, loc_seed);
-
-  error_chk();
 }
 
 void export_ranlux(int tag, char *out)
@@ -234,8 +237,6 @@ void export_ranlux(int tag, char *out)
       iw += fwrite(state, sizeof(stdint_t), ns, fout);
     }
   }
-
-  error_chk();
 
   if (my_rank == 0) {
     error_root(iw != (9 + NPROC * ns), 1, "export_ranlux [ranlux.c]",
@@ -312,8 +313,6 @@ int import_ranlux(char *in)
     } else if (my_rank == 0)
       reset_state();
   }
-
-  error_chk();
 
   if (my_rank == 0) {
     n = (int)(lsize[0]);

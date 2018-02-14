@@ -3,7 +3,7 @@
 *
 * File check1.c
 *
-* Copyright (C) 2007, 2011, 2013 Martin Luescher
+* Copyright (C) 2007, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   int ix, iy, iz, ifc, ie;
   int *bo1, *bo2;
   int l[4], mu, is;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   block_t *b;
   dfl_grid_t dfl_grid;
   FILE *flog = NULL, *fin = NULL;
@@ -73,8 +73,11 @@ int main(int argc, char *argv[])
   phi[1] = 0.0;
   phi_prime[0] = 0.0;
   phi_prime[1] = 0.0;
-  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.0;
+  theta[1] = 0.0;
+  theta[2] = 0.0;
+  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime, theta);
+  print_bc_parms(0);
 
   geometry();
   set_dfl_parms(bs, 4);

@@ -3,7 +3,7 @@
 *
 * File lat_parms.c
 *
-* Copyright (C) 2009-2013 Martin Luescher
+* Copyright (C) 2009-2013, 2016 Martin Luescher, Isabel Campos
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -49,7 +49,8 @@
 *   bc_parms_t set_bc_parms(int type,
 *                           double cG,double cG_prime,
 *                           double cF,double cF_prime,
-*                           double *phi,double *phi_prime)
+*                           double *phi,double *phi_prime,
+*                           double *theta)
 *     Sets the boundary conditions and the associated parameters of the
 *     action. The parameters are
 *
@@ -68,6 +69,10 @@
 *       phi_prime[0],  First two angles that define the boundary values of
 *       phi_prime[1]   the gauge field at time T.
 *
+*       theta[0],      Angles specifying the phase-periodic boundary
+*       theta[1],      conditions for the quark fields in direction 1,2,3.
+*       theta[2]
+*
 *     The return value is a structure that contains these parameters plus
 *     the third angles. In this structure, the improvement coefficients and
 *     the angles are stored in the form of arrays cG[2],cF[2] and phi[2][3],
@@ -84,8 +89,11 @@
 *   bc_parms_t bc_parms(void)
 *     Returns a structure that contains the boundary parameters.
 *
-*   void print_bc_parms(void)
-*     Prints the boundary parameters to stdout on MPI process 0.
+*   void print_bc_parms(int ipr)
+*     Prints the boundary parameters to stdout on MPI process 0. The
+*     improvement coefficients cG,cG' are printed if ipr&0x1!=0 and the
+*     parameters referring to the quark fields are printed if ipr&0x2!=0.
+*     All parameters are printed if ipr=3.
 *
 *   void write_bc_parms(FILE *fdat)
 *     Writes the boundary parameters to the file fdat on MPI process 0.
@@ -165,8 +173,11 @@
 
 static int flg_lat = 0, flg_bc = 0;
 static lat_parms_t lat = {0, 0.0, 1.0, 0.0, NULL, NULL, 1.0};
-static bc_parms_t bc = {
-    0, {1.0, 1.0}, {1.0, 1.0}, {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}}};
+static bc_parms_t bc = {0,
+                        {1.0, 1.0},
+                        {1.0, 1.0},
+                        {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}},
+                        {0.0, 0.0, 0.0}};
 static sw_parms_t sw = {DBL_MAX, 1.0, {1.0, 1.0}};
 static tm_parms_t tm = {0};
 
@@ -374,10 +385,11 @@ void check_lat_parms(FILE *fdat)
 }
 
 bc_parms_t set_bc_parms(int type, double cG, double cG_prime, double cF,
-                        double cF_prime, double *phi, double *phi_prime)
+                        double cF_prime, double *phi, double *phi_prime,
+                        double *theta)
 {
   int iprms[1], ie;
-  double dprms[6];
+  double dprms[9];
 
   error(flg_bc != 0, 1, "set_bc_parms [lat_parms.c]",
         "Attempt to reset the boundary conditions");
@@ -414,7 +426,11 @@ bc_parms_t set_bc_parms(int type, double cG, double cG_prime, double cF,
         dprms[5] = phi_prime[1];
       }
 
-      MPI_Bcast(dprms, 6, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      dprms[6] = theta[0];
+      dprms[7] = theta[1];
+      dprms[8] = theta[2];
+
+      MPI_Bcast(dprms, 9, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
       ie = ((dprms[0] != cG) || (dprms[1] != cF));
 
@@ -425,6 +441,9 @@ bc_parms_t set_bc_parms(int type, double cG, double cG_prime, double cF,
         ie |= ((dprms[2] != cG_prime) || (dprms[3] != cF_prime));
         ie |= ((dprms[4] != phi_prime[0]) || (dprms[5] != phi_prime[1]));
       }
+
+      ie |= ((dprms[6] != theta[0]) || (dprms[7] != theta[1]) ||
+             (dprms[8] != theta[2]));
 
       error(ie != 0, 1, "set_bc_parms [lat_parms.c]",
             "Parameters are not global");
@@ -464,6 +483,10 @@ bc_parms_t set_bc_parms(int type, double cG, double cG_prime, double cF,
     }
   }
 
+  bc.theta[0] = theta[0];
+  bc.theta[1] = theta[1];
+  bc.theta[2] = theta[2];
+
   flg_bc = 1;
 
   return bc;
@@ -471,7 +494,7 @@ bc_parms_t set_bc_parms(int type, double cG, double cG_prime, double cF,
 
 bc_parms_t bc_parms(void) { return bc; }
 
-void print_bc_parms(void)
+void print_bc_parms(int ipr)
 {
   int my_rank, n[3];
 
@@ -481,17 +504,27 @@ void print_bc_parms(void)
     if (bc.type == 0) {
       printf("Open boundary conditions\n");
 
-      n[0] = fdigits(bc.cG[0]);
-      printf("cG = %.*f\n", IMAX(n[0], 1), bc.cG[0]);
-      n[0] = fdigits(bc.cF[0]);
-      printf("cF = %.*f\n\n", IMAX(n[0], 1), bc.cF[0]);
+      if (ipr & 0x1) {
+        n[0] = fdigits(bc.cG[0]);
+        printf("cG = %.*f\n", IMAX(n[0], 1), bc.cG[0]);
+      }
+
+      if (ipr & 0x2) {
+        n[0] = fdigits(bc.cF[0]);
+        printf("cF = %.*f\n", IMAX(n[0], 1), bc.cF[0]);
+      }
     } else if (bc.type == 1) {
       printf("SF boundary conditions\n");
 
-      n[0] = fdigits(bc.cG[0]);
-      printf("cG = %.*f\n", IMAX(n[0], 1), bc.cG[0]);
-      n[0] = fdigits(bc.cF[0]);
-      printf("cF = %.*f\n", IMAX(n[0], 1), bc.cF[0]);
+      if (ipr & 0x1) {
+        n[0] = fdigits(bc.cG[0]);
+        printf("cG = %.*f\n", IMAX(n[0], 1), bc.cG[0]);
+      }
+
+      if (ipr & 0x2) {
+        n[0] = fdigits(bc.cF[0]);
+        printf("cF = %.*f\n", IMAX(n[0], 1), bc.cF[0]);
+      }
 
       n[0] = fdigits(bc.phi[0][0]);
       n[1] = fdigits(bc.phi[0][1]);
@@ -502,28 +535,48 @@ void print_bc_parms(void)
       n[0] = fdigits(bc.phi[1][0]);
       n[1] = fdigits(bc.phi[1][1]);
       n[2] = fdigits(bc.phi[1][2]);
-      printf("phi' = %.*f,%.*f,%.*f\n\n", IMAX(n[0], 1), bc.phi[1][0],
+      printf("phi' = %.*f,%.*f,%.*f\n", IMAX(n[0], 1), bc.phi[1][0],
              IMAX(n[1], 1), bc.phi[1][1], IMAX(n[2], 1), bc.phi[1][2]);
     } else if (bc.type == 2) {
       printf("Open-SF boundary conditions\n");
 
-      n[0] = fdigits(bc.cG[0]);
-      printf("cG = %.*f\n", IMAX(n[0], 1), bc.cG[0]);
-      n[0] = fdigits(bc.cF[0]);
-      printf("cF = %.*f\n", IMAX(n[0], 1), bc.cF[0]);
+      if (ipr & 0x1) {
+        n[0] = fdigits(bc.cG[0]);
+        printf("cG = %.*f\n", IMAX(n[0], 1), bc.cG[0]);
+      }
 
-      n[1] = fdigits(bc.cG[1]);
-      printf("cG' = %.*f\n", IMAX(n[1], 1), bc.cG[1]);
-      n[1] = fdigits(bc.cF[1]);
-      printf("cF' = %.*f\n", IMAX(n[1], 1), bc.cF[1]);
+      if (ipr & 0x2) {
+        n[0] = fdigits(bc.cF[0]);
+        printf("cF = %.*f\n", IMAX(n[0], 1), bc.cF[0]);
+      }
+
+      if (ipr & 0x1) {
+        n[1] = fdigits(bc.cG[1]);
+        printf("cG' = %.*f\n", IMAX(n[1], 1), bc.cG[1]);
+      }
+
+      if (ipr & 0x2) {
+        n[1] = fdigits(bc.cF[1]);
+        printf("cF' = %.*f\n", IMAX(n[1], 1), bc.cF[1]);
+      }
 
       n[0] = fdigits(bc.phi[1][0]);
       n[1] = fdigits(bc.phi[1][1]);
       n[2] = fdigits(bc.phi[1][2]);
-      printf("phi' = %.*f,%.*f,%.*f\n\n", IMAX(n[0], 1), bc.phi[1][0],
+      printf("phi' = %.*f,%.*f,%.*f\n", IMAX(n[0], 1), bc.phi[1][0],
              IMAX(n[1], 1), bc.phi[1][1], IMAX(n[2], 1), bc.phi[1][2]);
     } else
-      printf("Periodic boundary conditions\n\n");
+      printf("Periodic boundary conditions\n");
+
+    if (ipr & 0x2) {
+      n[0] = fdigits(bc.theta[0]);
+      n[1] = fdigits(bc.theta[1]);
+      n[2] = fdigits(bc.theta[2]);
+      printf("theta = %.*f,%.*f,%.*f\n", IMAX(n[0], 1), bc.theta[0],
+             IMAX(n[1], 1), bc.theta[1], IMAX(n[2], 1), bc.theta[2]);
+    }
+
+    printf("\n");
   }
 }
 
@@ -531,7 +584,7 @@ void write_bc_parms(FILE *fdat)
 {
   int my_rank, endian, iw;
   stdint_t istd[1];
-  double dstd[10];
+  double dstd[13];
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
   endian = endianness();
@@ -549,16 +602,19 @@ void write_bc_parms(FILE *fdat)
     dstd[7] = bc.phi[1][0];
     dstd[8] = bc.phi[1][1];
     dstd[9] = bc.phi[1][2];
+    dstd[10] = bc.theta[0];
+    dstd[11] = bc.theta[1];
+    dstd[12] = bc.theta[2];
 
     if (endian == BIG_ENDIAN) {
       bswap_int(1, istd);
-      bswap_double(10, dstd);
+      bswap_double(13, dstd);
     }
 
     iw = fwrite(istd, sizeof(stdint_t), 1, fdat);
-    iw += fwrite(dstd, sizeof(double), 10, fdat);
+    iw += fwrite(dstd, sizeof(double), 13, fdat);
 
-    error_root(iw != 11, 1, "write_bc_parms [bc_parms.c]",
+    error_root(iw != 14, 1, "write_bc_parms [bc_parms.c]",
                "Incorrect write count");
   }
 }
@@ -567,18 +623,18 @@ void check_bc_parms(FILE *fdat)
 {
   int my_rank, endian, ir, ie;
   stdint_t istd[1];
-  double dstd[10];
+  double dstd[13];
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
   endian = endianness();
 
   if (my_rank == 0) {
     ir = fread(istd, sizeof(stdint_t), 1, fdat);
-    ir += fread(dstd, sizeof(double), 10, fdat);
+    ir += fread(dstd, sizeof(double), 13, fdat);
 
     if (endian == BIG_ENDIAN) {
       bswap_int(1, istd);
-      bswap_double(10, dstd);
+      bswap_double(13, dstd);
     }
 
     ie = 0;
@@ -594,8 +650,11 @@ void check_bc_parms(FILE *fdat)
     ie |= (dstd[7] != bc.phi[1][0]);
     ie |= (dstd[8] != bc.phi[1][1]);
     ie |= (dstd[9] != bc.phi[1][2]);
+    ie |= (dstd[10] != bc.theta[0]);
+    ie |= (dstd[11] != bc.theta[1]);
+    ie |= (dstd[12] != bc.theta[2]);
 
-    error_root(ir != 11, 1, "check_bc_parms [bc_parms.c]",
+    error_root(ir != 14, 1, "check_bc_parms [bc_parms.c]",
                "Incorrect read count");
 
     error_root(ie != 0, 1, "check_bc_parms [bc_parms.c]",

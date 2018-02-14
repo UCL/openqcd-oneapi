@@ -3,8 +3,8 @@
 *
 * File check4.c
 *
-* Copyright (C) 2005, 2008-2013 Martin Luescher, Filippo Palombi,
-*                               Stefan Schaefer
+* Copyright (C) 2005, 2008-2013, 2016 Martin Luescher, Filippo Palombi,
+*                                     Stefan Schaefer
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -482,7 +482,7 @@ static double dSdt_det(ptset_t set)
 int main(int argc, char *argv[])
 {
   int my_rank, bc, k;
-  double chi[2], chi_prime[2];
+  double chi[2], chi_prime[2], theta[3];
   double eps, act0, act1, dsdt;
   double dev_frc, sig_loss, s[2], r[2];
   spinor_dble **phi;
@@ -519,8 +519,11 @@ int main(int argc, char *argv[])
   chi[1] = -0.534;
   chi_prime[0] = 0.912;
   chi_prime[1] = 0.078;
-  set_bc_parms(bc, 1.0, 1.0, 0.953, 1.203, chi, chi_prime);
-  print_bc_parms();
+  theta[0] = 0.38;
+  theta[1] = -1.25;
+  theta[2] = 0.54;
+  set_bc_parms(bc, 1.0, 1.0, 0.953, 1.203, chi, chi_prime, theta);
+  print_bc_parms(1);
 
   start_ranlux(0, 1245);
   geometry();
@@ -531,7 +534,7 @@ int main(int argc, char *argv[])
 
   for (k = 1; k <= 4; k++) {
     random_ud();
-    chs_ubnd(-1);
+    set_ud_phase();
     random_mom();
     random_sd(VOLUME, phi[0], 1.0);
     bnd_sd2zero(ALL_PTS, phi[0]);
@@ -568,8 +571,6 @@ int main(int argc, char *argv[])
     dev_frc = fabs(r[0] / r[1]);
     sig_loss = -log10(fabs(1.0 - act0 / act1));
 
-    error_chk();
-
     if (my_rank == 0) {
       printf("Calculation of the force for S=(phi,Q^%d*phi):\n", k);
       printf("Relative deviation of dS/dt = %.2e ", dev_frc);
@@ -591,7 +592,7 @@ int main(int argc, char *argv[])
       set = ALL_PTS;
 
     random_ud();
-    chs_ubnd(-1);
+    set_ud_phase();
     random_mom();
     dsdt = dSdt_det(set);
 
@@ -628,8 +629,6 @@ int main(int argc, char *argv[])
       sig_loss = -log10(fabs(1.0 - act0 / act1));
     } else
       dev_frc = fabs(r[0]);
-
-    error_chk();
 
     if (my_rank == 0) {
       if (k == 0)

@@ -132,7 +132,9 @@
 
 static u3_alg_dble X[6];
 static u3_alg_dble **xts = NULL, **xt;
-static const su3_dble ud0 = {{0.0}};
+static const su3_dble ud0 = {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0},
+                             {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0},
+                             {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
 static su3_dble w ALIGNED16;
 static su3_dble *xvs = NULL, *xv;
 

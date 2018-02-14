@@ -14,10 +14,11 @@ eoflg        1
 
 [Boundary conditions]
 type         0
-#phi          0.12 -0.56
-#phi'         0.92 0.76
+phi          0.12 -0.56
+phi'         0.92 0.76
 cF           0.95
-#cF'          0.90
+cF'          0.90
+theta        0.34 -1.25 0.58
 
 [SAP]
 bs           4 4 4 4

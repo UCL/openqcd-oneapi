@@ -3,7 +3,7 @@
 *
 * File vinit.c
 *
-* Copyright (C) 2007, 2011 Martin Luescher
+* Copyright (C) 2007, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -73,8 +73,8 @@
 #include "random.h"
 #include "vflds.h"
 
-static const complex v0 = {0.0f};
-static const complex_dble vd0 = {0.0};
+static const complex v0 = {0.0f, 0.0f};
+static const complex_dble vd0 = {0.0, 0.0};
 
 void set_v2zero(int n, complex *v)
 {

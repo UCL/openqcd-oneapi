@@ -41,7 +41,7 @@ static double eps, Q1, Q2, Q[N0], Q0[N0];
 int main(int argc, char *argv[])
 {
   int my_rank, i, imax, t;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   double nplaq, act, dev;
   FILE *fin = NULL, *flog = NULL;
 
@@ -88,8 +88,11 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 0.9012, 1.2034, 1.0, 1.0, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.0;
+  theta[1] = 0.0;
+  theta[2] = 0.0;
+  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime, theta);
+  print_bc_parms(0);
 
   start_ranlux(0, 123456);
   geometry();

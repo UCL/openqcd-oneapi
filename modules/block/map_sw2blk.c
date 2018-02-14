@@ -3,7 +3,7 @@
 *
 * File map_sw2blk.c
 *
-* Copyright (C) 2005, 2011 Martin Luescher
+* Copyright (C) 2005, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -58,7 +58,7 @@
 #include "block.h"
 #include "global.h"
 
-pauli_dble m[2] ALIGNED16;
+static pauli_dble ms[2] ALIGNED16;
 
 static int cp_swd2sw(block_t *b, ptset_t set)
 {
@@ -77,9 +77,9 @@ static int cp_swd2sw(block_t *b, ptset_t set)
     imb += 1;
 
     if ((set == ALL_PTS) || (set == EVEN_PTS)) {
-      ifail |= inv_pauli_dble(0.0, p, m);
-      ifail |= inv_pauli_dble(0.0, p + 1, m + 1);
-      assign_pauli(2, m, pb);
+      ifail |= inv_pauli_dble(0.0, p, ms);
+      ifail |= inv_pauli_dble(0.0, p + 1, ms + 1);
+      assign_pauli(2, ms, pb);
     } else
       assign_pauli(2, p, pb);
   }
@@ -91,9 +91,9 @@ static int cp_swd2sw(block_t *b, ptset_t set)
     imb += 1;
 
     if ((set == ALL_PTS) || (set == ODD_PTS)) {
-      ifail |= inv_pauli_dble(0.0, p, m);
-      ifail |= inv_pauli_dble(0.0, p + 1, m + 1);
-      assign_pauli(2, m, pb);
+      ifail |= inv_pauli_dble(0.0, p, ms);
+      ifail |= inv_pauli_dble(0.0, p + 1, ms + 1);
+      assign_pauli(2, ms, pb);
     } else
       assign_pauli(2, p, pb);
   }

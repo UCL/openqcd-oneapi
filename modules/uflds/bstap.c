@@ -3,7 +3,7 @@
 *
 * File bstap.c
 *
-* Copyright (C) 2012, 2013 Martin Luescher
+* Copyright (C) 2012, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -53,7 +53,6 @@
 #include <stdio.h>
 #include <math.h>
 #include "mpi.h"
-#include "su3.h"
 #include "su3fcts.h"
 #include "flags.h"
 #include "utils.h"
@@ -63,7 +62,6 @@
 
 static const int plns[6][2] = {{0, 1}, {0, 2}, {0, 3}, {2, 3}, {3, 1}, {1, 2}};
 static int bc, np, nfc[8], ofs[8], hofs[8], tags[8], nmu[8];
-static const su3_dble ud0 = {{0.0}};
 static su3_dble wd ALIGNED16;
 static su3_dble *hdb = NULL;
 
@@ -109,8 +107,7 @@ static void set_ofs(void)
 
 static void alloc_hdb(void)
 {
-  int ifc, n, ib;
-  su3_dble unity;
+  int ifc, n;
 
   error(iup[0][0] == 0, 1, "alloc_hdb [bstap.c]",
         "Geometry arrays are not set");
@@ -127,14 +124,7 @@ static void alloc_hdb(void)
   hdb = amalloc(n * sizeof(*hdb), ALIGN);
   error(hdb == NULL, 1, "alloc_hdb [bstap.c]",
         "Unable to allocate the boundary staple field");
-
-  unity = ud0;
-  unity.c11.re = 1.0;
-  unity.c22.re = 1.0;
-  unity.c33.re = 1.0;
-
-  for (ib = 0; ib < n; ib++)
-    hdb[ib] = unity;
+  cm3x3_unity(n, hdb);
 }
 
 su3_dble *bstap(void)
@@ -207,7 +197,7 @@ static void get_staples(int ifc)
 
 static void send_staples(int ifc, int tag)
 {
-  int saddr, raddr, nbf, ib;
+  int saddr, raddr, nbf;
   su3_dble *sbuf, *rbuf;
   MPI_Status stat;
 
@@ -226,10 +216,8 @@ static void send_staples(int ifc, int tag)
       MPI_Recv(rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD, &stat);
       MPI_Send(sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
     }
-  } else {
-    for (ib = 0; ib < (3 * FACE0); ib++)
-      rbuf[ib] = ud0;
-  }
+  } else
+    cm3x3_zero(3 * FACE0, rbuf);
 }
 
 void set_bstap(void)

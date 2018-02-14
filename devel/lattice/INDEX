@@ -3,7 +3,7 @@ Lattice geometry and boundary conditions.
 
 check1        Consistency checks on the global index arrays cpr,...,map.
 
-check2        Check of the programs set_bc(), check_bc() and chs_ubnd().
+check2        Check of the programs set_bc() and check_bc().
 
 check3        Check of the programs bnd_s2zero() and bnd_sd2zero().
 

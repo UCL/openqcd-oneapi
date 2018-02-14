@@ -3,7 +3,7 @@
 *
 * File flags.c
 *
-* Copyright (C) 2009, 2011, 2012 Martin Luescher
+* Copyright (C) 2009, 2011, 2012, 2016 Martin Luescher, Isabel Campos
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -68,7 +68,7 @@
 #include "flags.h"
 #include "global.h"
 
-#define NFLGS (9 + 4 * (int)(BLK_GRIDS))
+#define NFLGS (10 + 4 * (int)(BLK_GRIDS))
 
 static struct
 {
@@ -76,7 +76,8 @@ static struct
   int bstap, fts;
   int sw[3], swd[3];
   int aw, awh;
-} lat = {0, 0, 0, 0, 0, {0, 0, 0}, {0, 0, 0}, 0, 0};
+  int phase;
+} lat = {0, 0, 0, 0, 0, {0, 0, 0}, {0, 0, 0}, 0, 0, 0};
 
 typedef struct
 {
@@ -104,8 +105,9 @@ static void set_flgs(void)
   flgs[6] = lat.swd[0];
   flgs[7] = lat.aw;
   flgs[8] = lat.awh;
+  flgs[9] = lat.phase;
 
-  n = 9;
+  n = 10;
 
   for (igr = 0; igr < (int)(BLK_GRIDS); igr++) {
     flgs[n++] = gfs[igr].u;
@@ -175,8 +177,9 @@ static void compress_flags(void)
   lat.swd[0] = flgs[6];
   lat.aw = flgs[7];
   lat.awh = flgs[8];
+  lat.phase = flgs[9];
 
-  n = 9;
+  n = 10;
 
   for (igr = 0; igr < (int)(BLK_GRIDS); igr++) {
     gfs[igr].u = flgs[n++];
@@ -327,6 +330,7 @@ void print_flags(void)
     printf("sw         = %d,%d,%d\n", lat.sw[0], lat.sw[1], lat.sw[2]);
     printf("swd        = %d,%d,%d\n", lat.swd[0], lat.swd[1], lat.swd[2]);
     printf("aw,awh     = %d,%d\n", lat.aw, lat.awh);
+    printf("phase      = %d\n", lat.phase);
     printf("\n");
   }
 }

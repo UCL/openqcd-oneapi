@@ -3,7 +3,7 @@
 *
 * File check3.c
 *
-* Copyright (C) 2011-2013 Martin Luescher
+* Copyright (C) 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -34,7 +34,7 @@
 int my_rank, id, first, last, step;
 int bs[4], nmr, ncy, nkv, nmx, eoflg, bc;
 double kappa, csw, mu, cF, cF_prime;
-double phi[2], phi_prime[2], m0, res;
+double phi[2], phi_prime[2], theta[3], m0, res;
 char cnfg_dir[NAME_SIZE], cnfg_file[NAME_SIZE], nbase[NAME_SIZE];
 
 int main(int argc, char *argv[])
@@ -101,6 +101,8 @@ int main(int argc, char *argv[])
     else
       cF_prime = cF;
 
+    read_dprms("theta", 3, theta);
+
     find_section("SAP");
     read_iprms("bs", 4, bs);
     read_line("nmr", "%d", &nmr);
@@ -130,6 +132,7 @@ int main(int argc, char *argv[])
   MPI_Bcast(phi_prime, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cF, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cF_prime, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(theta, 3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
   MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&nmr, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -142,8 +145,8 @@ int main(int argc, char *argv[])
   lat = set_lat_parms(5.5, 1.0, 1, &kappa, csw);
   print_lat_parms();
 
-  set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime);
-  print_bc_parms();
+  set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime, theta);
+  print_bc_parms(2);
 
   sap = set_sap_parms(bs, 0, nmr, ncy);
   m0 = lat.m0[0];
@@ -189,7 +192,7 @@ int main(int argc, char *argv[])
       fflush(flog);
     }
 
-    chs_ubnd(-1);
+    set_ud_phase();
     random_sd(VOLUME, psd[0], 1.0);
     bnd_sd2zero(ALL_PTS, psd[0]);
     nrm = sqrt(norm_square_dble(VOLUME, 1, psd[0]));
@@ -200,7 +203,6 @@ int main(int argc, char *argv[])
 
       rho = sap_gcr(nkv, nmx, res, mu, psd[0], psd[1], &status);
 
-      error_chk();
       mulr_spinor_add_dble(VOLUME, psd[2], psd[0], -1.0);
       del = norm_square_dble(VOLUME, 1, psd[2]);
       error_root(del != 0.0, 1, "main [check3.c]",

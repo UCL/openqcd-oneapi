@@ -3,7 +3,7 @@
 *
 * File shift.c
 *
-* Copyright (C) 2006, 2009, 2011, 2012, 2013 Martin Luescher
+* Copyright (C) 2006, 2009, 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -448,7 +448,7 @@ static void shift_udstars(int ifc)
 int shift_ud(int *s)
 {
   int iprms[4], sr[4];
-  int mu, ifc, t, n, ie;
+  int mu, ifc, t, n;
 
   if (NPROC > 1) {
     iprms[0] = s[0];
@@ -484,11 +484,9 @@ int shift_ud(int *s)
   error_root((sr[0] != 0) && (bc_type() != 3), 1, "shift_ud [shift.c]",
              "Shifts in time are only permitted for periodic bc");
 
-  if (sr[0] != 0) {
-    ie = chs_ubnd(1);
-    error_root(ie == 1, 1, "shift_ud [shift.c]",
-               "Attempt to move sign-changed link variables in time");
-  }
+  error_root((sr[0] != 0) && (query_flags(UD_PHASE_SET) != 0), 1,
+             "shift_ud [shift.c]",
+             "Attempt to move sign-changed link variables in time");
 
   get_udlinks();
   n = 0;

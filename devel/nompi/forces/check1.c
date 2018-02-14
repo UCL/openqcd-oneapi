@@ -3,7 +3,7 @@
 *
 * File check1.c
 *
-* Copyright (C) 2005, 2011 Martin Luescher
+* Copyright (C) 2005, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -36,11 +36,16 @@ typedef union
 } vec_t;
 
 static int pln[6][2] = {{0, 1}, {0, 2}, {0, 3}, {2, 3}, {3, 1}, {1, 2}};
-static const su3_vector_dble vd0 = {{0.0}};
-static const spinor_dble sd0 = {{{0.0}}};
-
+static const su3_vector_dble vd0 = {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
+static const spinor_dble sd0 = {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+                                {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+                                {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+                                {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}}};
 static su3_dble Q ALIGNED16;
-static spin_t s1, s2, s3, s4 ALIGNED16;
+static spin_t s1 ALIGNED16;
+static spin_t s2 ALIGNED16;
+static spin_t s3 ALIGNED16;
+static spin_t s4 ALIGNED16;
 static pauli_dble m[2] ALIGNED16;
 
 static su3_vector_dble mul_cplx(complex_dble z, su3_vector_dble s)

@@ -1,7 +1,7 @@
 
 ********************************************************************************
 
-                            Utility programs 
+                            Utility programs
 
 ********************************************************************************
 
@@ -10,6 +10,10 @@ Files
 -----
 
 endian.c       Byte swapping programs
+
+error.c        Error handling functions.
+
+hsum.c         Hierarchical summation programs.
 
 mutils.c       Utility functions used in main programs
 
@@ -34,11 +38,60 @@ int endianness(void)
 
 void bswap_int(int n,void *a)
   Inverts the byte order of the array elements a[0],..,a[n-1]
-  assuming these are 4 byte long 
+  assuming these are 4 byte long
 
 void bswap_double(int n,void *a)
   Inverts the byte order of the array elements a[0],..,a[n-1]
-  assuming these are 8 byte long 
+  assuming these are 8 byte long
+
+void set_error_file(char *path,int loc_flag)
+  Sets the path of the file to which error messages are written. If
+  loc_flag!=0, the number of the local MPI process is appended to the
+  file name when the error_loc() function writes a message. Otherwise
+  the same file is used for all error messages.
+
+void error(int test,int no,char *name,char *format,...)
+  Checks whether "test"=0 on all processes and, if not, aborts the
+  program gracefully with error number "no" after printing the "name"
+  of the calling program and an error message to the error file from
+  process 0. The message is formed using the "format" string and any
+  additional arguments, exactly as in a printf() statement.
+
+void error_root(int test,int no,char *name,char *format,...)
+  Same as the error() function except that "test" is examined on
+  process 0 only.
+
+void error_loc(int test,int no,char *name,char *message)
+  Checks whether "test"=0 on the local process and, if not, aborts the
+  program gracefully with error number "no" after printing the "name"
+  of the calling program and an error message to the local error file.
+  The message is formed using the "format" string and any additional
+  arguments, exactly as in a printf() statement.
+
+int init_hsum(int n)
+  Creates a new instance of a hierarchical sum and returns the id of
+  the instance. The parameter n>=1 specifies the number of streams
+  of double-precision floating point numbers that are to be summed
+  in parallel.
+
+void reset_hsum(int id)
+  Resets the hiearchical sum with the given id to zero.
+
+void add_to_hsum(int id,double *x)
+  Adds the numbers x[0],..,x[n-1] to the hiearchical sum with the
+  given id. More precisely, the number x[k] is added to the k'th
+  sum accumulated in parallel. The number n of parallel sums is
+  the one set by init_hsum().
+
+void local_hsum(int id,double *sx)
+  Evaluates the hiearchical sum with the given id and assigns the
+  k'th sum computed in parallel to sx[k] (k=0,..,n-1). The number
+  n of parallel sums is the one set by init_hsum().
+
+void global_hsum(int id,double *sx)
+  Same as local_hsum(), but additionally sums the results over all
+  MPI processes. The calculated sums are guaranteed to be exactly
+  the same on all processes.
 
 int find_opt(int argc,char *argv[],char *opt)
   On process 0, this program compares the string opt with the arguments
@@ -78,7 +131,7 @@ long find_section(char *title)
   with an error message if no such line is found or if there are
   several of them. The program returns the offset of the line from
   the beginning of the file and positions the file pointer to the
-  next line. On processes other than 0, the program does nothing 
+  next line. On processes other than 0, the program does nothing
   and returns -1L.
 
 long read_line(char *tag,char *format,...)
@@ -97,7 +150,7 @@ int count_tokens(char *tag)
   that line after the tag. Tokens are separated by white space (blanks,
   tabs or newline characters) and comments (text beginning with #) are
   ignored. On exit, the file pointer is positioned at the next line. If
-  called on other processes, the program does nothing and returns 0.  
+  called on other processes, the program does nothing and returns 0.
 
 void read_iprms(char *tag,int n,int *iprms)
   On process 0, this program finds and reads a line from stdin, exactly
@@ -115,13 +168,11 @@ void read_dprms(char *tag,int n,double *dprms)
   occurs if less than n values are found on the line. The values must be
   separated by white space (blanks, tabs or newline characters).On exit,
   the file pointer is positioned at the next line. When called on other
-  processes, the program does nothing. 
+  processes, the program does nothing.
 
 int copy_file(char *in,char *out)
-  Copies the file "in" to the file "out" in binary mode. The return
-  value is 0 if no I/O error is detected and 1 otherwise, in which
-  case the error can also be detected by the error_chk() [utils.c]
-  function.
+  Copies the file "in" to the file "out" in binary mode. An error occurs
+  if the file copy is not successful.
 
 int safe_mod(int x,int y)
   Returns x mod y, where y is assumed positive and x can have any
@@ -140,7 +191,7 @@ void afree(void *addr)
   anything
 
 int mpi_permanent_tag(void)
-  Returns a new send tag that is guaranteed to be unique and which 
+  Returns a new send tag that is guaranteed to be unique and which
   is therefore suitable for use in permanent communication requests.
   The available number of tags of this kind is 16384
 
@@ -148,32 +199,6 @@ int mpi_tag(void)
   Returns a new send tag for use in non-permanent communications.
   Note that the counter for these tags wraps around after 16384
   tags have been delivered
-
-void error(int test,int no,char *name,char *format,...)
-  Checks whether "test"=0 on all processes and, if not, aborts the
-  program gracefully with error number "no" after printing the "name"
-  of the calling program and an error message to stdout from process 0.
-  The message is formed on process 0 using the "format" string and any
-  additional arguments, exactly as in a printf statement
-
-void error_root(int test,int no,char *name,char *format,...)
-  Same as the error() function except that "test" is examined on
-  process 0 only
-
-int error_loc(int test,int no,char *name,char *message)
-  Checks whether "test"=0 on the local process and, if not, writes
-  the error number "no", the program "name" and the error "message" 
-  to an internal buffer. Only the data of the first instance where
-  this happens are recorded. Note that saved program names and error
-  messages are truncated to 127 and 511 bytes, respectively. In all
-  cases, the program returns the value of "test"
-
-void error_chk(void)
-  Checks the status of the data saved by error_loc() and aborts the
-  program gracefully, with error number 1, if an error is recorded on
-  some of the processes. Before abortion the error numbers, program
-  names and error messages saved on these processes are printed to
-  stdout from process 0
 
 void message(char *format,...)
   Prints a message from process 0 to stdout. The usage and argument

@@ -3,7 +3,7 @@
 *
 * File utils.c
 *
-* Copyright (C) 2005, 2008, 2011 Martin Luescher
+* Copyright (C) 2005, 2008, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -38,47 +38,9 @@
 *     Note that the counter for these tags wraps around after 16384
 *     tags have been delivered
 *
-*   void error(int test,int no,char *name,char *format,...)
-*     Checks whether "test"=0 on all processes and, if not, aborts the
-*     program gracefully with error number "no" after printing the "name"
-*     of the calling program and an error message to stdout from process 0.
-*     The message is formed on process 0 using the "format" string and any
-*     additional arguments, exactly as in a printf statement
-*
-*   void error_root(int test,int no,char *name,char *format,...)
-*     Same as the error() function except that "test" is examined on
-*     process 0 only
-*
-*   int error_loc(int test,int no,char *name,char *message)
-*     Checks whether "test"=0 on the local process and, if not, writes
-*     the error number "no", the program "name" and the error "message"
-*     to an internal buffer. Only the data of the first instance where
-*     this happens are recorded. Note that saved program names and error
-*     messages are truncated to 127 and 511 bytes, respectively. In all
-*     cases, the program returns the value of "test"
-*
-*   void error_chk(void)
-*     Checks the status of the data saved by error_loc() and aborts the
-*     program gracefully, with error number 1, if an error is recorded on
-*     some of the processes. Before abortion the error numbers, program
-*     names and error messages saved on these processes are printed to
-*     stdout from process 0
-*
 *   void message(char *format,...)
 *     Prints a message from process 0 to stdout. The usage and argument
 *     list is the same as in the case of the printf function
-*
-* Notes:
-*
-* If an error is detected in a locally operating program, it is not possible
-* to stop the global program immediately in a decent manner. Such errors
-* should first be recorded by the error_loc() function, and the main program
-* may later be aborted by calling error_chk() outside the program where the
-* error was detected.
-*
-* An important point to note is that the programs error() and error_chk()
-* require a global communication. They must therefore be called on all
-* processes simultaneously.
 *
 *******************************************************************************/
 
@@ -97,8 +59,6 @@
 #define MAX_PERMANENT_TAG MAX_TAG / 2
 
 static int pcmn_cnt = -1, cmn_cnt = MAX_TAG;
-static int err_no, err_flg = 0;
-static char prog_name[128], err_msg[512];
 
 struct addr_t
 {
@@ -170,66 +130,6 @@ void afree(void *addr)
   }
 }
 
-void error(int test, int no, char *name, char *format, ...)
-{
-  int i, all, my_rank;
-  va_list args;
-
-  i = (test != 0);
-  MPI_Allreduce(&i, &all, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-
-  if (all == 0)
-    return;
-
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
-  if (my_rank == 0) {
-    printf("\nError in %s:\n", name);
-    va_start(args, format);
-    vprintf(format, args);
-    va_end(args);
-    printf("\nProgram aborted\n\n");
-    fflush(stdout);
-
-    MPI_Abort(MPI_COMM_WORLD, no);
-  } else
-    for (i = 1; i < 2; i = safe_mod(i, 2))
-      ;
-}
-
-void error_root(int test, int no, char *name, char *format, ...)
-{
-  int my_rank;
-  va_list args;
-
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
-  if ((my_rank == 0) && (test != 0)) {
-    printf("\nError in %s:\n", name);
-    va_start(args, format);
-    vprintf(format, args);
-    va_end(args);
-    printf("\nProgram aborted\n\n");
-    fflush(stdout);
-
-    MPI_Abort(MPI_COMM_WORLD, no);
-  }
-}
-
-int error_loc(int test, int no, char *name, char *message)
-{
-  if ((test != 0) && (err_flg == 0)) {
-    err_no = no;
-    strncpy(prog_name, name, 128);
-    strncpy(err_msg, message, 512);
-    prog_name[127] = '\0';
-    err_msg[511] = '\0';
-    err_flg = 1;
-  }
-
-  return test;
-}
-
 int mpi_permanent_tag(void)
 {
   if (pcmn_cnt < MAX_PERMANENT_TAG)
@@ -249,61 +149,6 @@ int mpi_tag(void)
   cmn_cnt += 1;
 
   return cmn_cnt;
-}
-
-void error_chk(void)
-{
-  int i, n, my_rank, tag1, tag2, tag3;
-  int err[2];
-  MPI_Status stat;
-
-  MPI_Allreduce(&err_flg, &i, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-
-  if (i == 0)
-    return;
-
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-  err[0] = err_flg;
-  err[1] = err_no;
-
-  if (my_rank == 0)
-    printf("Errors were detected on the following processes:\n\n");
-
-  for (n = 0; n < NPROC; n++) {
-    if (n > 0) {
-      MPI_Barrier(MPI_COMM_WORLD);
-
-      tag1 = mpi_tag();
-      tag2 = mpi_tag();
-      tag3 = mpi_tag();
-
-      if (my_rank == n) {
-        MPI_Send(err, 2, MPI_INT, 0, tag1, MPI_COMM_WORLD);
-        MPI_Send(prog_name, 127, MPI_CHAR, 0, tag2, MPI_COMM_WORLD);
-        MPI_Send(err_msg, 511, MPI_CHAR, 0, tag3, MPI_COMM_WORLD);
-      }
-
-      if (my_rank == 0) {
-        MPI_Recv(err, 2, MPI_INT, n, tag1, MPI_COMM_WORLD, &stat);
-        MPI_Recv(prog_name, 127, MPI_CHAR, n, tag2, MPI_COMM_WORLD, &stat);
-        MPI_Recv(err_msg, 511, MPI_CHAR, n, tag3, MPI_COMM_WORLD, &stat);
-      }
-    }
-
-    if ((err[0] == 1) && (my_rank == 0)) {
-      printf("%3d: in %s:\n", n, prog_name);
-      printf("     %s (error number %d)\n", err_msg, err[1]);
-    }
-  }
-
-  if (my_rank == 0) {
-    printf("\nProgram aborted\n\n");
-    fflush(stdout);
-
-    MPI_Abort(MPI_COMM_WORLD, 1);
-  } else
-    for (i = 1; i < 2; i = safe_mod(i, 2))
-      ;
 }
 
 void message(char *format, ...)

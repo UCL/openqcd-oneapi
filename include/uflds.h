@@ -33,6 +33,8 @@ extern int shift_ud(int *s);
 extern su3 *ufld(void);
 extern su3_dble *udfld(void);
 extern void random_ud(void);
+extern void set_ud_phase(void);
+extern void unset_ud_phase(void);
 extern void renormalize_ud(void);
 extern void assign_ud2u(void);
 

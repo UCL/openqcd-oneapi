@@ -8,7 +8,7 @@
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
 *
-* Computation of Wilson flow observables.
+* Computation of Wilson-flow observables.
 *
 * Syntax: ms3 -i <input file> [-noexp] [-a]
 *
@@ -324,7 +324,7 @@ static void setup_files(void)
 static void read_bc_parms(void)
 {
   int bc;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
 
   if (my_rank == 0) {
     find_section("Boundary conditions");
@@ -345,8 +345,11 @@ static void read_bc_parms(void)
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(phi, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(phi_prime, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  theta[0] = 0.0;
+  theta[1] = 0.0;
+  theta[2] = 0.0;
 
-  bcp = set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime);
+  bcp = set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime, theta);
 
   if (append)
     check_bc_parms(fdat);
@@ -622,7 +625,7 @@ static void check_files(void)
 
 static void print_info(void)
 {
-  int n[3];
+  int n;
   long ip;
 
   if (my_rank == 0) {
@@ -675,32 +678,7 @@ static void print_info(void)
     }
 
     if (append == 0) {
-      if (bcp.type == 0)
-        printf("Open boundary conditions\n\n");
-      else if (bcp.type == 1) {
-        printf("SF boundary conditions\n");
-
-        n[0] = fdigits(bcp.phi[0][0]);
-        n[1] = fdigits(bcp.phi[0][1]);
-        n[2] = fdigits(bcp.phi[0][2]);
-        printf("phi = %.*f,%.*f,%.*f\n", IMAX(n[0], 1), bcp.phi[0][0],
-               IMAX(n[1], 1), bcp.phi[0][1], IMAX(n[2], 1), bcp.phi[0][2]);
-
-        n[0] = fdigits(bcp.phi[1][0]);
-        n[1] = fdigits(bcp.phi[1][1]);
-        n[2] = fdigits(bcp.phi[1][2]);
-        printf("phi' = %.*f,%.*f,%.*f\n\n", IMAX(n[0], 1), bcp.phi[1][0],
-               IMAX(n[1], 1), bcp.phi[1][1], IMAX(n[2], 1), bcp.phi[1][2]);
-      } else if (bcp.type == 2) {
-        printf("Open-SF boundary conditions\n");
-
-        n[0] = fdigits(bcp.phi[1][0]);
-        n[1] = fdigits(bcp.phi[1][1]);
-        n[2] = fdigits(bcp.phi[1][2]);
-        printf("phi' = %.*f,%.*f,%.*f\n\n", IMAX(n[0], 1), bcp.phi[1][0],
-               IMAX(n[1], 1), bcp.phi[1][1], IMAX(n[2], 1), bcp.phi[1][2]);
-      } else
-        printf("Periodic boundary conditions\n\n");
+      print_bc_parms(0);
 
       printf("Wilson flow:\n");
       if (flint == 0)
@@ -709,8 +687,8 @@ static void print_info(void)
         printf("2nd order RK integrator\n");
       else
         printf("3rd order RK integrator\n");
-      n[0] = fdigits(file_head.eps);
-      printf("eps = %.*f\n", IMAX(n[0], 1), file_head.eps);
+      n = fdigits(file_head.eps);
+      printf("eps = %.*f\n", IMAX(n, 1), file_head.eps);
       printf("nstep = %d\n", file_head.dn * file_head.nn);
       printf("dnms = %d\n\n", file_head.dn);
     }
@@ -838,7 +816,6 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();
     wtavg += (wt2 - wt1);
-    error_chk();
 
     if (my_rank == 0) {
       printf("Configuration no %d fully processed in %.2e sec ", nc, wt2 - wt1);
@@ -852,8 +829,6 @@ int main(int argc, char *argv[])
 
     check_endflag(&iend);
   }
-
-  error_chk();
 
   if (my_rank == 0) {
     fflush(flog);

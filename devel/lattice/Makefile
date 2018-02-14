@@ -27,13 +27,13 @@ LATTICE = bcnds uidx geometry
 
 RANDOM = ranlux ranlxs ranlxd gauss random_su3
 
-UFLDS = plaq_sum shift uflds udcom bstap
-
 SFLDS = sflds
 
 SU3FCTS = su3prod su3ren cm3x3
 
-UTILS = endian mutils utils wspace
+UFLDS = plaq_sum shift uflds udcom bstap
+
+UTILS = endian error hsum mutils utils wspace
 
 MODULES = $(FLAGS) $(LATTICE) $(RANDOM) $(UFLDS) $(SFLDS) $(SU3FCTS) \
           $(UTILS)
@@ -70,11 +70,13 @@ CFLAGS = -std=c89 -pedantic -fstrict-aliasing \
          -Wall -Wno-long-long -Wstrict-prototypes -Werror \
          -O -mno-avx -Dx64 -DPM
 
+LFLAGS =
+
 
 ############################## do not change ###################################
 
 SHELL=/bin/bash
-CC=$(MPI_HOME)/bin/mpicc
+CC=mpicc
 CLINKER=$(CC)
 
 PGMS= $(MAIN) $(MODULES)
@@ -97,7 +99,7 @@ $(addsuffix .o,$(PGMS)): %.o: %.c Makefile
 # rule to link object files
 
 $(MAIN): %: %.o $(addsuffix .o,$(MODULES)) Makefile
-	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(CFLAGS) $(LOGOPTION) \
+	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(LFLAGS) $(LOGOPTION) \
         $(addprefix -L,$(LIBPATH)) $(addprefix -l,$(LIBS)) -o $@
 
 

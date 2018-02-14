@@ -3,7 +3,7 @@
 *
 * File Dw.c
 *
-* Copyright (C) 2005, 2011-2013 Martin Luescher
+* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -116,7 +116,10 @@ typedef union
 } spin_t;
 
 static float coe, ceo;
-static const spinor s0 = {{{0.0}}};
+static const spinor s0 = {{{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}},
+                          {{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}},
+                          {{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}},
+                          {{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}}};
 static spin_t rs ALIGNED32;
 
 #if (defined AVX)

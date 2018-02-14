@@ -3,7 +3,7 @@
 *
 * File check3.c
 *
-* Copyright (C) 2011-2013 Martin Luescher
+* Copyright (C) 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -38,7 +38,7 @@
 int my_rank, id, first, last, step;
 int bs[4], Ns, nkv, nmx, eoflg, bc;
 double kappa, csw, mu, cF, cF_prime;
-double phi[2], phi_prime[2], m0, res;
+double phi[2], phi_prime[2], theta[3], m0, res;
 char cnfg_dir[NAME_SIZE], cnfg_file[NAME_SIZE], nbase[NAME_SIZE];
 
 static void new_subspace(void)
@@ -157,6 +157,8 @@ int main(int argc, char *argv[])
     else
       cF_prime = cF;
 
+    read_dprms("theta", 3, theta);
+
     find_section("DFL");
     read_line("bs", "%d %d %d %d", bs, bs + 1, bs + 2, bs + 3);
     read_line("Ns", "%d", &Ns);
@@ -186,6 +188,7 @@ int main(int argc, char *argv[])
   MPI_Bcast(phi_prime, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cF, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cF_prime, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(theta, 3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
   MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&Ns, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -197,8 +200,8 @@ int main(int argc, char *argv[])
   lat = set_lat_parms(5.5, 1.0, 1, &kappa, csw);
   print_lat_parms();
 
-  set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime);
-  print_bc_parms();
+  set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime, theta);
+  print_bc_parms(3);
 
   set_sap_parms(bs, 1, 4, 5);
   m0 = lat.m0[0];
@@ -242,7 +245,7 @@ int main(int argc, char *argv[])
   for (icnfg = first; icnfg <= last; icnfg += step) {
     sprintf(cnfg_file, "%s/%sn%d", cnfg_dir, nbase, icnfg);
     import_cnfg(cnfg_file);
-    chs_ubnd(-1);
+    set_ud_phase();
 
     if (my_rank == 0) {
       printf("Configuration no %d\n", icnfg);
@@ -264,7 +267,6 @@ int main(int argc, char *argv[])
     wt2 = MPI_Wtime();
     wdt = wt2 - wt1;
 
-    error_chk();
     z.re = -1.0;
     z.im = 0.0;
     mulc_vadd_dble(nv, wvd[2], wvd[0], z);

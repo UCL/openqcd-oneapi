@@ -252,9 +252,21 @@ by an integer running from 0 to 3:
  3:  Periodic bc for the gauge field, anti-periodic bc for the quark fields.
 
 In the space directions, periodic boundary conditions are chosen for all
-fields. A detailed description of the boundary conditions is included in the
-notes doc/gauge_action.pdf and doc/dirac.pdf. The type of boundary condition
-is set at run time via the input parameter file (see doc/parms.pdf).
+fields, where, in the case of the quark fields, periodicity is imposed up to a
+U(1) phase factor, i.e. for all k=1,2,3, the quark fields psi(x) are required
+to satisfy
+
+ psi(x+N_k*e_k)=exp{i*theta_k}*psi(x),
+
+ N_k: Size of the (global) lattice in direction k,
+
+ e_k: Unit vector in direction k,
+
+ theta_k: A k-dependent but otherwise fixed angle.
+
+A detailed description of the boundary conditions is included in the notes
+doc/gauge_action.pdf and doc/dirac.pdf. The type of boundary condition is set
+at run time via the input parameter file (see doc/parms.pdf).
 
 The physical time extent T of the lattice is NPROC0*L0-1 in the case of open
 boundary conditions (type 0) and NPROC0*L0 in all other cases (type 1-3).

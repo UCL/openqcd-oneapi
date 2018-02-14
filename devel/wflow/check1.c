@@ -3,7 +3,7 @@
 *
 * File check1.c
 *
-* Copyright (C) 2010-2013 Martin Luescher
+* Copyright (C) 2010-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include <math.h>
 #include "mpi.h"
-#include "su3.h"
 #include "flags.h"
 #include "random.h"
 #include "su3fcts.h"
@@ -36,9 +35,10 @@
 #define N2 (NPROC2 * L2)
 #define N3 (NPROC3 * L3)
 
-static const su3_alg_dble fr0 = {0.0};
 static su3_alg_dble XX ALIGNED16;
-static su3_dble mm, uu, vv ALIGNED16;
+static su3_dble mm ALIGNED16;
+static su3_dble uu ALIGNED16;
+static su3_dble vv ALIGNED16;
 
 static double cmp_ud(su3_dble *u, su3_dble *v)
 {
@@ -323,8 +323,8 @@ static void scale_bnd_frc(su3_alg_dble *frc)
 int main(int argc, char *argv[])
 {
   int my_rank, bc, n, k, ie;
-  double eps, nplaq, phi[2], phi_prime[2];
-  double act0, act1, dev0, dev1;
+  double phi[2], phi_prime[2], theta[3];
+  double eps, nplaq, act0, act1, dev0, dev1;
   su3_dble *udb, *u, *um, **usv;
   su3_alg_dble *frc, **fsv;
   mdflds_t *mdfs;
@@ -371,8 +371,11 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.0;
+  theta[1] = 0.0;
+  theta[2] = 0.0;
+  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime, theta);
+  print_bc_parms(0);
 
   start_ranlux(0, 1234);
   geometry();
@@ -459,7 +462,6 @@ int main(int argc, char *argv[])
   ie = check_bc(0.0);
   error_root(ie != 1, 1, "main [check3.c]",
              "Boundary values of the gauge field are not preserved");
-  error_chk();
 
   if (my_rank == 0) {
     printf("\n");
@@ -494,7 +496,6 @@ int main(int argc, char *argv[])
   error_root(ie != 1, 1, "main [check3.c]",
              "Boundary values of the gauge field are not preserved");
   dev0 = max_dev_ud(usv[0]);
-  error_chk();
 
   if (my_rank == 0) {
     printf("Comparison of fwd_rk2() and fwd_rk3():   |dU| = %.1e\n\n", dev0);

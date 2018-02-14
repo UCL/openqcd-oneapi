@@ -3,12 +3,13 @@
 *
 * File cmatrix.c
 *
-* Copyright (C) 2007, 2009, 2011, 2013 Martin Luescher
+* Copyright (C) 2007, 2009, 2011, 2013,  Martin Luescher, Isabel Campos
+*               2016
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
 *
-* Complex matrix algebra (single-precision version)
+* Complex matrix algebra (single-precision version).
 *
 * The externally accessible functions are
 *
@@ -57,6 +58,496 @@
 
 #if (defined AVX)
 #include "avx.h"
+
+#if (defined FMA3)
+
+void cmat_vec(int n, complex *a, complex *v, complex *w)
+{
+  complex *b[4], *vv, *vm, *vmm, *wm;
+
+  wm = w + n;
+
+  if ((n & 0x3) == 0x0) {
+    vm = v + n;
+    b[3] = a;
+
+    for (; w < wm; w += 4) {
+      b[0] = b[3];
+      b[1] = b[0] + n;
+      b[2] = b[1] + n;
+      b[3] = b[2] + n;
+
+      __asm__ __volatile__("vxorps %%ymm0, %%ymm0, %%ymm0 \n\t"
+                           "vxorps %%ymm1, %%ymm1, %%ymm1 \n\t"
+                           "vxorps %%ymm2, %%ymm2, %%ymm2 \n\t"
+                           "vxorps %%ymm3, %%ymm3, %%ymm3"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3");
+
+      for (vv = v; vv < vm; vv += 4) {
+        __asm__ __volatile__("vmovshdup %0, %%ymm4 \n\t"
+                             "vmovsldup %0, %%ymm5"
+                             :
+                             : "m"(vv[0]), "m"(vv[1]), "m"(vv[2]), "m"(vv[3])
+                             : "xmm4", "xmm5");
+
+        __asm__ __volatile__("vmovups %0, %%ymm6 \n\t"
+                             "vmovups %4, %%ymm7"
+                             :
+                             : "m"(b[0][0]), "m"(b[0][1]), "m"(b[0][2]),
+                               "m"(b[0][3]), "m"(b[1][0]), "m"(b[1][1]),
+                               "m"(b[1][2]), "m"(b[1][3])
+                             : "xmm6", "xmm7");
+
+        __asm__ __volatile__("vmovups %0, %%ymm8 \n\t"
+                             "vmovups %4, %%ymm9"
+                             :
+                             : "m"(b[2][0]), "m"(b[2][1]), "m"(b[2][2]),
+                               "m"(b[2][3]), "m"(b[3][0]), "m"(b[3][1]),
+                               "m"(b[3][2]), "m"(b[3][3])
+                             : "xmm8", "xmm9");
+
+        __asm__ __volatile__("vpermilps $0xb1, %%ymm6, %%ymm10 \n\t"
+                             "vpermilps $0xb1, %%ymm7, %%ymm11 \n\t"
+                             "vpermilps $0xb1, %%ymm8, %%ymm12 \n\t"
+                             "vpermilps $0xb1, %%ymm9, %%ymm13 \n\t"
+                             "vfmaddsub231ps %%ymm4, %%ymm10, %%ymm0 \n\t"
+                             "vfmaddsub231ps %%ymm4, %%ymm11, %%ymm1 \n\t"
+                             "vfmaddsub231ps %%ymm4, %%ymm12, %%ymm2 \n\t"
+                             "vfmaddsub231ps %%ymm4, %%ymm13, %%ymm3 \n\t"
+                             "vfmaddsub231ps %%ymm5, %%ymm6, %%ymm0 \n\t"
+                             "vfmaddsub231ps %%ymm5, %%ymm7, %%ymm1 \n\t"
+                             "vfmaddsub231ps %%ymm5, %%ymm8, %%ymm2 \n\t"
+                             "vfmaddsub231ps %%ymm5, %%ymm9, %%ymm3"
+                             :
+                             :
+                             : "xmm0", "xmm1", "xmm2", "xmm3", "xmm10", "xmm11",
+                               "xmm12", "xmm13");
+
+        b[0] += 4;
+        b[1] += 4;
+        b[2] += 4;
+        b[3] += 4;
+      }
+
+      __asm__ __volatile__("vextractf128 $0x1, %%ymm0, %%xmm10 \n\t"
+                           "vextractf128 $0x1, %%ymm1, %%xmm11 \n\t"
+                           "vextractf128 $0x1, %%ymm2, %%xmm12 \n\t"
+                           "vextractf128 $0x1, %%ymm3, %%xmm13 \n\t"
+                           "vaddps %%xmm10, %%xmm0, %%xmm0 \n\t"
+                           "vaddps %%xmm11, %%xmm1, %%xmm1 \n\t"
+                           "vaddps %%xmm12, %%xmm2, %%xmm2 \n\t"
+                           "vaddps %%xmm13, %%xmm3, %%xmm3 \n\t"
+                           "vinsertf128 $0x1, %%xmm2, %%ymm0, %%ymm0 \n\t"
+                           "vinsertf128 $0x1, %%xmm3, %%ymm1, %%ymm1 \n\t"
+                           "vpermilps $0xd8, %%ymm0, %%ymm0 \n\t"
+                           "vpermilps $0xd8, %%ymm1, %%ymm1 \n\t"
+                           "vhaddps %%ymm1, %%ymm0, %%ymm0 \n\t"
+                           "vmovups %%ymm0, %0"
+                           : "=m"(w[0]), "=m"(w[1]), "=m"(w[2]), "=m"(w[3])
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3", "xmm10", "xmm11",
+                             "xmm12", "xmm13");
+    }
+  } else if ((n & 0x1) == 0x0) {
+    vm = v + n - 2;
+    b[1] = a;
+
+    for (; w < wm; w += 2) {
+      b[0] = b[1];
+      b[1] = b[0] + n;
+
+      __asm__ __volatile__("vxorps %%ymm0, %%ymm0, %%ymm0 \n\t"
+                           "vxorps %%ymm1, %%ymm1, %%ymm1 \n\t"
+                           "vxorps %%ymm2, %%ymm2, %%ymm2 \n\t"
+                           "vxorps %%ymm3, %%ymm3, %%ymm3"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3");
+
+      for (vv = v; vv < vm; vv += 4) {
+        __asm__ __volatile__("vmovsldup %0, %%ymm4 \n\t"
+                             "vmovshdup %0, %%ymm5"
+                             :
+                             : "m"(vv[0]), "m"(vv[1]), "m"(vv[2]), "m"(vv[3])
+                             : "xmm4", "xmm5");
+
+        __asm__ __volatile__("vmovups %0, %%ymm6 \n\t"
+                             "vmovups %4, %%ymm7"
+                             :
+                             : "m"(b[0][0]), "m"(b[0][1]), "m"(b[0][2]),
+                               "m"(b[0][3]), "m"(b[1][0]), "m"(b[1][1]),
+                               "m"(b[1][2]), "m"(b[1][3])
+                             : "xmm6", "xmm7");
+
+        __asm__ __volatile__("vfmadd231ps %%ymm4, %%ymm6, %%ymm0 \n\t"
+                             "vfmadd231ps %%ymm4, %%ymm7, %%ymm1 \n\t"
+                             "vfmadd231ps %%ymm5, %%ymm6, %%ymm2 \n\t"
+                             "vfmadd231ps %%ymm5, %%ymm7, %%ymm3"
+                             :
+                             :
+                             : "xmm0", "xmm1", "xmm2", "xmm3");
+
+        b[0] += 4;
+        b[1] += 4;
+      }
+
+      __asm__ __volatile__("vextractf128 $0x1, %%ymm0, %%xmm8 \n\t"
+                           "vextractf128 $0x1, %%ymm1, %%xmm9 \n\t"
+                           "vextractf128 $0x1, %%ymm2, %%xmm10 \n\t"
+                           "vextractf128 $0x1, %%ymm3, %%xmm11\n\t"
+                           "vaddps %%xmm8, %%xmm0, %%xmm0 \n\t"
+                           "vaddps %%xmm9, %%xmm1, %%xmm1 \n\t"
+                           "vaddps %%xmm10, %%xmm2, %%xmm2 \n\t"
+                           "vaddps %%xmm11, %%xmm3, %%xmm3"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3", "xmm8", "xmm9",
+                             "xmm10", "xmm11");
+
+      __asm__ __volatile__("vmovsldup %0, %%xmm4 \n\t"
+                           "vmovshdup %0, %%xmm5 \n\t"
+                           "vmovaps %2, %%xmm6 \n\t"
+                           "vmovaps %4, %%xmm7 \n\t"
+                           "vfmadd231ps %%xmm4, %%xmm6, %%xmm0 \n\t"
+                           "vfmadd231ps %%xmm4, %%xmm7, %%xmm1 \n\t"
+                           "vfmadd231ps %%xmm5, %%xmm6, %%xmm2 \n\t"
+                           "vfmadd231ps %%xmm5, %%xmm7, %%xmm3"
+                           :
+                           : "m"(vv[0]), "m"(vv[1]), "m"(b[0][0]), "m"(b[0][1]),
+                             "m"(b[1][0]), "m"(b[1][1])
+                           : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",
+                             "xmm6", "xmm7");
+
+      __asm__ __volatile__("vpermilps $0xb1, %%xmm2, %%xmm2 \n\t"
+                           "vpermilps $0xb1, %%xmm3, %%xmm3 \n\t"
+                           "vaddsubps %%xmm2, %%xmm0, %%xmm0 \n\t"
+                           "vaddsubps %%xmm3, %%xmm1, %%xmm1"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3");
+
+      __asm__ __volatile__("vpermilps $0xd8, %%xmm0, %%xmm0 \n\t"
+                           "vpermilps $0xd8, %%xmm1, %%xmm1 \n\t"
+                           "vhaddps %%xmm1, %%xmm0, %%xmm0 \n\t"
+                           "vmovaps %%xmm0, %0"
+                           : "=m"(w[0]), "=m"(w[1])
+                           :
+                           : "xmm0", "xmm1");
+
+      b[1] += 2;
+    }
+  } else {
+    vmm = v + n;
+    vm = vmm - (n & 0x3);
+    b[0] = a;
+
+    for (; w < wm; w++) {
+      __asm__ __volatile__("vxorps %%ymm0, %%ymm0, %%ymm0 \n\t"
+                           "vxorps %%ymm1, %%ymm1, %%ymm1"
+                           :
+                           :
+                           : "xmm0", "xmm1");
+
+      for (vv = v; vv < vm; vv += 4) {
+        __asm__ __volatile__("vmovsldup %0, %%ymm4 \n\t"
+                             "vmovshdup %0, %%ymm5"
+                             :
+                             : "m"(vv[0]), "m"(vv[1]), "m"(vv[2]), "m"(vv[3])
+                             : "xmm4", "xmm5");
+
+        __asm__ __volatile__("vmovups %0, %%ymm6 \n\t"
+                             "vfmadd231ps %%ymm4, %%ymm6, %%ymm0 \n\t"
+                             "vfmadd231ps %%ymm5, %%ymm6, %%ymm1"
+                             :
+                             : "m"(b[0][0]), "m"(b[0][1]), "m"(b[0][2]),
+                               "m"(b[0][3])
+                             : "xmm0", "xmm1", "xmm6");
+
+        b[0] += 4;
+      }
+
+      __asm__ __volatile__("vextractf128 $0x1, %%ymm0, %%xmm7 \n\t"
+                           "vextractf128 $0x1, %%ymm1, %%xmm8 \n\t"
+                           "vaddps %%xmm7, %%xmm0, %%xmm0 \n\t"
+                           "vaddps %%xmm8, %%xmm1, %%xmm1"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm7", "xmm8");
+
+      for (; vv < vmm; vv++) {
+        __asm__ __volatile__("vmovsd %0, %%xmm4 \n\t"
+                             "vmovsd %1, %%xmm6 \n\t"
+                             "vpermilps $0xe5, %%xmm4, %%xmm5 \n\t"
+                             "vpermilps $0xe0, %%xmm4, %%xmm4 \n\t"
+                             "vfmadd231ps %%xmm5, %%xmm6, %%xmm1 \n\t"
+                             "vfmadd231ps %%xmm4, %%xmm6, %%xmm0"
+                             :
+                             : "m"(vv[0]), "m"(b[0][0])
+                             : "xmm0", "xmm1", "xmm4", "xmm5", "xmm6");
+
+        b[0] += 1;
+      }
+
+      __asm__ __volatile__("vpermilps $0xb1, %%xmm1, %%xmm1 \n\t"
+                           "vaddsubps %%xmm1, %%xmm0, %%xmm2 \n\t"
+                           "vpermilps $0x4e, %%xmm2, %%xmm3 \n\t"
+                           "vaddps %%xmm2, %%xmm3, %%xmm0 \n\t"
+                           "vmovsd %%xmm0, %0"
+                           : "=m"(w[0])
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3");
+    }
+  }
+
+  _avx_zeroupper();
+}
+
+void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
+{
+  complex *b[4], *vv, *vm, *vmm, *wm;
+
+  wm = w + n;
+
+  if ((n & 0x3) == 0x0) {
+    vm = v + n;
+    b[3] = a;
+
+    for (; w < wm; w += 4) {
+      b[0] = b[3];
+      b[1] = b[0] + n;
+      b[2] = b[1] + n;
+      b[3] = b[2] + n;
+
+      __asm__ __volatile__("vmovsd %0, %%xmm0 \n\t"
+                           "vmovsd %1, %%xmm1 \n\t"
+                           "vmovsd %2, %%xmm2 \n\t"
+                           "vmovsd %3, %%xmm3"
+                           :
+                           : "m"(w[0]), "m"(w[1]), "m"(w[2]), "m"(w[3])
+                           : "xmm0", "xmm1", "xmm2", "xmm3");
+
+      for (vv = v; vv < vm; vv += 4) {
+        __asm__ __volatile__("vmovshdup %0, %%ymm4 \n\t"
+                             "vmovsldup %0, %%ymm5"
+                             :
+                             : "m"(vv[0]), "m"(vv[1]), "m"(vv[2]), "m"(vv[3])
+                             : "xmm4", "xmm5");
+
+        __asm__ __volatile__("vmovups %0, %%ymm6 \n\t"
+                             "vmovups %4, %%ymm7"
+                             :
+                             : "m"(b[0][0]), "m"(b[0][1]), "m"(b[0][2]),
+                               "m"(b[0][3]), "m"(b[1][0]), "m"(b[1][1]),
+                               "m"(b[1][2]), "m"(b[1][3])
+                             : "xmm6", "xmm7");
+
+        __asm__ __volatile__("vmovups %0, %%ymm8 \n\t"
+                             "vmovups %4, %%ymm9"
+                             :
+                             : "m"(b[2][0]), "m"(b[2][1]), "m"(b[2][2]),
+                               "m"(b[2][3]), "m"(b[3][0]), "m"(b[3][1]),
+                               "m"(b[3][2]), "m"(b[3][3])
+                             : "xmm8", "xmm9");
+
+        __asm__ __volatile__("vpermilps $0xb1, %%ymm6, %%ymm10 \n\t"
+                             "vpermilps $0xb1, %%ymm7, %%ymm11 \n\t"
+                             "vpermilps $0xb1, %%ymm8, %%ymm12 \n\t"
+                             "vpermilps $0xb1, %%ymm9, %%ymm13 \n\t"
+                             "vfmaddsub231ps %%ymm4, %%ymm10, %%ymm0 \n\t"
+                             "vfmaddsub231ps %%ymm4, %%ymm11, %%ymm1 \n\t"
+                             "vfmaddsub231ps %%ymm4, %%ymm12, %%ymm2 \n\t"
+                             "vfmaddsub231ps %%ymm4, %%ymm13, %%ymm3 \n\t"
+                             "vfmaddsub231ps %%ymm5, %%ymm6, %%ymm0 \n\t"
+                             "vfmaddsub231ps %%ymm5, %%ymm7, %%ymm1 \n\t"
+                             "vfmaddsub231ps %%ymm5, %%ymm8, %%ymm2 \n\t"
+                             "vfmaddsub231ps %%ymm5, %%ymm9, %%ymm3"
+                             :
+                             :
+                             : "xmm0", "xmm1", "xmm2", "xmm3", "xmm10", "xmm11",
+                               "xmm12", "xmm13");
+
+        b[0] += 4;
+        b[1] += 4;
+        b[2] += 4;
+        b[3] += 4;
+      }
+
+      __asm__ __volatile__("vextractf128 $0x1, %%ymm0, %%xmm10 \n\t"
+                           "vextractf128 $0x1, %%ymm1, %%xmm11 \n\t"
+                           "vextractf128 $0x1, %%ymm2, %%xmm12 \n\t"
+                           "vextractf128 $0x1, %%ymm3, %%xmm13 \n\t"
+                           "vaddps %%xmm10, %%xmm0, %%xmm0 \n\t"
+                           "vaddps %%xmm11, %%xmm1, %%xmm1 \n\t"
+                           "vaddps %%xmm12, %%xmm2, %%xmm2 \n\t"
+                           "vaddps %%xmm13, %%xmm3, %%xmm3 \n\t"
+                           "vinsertf128 $0x1, %%xmm2, %%ymm0, %%ymm0 \n\t"
+                           "vinsertf128 $0x1, %%xmm3, %%ymm1, %%ymm1 \n\t"
+                           "vpermilps $0xd8, %%ymm0, %%ymm0 \n\t"
+                           "vpermilps $0xd8, %%ymm1, %%ymm1 \n\t"
+                           "vhaddps %%ymm1, %%ymm0, %%ymm0 \n\t"
+                           "vmovups %%ymm0, %0"
+                           : "=m"(w[0]), "=m"(w[1]), "=m"(w[2]), "=m"(w[3])
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3", "xmm10", "xmm11",
+                             "xmm12", "xmm13");
+    }
+  } else if ((n & 0x1) == 0x0) {
+    vm = v + n - 2;
+    b[1] = a;
+
+    for (; w < wm; w += 2) {
+      b[0] = b[1];
+      b[1] = b[0] + n;
+
+      __asm__ __volatile__("vmovsd %0, %%xmm0  \n\t"
+                           "vmovsd %1, %%xmm1 \n\t"
+                           "vxorps %%ymm2, %%ymm2, %%ymm2 \n\t"
+                           "vxorps %%ymm3, %%ymm3, %%ymm3"
+                           :
+                           : "m"(w[0]), "m"(w[1])
+                           : "xmm0", "xmm1", "xmm2", "xmm3");
+
+      for (vv = v; vv < vm; vv += 4) {
+        __asm__ __volatile__("vmovsldup %0, %%ymm4 \n\t"
+                             "vmovshdup %0, %%ymm5"
+                             :
+                             : "m"(vv[0]), "m"(vv[1]), "m"(vv[2]), "m"(vv[3])
+                             : "xmm4", "xmm5");
+
+        __asm__ __volatile__("vmovups %0, %%ymm6 \n\t"
+                             "vmovups %4, %%ymm7"
+                             :
+                             : "m"(b[0][0]), "m"(b[0][1]), "m"(b[0][2]),
+                               "m"(b[0][3]), "m"(b[1][0]), "m"(b[1][1]),
+                               "m"(b[1][2]), "m"(b[1][3])
+                             : "xmm6", "xmm7");
+
+        __asm__ __volatile__("vfmadd231ps %%ymm4, %%ymm6, %%ymm0 \n\t"
+                             "vfmadd231ps %%ymm4, %%ymm7, %%ymm1 \n\t"
+                             "vfmadd231ps %%ymm5, %%ymm6, %%ymm2 \n\t"
+                             "vfmadd231ps %%ymm5, %%ymm7, %%ymm3"
+                             :
+                             :
+                             : "xmm0", "xmm1", "xmm2", "xmm3");
+
+        b[0] += 4;
+        b[1] += 4;
+      }
+
+      __asm__ __volatile__("vextractf128 $0x1, %%ymm0, %%xmm8 \n\t"
+                           "vextractf128 $0x1, %%ymm1, %%xmm9 \n\t"
+                           "vextractf128 $0x1, %%ymm2, %%xmm10 \n\t"
+                           "vextractf128 $0x1, %%ymm3, %%xmm11\n\t"
+                           "vaddps %%xmm8, %%xmm0, %%xmm0 \n\t"
+                           "vaddps %%xmm9, %%xmm1, %%xmm1 \n\t"
+                           "vaddps %%xmm10, %%xmm2, %%xmm2 \n\t"
+                           "vaddps %%xmm11, %%xmm3, %%xmm3"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3", "xmm8", "xmm9",
+                             "xmm10", "xmm11");
+
+      __asm__ __volatile__("vmovsldup %0, %%xmm4 \n\t"
+                           "vmovshdup %0, %%xmm5 \n\t"
+                           "vmovaps %2, %%xmm6 \n\t"
+                           "vmovaps %4, %%xmm7 \n\t"
+                           "vfmadd231ps %%xmm4, %%xmm6, %%xmm0 \n\t"
+                           "vfmadd231ps %%xmm4, %%xmm7, %%xmm1 \n\t"
+                           "vfmadd231ps %%xmm5, %%xmm6, %%xmm2 \n\t"
+                           "vfmadd231ps %%xmm5, %%xmm7, %%xmm3"
+                           :
+                           : "m"(vv[0]), "m"(vv[1]), "m"(b[0][0]), "m"(b[0][1]),
+                             "m"(b[1][0]), "m"(b[1][1])
+                           : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",
+                             "xmm6", "xmm7");
+
+      __asm__ __volatile__("vpermilps $0xb1, %%xmm2, %%xmm2 \n\t"
+                           "vpermilps $0xb1, %%xmm3, %%xmm3 \n\t"
+                           "vaddsubps %%xmm2, %%xmm0, %%xmm0 \n\t"
+                           "vaddsubps %%xmm3, %%xmm1, %%xmm1"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3");
+
+      __asm__ __volatile__("vpermilps $0xd8, %%xmm0, %%xmm0 \n\t"
+                           "vpermilps $0xd8, %%xmm1, %%xmm1 \n\t"
+                           "vhaddps %%xmm1, %%xmm0, %%xmm0 \n\t"
+                           "vmovaps %%xmm0, %0"
+                           : "=m"(w[0]), "=m"(w[1])
+                           :
+                           : "xmm0", "xmm1");
+
+      b[1] += 2;
+    }
+  } else {
+    vmm = v + n;
+    vm = vmm - (n & 0x3);
+    b[0] = a;
+
+    for (; w < wm; w += 1) {
+      __asm__ __volatile__("vmovsd %0, %%xmm0 \n\t"
+                           "vxorps %%ymm1, %%ymm1, %%ymm1"
+                           :
+                           : "m"(w[0])
+                           : "xmm0", "xmm1");
+
+      for (vv = v; vv < vm; vv += 4) {
+        __asm__ __volatile__("vmovsldup %0, %%ymm4 \n\t"
+                             "vmovshdup %0, %%ymm5"
+                             :
+                             : "m"(vv[0]), "m"(vv[1]), "m"(vv[2]), "m"(vv[3])
+                             : "xmm4", "xmm5");
+
+        __asm__ __volatile__("vmovups %0, %%ymm6 \n\t"
+                             "vfmadd231ps %%ymm4, %%ymm6, %%ymm0 \n\t"
+                             "vfmadd231ps %%ymm5, %%ymm6, %%ymm1"
+                             :
+                             : "m"(b[0][0]), "m"(b[0][1]), "m"(b[0][2]),
+                               "m"(b[0][3])
+                             : "xmm0", "xmm1", "xmm6");
+
+        b[0] += 4;
+      }
+
+      __asm__ __volatile__("vextractf128 $0x1, %%ymm0, %%xmm7 \n\t"
+                           "vextractf128 $0x1, %%ymm1, %%xmm8 \n\t"
+                           "vaddps %%xmm7, %%xmm0, %%xmm0 \n\t"
+                           "vaddps %%xmm8, %%xmm1, %%xmm1"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm7", "xmm8");
+
+      for (; vv < vmm; vv++) {
+        __asm__ __volatile__("vmovsd %0, %%xmm4 \n\t"
+                             "vmovsd %1, %%xmm6 \n\t"
+                             "vpermilps $0xe5, %%xmm4, %%xmm5 \n\t"
+                             "vpermilps $0xe0, %%xmm4, %%xmm4 \n\t"
+                             "vfmadd231ps %%xmm5, %%xmm6, %%xmm1 \n\t"
+                             "vfmadd231ps %%xmm4, %%xmm6, %%xmm0"
+                             :
+                             : "m"(vv[0]), "m"(b[0][0])
+                             : "xmm0", "xmm1", "xmm4", "xmm5", "xmm6");
+
+        b[0] += 1;
+      }
+
+      __asm__ __volatile__("vpermilps $0xb1, %%xmm1, %%xmm1 \n\t"
+                           "vaddsubps %%xmm1, %%xmm0, %%xmm2 \n\t"
+                           "vpermilps $0x4e, %%xmm2, %%xmm3 \n\t"
+                           "vaddps %%xmm2, %%xmm3, %%xmm0 \n\t"
+                           "vmovsd %%xmm0, %0"
+                           : "=m"(w[0])
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3");
+    }
+  }
+
+  _avx_zeroupper();
+}
+
+#else
 
 void cmat_vec(int n, complex *a, complex *v, complex *w)
 {
@@ -261,7 +752,7 @@ void cmat_vec(int n, complex *a, complex *v, complex *w)
                            : "xmm2", "xmm3");
 
       if ((n & 0x2) != 0x0) {
-        __asm__ __volatile__("vmovaps %0, %%xmm4 \n\t"
+        __asm__ __volatile__("vmovups %0, %%xmm4 \n\t"
                              "vmovsldup %2, %%xmm6 \n\t"
                              "vmovshdup %2, %%xmm7 \n\t"
                              "vpermilps $0xb1, %%xmm4, %%xmm5 \n\t"
@@ -277,23 +768,21 @@ void cmat_vec(int n, complex *a, complex *v, complex *w)
         vv += 2;
       }
 
-      if ((n & 0x1) != 0x0) {
-        __asm__ __volatile__("vmovlps %0, %%xmm9, %%xmm4 \n\t"
-                             "vmovlps %1, %%xmm9, %%xmm8 \n\t"
-                             "vmovsldup %%xmm8, %%xmm6 \n\t"
-                             "vmovshdup %%xmm8, %%xmm7 \n\t"
-                             "vpermilps $0xb1, %%xmm4, %%xmm5 \n\t"
-                             "vmulps %%xmm4, %%xmm6, %%xmm6 \n\t"
-                             "vmulps %%xmm5, %%xmm7, %%xmm7 \n\t"
-                             "vaddps %%xmm6, %%xmm2, %%xmm2 \n\t"
-                             "vaddsubps %%xmm7, %%xmm3, %%xmm3"
-                             :
-                             : "m"(vv[0]), "m"(a[0])
-                             : "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7",
-                               "xmm8");
+      __asm__ __volatile__("vmovlps %0, %%xmm9, %%xmm4 \n\t"
+                           "vmovlps %1, %%xmm9, %%xmm8 \n\t"
+                           "vmovsldup %%xmm8, %%xmm6 \n\t"
+                           "vmovshdup %%xmm8, %%xmm7 \n\t"
+                           "vpermilps $0xb1, %%xmm4, %%xmm5 \n\t"
+                           "vmulps %%xmm4, %%xmm6, %%xmm6 \n\t"
+                           "vmulps %%xmm5, %%xmm7, %%xmm7 \n\t"
+                           "vaddps %%xmm6, %%xmm2, %%xmm2 \n\t"
+                           "vaddsubps %%xmm7, %%xmm3, %%xmm3"
+                           :
+                           : "m"(vv[0]), "m"(a[0])
+                           : "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7",
+                             "xmm8");
 
-        a += 1;
-      }
+      a += 1;
 
       __asm__ __volatile__("vaddps %%xmm3, %%xmm2, %%xmm2 \n\t"
                            "vpermilps $0xd8, %%xmm2, %%xmm0 \n\t"
@@ -511,7 +1000,7 @@ void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
                            : "xmm2", "xmm3");
 
       if ((n & 0x2) != 0x0) {
-        __asm__ __volatile__("vmovaps %0, %%xmm4 \n\t"
+        __asm__ __volatile__("vmovups %0, %%xmm4 \n\t"
                              "vmovsldup %2, %%xmm6 \n\t"
                              "vmovshdup %2, %%xmm7 \n\t"
                              "vpermilps $0xb1, %%xmm4, %%xmm5 \n\t"
@@ -527,23 +1016,21 @@ void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
         vv += 2;
       }
 
-      if ((n & 0x1) != 0x0) {
-        __asm__ __volatile__("vmovlps %0, %%xmm9, %%xmm4 \n\t"
-                             "vmovlps %1, %%xmm9, %%xmm8 \n\t"
-                             "vmovsldup %%xmm8, %%xmm6 \n\t"
-                             "vmovshdup %%xmm8, %%xmm7 \n\t"
-                             "vpermilps $0xb1, %%xmm4, %%xmm5 \n\t"
-                             "vmulps %%xmm4, %%xmm6, %%xmm6 \n\t"
-                             "vmulps %%xmm5, %%xmm7, %%xmm7 \n\t"
-                             "vaddps %%xmm6, %%xmm2, %%xmm2 \n\t"
-                             "vaddsubps %%xmm7, %%xmm3, %%xmm3"
-                             :
-                             : "m"(vv[0]), "m"(a[0])
-                             : "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7",
-                               "xmm8");
+      __asm__ __volatile__("vmovlps %0, %%xmm9, %%xmm4 \n\t"
+                           "vmovlps %1, %%xmm9, %%xmm8 \n\t"
+                           "vmovsldup %%xmm8, %%xmm6 \n\t"
+                           "vmovshdup %%xmm8, %%xmm7 \n\t"
+                           "vpermilps $0xb1, %%xmm4, %%xmm5 \n\t"
+                           "vmulps %%xmm4, %%xmm6, %%xmm6 \n\t"
+                           "vmulps %%xmm5, %%xmm7, %%xmm7 \n\t"
+                           "vaddps %%xmm6, %%xmm2, %%xmm2 \n\t"
+                           "vaddsubps %%xmm7, %%xmm3, %%xmm3"
+                           :
+                           : "m"(vv[0]), "m"(a[0])
+                           : "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7",
+                             "xmm8");
 
-        a += 1;
-      }
+      a += 1;
 
       __asm__ __volatile__("vaddps %%xmm3, %%xmm2, %%xmm2 \n\t"
                            "vpermilps $0xd8, %%xmm2, %%xmm0 \n\t"
@@ -557,6 +1044,8 @@ void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
 
   _avx_zeroupper();
 }
+
+#endif
 
 #elif (defined x64)
 #include "sse2.h"

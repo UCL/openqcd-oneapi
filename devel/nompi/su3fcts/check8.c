@@ -3,7 +3,7 @@
 *
 * File check8.c
 *
-* Copyright (C) 2009, 2010, 2011 Martin Luescher
+* Copyright (C) 2009, 2010, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "su3.h"
 #include "utils.h"
 #include "random.h"
 #include "su3fcts.h"
@@ -26,7 +25,9 @@
 static double rs, *rus, *rvs, *rws, *rzs;
 static complex_dble *cs;
 static su3_dble *us, *vs, *ws, *zs;
-static su3_dble ud0 = {{0.0}};
+static su3_dble ud0 = {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0},
+                       {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0},
+                       {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}};
 static complex_dble trs ALIGNED16;
 
 static void alloc_matrices(void)

@@ -3,7 +3,7 @@
 *
 * File sse2.h
 *
-* Copyright (C) 2005, 2008, 2011 Martin Luescher
+* Copyright (C) 2005, 2008, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -21,10 +21,10 @@
 #include "sse.h"
 #endif
 
-typedef struct
+typedef struct __attribute__((aligned(16)))
 {
   double c1, c2;
-} sse_double __attribute__((aligned(16)));
+} sse_double;
 
 static sse_double _sse_sgn1_dble __attribute__((unused)) = {-1.0, 1.0};
 static sse_double _sse_sgn2_dble __attribute__((unused)) = {1.0, -1.0};
@@ -384,10 +384,10 @@ static sse_double _sse_sgn_dble __attribute__((unused)) = {-1.0, -1.0};
 
 /*
 * Multiplies an su3 vector s with an su3 matrix u, assuming s is
-* stored in  xmm0,xmm1,xmm2
+* stored in  xmm0,xmm1,xmm2.
 *
-* On output the result is in xmm3,xmm4,xmm5 and the registers
-* xmm0,xmm1,xmm2 are changed
+* On output the result is in xmm3,xmm4,xmm5 and all registers except
+* for xmm15 are changed.
 */
 
 #define _sse_su3_multiply_dble(u)                                              \
@@ -469,10 +469,10 @@ static sse_double _sse_sgn_dble __attribute__((unused)) = {-1.0, -1.0};
 
 /*
 * Multiplies an su3 vector s with an su3 matrix u^dagger, assuming s is
-* stored in  xmm0,xmm1,xmm2
+* stored in  xmm0,xmm1,xmm2.
 *
-* On output the result is in xmm3,xmm4,xmm5 and the registers
-* xmm0,xmm1,xmm2 are changed
+* On output the result is in xmm3,xmm4,xmm5 and all registers except
+* for xmm15 are changed.
 */
 
 #define _sse_su3_inverse_multiply_dble(u)                                      \

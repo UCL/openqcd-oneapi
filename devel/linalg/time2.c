@@ -3,7 +3,7 @@
 *
 * File time2.c
 *
-* Copyright (C) 2005, 2008, 2011, 2013 Martin Luescher
+* Copyright (C) 2005, 2008, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -446,7 +446,6 @@ int main(int argc, char *argv[])
   }
 
   wdt = 1.0e6 * wt_rotate_dble() / (double)(25 * VOLUME);
-  error_chk();
 
   if (my_rank == 0) {
     printf("Function rotate_dble (n=5 fields):\n");

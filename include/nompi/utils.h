@@ -70,7 +70,7 @@ extern void *amalloc(size_t size, int p);
 extern void afree(void *addr);
 extern void error(int test, int no, char *name, char *format, ...);
 extern void error_root(int test, int no, char *name, char *format, ...);
-extern int error_loc(int test, int no, char *name, char *format, ...);
+extern void error_loc(int test, int no, char *name, char *format, ...);
 extern void message(char *format, ...);
 
 #endif

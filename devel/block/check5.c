@@ -3,7 +3,7 @@
 *
 * File check5.c
 *
-* Copyright (C) 2005, 2011 Martin Luescher
+* Copyright (C) 2005, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -384,8 +384,6 @@ int main(int argc, char *argv[])
 
     b += 1;
   }
-
-  error_chk();
 
   if (my_rank == 0) {
     printf("\n");

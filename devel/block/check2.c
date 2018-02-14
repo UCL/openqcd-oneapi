@@ -3,7 +3,7 @@
 *
 * File check2.c
 *
-* Copyright (C) 2005, 2011 Martin Luescher
+* Copyright (C) 2005, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -512,8 +512,6 @@ int main(int argc, char *argv[])
     error(itest == 10, 1, "main [check2.c]",
           "b.bb.wd is not in the proper condition");
   }
-
-  error_chk();
 
   if (my_rank == 0) {
     printf("No errors detected\n\n");

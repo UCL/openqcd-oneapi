@@ -34,6 +34,7 @@ csw          1.715000
 type         0
 cG           1.0
 cF           1.0
+theta        0.0 0.0 0.0
 
 [Reweighting factor 0]
 rwfact       RWTM2_EO

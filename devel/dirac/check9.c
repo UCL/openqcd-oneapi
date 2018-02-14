@@ -3,7 +3,7 @@
 *
 * File check9.c
 *
-* Copyright (C) 2011-2013 Martin Luescher
+* Copyright (C) 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
   int nb, isw, nbh, ic;
   int bs[4], n, nm, vol, ie;
   float mu, d, dmax;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   spinor **ps;
   block_t *b;
   sw_parms_t swp;
@@ -147,12 +147,15 @@ int main(int argc, char *argv[])
 
   MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  phi[0] = 0.0;
-  phi[1] = 0.0;
-  phi_prime[0] = 0.0;
-  phi_prime[1] = 0.0;
-  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime);
-  print_bc_parms();
+  phi[0] = 0.123;
+  phi[1] = -0.534;
+  phi_prime[0] = 0.912;
+  phi_prime[1] = 0.078;
+  theta[0] = 0.35;
+  theta[1] = -1.25;
+  theta[2] = 0.78;
+  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime, theta);
+  print_bc_parms(2);
 
   start_ranlux(0, 1234);
   geometry();
@@ -168,7 +171,7 @@ int main(int argc, char *argv[])
            swp.m0, mu, swp.csw, swp.cF[0], swp.cF[1]);
 
   random_ud();
-  chs_ubnd(-1);
+  set_ud_phase();
   sw_term(NO_PTS);
 
   assign_ud2u();
@@ -231,8 +234,6 @@ int main(int argc, char *argv[])
         ie = 1;
     }
   }
-
-  error_chk();
 
   error(ie, 1, "main [check9.c]",
         "Dw_bnd() changes the input field where it should not");

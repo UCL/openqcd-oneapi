@@ -3,7 +3,7 @@
 *
 * File check6.c
 *
-* Copyright (C) 2007, 2008, 2011, 2013 Martin Luescher
+* Copyright (C) 2007, 2008, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -101,8 +101,6 @@ int main(int argc, char *argv[])
 
   mulr_spinor_add_dble(VOLUME, psd[0], psd[1], -1.0);
   d = norm_square_dble(VOLUME, 1, psd[0]);
-
-  error_chk();
 
   if (my_rank == 0) {
     printf("Imported field from file\n"

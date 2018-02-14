@@ -3,8 +3,8 @@
 *
 * File hmc.c
 *
-* Copyright (C) 2005, 2007, 2009-2013  Martin Luescher, Filippo Palombi,
-*                                      Stefan Schaefer
+* Copyright (C) 2005, 2007, 2009-2013,    Martin Luescher, Filippo Palombi,
+*               2016                      Stefan Schaefer, Isabel Campos
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -68,7 +68,6 @@
 #include <stdio.h>
 #include <math.h>
 #include "mpi.h"
-#include "su3.h"
 #include "random.h"
 #include "su3fcts.h"
 #include "flags.h"
@@ -87,6 +86,7 @@
   (n) = (m)
 
 static int nrs = 0, *rs;
+static su3_dble ubnd[3] ALIGNED16;
 
 static void init_rs(int nr)
 {
@@ -355,8 +355,6 @@ void hmc_sanity_check(void)
     error_root(ie != 0, 1, "hmc_sanity_check [hmc.c]",
                "Inconsistent rational function actions");
   }
-
-  error_chk();
 }
 
 static void dfl_wsize(int *nws, int *nwv, int *nwvd)
@@ -491,7 +489,7 @@ static void chk_mode_regen(int isp, int *status)
 
 static void start_hmc(double *act0, su3_dble *uold)
 {
-  int i, n, nact, *iact;
+  int i, n, nact, *iact, npf;
   int status[3];
   double *mu;
   su3_dble *udb;
@@ -499,13 +497,25 @@ static void start_hmc(double *act0, su3_dble *uold)
   hmc_parms_t hmc;
   action_parms_t ap;
 
+  hmc = hmc_parms();
+  nact = hmc.nact;
+  iact = hmc.iact;
+  npf = hmc.npf;
+  mu = hmc.mu;
+
   clear_counters();
   udb = udfld();
   cm3x3_assign(4 * VOLUME, udb, uold);
-  chs_ubnd(-1);
+  if ((cpr[0] == (NPROC0 - 1)) && ((bc_type() == 1) || (bc_type() == 2)))
+    cm3x3_assign(3, udb + 4 * VOLUME + 7 * (BNDRY / 4), ubnd);
+
+  error_root(query_flags(UD_PHASE_SET) == 1, 1, "start_hmc [hmc.c]",
+             "Phase-set initial configuration");
+
+  if (npf != 0)
+    set_ud_phase();
   random_mom();
   act0[0] = momentum_action(0);
-
   dfl = dfl_parms();
 
   if (dfl.Ns) {
@@ -521,10 +531,6 @@ static void start_hmc(double *act0, su3_dble *uold)
       add2counter("modes", 2, status + 1);
   }
 
-  hmc = hmc_parms();
-  nact = hmc.nact;
-  iact = hmc.iact;
-  mu = hmc.mu;
   n = 2;
 
   for (i = 0; i < nact; i++) {
@@ -622,7 +628,7 @@ static void end_hmc(double *act1)
 
 static int accept_hmc(double *act0, double *act1, su3_dble *uold)
 {
-  int my_rank, nact, iac, i;
+  int my_rank, nact, npf, iac, i;
   double da, r;
   su3_dble *udb;
   hmc_parms_t hmc;
@@ -630,6 +636,7 @@ static int accept_hmc(double *act0, double *act1, su3_dble *uold)
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
   hmc = hmc_parms();
   nact = hmc.nact;
+  npf = hmc.npf;
   iac = 0;
   da = 0.0;
 
@@ -656,9 +663,14 @@ static int accept_hmc(double *act0, double *act1, su3_dble *uold)
   if (iac == 0) {
     udb = udfld();
     cm3x3_assign(4 * VOLUME, uold, udb);
+    if ((cpr[0] == (NPROC0 - 1)) && ((bc_type() == 1) || (bc_type() == 2)))
+      cm3x3_assign(3, ubnd, udb + 4 * VOLUME + 7 * (BNDRY / 4));
     set_flags(UPDATED_UD);
+    if (npf != 0)
+      set_flags(UNSET_UD_PHASE);
   } else {
-    chs_ubnd(1);
+    if (npf != 0)
+      unset_ud_phase();
     renormalize_ud();
   }
 

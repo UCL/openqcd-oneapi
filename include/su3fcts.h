@@ -3,7 +3,7 @@
 *
 * File su3fcts.h
 *
-* Copyright (C) 2010, 2011 Martin Luescher
+* Copyright (C) 2010, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -20,22 +20,26 @@
 typedef struct
 {
   double t, d;
-  complex_dble p[3];
+  complex_dble p[3] ALIGNED16;
 } ch_drv0_t;
 
 typedef struct
 {
   double t, d;
-  complex_dble p[3];
-  complex_dble pt[3], pd[3];
+  complex_dble p[3] ALIGNED16;
+  complex_dble pt[3] ALIGNED16;
+  complex_dble pd[3] ALIGNED16;
 } ch_drv1_t;
 
 typedef struct
 {
   double t, d;
-  complex_dble p[3];
-  complex_dble pt[3], pd[3];
-  complex_dble ptt[3], ptd[3], pdd[3];
+  complex_dble p[3] ALIGNED16;
+  complex_dble pt[3] ALIGNED16;
+  complex_dble pd[3] ALIGNED16;
+  complex_dble ptt[3] ALIGNED16;
+  complex_dble ptd[3] ALIGNED16;
+  complex_dble pdd[3] ALIGNED16;
 } ch_drv2_t;
 
 /* CHEXP_C */

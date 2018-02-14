@@ -33,13 +33,6 @@
 *     the tolerated difference of the boundary values of the gauge field from
 *     the expected ones in the case of SF and open-SF boundary conditions.
 *
-*   int chs_ubnd(int ibc)
-*     Multiplies the double-precision link variables on the time-like links
-*     at time NPROC0*L0-1 by -1 if the following conditions are met: (1) ibc
-*     and the determinants of the link variables have opposite sign, (2) the
-*     boundary conditions are of type 3 (periodic for the gauge field). The
-*     program returns 1 if the link variables are changed and 0 otherwise.
-*
 *   void bnd_s2zero(ptset_t set,spinor *s)
 *     Sets the components of the single-precision spinor field s on the
 *     specified set of points at global time 0 (boundary conditions type
@@ -79,8 +72,10 @@
 *
 * Then the program checks whether any active link variables are equal to
 * zero and, if some are found, aborts the program with an error message.
+* An error occurs if set_bc() or check_bc() is called when the gauge field
+* is phase-set (see set_ud_phase() [uflds.c]).
 *
-* The programs in this module act globally and should be called simultaneously
+* The programs in this module act globally and must be called simultaneously
 * on all MPI processes. After the first time, the programs bnd_s2zero() and
 * bnd_sd2zero() may be locally called.
 *
@@ -383,6 +378,8 @@ void set_bc(void)
 {
   int bc, it;
 
+  error_root(query_flags(UD_PHASE_SET) == 1, 1, "set_bc [bcnds.c]",
+             "Gauge configuration must not be phase-set");
   bc = bc_type();
 
   if (bc == 0)
@@ -393,7 +390,6 @@ void set_bc(void)
     openSF_bc();
 
   it = check_zero(bc);
-
   error(it != 1, 1, "set_bc [bcnds.c]",
         "Link variables vanish on an incorrect set of links");
 }
@@ -461,6 +457,9 @@ int check_bc(double tol)
   int bc, it, is;
   double dprms[1];
 
+  error_root(query_flags(UD_PHASE_SET) == 1, 1, "check_bc [bcnds.c]",
+             "Gauge configuration must not be phase-set");
+
   if (NPROC > 1) {
     dprms[0] = tol;
     MPI_Bcast(dprms, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -481,93 +480,6 @@ int check_bc(double tol)
   }
 
   return it;
-}
-
-static int sdet(su3_dble *u)
-{
-  double r;
-  complex_dble z;
-
-  z.re = (*u).c22.re * (*u).c33.re - (*u).c22.im * (*u).c33.im -
-         (*u).c32.re * (*u).c23.re + (*u).c32.im * (*u).c23.im;
-
-  z.im = (*u).c22.re * (*u).c33.im + (*u).c22.im * (*u).c33.re -
-         (*u).c32.re * (*u).c23.im - (*u).c32.im * (*u).c23.re;
-
-  r = (*u).c11.re * z.re - (*u).c11.im * z.im;
-
-  z.re = (*u).c32.re * (*u).c13.re - (*u).c32.im * (*u).c13.im -
-         (*u).c12.re * (*u).c33.re + (*u).c12.im * (*u).c33.im;
-
-  z.im = (*u).c32.re * (*u).c13.im + (*u).c32.im * (*u).c13.re -
-         (*u).c12.re * (*u).c33.im - (*u).c12.im * (*u).c33.re;
-
-  r += ((*u).c21.re * z.re - (*u).c21.im * z.im);
-
-  z.re = (*u).c12.re * (*u).c23.re - (*u).c12.im * (*u).c23.im -
-         (*u).c22.re * (*u).c13.re + (*u).c22.im * (*u).c13.im;
-
-  z.im = (*u).c12.re * (*u).c23.im + (*u).c12.im * (*u).c23.re -
-         (*u).c22.re * (*u).c13.im - (*u).c22.im * (*u).c13.re;
-
-  r += ((*u).c31.re * z.re - (*u).c31.im * z.im);
-
-  if (r >= 0.0)
-    return 1;
-  else
-    return -1;
-}
-
-int chs_ubnd(int ibc)
-{
-  int iprms[1], i, ich, ichs;
-  int *lk, *lkm;
-  su3_dble *ub;
-  umat_t *um;
-
-  if (bc_type() == 3) {
-    if (NPROC > 1) {
-      iprms[0] = ibc;
-      MPI_Bcast(iprms, 1, MPI_INT, 0, MPI_COMM_WORLD);
-      error(iprms[0] != ibc, 1, "chs_ubnd [bcnds.c]",
-            "Parameter is not global");
-    }
-
-    if (init0 == 0)
-      alloc_lks();
-
-    if (ibc >= 0)
-      ibc = 1;
-    else
-      ibc = -1;
-
-    ub = udfld();
-    ich = 0;
-
-    if (nlks > 0) {
-      lk = lks;
-
-      if (sdet(ub + (*lk)) != ibc) {
-        ich = 1;
-        lkm = lk + nlks;
-
-        for (; lk < lkm; lk++) {
-          um = (umat_t *)(ub + (*lk));
-
-          for (i = 0; i < 18; i++)
-            (*um).r[i] = -(*um).r[i];
-        }
-      }
-    }
-
-    MPI_Allreduce(&ich, &ichs, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
-
-    if (ichs == 1)
-      set_flags(UPDATED_UD);
-
-    return ichs;
-  } else
-    return 0;
 }
 
 void bnd_s2zero(ptset_t set, spinor *s)

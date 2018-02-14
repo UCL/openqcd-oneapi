@@ -3,12 +3,12 @@
 *
 * File salg_dble.c
 *
-* Copyright (C) 2005, 2007, 2011, 2013 Martin Luescher
+* Copyright (C) 2005, 2007, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
 *
-* Generic linear algebra routines for double-precision Dirac fields
+* Generic linear algebra routines for double-precision Dirac fields.
 *
 * The externally accessible functions are
 *
@@ -85,13 +85,10 @@
 #include "linalg.h"
 #include "global.h"
 
-#define MAX_LEVELS 12
-#define BLK_LENGTH 8
-
-static int nrot = 0, ifail = 0;
-static int cnt[MAX_LEVELS];
-static double smx[MAX_LEVELS] ALIGNED16;
-static complex_dble smz[MAX_LEVELS] ALIGNED16;
+static int nrot = 0;
+static int isx, isz, init = 0;
+static double smx ALIGNED8;
+static complex_dble smz ALIGNED16;
 static spinor_dble *psi;
 
 static void alloc_wrotate(int n)
@@ -100,37 +97,461 @@ static void alloc_wrotate(int n)
     afree(psi);
 
   psi = amalloc(n * sizeof(*psi), ALIGN);
-
-  if (psi == NULL) {
-    error_loc(1, 1, "alloc_wrotate [salg_dble.c]",
-              "Unable to allocate workspace");
-    nrot = 0;
-    ifail = 1;
-  } else {
-    nrot = n;
-    set_sd2zero(n, psi);
-  }
+  error_loc(psi == NULL, 1, "alloc_wrotate [salg_dble.c]",
+            "Unable to allocate workspace");
+  set_sd2zero(n, psi);
+  nrot = n;
 }
 
 #if (defined AVX)
 #include "avx.h"
 
+#if (defined FMA3)
+
 complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
 {
-  int n;
-  complex_dble w, z;
   spinor_dble *sm, *smb;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smz[n].re = 0.0;
-    smz[n].im = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isz);
   sm = s + vol;
 
   while (s < sm) {
-    smb = s + BLK_LENGTH;
+    smb = s + 8;
+    if (smb > sm)
+      smb = sm;
+
+    __asm__ __volatile__("vxorpd %%ymm0, %%ymm0, %%ymm0 \n\t"
+                         "vxorpd %%ymm1, %%ymm1, %%ymm1 \n\t"
+                         "vxorpd %%ymm2, %%ymm2, %%ymm2 \n\t"
+                         "vxorpd %%ymm3, %%ymm3, %%ymm3 \n\t"
+                         "vxorpd %%ymm4, %%ymm4, %%ymm4 \n\t"
+                         "vxorpd %%ymm5, %%ymm5, %%ymm5"
+                         :
+                         :
+                         : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5");
+
+    for (; s < smb; s++) {
+      __asm__ __volatile__("vmovapd %0, %%ymm6 \n\t"
+                           "vmovapd %2, %%ymm7 \n\t"
+                           "vmovapd %4, %%ymm8"
+                           :
+                           : "m"((*r).c1.c1), "m"((*r).c1.c2), "m"((*r).c1.c3),
+                             "m"((*r).c2.c1), "m"((*r).c2.c2), "m"((*r).c2.c3)
+                           : "xmm6", "xmm7", "xmm8");
+
+      __asm__ __volatile__("vmovddup %0, %%ymm9 \n\t"
+                           "vmovddup %2, %%ymm10 \n\t"
+                           "vmovddup %4, %%ymm11"
+                           :
+                           : "m"((*s).c1.c1.re), "m"((*s).c1.c2.re),
+                             "m"((*s).c1.c3.re), "m"((*s).c2.c1.re),
+                             "m"((*s).c2.c2.re), "m"((*s).c2.c3.re)
+                           : "xmm9", "xmm10", "xmm11");
+
+      __asm__ __volatile__("vmovddup %0, %%ymm12 \n\t"
+                           "vmovddup %2, %%ymm13 \n\t"
+                           "vmovddup %4, %%ymm14"
+                           :
+                           : "m"((*s).c1.c1.im), "m"((*s).c1.c2.im),
+                             "m"((*s).c1.c3.im), "m"((*s).c2.c1.im),
+                             "m"((*s).c2.c2.im), "m"((*s).c2.c3.im)
+                           : "xmm12", "xmm13", "xmm14");
+
+      __asm__ __volatile__("vfmadd231pd %%ymm6, %%ymm9, %%ymm0 \n\t"
+                           "vfmadd231pd %%ymm7, %%ymm10, %%ymm1 \n\t"
+                           "vfmadd231pd %%ymm8, %%ymm11, %%ymm2 \n\t"
+                           "vfnmadd231pd %%ymm6, %%ymm12, %%ymm3 \n\t"
+                           "vfnmadd231pd %%ymm7, %%ymm13, %%ymm4 \n\t"
+                           "vfnmadd231pd %%ymm8, %%ymm14, %%ymm5"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5");
+
+      __asm__ __volatile__("vmovapd %0, %%ymm6 \n\t"
+                           "vmovapd %2, %%ymm7 \n\t"
+                           "vmovapd %4, %%ymm8"
+                           :
+                           : "m"((*r).c3.c1), "m"((*r).c3.c2), "m"((*r).c3.c3),
+                             "m"((*r).c4.c1), "m"((*r).c4.c2), "m"((*r).c4.c3)
+                           : "xmm6", "xmm7", "xmm8");
+
+      __asm__ __volatile__("vmovddup %0, %%ymm9 \n\t"
+                           "vmovddup %2, %%ymm10 \n\t"
+                           "vmovddup %4, %%ymm11"
+                           :
+                           : "m"((*s).c3.c1.re), "m"((*s).c3.c2.re),
+                             "m"((*s).c3.c3.re), "m"((*s).c4.c1.re),
+                             "m"((*s).c4.c2.re), "m"((*s).c4.c3.re)
+                           : "xmm9", "xmm10", "xmm11");
+
+      __asm__ __volatile__("vmovddup %0, %%ymm12 \n\t"
+                           "vmovddup %2, %%ymm13 \n\t"
+                           "vmovddup %4, %%ymm14"
+                           :
+                           : "m"((*s).c3.c1.im), "m"((*s).c3.c2.im),
+                             "m"((*s).c3.c3.im), "m"((*s).c4.c1.im),
+                             "m"((*s).c4.c2.im), "m"((*s).c4.c3.im)
+                           : "xmm12", "xmm13", "xmm14");
+
+      __asm__ __volatile__("vfmadd231pd %%ymm6, %%ymm9, %%ymm0 \n\t"
+                           "vfmadd231pd %%ymm7, %%ymm10, %%ymm1 \n\t"
+                           "vfmadd231pd %%ymm8, %%ymm11, %%ymm2 \n\t"
+                           "vfnmadd231pd %%ymm6, %%ymm12, %%ymm3 \n\t"
+                           "vfnmadd231pd %%ymm7, %%ymm13, %%ymm4 \n\t"
+                           "vfnmadd231pd %%ymm8, %%ymm14, %%ymm5"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5");
+
+      r += 1;
+    }
+
+    __asm__ __volatile__("vaddpd %%ymm1, %%ymm0, %%ymm0 \n\t"
+                         "vaddpd %%ymm4, %%ymm3, %%ymm3 \n\t"
+                         "vaddpd %%ymm2, %%ymm0, %%ymm0 \n\t"
+                         "vaddpd %%ymm5, %%ymm3, %%ymm3 \n\t"
+                         "vpermilpd $0x5, %%ymm3, %%ymm3 \n\t"
+                         "vaddsubpd %%ymm3, %%ymm0, %%ymm0 \n\t"
+                         "vextractf128 $0x1, %%ymm0, %%xmm1 \n\t"
+                         "vaddpd %%xmm1, %%xmm0, %%xmm0 \n\t"
+                         "vmovapd %%xmm0, %0"
+                         : "=m"(smz)
+                         :
+                         : "xmm0", "xmm1", "xmm3");
+
+    _avx_zeroupper();
+
+    add_to_hsum(isz, (double *)(&smz));
+  }
+
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isz, (double *)(&smz));
+  else
+    local_hsum(isz, (double *)(&smz));
+
+  return smz;
+}
+
+double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+{
+  spinor_dble *sm, *smb;
+
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
+  }
+
+  reset_hsum(isx);
+  sm = s + vol;
+
+  while (s < sm) {
+    smb = s + 8;
+    if (smb > sm)
+      smb = sm;
+
+    __asm__ __volatile__("vxorpd %%ymm0, %%ymm0, %%ymm0 \n\t"
+                         "vxorpd %%ymm1, %%ymm1, %%ymm1 \n\t"
+                         "vxorpd %%ymm2, %%ymm2, %%ymm2"
+                         :
+                         :
+                         : "xmm0", "xmm1", "xmm2");
+
+    for (; s < smb; s++) {
+      __asm__ __volatile__("vmovapd %0, %%ymm3 \n\t"
+                           "vmovapd %2, %%ymm4 \n\t"
+                           "vmovapd %4, %%ymm5"
+                           :
+                           : "m"((*s).c1.c1), "m"((*s).c1.c2), "m"((*s).c1.c3),
+                             "m"((*s).c2.c1), "m"((*s).c2.c2), "m"((*s).c2.c3)
+                           : "xmm3", "xmm4", "xmm5");
+
+      __asm__ __volatile__("vmovapd %0, %%ymm6 \n\t"
+                           "vmovapd %2, %%ymm7 \n\t"
+                           "vmovapd %4, %%ymm8"
+                           :
+                           : "m"((*r).c1.c1), "m"((*r).c1.c2), "m"((*r).c1.c3),
+                             "m"((*r).c2.c1), "m"((*r).c2.c2), "m"((*r).c2.c3)
+                           : "xmm6", "xmm7", "xmm8");
+
+      __asm__ __volatile__("vfmadd231pd %%ymm3, %%ymm6, %%ymm0 \n\t"
+                           "vfmadd231pd %%ymm4, %%ymm7, %%ymm1 \n\t"
+                           "vfmadd231pd %%ymm5, %%ymm8, %%ymm2"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm2");
+
+      __asm__ __volatile__("vmovapd %0, %%ymm9 \n\t"
+                           "vmovapd %2, %%ymm10 \n\t"
+                           "vmovapd %4, %%ymm11"
+                           :
+                           : "m"((*s).c3.c1), "m"((*s).c3.c2), "m"((*s).c3.c3),
+                             "m"((*s).c4.c1), "m"((*s).c4.c2), "m"((*s).c4.c3)
+                           : "xmm9", "xmm10", "xmm11");
+
+      __asm__ __volatile__("vmovapd %0, %%ymm12 \n\t"
+                           "vmovapd %2, %%ymm13 \n\t"
+                           "vmovapd %4, %%ymm14"
+                           :
+                           : "m"((*r).c3.c1), "m"((*r).c3.c2), "m"((*r).c3.c3),
+                             "m"((*r).c4.c1), "m"((*r).c4.c2), "m"((*r).c4.c3)
+                           : "xmm12", "xmm13", "xmm14");
+
+      __asm__ __volatile__("vfmadd231pd %%ymm9, %%ymm12, %%ymm0 \n\t"
+                           "vfmadd231pd %%ymm10, %%ymm13, %%ymm1 \n\t"
+                           "vfmadd231pd %%ymm11, %%ymm14, %%ymm2"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm2");
+
+      r += 1;
+    }
+
+    __asm__ __volatile__("vaddpd %%ymm1, %%ymm0, %%ymm0 \n\t"
+                         "vaddpd %%ymm2, %%ymm0, %%ymm0 \n\t"
+                         "vextractf128 $0x1, %%ymm0, %%xmm1 \n\t"
+                         "vaddpd %%xmm1, %%xmm0, %%xmm0 \n\t"
+                         "vhaddpd %%xmm0, %%xmm0, %%xmm2 \n\t"
+                         "vmovsd %%xmm2, %0"
+                         : "=m"(smx)
+                         :
+                         : "xmm0", "xmm1", "xmm2");
+
+    _avx_zeroupper();
+
+    add_to_hsum(isx, &smx);
+  }
+
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isx, &smx);
+  else
+    local_hsum(isx, &smx);
+
+  return smx;
+}
+
+complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
+                               spinor_dble *r)
+{
+  spinor_dble *sm, *smb;
+
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
+  }
+
+  reset_hsum(isz);
+  sm = s + vol;
+
+  while (s < sm) {
+    smb = s + 8;
+    if (smb > sm)
+      smb = sm;
+
+    __asm__ __volatile__("vxorpd %%ymm0, %%ymm0, %%ymm0 \n\t"
+                         "vxorpd %%ymm1, %%ymm1, %%ymm1 \n\t"
+                         "vxorpd %%ymm2, %%ymm2, %%ymm2 \n\t"
+                         "vxorpd %%ymm3, %%ymm3, %%ymm3 \n\t"
+                         "vxorpd %%ymm4, %%ymm4, %%ymm4 \n\t"
+                         "vxorpd %%ymm5, %%ymm5, %%ymm5"
+                         :
+                         :
+                         : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5");
+
+    for (; s < smb; s++) {
+      __asm__ __volatile__("vmovapd %0, %%ymm6 \n\t"
+                           "vmovapd %2, %%ymm7 \n\t"
+                           "vmovapd %4, %%ymm8"
+                           :
+                           : "m"((*r).c1.c1), "m"((*r).c1.c2), "m"((*r).c1.c3),
+                             "m"((*r).c2.c1), "m"((*r).c2.c2), "m"((*r).c2.c3)
+                           : "xmm6", "xmm7", "xmm8");
+
+      __asm__ __volatile__("vmovddup %0, %%ymm9 \n\t"
+                           "vmovddup %2, %%ymm10 \n\t"
+                           "vmovddup %4, %%ymm11"
+                           :
+                           : "m"((*s).c1.c1.re), "m"((*s).c1.c2.re),
+                             "m"((*s).c1.c3.re), "m"((*s).c2.c1.re),
+                             "m"((*s).c2.c2.re), "m"((*s).c2.c3.re)
+                           : "xmm9", "xmm10", "xmm11");
+
+      __asm__ __volatile__("vmovddup %0, %%ymm12 \n\t"
+                           "vmovddup %2, %%ymm13 \n\t"
+                           "vmovddup %4, %%ymm14"
+                           :
+                           : "m"((*s).c1.c1.im), "m"((*s).c1.c2.im),
+                             "m"((*s).c1.c3.im), "m"((*s).c2.c1.im),
+                             "m"((*s).c2.c2.im), "m"((*s).c2.c3.im)
+                           : "xmm12", "xmm13", "xmm14");
+
+      __asm__ __volatile__("vfmadd231pd %%ymm6, %%ymm9, %%ymm0 \n\t"
+                           "vfmadd231pd %%ymm7, %%ymm10, %%ymm1 \n\t"
+                           "vfmadd231pd %%ymm8, %%ymm11, %%ymm2 \n\t"
+                           "vfnmadd231pd %%ymm6, %%ymm12, %%ymm3 \n\t"
+                           "vfnmadd231pd %%ymm7, %%ymm13, %%ymm4 \n\t"
+                           "vfnmadd231pd %%ymm8, %%ymm14, %%ymm5"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5");
+
+      __asm__ __volatile__("vmovapd %0, %%ymm6 \n\t"
+                           "vmovapd %2, %%ymm7 \n\t"
+                           "vmovapd %4, %%ymm8"
+                           :
+                           : "m"((*r).c3.c1), "m"((*r).c3.c2), "m"((*r).c3.c3),
+                             "m"((*r).c4.c1), "m"((*r).c4.c2), "m"((*r).c4.c3)
+                           : "xmm6", "xmm7", "xmm8");
+
+      __asm__ __volatile__("vmovddup %0, %%ymm9 \n\t"
+                           "vmovddup %2, %%ymm10 \n\t"
+                           "vmovddup %4, %%ymm11"
+                           :
+                           : "m"((*s).c3.c1.re), "m"((*s).c3.c2.re),
+                             "m"((*s).c3.c3.re), "m"((*s).c4.c1.re),
+                             "m"((*s).c4.c2.re), "m"((*s).c4.c3.re)
+                           : "xmm9", "xmm10", "xmm11");
+
+      __asm__ __volatile__("vmovddup %0, %%ymm12 \n\t"
+                           "vmovddup %2, %%ymm13 \n\t"
+                           "vmovddup %4, %%ymm14"
+                           :
+                           : "m"((*s).c3.c1.im), "m"((*s).c3.c2.im),
+                             "m"((*s).c3.c3.im), "m"((*s).c4.c1.im),
+                             "m"((*s).c4.c2.im), "m"((*s).c4.c3.im)
+                           : "xmm12", "xmm13", "xmm14");
+
+      __asm__ __volatile__("vfnmadd231pd %%ymm6, %%ymm9, %%ymm0 \n\t"
+                           "vfnmadd231pd %%ymm7, %%ymm10, %%ymm1 \n\t"
+                           "vfnmadd231pd %%ymm8, %%ymm11, %%ymm2 \n\t"
+                           "vfmadd231pd %%ymm6, %%ymm12, %%ymm3 \n\t"
+                           "vfmadd231pd %%ymm7, %%ymm13, %%ymm4 \n\t"
+                           "vfmadd231pd %%ymm8, %%ymm14, %%ymm5"
+                           :
+                           :
+                           : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5");
+
+      r += 1;
+    }
+
+    __asm__ __volatile__("vaddpd %%ymm1, %%ymm0, %%ymm0 \n\t"
+                         "vaddpd %%ymm4, %%ymm3, %%ymm3 \n\t"
+                         "vaddpd %%ymm2, %%ymm0, %%ymm0 \n\t"
+                         "vaddpd %%ymm5, %%ymm3, %%ymm3 \n\t"
+                         "vpermilpd $0x5, %%ymm3, %%ymm3 \n\t"
+                         "vaddsubpd %%ymm3, %%ymm0, %%ymm0 \n\t"
+                         "vextractf128 $0x1, %%ymm0, %%xmm1 \n\t"
+                         "vaddpd %%xmm1, %%xmm0, %%xmm0 \n\t"
+                         "vmovapd %%xmm0, %0"
+                         : "=m"(smz)
+                         :
+                         : "xmm0", "xmm1", "xmm3");
+
+    _avx_zeroupper();
+
+    add_to_hsum(isz, (double *)(&smz));
+  }
+
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isz, (double *)(&smz));
+  else
+    local_hsum(isz, (double *)(&smz));
+
+  return smz;
+}
+
+double norm_square_dble(int vol, int icom, spinor_dble *s)
+{
+  spinor_dble *sm, *smb;
+
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
+  }
+
+  reset_hsum(isx);
+  sm = s + vol;
+
+  while (s < sm) {
+    smb = s + 8;
+    if (smb > sm)
+      smb = sm;
+
+    __asm__ __volatile__("vxorpd %%ymm6, %%ymm6, %%ymm6 \n\t"
+                         "vxorpd %%ymm7, %%ymm7, %%ymm7 \n\t"
+                         "vxorpd %%ymm8, %%ymm8, %%ymm8 \n\t"
+                         "vxorpd %%ymm9, %%ymm9, %%ymm9 \n\t"
+                         "vxorpd %%ymm10, %%ymm10, %%ymm10 \n\t"
+                         "vxorpd %%ymm11, %%ymm11, %%ymm11"
+                         :
+                         :
+                         : "xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11");
+
+    for (; s < smb; s++) {
+      _avx_spinor_load_dble(*s);
+
+      __asm__ __volatile__("vfmadd231pd %%ymm0, %%ymm0, %%ymm6 \n\t"
+                           "vfmadd231pd %%ymm1, %%ymm1, %%ymm7 \n\t"
+                           "vfmadd231pd %%ymm2, %%ymm2, %%ymm8 \n\t"
+                           "vfmadd231pd %%ymm3, %%ymm3, %%ymm9 \n\t"
+                           "vfmadd231pd %%ymm4, %%ymm4, %%ymm10 \n\t"
+                           "vfmadd231pd %%ymm5, %%ymm5, %%ymm11 \n\t"
+                           :
+                           :
+                           : "xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11");
+    }
+
+    __asm__ __volatile__("vaddpd %%ymm6, %%ymm7, %%ymm7 \n\t"
+                         "vaddpd %%ymm8, %%ymm9, %%ymm9 \n\t"
+                         "vaddpd %%ymm10, %%ymm11, %%ymm11 \n\t"
+                         "vaddpd %%ymm7, %%ymm9, %%ymm9 \n\t"
+                         "vaddpd %%ymm9, %%ymm11, %%ymm11 \n\t"
+                         "vextractf128 $0x1, %%ymm11, %%xmm12 \n\t"
+                         "vaddpd %%xmm11, %%xmm12, %%xmm12 \n\t"
+                         "vhaddpd %%xmm12, %%xmm12, %%xmm13 \n\t"
+                         "vmovsd %%xmm13, %0 \n\t"
+                         : "=m"(smx)
+                         :
+                         : "xmm0", "xmm1", "xmm2", "xmm7", "xmm9", "xmm11");
+
+    _avx_zeroupper();
+
+    add_to_hsum(isx, &smx);
+  }
+
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isx, &smx);
+  else
+    local_hsum(isx, &smx);
+
+  return smx;
+}
+
+#else
+
+complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+{
+  spinor_dble *sm, *smb;
+
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
+  }
+
+  reset_hsum(isz);
+  sm = s + vol;
+
+  while (s < sm) {
+    smb = s + 8;
     if (smb > sm)
       smb = sm;
 
@@ -227,57 +648,38 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
                          "vhaddpd %%ymm5, %%ymm2, %%ymm0 \n\t"
                          "vextractf128 $0x1, %%ymm0, %%xmm1 \n\t"
                          "vaddpd %%xmm0, %%xmm1, %%xmm2 \n\t"
-                         "vaddpd %1, %%xmm2, %%xmm2 \n\t"
                          "vmovapd %%xmm2, %0 \n\t"
                          "vzeroupper"
-                         : "=m"(smz[0])
-                         : "m"(smz[0])
+                         : "=m"(smz)
+                         :
                          : "xmm0", "xmm1", "xmm2", "xmm5");
 
-    cnt[0] += 1;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smz[n].re += smz[n - 1].re;
-      smz[n].im += smz[n - 1].im;
-
-      cnt[n - 1] = 0;
-      smz[n - 1].re = 0.0;
-      smz[n - 1].im = 0.0;
-    }
+    add_to_hsum(isz, (double *)(&smz));
   }
 
-  w.re = 0.0;
-  w.im = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isz, (double *)(&smz));
+  else
+    local_hsum(isz, (double *)(&smz));
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    w.re += smz[n].re;
-    w.im += smz[n].im;
-  }
-
-  if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&w.re, &z.re, 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&z.re, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return z;
-  } else
-    return w;
+  return smz;
 }
 
 double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
 {
-  int n;
-  double x, y;
   spinor_dble *sm, *smb;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smx[n] = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isx);
   sm = s + vol;
 
   while (s < sm) {
-    smb = s + BLK_LENGTH;
+    smb = s + 8;
     if (smb > sm)
       smb = sm;
 
@@ -349,54 +751,39 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
                          "vextractf128 $0x1, %%ymm2, %%xmm1 \n\t"
                          "vaddpd %%xmm1, %%xmm2, %%xmm2 \n\t"
                          "vhaddpd %%xmm2, %%xmm2, %%xmm0 \n\t"
-                         "vaddsd %1, %%xmm0, %%xmm0 \n\t"
                          "vmovsd %%xmm0, %0 \n\t"
                          "vzeroupper"
-                         : "=m"(smx[0])
-                         : "m"(smx[0])
+                         : "=m"(smx)
+                         :
                          : "xmm0", "xmm1", "xmm2");
 
-    cnt[0] += 1;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smx[n] += smx[n - 1];
-
-      cnt[n - 1] = 0;
-      smx[n - 1] = 0.0;
-    }
+    add_to_hsum(isx, &smx);
   }
 
-  x = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isx, &smx);
+  else
+    local_hsum(isx, &smx);
 
-  for (n = 0; n < MAX_LEVELS; n++)
-    x += smx[n];
-
-  if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&x, &y, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&y, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return y;
-  } else
-    return x;
+  return smx;
 }
 
 complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
                                spinor_dble *r)
 {
-  int n;
-  complex_dble w, z;
   spinor_dble *sm, *smb;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smz[n].re = 0.0;
-    smz[n].im = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isz);
   sm = s + vol;
 
   while (s < sm) {
-    smb = s + BLK_LENGTH;
+    smb = s + 8;
     if (smb > sm)
       smb = sm;
 
@@ -493,57 +880,38 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
                          "vhaddpd %%ymm5, %%ymm2, %%ymm0 \n\t"
                          "vextractf128 $0x1, %%ymm0, %%xmm1 \n\t"
                          "vaddpd %%xmm0, %%xmm1, %%xmm2 \n\t"
-                         "vaddpd %1, %%xmm2, %%xmm2 \n\t"
                          "vmovapd %%xmm2, %0 \n\t"
                          "vzeroupper"
-                         : "=m"(smz[0])
-                         : "m"(smz[0])
+                         : "=m"(smz)
+                         :
                          : "xmm0", "xmm1", "xmm2", "xmm5");
 
-    cnt[0] += 1;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smz[n].re += smz[n - 1].re;
-      smz[n].im += smz[n - 1].im;
-
-      cnt[n - 1] = 0;
-      smz[n - 1].re = 0.0;
-      smz[n - 1].im = 0.0;
-    }
+    add_to_hsum(isz, (double *)(&smz));
   }
 
-  w.re = 0.0;
-  w.im = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isz, (double *)(&smz));
+  else
+    local_hsum(isz, (double *)(&smz));
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    w.re += smz[n].re;
-    w.im += smz[n].im;
-  }
-
-  if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&w.re, &z.re, 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&z.re, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return z;
-  } else
-    return w;
+  return smz;
 }
 
 double norm_square_dble(int vol, int icom, spinor_dble *s)
 {
-  int n;
-  double x, y;
   spinor_dble *sm, *smb;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smx[n] = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isx);
   sm = s + vol;
 
   while (s < sm) {
-    smb = s + BLK_LENGTH;
+    smb = s + 8;
     if (smb > sm)
       smb = sm;
 
@@ -586,36 +954,24 @@ double norm_square_dble(int vol, int icom, spinor_dble *s)
                          "vextractf128 $0x1, %%ymm11, %%xmm0 \n\t"
                          "vaddpd %%xmm11, %%xmm0, %%xmm1 \n\t"
                          "vhaddpd %%xmm1, %%xmm1, %%xmm2 \n\t"
-                         "vaddsd %1, %%xmm2, %%xmm0 \n\t"
-                         "vmovsd %%xmm0, %0 \n\t"
+                         "vmovsd %%xmm2, %0 \n\t"
                          "vzeroupper"
-                         : "=m"(smx[0])
-                         : "m"(smx[0])
+                         : "=m"(smx)
+                         :
                          : "xmm0", "xmm1", "xmm2", "xmm7", "xmm9", "xmm11");
 
-    cnt[0] += 1;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smx[n] += smx[n - 1];
-
-      cnt[n - 1] = 0;
-      smx[n - 1] = 0.0;
-    }
+    add_to_hsum(isx, &smx);
   }
 
-  y = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isx, &smx);
+  else
+    local_hsum(isx, &smx);
 
-  for (n = 0; n < MAX_LEVELS; n++)
-    y += smx[n];
-
-  if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&y, &x, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&x, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return x;
-  } else
-    return y;
+  return smx;
 }
+
+#endif
 
 void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r,
                           complex_dble z)
@@ -695,36 +1051,34 @@ void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble *v)
   complex_dble *z;
   spinor_dble *pk, *pj;
 
-  if ((n > nrot) && (ifail == 0))
+  if (n > nrot)
     alloc_wrotate(n);
 
-  if ((n > 0) && (ifail == 0)) {
-    for (ix = 0; ix < vol; ix++) {
-      for (k = 0; k < n; k++) {
-        pj = ppk[0] + ix;
-        z = v + k;
+  for (ix = 0; ix < vol; ix++) {
+    for (k = 0; k < n; k++) {
+      pj = ppk[0] + ix;
+      z = v + k;
 
-        _avx_load_cmplx_dble(*z);
-        _avx_mulc_spinor_dble(*pj);
+      _avx_load_cmplx_dble(*z);
+      _avx_mulc_spinor_dble(*pj);
 
-        for (j = 1; j < n; j++) {
-          pj = ppk[j] + ix;
-          z += n;
-          _avx_load_cmplx_up_dble(*z);
-          _avx_mulc_spinor_add_dble(*pj);
-        }
-
-        pk = psi + k;
-        _avx_spinor_store_dble(*pk);
+      for (j = 1; j < n; j++) {
+        pj = ppk[j] + ix;
+        z += n;
+        _avx_load_cmplx_up_dble(*z);
+        _avx_mulc_spinor_add_dble(*pj);
       }
 
-      for (k = 0; k < n; k++) {
-        pk = psi + k;
-        pj = ppk[k] + ix;
+      pk = psi + k;
+      _avx_spinor_store_dble(*pk);
+    }
 
-        _avx_spinor_load_dble(*pk);
-        _avx_spinor_store_dble(*pj);
-      }
+    for (k = 0; k < n; k++) {
+      pk = psi + k;
+      pj = ppk[k] + ix;
+
+      _avx_spinor_load_dble(*pk);
+      _avx_spinor_store_dble(*pj);
     }
   }
 
@@ -808,20 +1162,19 @@ void mulmg5_dble(int vol, spinor_dble *s)
 
 complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
 {
-  int n;
-  complex_dble w, z;
   spinor_dble *sm, *smb;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smz[n].re = 0.0;
-    smz[n].im = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isz);
   sm = s + vol;
 
   while (s < sm) {
-    smb = s + BLK_LENGTH;
+    smb = s + 8;
     if (smb > sm)
       smb = sm;
 
@@ -961,58 +1314,40 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
                          "addpd %%xmm10, %%xmm11 \n\t"
                          "haddpd %%xmm8, %%xmm8 \n\t"
                          "hsubpd %%xmm11, %%xmm11 \n\t"
-                         "addsd %2, %%xmm8 \n\t"
-                         "addsd %3, %%xmm11 \n\t"
                          "movsd %%xmm8, %0 \n\t"
                          "movsd %%xmm11, %1"
-                         : "=m"(smz[0].re), "=m"(smz[0].im)
-                         : "m"(smz[0].re), "m"(smz[0].im)
+                         : "=m"(smz.re), "=m"(smz.im)
+                         :
                          : "xmm8", "xmm11");
 
-    cnt[0] += 1;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smz[n].re += smz[n - 1].re;
-      smz[n].im += smz[n - 1].im;
-
-      cnt[n - 1] = 0;
-      smz[n - 1].re = 0.0;
-      smz[n - 1].im = 0.0;
-    }
+    add_to_hsum(isz, (double *)(&smz));
   }
 
-  w.re = 0.0;
-  w.im = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isz, (double *)(&smz));
+  else
+    local_hsum(isz, (double *)(&smz));
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    w.re += smz[n].re;
-    w.im -= smz[n].im;
-  }
+  smz.im = -smz.im;
 
-  if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&w.re, &z.re, 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&z.re, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return z;
-  } else
-    return w;
+  return smz;
 }
 
 double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
 {
-  int n;
-  double x, y;
   spinor_dble *sm, *smb;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smx[n] = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isx);
   sm = s + vol;
 
   while (s < sm) {
-    smb = s + BLK_LENGTH;
+    smb = s + 8;
     if (smb > sm)
       smb = sm;
 
@@ -1078,53 +1413,38 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
     __asm__ __volatile__("addpd %%xmm6, %%xmm8 \n\t"
                          "addpd %%xmm7, %%xmm8 \n\t"
                          "haddpd %%xmm8, %%xmm8 \n\t"
-                         "addsd %1, %%xmm8 \n\t"
                          "movsd %%xmm8, %0"
-                         : "=m"(smx[0])
-                         : "m"(smx[0])
+                         : "=m"(smx)
+                         :
                          : "xmm8");
 
-    cnt[0] += 1;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smx[n] += smx[n - 1];
-
-      cnt[n - 1] = 0;
-      smx[n - 1] = 0.0;
-    }
+    add_to_hsum(isx, &smx);
   }
 
-  y = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isx, &smx);
+  else
+    local_hsum(isx, &smx);
 
-  for (n = 0; n < MAX_LEVELS; n++)
-    y += smx[n];
-
-  if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&y, &x, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&x, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return x;
-  } else
-    return y;
+  return smx;
 }
 
 complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
                                spinor_dble *r)
 {
-  int n;
-  complex_dble w, z;
   spinor_dble *sm, *smb;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smz[n].re = 0.0;
-    smz[n].im = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isz);
   sm = s + vol;
 
   while (s < sm) {
-    smb = s + BLK_LENGTH;
+    smb = s + 8;
     if (smb > sm)
       smb = sm;
 
@@ -1264,58 +1584,40 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
                          "addpd %%xmm10, %%xmm11 \n\t"
                          "haddpd %%xmm8, %%xmm8 \n\t"
                          "hsubpd %%xmm11, %%xmm11 \n\t"
-                         "addsd %2, %%xmm8 \n\t"
-                         "addsd %3, %%xmm11 \n\t"
                          "movsd %%xmm8, %0 \n\t"
                          "movsd %%xmm11, %1"
-                         : "=m"(smz[0].re), "=m"(smz[0].im)
-                         : "m"(smz[0].re), "m"(smz[0].im)
+                         : "=m"(smz.re), "=m"(smz.im)
+                         :
                          : "xmm8", "xmm11");
 
-    cnt[0] += 1;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smz[n].re += smz[n - 1].re;
-      smz[n].im += smz[n - 1].im;
-
-      cnt[n - 1] = 0;
-      smz[n - 1].re = 0.0;
-      smz[n - 1].im = 0.0;
-    }
+    add_to_hsum(isz, (double *)(&smz));
   }
 
-  w.re = 0.0;
-  w.im = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isz, (double *)(&smz));
+  else
+    local_hsum(isz, (double *)(&smz));
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    w.re += smz[n].re;
-    w.im -= smz[n].im;
-  }
+  smz.im = -smz.im;
 
-  if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&w.re, &z.re, 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&z.re, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return z;
-  } else
-    return w;
+  return smz;
 }
 
 double norm_square_dble(int vol, int icom, spinor_dble *s)
 {
-  int n;
-  double x, y;
   spinor_dble *sm, *smb;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smx[n] = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isx);
   sm = s + vol;
 
   while (s < sm) {
-    smb = s + BLK_LENGTH;
+    smb = s + 8;
     if (smb > sm)
       smb = sm;
 
@@ -1377,34 +1679,20 @@ double norm_square_dble(int vol, int icom, spinor_dble *s)
     __asm__ __volatile__("addpd %%xmm6, %%xmm8 \n\t"
                          "addpd %%xmm7, %%xmm8 \n\t"
                          "haddpd %%xmm8, %%xmm8 \n\t"
-                         "addsd %1, %%xmm8 \n\t"
                          "movsd %%xmm8, %0"
-                         : "=m"(smx[0])
-                         : "m"(smx[0])
+                         : "=m"(smx)
+                         :
                          : "xmm8");
 
-    cnt[0] += 1;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smx[n] += smx[n - 1];
-
-      cnt[n - 1] = 0;
-      smx[n - 1] = 0.0;
-    }
+    add_to_hsum(isx, &smx);
   }
 
-  y = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isx, &smx);
+  else
+    local_hsum(isx, &smx);
 
-  for (n = 0; n < MAX_LEVELS; n++)
-    y += smx[n];
-
-  if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&y, &x, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&x, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return x;
-  } else
-    return y;
+  return smx;
 }
 
 void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r,
@@ -1614,71 +1902,69 @@ void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble *v)
   complex_dble *z;
   spinor_dble *pk, *pj;
 
-  if ((n > nrot) && (ifail == 0))
+  if (n > nrot)
     alloc_wrotate(n);
 
-  if ((n > 0) && (ifail == 0)) {
-    for (ix = 0; ix < vol; ix++) {
-      for (k = 0; k < n; k++) {
-        pj = ppk[0] + ix;
-        z = v + k;
+  for (ix = 0; ix < vol; ix++) {
+    for (k = 0; k < n; k++) {
+      pj = ppk[0] + ix;
+      z = v + k;
 
+      _sse_load_cmplx_dble(*z);
+      _sse_load_dble((*pj).c1);
+      _sse_load_up_dble((*pj).c2);
+      _sse_mulc_vector_dble();
+      _sse_mulc_vector_up_dble();
+
+      for (j = 1; j < n; j++) {
+        pj = ppk[j] + ix;
+        z += n;
         _sse_load_cmplx_dble(*z);
-        _sse_load_dble((*pj).c1);
-        _sse_load_up_dble((*pj).c2);
-        _sse_mulc_vector_dble();
-        _sse_mulc_vector_up_dble();
-
-        for (j = 1; j < n; j++) {
-          pj = ppk[j] + ix;
-          z += n;
-          _sse_load_cmplx_dble(*z);
-          _sse_mulc_vector_add_dble((*pj).c1);
-          _sse_mulc_vector_add_up_dble((*pj).c2);
-        }
-
-        pk = psi + k;
-        _sse_store_dble((*pk).c1);
-        _sse_store_up_dble((*pk).c2);
+        _sse_mulc_vector_add_dble((*pj).c1);
+        _sse_mulc_vector_add_up_dble((*pj).c2);
       }
 
-      for (k = 0; k < n; k++) {
-        pj = ppk[0] + ix;
-        z = v + k;
+      pk = psi + k;
+      _sse_store_dble((*pk).c1);
+      _sse_store_up_dble((*pk).c2);
+    }
 
+    for (k = 0; k < n; k++) {
+      pj = ppk[0] + ix;
+      z = v + k;
+
+      _sse_load_cmplx_dble(*z);
+      _sse_load_dble((*pj).c3);
+      _sse_load_up_dble((*pj).c4);
+      _sse_mulc_vector_dble();
+      _sse_mulc_vector_up_dble();
+
+      for (j = 1; j < n; j++) {
+        pj = ppk[j] + ix;
+        z += n;
         _sse_load_cmplx_dble(*z);
-        _sse_load_dble((*pj).c3);
-        _sse_load_up_dble((*pj).c4);
-        _sse_mulc_vector_dble();
-        _sse_mulc_vector_up_dble();
-
-        for (j = 1; j < n; j++) {
-          pj = ppk[j] + ix;
-          z += n;
-          _sse_load_cmplx_dble(*z);
-          _sse_mulc_vector_add_dble((*pj).c3);
-          _sse_mulc_vector_add_up_dble((*pj).c4);
-        }
-
-        pk = psi + k;
-        _sse_store_dble((*pk).c3);
-        _sse_store_up_dble((*pk).c4);
+        _sse_mulc_vector_add_dble((*pj).c3);
+        _sse_mulc_vector_add_up_dble((*pj).c4);
       }
 
-      for (k = 0; k < n; k++) {
-        pk = psi + k;
-        pj = ppk[k] + ix;
+      pk = psi + k;
+      _sse_store_dble((*pk).c3);
+      _sse_store_up_dble((*pk).c4);
+    }
 
-        _sse_load_dble((*pk).c1);
-        _sse_load_up_dble((*pk).c2);
-        _sse_store_dble((*pj).c1);
-        _sse_store_up_dble((*pj).c2);
+    for (k = 0; k < n; k++) {
+      pk = psi + k;
+      pj = ppk[k] + ix;
 
-        _sse_load_dble((*pk).c3);
-        _sse_load_up_dble((*pk).c4);
-        _sse_store_dble((*pj).c3);
-        _sse_store_up_dble((*pj).c4);
-      }
+      _sse_load_dble((*pk).c1);
+      _sse_load_up_dble((*pk).c2);
+      _sse_store_dble((*pj).c1);
+      _sse_store_up_dble((*pj).c2);
+
+      _sse_load_dble((*pk).c3);
+      _sse_load_up_dble((*pk).c4);
+      _sse_store_dble((*pj).c3);
+      _sse_store_up_dble((*pj).c4);
     }
   }
 }
@@ -1731,245 +2017,175 @@ void mulmg5_dble(int vol, spinor_dble *s)
 
 complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
 {
-  int n;
-  complex_dble w, z;
   spinor_dble *sm, *smb;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smz[n].re = 0.0;
-    smz[n].im = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isz);
   sm = s + vol;
 
   while (s < sm) {
-    smb = s + BLK_LENGTH;
+    smb = s + 8;
     if (smb > sm)
       smb = sm;
 
-    z.re = 0.0;
-    z.im = 0.0;
+    smz.re = 0.0;
+    smz.im = 0.0;
 
     for (; s < smb; s++) {
-      z.re += (_vector_prod_re((*s).c1, (*r).c1) +
-               _vector_prod_re((*s).c2, (*r).c2) +
-               _vector_prod_re((*s).c3, (*r).c3) +
-               _vector_prod_re((*s).c4, (*r).c4));
+      smz.re += (_vector_prod_re((*s).c1, (*r).c1) +
+                 _vector_prod_re((*s).c2, (*r).c2) +
+                 _vector_prod_re((*s).c3, (*r).c3) +
+                 _vector_prod_re((*s).c4, (*r).c4));
 
-      z.im += (_vector_prod_im((*s).c1, (*r).c1) +
-               _vector_prod_im((*s).c2, (*r).c2) +
-               _vector_prod_im((*s).c3, (*r).c3) +
-               _vector_prod_im((*s).c4, (*r).c4));
+      smz.im += (_vector_prod_im((*s).c1, (*r).c1) +
+                 _vector_prod_im((*s).c2, (*r).c2) +
+                 _vector_prod_im((*s).c3, (*r).c3) +
+                 _vector_prod_im((*s).c4, (*r).c4));
 
       r += 1;
     }
 
-    cnt[0] += 1;
-    smz[0].re += z.re;
-    smz[0].im += z.im;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smz[n].re += smz[n - 1].re;
-      smz[n].im += smz[n - 1].im;
-
-      cnt[n - 1] = 0;
-      smz[n - 1].re = 0.0;
-      smz[n - 1].im = 0.0;
-    }
+    add_to_hsum(isz, (double *)(&smz));
   }
 
-  w.re = 0.0;
-  w.im = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isz, (double *)(&smz));
+  else
+    local_hsum(isz, (double *)(&smz));
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    w.re += smz[n].re;
-    w.im += smz[n].im;
-  }
-
-  if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&w.re, &z.re, 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&z.re, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return z;
-  } else
-    return w;
+  return smz;
 }
 
 double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
 {
-  int n;
-  double x, y;
   spinor_dble *sm, *smb;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smx[n] = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isx);
   sm = s + vol;
 
   while (s < sm) {
-    smb = s + BLK_LENGTH;
+    smb = s + 8;
     if (smb > sm)
       smb = sm;
 
-    x = 0.0;
+    smx = 0.0;
 
     for (; s < smb; s++) {
-      x += (_vector_prod_re((*s).c1, (*r).c1) +
-            _vector_prod_re((*s).c2, (*r).c2) +
-            _vector_prod_re((*s).c3, (*r).c3) +
-            _vector_prod_re((*s).c4, (*r).c4));
+      smx += (_vector_prod_re((*s).c1, (*r).c1) +
+              _vector_prod_re((*s).c2, (*r).c2) +
+              _vector_prod_re((*s).c3, (*r).c3) +
+              _vector_prod_re((*s).c4, (*r).c4));
 
       r += 1;
     }
 
-    cnt[0] += 1;
-    smx[0] += x;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smx[n] += smx[n - 1];
-
-      cnt[n - 1] = 0;
-      smx[n - 1] = 0.0;
-    }
+    add_to_hsum(isx, &smx);
   }
 
-  y = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isx, &smx);
+  else
+    local_hsum(isx, &smx);
 
-  for (n = 0; n < MAX_LEVELS; n++)
-    y += smx[n];
-
-  if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&y, &x, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&x, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return x;
-  } else
-    return y;
+  return smx;
 }
 
 complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
                                spinor_dble *r)
 {
-  int n;
-  complex_dble w, z;
   spinor_dble *sm, *smb;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smz[n].re = 0.0;
-    smz[n].im = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isz);
   sm = s + vol;
 
   while (s < sm) {
-    smb = s + BLK_LENGTH;
+    smb = s + 8;
     if (smb > sm)
       smb = sm;
 
-    z.re = 0.0;
-    z.im = 0.0;
+    smz.re = 0.0;
+    smz.im = 0.0;
 
     for (; s < smb; s++) {
-      z.re += (_vector_prod_re((*s).c1, (*r).c1) +
-               _vector_prod_re((*s).c2, (*r).c2));
+      smz.re += (_vector_prod_re((*s).c1, (*r).c1) +
+                 _vector_prod_re((*s).c2, (*r).c2));
 
-      z.re -= (_vector_prod_re((*s).c3, (*r).c3) +
-               _vector_prod_re((*s).c4, (*r).c4));
+      smz.re -= (_vector_prod_re((*s).c3, (*r).c3) +
+                 _vector_prod_re((*s).c4, (*r).c4));
 
-      z.im += (_vector_prod_im((*s).c1, (*r).c1) +
-               _vector_prod_im((*s).c2, (*r).c2));
+      smz.im += (_vector_prod_im((*s).c1, (*r).c1) +
+                 _vector_prod_im((*s).c2, (*r).c2));
 
-      z.im -= (_vector_prod_im((*s).c3, (*r).c3) +
-               _vector_prod_im((*s).c4, (*r).c4));
+      smz.im -= (_vector_prod_im((*s).c3, (*r).c3) +
+                 _vector_prod_im((*s).c4, (*r).c4));
 
       r += 1;
     }
 
-    cnt[0] += 1;
-    smz[0].re += z.re;
-    smz[0].im += z.im;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smz[n].re += smz[n - 1].re;
-      smz[n].im += smz[n - 1].im;
-
-      cnt[n - 1] = 0;
-      smz[n - 1].re = 0.0;
-      smz[n - 1].im = 0.0;
-    }
+    add_to_hsum(isz, (double *)(&smz));
   }
 
-  w.re = 0.0;
-  w.im = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isz, (double *)(&smz));
+  else
+    local_hsum(isz, (double *)(&smz));
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    w.re += smz[n].re;
-    w.im += smz[n].im;
-  }
-
-  if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&w.re, &z.re, 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&z.re, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return z;
-  } else
-    return w;
+  return smz;
 }
 
 double norm_square_dble(int vol, int icom, spinor_dble *s)
 {
-  int n;
-  double x, y;
   spinor_dble *sm, *smb;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smx[n] = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isx);
   sm = s + vol;
 
   while (s < sm) {
-    smb = s + BLK_LENGTH;
+    smb = s + 8;
     if (smb > sm)
       smb = sm;
 
-    x = 0.0;
+    smx = 0.0;
 
     for (; s < smb; s++) {
-      x += (_vector_prod_re((*s).c1, (*s).c1) +
-            _vector_prod_re((*s).c2, (*s).c2) +
-            _vector_prod_re((*s).c3, (*s).c3) +
-            _vector_prod_re((*s).c4, (*s).c4));
+      smx += (_vector_prod_re((*s).c1, (*s).c1) +
+              _vector_prod_re((*s).c2, (*s).c2) +
+              _vector_prod_re((*s).c3, (*s).c3) +
+              _vector_prod_re((*s).c4, (*s).c4));
     }
 
-    cnt[0] += 1;
-    smx[0] += x;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smx[n] += smx[n - 1];
-
-      cnt[n - 1] = 0;
-      smx[n - 1] = 0.0;
-    }
+    add_to_hsum(isx, &smx);
   }
 
-  y = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isx, &smx);
+  else
+    local_hsum(isx, &smx);
 
-  for (n = 0; n < MAX_LEVELS; n++)
-    y += smx[n];
-
-  if ((icom == 1) && (NPROC > 1)) {
-    MPI_Reduce(&y, &x, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&x, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return x;
-  } else
-    return y;
+  return smx;
 }
 
 void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r,
@@ -2042,35 +2258,33 @@ void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble *v)
   complex_dble *z;
   spinor_dble *pk, *pj;
 
-  if ((n > nrot) && (ifail == 0))
+  if (n > nrot)
     alloc_wrotate(n);
 
-  if ((n > 0) && (ifail == 0)) {
-    for (ix = 0; ix < vol; ix++) {
-      for (k = 0; k < n; k++) {
-        pk = psi + k;
-        pj = ppk[0] + ix;
-        z = v + k;
+  for (ix = 0; ix < vol; ix++) {
+    for (k = 0; k < n; k++) {
+      pk = psi + k;
+      pj = ppk[0] + ix;
+      z = v + k;
 
-        _vector_mulc((*pk).c1, *z, (*pj).c1);
-        _vector_mulc((*pk).c2, *z, (*pj).c2);
-        _vector_mulc((*pk).c3, *z, (*pj).c3);
-        _vector_mulc((*pk).c4, *z, (*pj).c4);
+      _vector_mulc((*pk).c1, *z, (*pj).c1);
+      _vector_mulc((*pk).c2, *z, (*pj).c2);
+      _vector_mulc((*pk).c3, *z, (*pj).c3);
+      _vector_mulc((*pk).c4, *z, (*pj).c4);
 
-        for (j = 1; j < n; j++) {
-          pj = ppk[j] + ix;
-          z += n;
+      for (j = 1; j < n; j++) {
+        pj = ppk[j] + ix;
+        z += n;
 
-          _vector_mulc_assign((*pk).c1, *z, (*pj).c1);
-          _vector_mulc_assign((*pk).c2, *z, (*pj).c2);
-          _vector_mulc_assign((*pk).c3, *z, (*pj).c3);
-          _vector_mulc_assign((*pk).c4, *z, (*pj).c4);
-        }
+        _vector_mulc_assign((*pk).c1, *z, (*pj).c1);
+        _vector_mulc_assign((*pk).c2, *z, (*pj).c2);
+        _vector_mulc_assign((*pk).c3, *z, (*pj).c3);
+        _vector_mulc_assign((*pk).c4, *z, (*pj).c4);
       }
-
-      for (k = 0; k < n; k++)
-        *(ppk[k] + ix) = psi[k];
     }
+
+    for (k = 0; k < n; k++)
+      *(ppk[k] + ix) = psi[k];
   }
 }
 

@@ -346,6 +346,12 @@ void read_rw_parms(int irw)
       error_root(nfct < 1, 1, "read_rw_parms [rw_parms.c]",
                  "No data on line with tag np");
     }
+  } else {
+    idr = 0;
+    im0 = 0;
+    nsrc = 0;
+    irp = 0;
+    nfct = 0;
   }
 
   if (NPROC > 1) {

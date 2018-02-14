@@ -3,7 +3,7 @@
 *
 * File mutils.c
 *
-* Copyright (C) 2005, 2007, 2008, 2011, 2013 Martin Luescher
+* Copyright (C) 2005, 2007, 2008, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -89,11 +89,9 @@
 *     the file pointer is positioned at the next line. When called on other
 *     processes, the program does nothing.
 *
-*   int copy_file(char *in,char *out)
-*     Copies the file "in" to the file "out" in binary mode. The return
-*     value is 0 if no I/O error is detected and 1 otherwise, in which
-*     case the error can also be detected by the error_chk() [utils.c]
-*     function.
+*   void copy_file(char *in,char *out)
+*     Copies the file "in" to the file "out" in binary mode. An error occurs
+*     if the file copy is not successful.
 *
 * Notes:
 *
@@ -213,11 +211,9 @@ void check_dir(char *dir)
   nc = sprintf(text, "Unable to access directory ");
   strncpy(text + nc, dir, 512 - nc);
   text[511] = '\0';
-
   error_loc(tmp == NULL, 1, "check_dir [mutils.c]", text);
-  error_chk();
-
   fclose(tmp);
+
   if (n == 1)
     remove(tmp_file);
   free(tmp_file);
@@ -638,25 +634,18 @@ void read_dprms(char *tag, int n, double *dprms)
   }
 }
 
-int copy_file(char *in, char *out)
+void copy_file(char *in, char *out)
 {
   int c;
   FILE *fin, *fout;
 
   fin = fopen(in, "rb");
-
-  if (fin == NULL) {
-    error_loc(1, 1, "copy_file [mutils.c]", "Unable to open input file");
-    return 1;
-  }
+  error_loc(fin == NULL, 1, "copy_file [mutils.c]",
+            "Unable to open input file");
 
   fout = fopen(out, "wb");
-
-  if (fout == NULL) {
-    error_loc(1, 1, "copy_file [mutils.c]", "Unable to open output file");
-    fclose(fin);
-    return 1;
-  }
+  error_loc(fout == NULL, 1, "copy_file [mutils.c]",
+            "Unable to open output file");
 
   c = getc(fin);
 
@@ -668,11 +657,6 @@ int copy_file(char *in, char *out)
   if ((ferror(fin) == 0) && (ferror(fout) == 0)) {
     fclose(fin);
     fclose(fout);
-    return 0;
-  } else {
+  } else
     error_loc(1, 1, "copy_file [mutils.c]", "Read or write error");
-    fclose(fin);
-    fclose(fout);
-    return 1;
-  }
 }
