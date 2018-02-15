@@ -37,7 +37,7 @@ SU3FCTS = su3prod
 
 #RANDOM = ranlux ranlxs ranlxd gauss
 
-UTILS = utils
+UTILS = utils error
 
 MODULES = $(ARCHIVE) $(BLOCK) $(DFL) $(DIRAC) $(FLAGS) $(FORCES) \
           $(LATTICE) $(LINALG) $(LINSOLV) $(LITTLE) $(MDFLDS) $(RANDOM) \

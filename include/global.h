@@ -16,14 +16,14 @@
 #define GLOBAL_H
 
 #define NPROC0 2
-#define NPROC1 1
+#define NPROC1 2
 #define NPROC2 1
 #define NPROC3 1
 
-#define L0 4
+#define L0 8
 #define L1 8
-#define L2 8
-#define L3 8
+#define L2 16
+#define L3 16
 
 #define NPROC0_BLK 1
 #define NPROC1_BLK 1

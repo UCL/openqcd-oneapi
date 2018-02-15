@@ -538,8 +538,8 @@ static void start_hmc(double *act0, su3_dble *uold)
   if ((cpr[0] == (NPROC0 - 1)) && ((bc_type() == 1) || (bc_type() == 2)))
     cm3x3_assign(3, udb + 4 * VOLUME + 7 * (BNDRY / 4), ubnd);
 
-  error_root(query_flags(UD_PHASE_SET) == 1, 1, "start_hmc [hmc.c]",
-             "Phase-set initial configuration");
+  error_root(query_flags(UD_IS_CLEAN) == 0, 1, "start_hmc [hmc.c]",
+             "Modified (phase|smearing) initial configuration");
 
   if (npf != 0)
     set_ud_phase();

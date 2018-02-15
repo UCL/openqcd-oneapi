@@ -484,9 +484,9 @@ int shift_ud(int *s)
   error_root((sr[0] != 0) && (bc_type() != 3), 1, "shift_ud [shift.c]",
              "Shifts in time are only permitted for periodic bc");
 
-  error_root((sr[0] != 0) && (query_flags(UD_PHASE_SET) != 0), 1,
-             "shift_ud [shift.c]",
-             "Attempt to move sign-changed link variables in time");
+  error_root(
+      (sr[0] != 0) && (query_flags(UD_IS_CLEAN) == 0), 1, "shift_ud [shift.c]",
+      "Attempt to move modified (phase|smearing) link variables in time");
 
   get_udlinks();
   n = 0;

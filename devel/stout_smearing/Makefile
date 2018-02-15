@@ -36,11 +36,13 @@ UFLDS = uflds udcom plaq_sum
 
 SFLDS = sflds
 
+VFLDS = vinit
+
 SU3FCTS = chexp su3prod su3ren cm3x3 random_su3
 
 RANDOM = ranlux ranlxs ranlxd gauss
 
-UTILS = endian mutils utils wspace
+UTILS = endian error hsum mutils utils wspace
 
 MDFLDS = mdflds fcom
 

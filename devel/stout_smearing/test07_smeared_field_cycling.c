@@ -26,6 +26,7 @@
 int main(int argc, char *argv[])
 {
   int my_rank, i;
+  double theta[3] = {0.0, 0.0, 0.0};
   su3_dble **sfields;
   su3_dble *ud;
   su3_dble* ud_adresses[7];
@@ -46,8 +47,8 @@ int main(int argc, char *argv[])
     printf("\n-------------------------------------------\n\n");
   }
 
-  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL);
-  set_stout_smearing_parms(6, 0., 0.25);
+  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL, theta);
+  set_stout_smearing_parms(6, 0., 0.25, 1, 1);
 
   geometry();
 

@@ -308,6 +308,7 @@ static void mult_ud_phase(void)
   ud = udfld();
   um = ud + 4 * VOLUME;
 
+  /* Multiply ud phase on the links in the bulk */
   for (; ud < um;) {
     ud += 2;
 
@@ -318,19 +319,68 @@ static void mult_ud_phase(void)
       ud += 1;
     }
   }
+
+  /* Multiply the type 1 boundary links with a phase */
+  ud = udfld() + 4 * VOLUME + FACE0 / 2;
+
+  um = ud + FACE1 / 2;
+  for (; ud < um; ud++)
+    cm3x3_mulc(phase + 0, ud, ud);
+
+  um = ud + FACE2 / 2;
+  for (; ud < um; ud++)
+    cm3x3_mulc(phase + 1, ud, ud);
+
+  um = ud + FACE3 / 2;
+  for (; ud < um; ud++)
+    cm3x3_mulc(phase + 2, ud, ud);
+
+  /* Then multiply type 2 boundary links */
+  um = ud + 3 * FACE0;
+  for (; ud < um;) {
+    for (k = 0; k < 3; ++k) {
+      cm3x3_mulc(phase + k, ud, ud);
+      ud += 1;
+    }
+  }
+
+  um = ud + 3 * FACE1;
+  for (; ud < um;) {
+    ud += 1;
+    cm3x3_mulc(phase + 1, ud, ud);
+    ud += 1;
+    cm3x3_mulc(phase + 2, ud, ud);
+    ud += 1;
+  }
+
+  um = ud + 3 * FACE2;
+  for (; ud < um;) {
+    ud += 1;
+    cm3x3_mulc(phase + 0, ud, ud);
+    ud += 1;
+    cm3x3_mulc(phase + 2, ud, ud);
+    ud += 1;
+  }
+
+  um = ud + 3 * FACE3;
+  for (; ud < um;) {
+    ud += 1;
+    cm3x3_mulc(phase + 0, ud, ud);
+    ud += 1;
+    cm3x3_mulc(phase + 1, ud, ud);
+    ud += 1;
+  }
 }
 
-static void chs_ud0(void)
+static void change_sign_links(su3_dble *ud, int *links, int num_links)
 {
-  int nlks, *lks, *lkm;
-  su3_dble *ud, *vd;
+  int *links_max;
+  su3_dble *vd;
 
-  lks = bnd_lks(&nlks);
-  lkm = lks + nlks;
-  ud = udfld();
+  links_max = links + num_links;
 
-  for (; lks < lkm; lks++) {
-    vd = ud + (*lks);
+  for (; links < links_max; links++) {
+    vd = ud + (*links);
 
     (*vd).c11.re = -(*vd).c11.re;
     (*vd).c11.im = -(*vd).c11.im;
@@ -355,6 +405,22 @@ static void chs_ud0(void)
   }
 }
 
+static void chs_ud0(void)
+{
+  int num_links, *links;
+  su3_dble *ud;
+
+  ud = udfld();
+
+  /* Change links in bulk */
+  links = bnd_lks(&num_links);
+  change_sign_links(ud, links, num_links);
+
+  /* Change links in the boundary */
+  links = bnd_bnd_lks(&num_links);
+  change_sign_links(ud, links, num_links);
+}
+
 void set_ud_phase(void)
 {
   int bc, is;
@@ -362,6 +428,10 @@ void set_ud_phase(void)
   bc_parms_t bcp;
 
   if (query_flags(UD_PHASE_SET) == 0) {
+
+    if (query_flags(UDBUF_UP2DATE) == 0)
+      copy_bnd_ud();
+
     bcp = bc_parms();
     bc = bcp.type;
     is = set_phase(1, bcp.theta);
@@ -382,7 +452,6 @@ void set_ud_phase(void)
     if (bc == 3)
       chs_ud0();
 
-    set_flags(UPDATED_UD);
     set_flags(SET_UD_PHASE);
   }
 }
@@ -393,7 +462,11 @@ void unset_ud_phase(void)
   bc_parms_t bcp;
 
   if (query_flags(UD_PHASE_SET) == 1) {
-    set_flags(UNSET_UD_PHASE);
+
+    error(
+        query_flags(UDBUF_UP2DATE) == 0, 1, "unset_ud_phase [uflds.c]",
+        "Trying to unset ud phase for a config where the boundary is not up to "
+        "date. This means an update has happened on a dirty configuration.");
 
     bcp = bc_parms();
     bc = bcp.type;
@@ -409,7 +482,7 @@ void unset_ud_phase(void)
     if (bc == 3)
       chs_ud0();
 
-    set_flags(UPDATED_UD);
+    set_flags(UNSET_UD_PHASE);
   }
 }
 
@@ -418,7 +491,8 @@ void renormalize_ud(void)
   int bc, ix, t, ifc;
   su3_dble *ud;
 
-  if (query_flags(UD_PHASE_SET) == 0) {
+  if (query_flags(UD_IS_CLEAN) == 1) {
+
     bc = bc_type();
     ud = udfld();
 
@@ -457,8 +531,9 @@ void renormalize_ud(void)
 
     set_flags(UPDATED_UD);
   } else
-    error(1, 1, "renormalize_ud [udflds.c]",
-          "Attempt to renormalize non-unimodular link variables");
+    error(1, 1, "renormalize_ud [udflds.c]", "Attempt to renormalize dirty "
+                                             "(smeared or phase transformed) "
+                                             "link variables");
 }
 
 void assign_ud2u(void)
@@ -498,7 +573,7 @@ void assign_ud2u(void)
   set_flags(ASSIGNED_UD2U);
 }
 
-extern void swap_udfld(su3_dble **new_field)
+void swap_udfld(su3_dble **new_field)
 {
   su3_dble *tmp = udb;
   udb = (*new_field);

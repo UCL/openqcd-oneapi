@@ -110,7 +110,7 @@ LIBPATH = $(MPI_HOME)/lib
 
 CFLAGS = -std=c89 -pedantic -fstrict-aliasing \
          -Wall -Wno-long-long -Wstrict-prototypes -Werror \
-         -O -mno-avx -Dx64 -DPM
+         -O2 -mno-avx -DAVX -DFMA3 -DPM
 
 LFLAGS =
 

@@ -102,7 +102,7 @@ typedef union
   double r[18];
 } umat_t;
 
-static int init0 = 0, nlks, *lks;
+static int init0 = 0, nlks, *lks, nbclks, *bclks;
 static int init1 = 0, npts, *pts;
 static int init2 = 0;
 static const su3_dble ud0 = {{0.0}};
@@ -112,18 +112,26 @@ static su3_dble ubnd[2][3];
 
 static void alloc_lks(void)
 {
-  int ix, t, *lk;
+  int ix, iy, t, *lk;
+  int pidx[4];
 
   error(iup[0][0] == 0, 1, "alloc_lks [bcnds.c]",
         "Geometry arrays are not set");
 
   if ((cpr[0] == 0) || (cpr[0] == (NPROC0 - 1))) {
-    if (NPROC0 > 1)
-      nlks = (L1 * L2 * L3) / 2;
-    else
-      nlks = L1 * L2 * L3;
+    nlks = (L1 * L2 * L3) / 2;
+    nbclks = 0;
+
+    if (cpr[0] == (NPROC0 - 1)) {
+      nlks += (NPROC0 == 1) * (L1 * L2 * L3 / 2);
+      nbclks += (FACE0 > 0) * (L1 * L2 * L3 / 2);
+      nbclks += (FACE1 > 0) * L2 * L3;
+      nbclks += (FACE2 > 0) * L1 * L3;
+      nbclks += (FACE3 > 0) * L1 * L2;
+    }
 
     lks = malloc(nlks * sizeof(*lks));
+    bclks = malloc(nbclks * sizeof(*bclks));
 
     if (lks != NULL) {
       lk = lks;
@@ -140,9 +148,61 @@ static void alloc_lks(void)
         }
       }
     }
+
+    /* Links on the boundary that crosses the temporal boundary */
+    if ((nbclks != 0) && (bclks != NULL)) {
+      lk = bclks;
+
+      /* Type 1 links at FACE0 */
+      for (ix = 0; ix < FACE0 / 2; ix++) {
+        (*lk) = 4 * VOLUME + ix;
+        lk += 1;
+      }
+
+      /* Type 2 links at the spatial faces pointing in t-dir at the time
+       * boundary */
+
+      /* Type 2 links at FACE1 */
+      if (FACE1 != 0) {
+        for (ix = 0; ix < L2; ++ix) {
+          for (iy = 0; iy < L3; ++iy) {
+            plaq_uidx(0, ipt[iy + L3 * (ix + L2 * (L1 - 1 + L1 * (L0 - 1)))],
+                      pidx);
+            (*lk) = pidx[3];
+            lk += 1;
+          }
+        }
+      }
+
+      /* Type 2 links at FACE2 */
+      if (FACE2 != 0) {
+        for (ix = 0; ix < L1; ++ix) {
+          for (iy = 0; iy < L3; ++iy) {
+            plaq_uidx(1, ipt[iy + L3 * ((L2 - 1) + L2 * (ix + L1 * (L0 - 1)))],
+                      pidx);
+            (*lk) = pidx[3];
+            lk += 1;
+          }
+        }
+      }
+
+      /* Type 2 links at FACE3 */
+      if (FACE3 != 0) {
+        for (ix = 0; ix < L1; ++ix) {
+          for (iy = 0; iy < L2; ++iy) {
+            plaq_uidx(2, ipt[(L3 - 1) + L3 * (iy + L2 * (ix + L1 * (L0 - 1)))],
+                      pidx);
+            (*lk) = pidx[3];
+            lk += 1;
+          }
+        }
+      }
+    }
   } else {
     nlks = 0;
+    nbclks = 0;
     lks = NULL;
+    bclks = NULL;
   }
 
   error((nlks > 0) && (lks == NULL), 1, "alloc_lks [bcnds.c]",
@@ -196,6 +256,16 @@ int *bnd_lks(int *n)
   (*n) = nlks;
 
   return lks;
+}
+
+int *bnd_bnd_lks(int *n)
+{
+  if (init0 == 0)
+    alloc_lks();
+
+  (*n) = nbclks;
+
+  return bclks;
 }
 
 int *bnd_pts(int *n)
@@ -378,8 +448,8 @@ void set_bc(void)
 {
   int bc, it;
 
-  error_root(query_flags(UD_PHASE_SET) == 1, 1, "set_bc [bcnds.c]",
-             "Gauge configuration must not be phase-set");
+  error_root(query_flags(UD_IS_CLEAN) == 0, 1, "set_bc [bcnds.c]",
+             "Gauge configuration must not be modified (phase|smearing)");
   bc = bc_type();
 
   if (bc == 0)
@@ -457,8 +527,8 @@ int check_bc(double tol)
   int bc, it, is;
   double dprms[1];
 
-  error_root(query_flags(UD_PHASE_SET) == 1, 1, "check_bc [bcnds.c]",
-             "Gauge configuration must not be phase-set");
+  error_root(query_flags(UD_IS_CLEAN) == 0, 1, "check_bc [bcnds.c]",
+             "Gauge configuration must not be modified (phase|smearing)");
 
   if (NPROC > 1) {
     dprms[0] = tol;

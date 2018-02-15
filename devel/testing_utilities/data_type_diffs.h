@@ -20,6 +20,7 @@ extern double norm_diff_su3(su3_dble const *l, su3_dble const *r);
 extern double abs_diff_su3_alg(su3_alg_dble const *l, su3_alg_dble const *r);
 
 extern size_t index_diff_array_int(int l[], int r[], size_t N);
-extern size_t index_diff_array_double(double l[], double r[], size_t N, double eps);
+extern size_t index_diff_array_double(double l[], double r[], size_t N,
+                                      double eps);
 
 #endif /* DATA_TYPE_DIFFS_H */

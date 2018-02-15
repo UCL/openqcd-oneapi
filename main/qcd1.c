@@ -469,6 +469,10 @@ static void read_bc_parms(void)
       read_line("cF'", "%lf", &cF_prime);
     }
 
+    theta[0] = 0.0;
+    theta[1] = 0.0;
+    theta[2] = 0.0;
+
     read_dprms("theta", 3, theta);
   }
 

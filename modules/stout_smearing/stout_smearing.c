@@ -168,13 +168,15 @@ static void cycle_smeared_fields(int direction)
 
   sfields = smeared_fields();
 
-  sign_flipped_q = chs_ubnd(1);
+  sign_flipped_q = query_flags(UD_PHASE_SET);
+  if (sign_flipped_q == 1)
+    unset_ud_phase();
 
   for (; begin != end; begin += dir)
     swap_udfld(sfields + begin);
 
   if (sign_flipped_q == 1)
-    chs_ubnd(-1);
+    set_ud_phase();
 }
 
 /* Summary:
@@ -200,7 +202,9 @@ static void compute_and_apply_smearing(void)
       copy_bnd_ud();
 
     /* Default boundaries before smearing */
-    sign_flipped_q = chs_ubnd(1);
+    sign_flipped_q = query_flags(UD_PHASE_SET);
+    if (sign_flipped_q == 1)
+      unset_ud_phase();
 
     sfields = smeared_fields();
     ch_coeffs = smearing_ch_coeff_fields();
@@ -213,7 +217,7 @@ static void compute_and_apply_smearing(void)
 
     /* Reapply boundaries after smearing */
     if (sign_flipped_q != 0)
-      chs_ubnd(-1);
+      set_ud_phase();
   }
 
   set_flags(SMEARED_UD);

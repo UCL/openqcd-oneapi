@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
 {
   int my_rank, ix;
   double npl, nlinks;
+  double theta[3] = {0.0, 0.0, 0.0};
   double plaq_temp_o, plaq_temp_r, plaq_temp_diff, config_temp_diff;
   double plaq_total_o, plaq_total_r, plaq_total_diff, config_total_diff;
   stout_smearing_params_t stout_params;
@@ -48,8 +49,8 @@ int main(int argc, char *argv[])
     printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
   }
 
-  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL);
-  set_stout_smearing_parms(3, 0., 0.25);
+  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL, theta);
+  set_stout_smearing_parms(3, 0., 0.25, 1, 1);
 
   geometry();
   npl = (double)(6 * N0 * N1) * (double)(N2 * N3);
@@ -82,7 +83,7 @@ int main(int argc, char *argv[])
   MPI_Reduce(&config_temp_diff, &config_total_diff, 1, MPI_DOUBLE, MPI_SUM, 0,
              MPI_COMM_WORLD);
 
-  stout_params = sout_smearing_parms();
+  stout_params = stout_smearing_parms();
 
   if (my_rank == 0) {
     printf("Check of smear_fields() with rho_t = %.2f, rho_s = %.2f, n = %d:\n",

@@ -130,8 +130,9 @@ void write_cnfg(char *out)
   double plaq;
   FILE *fout;
 
-  error_root(query_flags(UD_PHASE_SET) == 1, 1, "write_cnfg [archive.c]",
-             "Attempt to write phase-modified gauge field");
+  error_root(query_flags(UD_IS_CLEAN) == 0, 1, "write_cnfg [archive.c]",
+             "Attempt to write modified (phase|smearing) gauge field");
+
   fout = fopen(out, "wb");
   error_loc(fout == NULL, 1, "write_cnfg [archive.c]",
             "Unable to open output file");
@@ -314,8 +315,8 @@ void export_cnfg(char *out)
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-  error_root(query_flags(UD_PHASE_SET) == 1, 1, "export_cnfg [archive.c]",
-             "Attempt to export phase-modified gauge field");
+  error_root(query_flags(UD_IS_CLEAN) == 0, 1, "export_cnfg [archive.c]",
+             "Attempt to export a modified (phase|smearing) gauge field");
 
   if (ubuf == NULL) {
     check_machine();

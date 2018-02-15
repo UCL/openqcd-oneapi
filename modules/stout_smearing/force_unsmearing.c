@@ -520,7 +520,10 @@ void unsmear_force(su3_alg_dble *force)
    * fields have already been computed */
   smear_fields();
 
-  sign_flipped_q = chs_ubnd(1);
+  sign_flipped_q = query_flags(UD_PHASE_SET);
+
+  if (sign_flipped_q)
+    unset_ud_phase();
 
   sfields = smeared_fields();
   ch_coeffs = smearing_ch_coeff_fields();
@@ -534,7 +537,7 @@ void unsmear_force(su3_alg_dble *force)
   }
 
   if (sign_flipped_q == 1)
-    chs_ubnd(-1);
+    set_ud_phase();
 }
 
 /* Summary:

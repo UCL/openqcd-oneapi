@@ -51,9 +51,9 @@ static void GridAssignedSwd2swbgr(void)
     error_root(1, 1, "GridAssignedSwd2swbgr [grid_events.h]",
                "Event involving shared fields");
   else {
-    (*gf).sw[0] = lat.swd[0];
-    (*gf).sw[1] = lat.swd[1];
-    (*gf).sw[2] = lat.swd[2];
+    (*gf).sw.state = lat.swd.state;
+    (*gf).sw.even_flag = lat.swd.even_flag;
+    (*gf).sw.odd_flag = lat.swd.odd_flag;
   }
 }
 
@@ -63,9 +63,9 @@ static void GridAssignedSwd2swdbgr(void)
     error_root(1, 1, "GridAssignedSwd2swdbgr [grid_events.h]",
                "Event involving shared fields");
   else {
-    (*gf).swd[0] = lat.swd[0];
-    (*gf).swd[1] = lat.swd[1];
-    (*gf).swd[2] = lat.swd[2];
+    (*gf).swd.state = lat.swd.state;
+    (*gf).swd.even_flag = lat.swd.even_flag;
+    (*gf).swd.odd_flag = lat.swd.odd_flag;
   }
 }
 
@@ -75,7 +75,7 @@ static void GridInvertedSwdE(void)
     error_root(1, 1, "GridInvertedSwdE [grid_events.h]",
                "Event involving shared fields");
   else
-    (*gf).swd[1] ^= 0x1;
+    (*gf).swd.even_flag ^= 0x1;
 }
 
 static void GridInvertedSwdO(void)
@@ -84,7 +84,7 @@ static void GridInvertedSwdO(void)
     error_root(1, 1, "GridInvertedSwdO [grid_events.h]",
                "Event involving shared fields");
   else
-    (*gf).swd[2] ^= 0x1;
+    (*gf).swd.odd_flag ^= 0x1;
 }
 
 static void GridInvertedSwE(void)
@@ -93,7 +93,7 @@ static void GridInvertedSwE(void)
     error_root(1, 1, "GridInvertedSwE [grid_events.h]",
                "Event involving shared fields");
   else
-    (*gf).sw[1] ^= 0x1;
+    (*gf).sw.even_flag ^= 0x1;
 }
 
 static void GridInvertedSwO(void)
@@ -102,7 +102,7 @@ static void GridInvertedSwO(void)
     error_root(1, 1, "GridInvertedSwO [grid_events.h]",
                "Event involving shared fields");
   else
-    (*gf).sw[2] ^= 0x1;
+    (*gf).sw.odd_flag ^= 0x1;
 }
 
 static void GridErasedSw(void)
@@ -111,9 +111,10 @@ static void GridErasedSw(void)
     error_root(1, 1, "GridErasedSw [grid_events.h]",
                "Event involving shared fields");
   else {
-    (*gf).sw[0] = 0;
-    (*gf).sw[1] = 0;
-    (*gf).sw[2] = 0;
+    (*gf).sw.state.tag = 0;
+    (*gf).sw.state.state = 0;
+    (*gf).sw.even_flag = 0;
+    (*gf).sw.odd_flag = 0;
   }
 }
 
@@ -123,9 +124,10 @@ static void GridErasedSwd(void)
     error_root(1, 1, "GridErasedSwd [grid_events.h]",
                "Event involving shared fields");
   else {
-    (*gf).swd[0] = 0;
-    (*gf).swd[1] = 0;
-    (*gf).swd[2] = 0;
+    (*gf).swd.state.tag = 0;
+    (*gf).swd.state.state = 0;
+    (*gf).swd.even_flag = 0;
+    (*gf).swd.odd_flag = 0;
   }
 }
 

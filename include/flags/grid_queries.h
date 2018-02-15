@@ -16,6 +16,13 @@
 
 #if (defined FLAGS_C)
 
+static int check_grid_state(cfg_state_t const *state1,
+                            cfg_state_t const *state2)
+{
+  return ((*state1).tag == (*state2).tag) &&
+         ((*state1).state == (*state2).state);
+}
+
 static int (*grid_query_fcts[(int)(QUERIES) + 1])(void) = {NULL};
 
 static int GridQueryUbgrMatchUd(void)
@@ -25,7 +32,7 @@ static int GridQueryUbgrMatchUd(void)
               "Query involving shared fields");
     return -1;
   } else
-    return ((*gf).u == lat.ud);
+    return check_grid_state(&(*gf).u, &lat.ud);
 }
 
 static int GridQueryUdbgrMatchUd(void)
@@ -35,7 +42,7 @@ static int GridQueryUdbgrMatchUd(void)
               "Query involving shared fields");
     return -1;
   } else
-    return ((*gf).ud == lat.ud);
+    return check_grid_state(&(*gf).ud, &lat.ud);
 }
 
 static int GridQuerySwUp2date(void)
@@ -45,7 +52,7 @@ static int GridQuerySwUp2date(void)
               "Query involving shared fields");
     return -1;
   } else
-    return ((*gf).sw[0] == (*gf).u);
+    return check_grid_state(&(*gf).sw.state, &(*gf).u);
 }
 
 static int GridQuerySwEInverted(void)
@@ -55,7 +62,7 @@ static int GridQuerySwEInverted(void)
               "Query involving shared fields");
     return -1;
   } else
-    return ((*gf).sw[1] == 1);
+    return ((*gf).sw.even_flag == 1);
 }
 
 static int GridQuerySwOInverted(void)
@@ -65,7 +72,7 @@ static int GridQuerySwOInverted(void)
               "Query involving shared fields");
     return -1;
   } else
-    return ((*gf).sw[2] == 1);
+    return ((*gf).sw.odd_flag == 1);
 }
 
 static int GridQuerySwdUp2date(void)
@@ -75,7 +82,7 @@ static int GridQuerySwdUp2date(void)
               "Query involving shared fields");
     return -1;
   } else
-    return ((*gf).swd[0] == (*gf).ud);
+    return check_grid_state(&(*gf).swd.state, &(*gf).ud);
 }
 
 static int GridQuerySwdEInverted(void)
@@ -85,7 +92,7 @@ static int GridQuerySwdEInverted(void)
               "Query involving shared fields");
     return -1;
   } else
-    return ((*gf).swd[1] == 1);
+    return ((*gf).swd.even_flag == 1);
 }
 
 static int GridQuerySwdOInverted(void)
@@ -95,7 +102,7 @@ static int GridQuerySwdOInverted(void)
               "Query involving shared fields");
     return -1;
   } else
-    return ((*gf).swd[2] == 1);
+    return ((*gf).swd.odd_flag == 1);
 }
 
 static void set_grid_queries(void)
