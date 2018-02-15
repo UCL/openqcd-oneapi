@@ -3,7 +3,7 @@
 *
 * File frcfcts.c
 *
-* Copyright (C) 2005, 2011, 2012 Martin Luescher, Stefan Schaefer
+* Copyright (C) 2005, 2011, 2012, 2016 Martin Luescher, Stefan Schaefer
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -66,8 +66,8 @@
 #include "forces.h"
 #include "flags.h"
 
-static su3_vector_dble psi1, psi2, chi1, chi2 ALIGNED16;
-static pauli_dble ms[2] ALIGNED16;
+#define _re(z, w) ((z).re * (w).re + (z).im * (w).im)
+#define _im(z, w) ((z).im * (w).re - (z).re * (w).im)
 
 typedef union
 {
@@ -75,8 +75,11 @@ typedef union
   weyl_dble w[2];
 } spin_t;
 
-#define _re(z, w) ((z).re * (w).re + (z).im * (w).im)
-#define _im(z, w) ((z).im * (w).re - (z).re * (w).im)
+static su3_vector_dble psi1 ALIGNED16;
+static su3_vector_dble psi2 ALIGNED16;
+static su3_vector_dble chi1 ALIGNED16;
+static su3_vector_dble chi2 ALIGNED16;
+static pauli_dble ms[2] ALIGNED16;
 
 void det2xt(pauli_dble *m, u3_alg_dble *X)
 {

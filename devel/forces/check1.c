@@ -3,7 +3,7 @@
 *
 * File check1.c
 *
-* Copyright (C) 2012, 2013 Martin Luescher
+* Copyright (C) 2012, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -282,7 +282,7 @@ static void random_vec(int *svec)
 int main(int argc, char *argv[])
 {
   int my_rank, n, s[4];
-  double phi[2], phi_prime[2], p1, p2;
+  double phi[2], phi_prime[2], theta[3], p1, p2;
   FILE *flog = NULL;
 
   MPI_Init(&argc, &argv);
@@ -315,9 +315,12 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 0.9012, 1.2034, 1.0, 1.0, phi, phi_prime);
-  set_ani_parms(1.2, 1.1);
-  print_bc_parms();
+  theta[0] = 0.0;
+  theta[1] = 0.0;
+  theta[2] = 0.0;
+  set_bc_parms(bc, 0.9012, 1.2034, 1.0, 1.0, phi, phi_prime, theta);
+  set_ani_parms(1, 1.2, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+  print_bc_parms(1);
 
   start_ranlux(0, 12345);
   geometry();
@@ -329,7 +332,6 @@ int main(int argc, char *argv[])
   error((g == NULL) || ((BNDRY != 0) && (gbuf == NULL)), 1, "main [check1.c]",
         "Unable to allocate auxiliary arrays");
 
-  chs_ubnd(-1);
   p1 = action0(1);
   p2 = bnd_action();
 
@@ -339,7 +341,6 @@ int main(int argc, char *argv[])
   }
 
   random_ud();
-  chs_ubnd(-1);
   p1 = action0(1);
   random_g();
   transform_ud();
@@ -361,9 +362,7 @@ int main(int argc, char *argv[])
     random_vec(s);
     if (bc != 3)
       s[0] = 0;
-    chs_ubnd(1);
     shift_ud(s);
-    chs_ubnd(-1);
     p2 = action0(1);
 
     if (my_rank == 0) {

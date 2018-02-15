@@ -3,7 +3,7 @@
 *
 * File check1.c
 *
-* Copyright (C) 2005, 2009, 2011, 2013 Martin Luescher
+* Copyright (C) 2005, 2009, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -42,8 +42,14 @@ typedef union
 } mat_t;
 
 static pauli mp[2] ALIGNED16;
-static spin_t s1, s2, r1, r2 ALIGNED16;
-static spin2_t sd1, sd2, rd1, rd2 ALIGNED16;
+static spin_t s1 ALIGNED16;
+static spin_t s2 ALIGNED16;
+static spin_t r1 ALIGNED16;
+static spin_t r2 ALIGNED16;
+static spin2_t sd1 ALIGNED16;
+static spin2_t sd2 ALIGNED16;
+static spin2_t rd1 ALIGNED16;
+static spin2_t rd2 ALIGNED16;
 static mat_t mv[2] ALIGNED16;
 
 static void cpvec(int n, complex *s, complex *r)

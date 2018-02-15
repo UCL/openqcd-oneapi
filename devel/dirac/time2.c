@@ -1,15 +1,16 @@
+
 /*******************************************************************************
- *
- * File time2.c
- *
- * Copyright (C) 2005, 2008, 2011-2013 Martin Luescher
- *
- * This software is distributed under the terms of the GNU General Public
- * License (GPL)
- *
- * Timing of Dw_dble() and Dwhat_dble().
- *
- *******************************************************************************/
+*
+* File time2.c
+*
+* Copyright (C) 2005, 2008, 2011-2013, 2016 Martin Luescher
+*
+* This software is distributed under the terms of the GNU General Public
+* License (GPL)
+*
+* Timing of Dw_dble() and Dwhat_dble().
+*
+*******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
 {
   int my_rank, bc, count, nt;
   int i, nflds;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   double mu, wt1, wt2, wdt;
   spinor_dble **psd;
   FILE *flog = NULL;
@@ -103,9 +104,12 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime);
-  set_ani_parms(1.2, 1.1);
-  print_bc_parms();
+  theta[0] = 0.35;
+  theta[1] = -1.25;
+  theta[2] = 0.78;
+  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime, theta);
+  set_ani_parms(1, 1.2, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+  print_bc_parms(2);
 
   start_ranlux(0, 12345);
   geometry();
@@ -114,7 +118,7 @@ int main(int argc, char *argv[])
   mu = 0.0785;
 
   random_ud();
-  chs_ubnd(-1);
+  set_ud_phase();
   sw_term(NO_PTS);
 
   nflds = (int)((4 * 1024 * 1024) / (VOLUME * sizeof(double))) + 1;
@@ -145,7 +149,6 @@ int main(int argc, char *argv[])
     nt *= 2;
   }
 
-  error_chk();
   wdt = 4.0e6 * wdt / ((double)(nt) * (double)(nflds * VOLUME));
 
   if (my_rank == 0) {
@@ -172,7 +175,6 @@ int main(int argc, char *argv[])
     nt *= 2;
   }
 
-  error_chk();
   wdt = 4.0e6 * wdt / ((double)(nt) * (double)(nflds * VOLUME));
 
   if (my_rank == 0) {

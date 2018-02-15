@@ -3,7 +3,7 @@
 *
 * File check3.c
 *
-* Copyright (C) 2005, 2008, 2011-2013 Martin Luescher
+* Copyright (C) 2005, 2008, 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 {
   int my_rank, bc, i;
   float mu, d;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   complex z1, z2;
   spinor **ps;
   sw_parms_t swp;
@@ -73,9 +73,12 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime);
-  set_ani_parms(1.0, 2.0);
-  print_bc_parms();
+  theta[0] = 0.35;
+  theta[1] = -1.25;
+  theta[2] = 0.78;
+  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime, theta);
+  set_ani_parms(1, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+  print_bc_parms(2);
 
   start_ranlux(0, 12345);
   geometry();
@@ -90,7 +93,7 @@ int main(int argc, char *argv[])
            swp.cF[0], swp.cF[1]);
 
   random_ud();
-  chs_ubnd(-1);
+  set_ud_phase();
   sw_term(NO_PTS);
   assign_ud2u();
   assign_swd2sw();
@@ -109,7 +112,6 @@ int main(int argc, char *argv[])
   d = (float)(sqrt((double)((z1.re - z2.re) * (z1.re - z2.re) +
                             (z1.im - z2.im) * (z1.im - z2.im))));
   d /= (float)(sqrt((double)(12 * NPROC) * (double)(VOLUME)));
-  error_chk();
 
   if (my_rank == 0)
     printf("Deviation from gamma5-Hermiticity    = %.1e\n", d);
@@ -294,8 +296,6 @@ int main(int argc, char *argv[])
                   -1.0f);
   d = norm_square(VOLUME, 1, ps[1]) / norm_square(VOLUME, 1, ps[2]);
   d = (float)(sqrt((double)(d)));
-
-  error_chk();
 
   if (my_rank == 0) {
     printf("Check of Dw()|eoflg=1                = %.1e\n\n", d);

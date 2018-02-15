@@ -331,7 +331,8 @@ void print_lat_parms(void)
 bc_parms_t set_bc_parms(int type,
                         double cG,double cG_prime,
                         double cF,double cF_prime,
-                        double *phi,double *phi_prime)
+                        double *phi,double *phi_prime,
+                        double *theta)
   Sets the boundary conditions and the associated parameters of the
   action. The parameters are
 
@@ -350,6 +351,10 @@ bc_parms_t set_bc_parms(int type,
     phi_prime[0],  First two angles that define the boundary values of
     phi_prime[1]   the gauge field at time T.
 
+    theta[0],      Angles specifying the phase-periodic boundary
+    theta[1],      conditions for the quark fields in direction 1,2,3.
+    theta[2]
+
   The return value is a structure that contains these parameters plus
   the third angles. In this structure, the improvement coefficients and
   the angles are stored in the form of arrays cG[2],cF[2] and phi[2][3],
@@ -366,8 +371,11 @@ bc_parms_t set_bc_parms(int type,
 bc_parms_t bc_parms(void)
   Returns a structure that contains the boundary parameters.
 
-void print_bc_parms(void)
-  Prints the boundary parameters to stdout on MPI process 0.
+void print_bc_parms(int ipr)
+  Prints the boundary parameters to stdout on MPI process 0. The
+  improvement coefficients cG,cG' are printed if ipr&0x1!=0 and the
+  parameters referring to the quark fields are printed if ipr&0x2!=0.
+  All parameters are printed if ipr=3.
 
 void write_bc_parms(FILE *fdat)
   Writes the boundary parameters to the file fdat on MPI process 0.

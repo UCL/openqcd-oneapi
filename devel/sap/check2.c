@@ -3,7 +3,7 @@
 *
 * File check2.c
 *
-* Copyright (C) 2005, 2008, 2012, 2013 Martin Luescher
+* Copyright (C) 2005, 2008, 2012, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
   int n, ie, itm;
   int bs[4], nmr;
   float mu, res, del[3];
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   spinor **ps;
   tm_parms_t tm;
   FILE *flog = NULL, *fin = NULL;
@@ -87,8 +87,11 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.34;
+  theta[1] = -1.25;
+  theta[2] = 0.58;
+  set_bc_parms(bc, 1.0, 1.0, 0.9012, 1.2034, phi, phi_prime, theta);
+  print_bc_parms(2);
 
   start_ranlux(0, 12345);
   geometry();
@@ -106,7 +109,7 @@ int main(int argc, char *argv[])
       set_tm_parms(0);
 
     random_ud();
-    chs_ubnd(-1);
+    set_ud_phase();
     sw_term(NO_PTS);
     assign_ud2u();
     assign_swd2sw();
@@ -155,8 +158,6 @@ int main(int argc, char *argv[])
         printf("check = %.2e, bnd checks = %.1e,%.1e\n", del[0], del[1],
                del[2]);
     }
-
-    error_chk();
 
     ie = assign_swd2swbgr(SAP_BLOCKS, ODD_PTS);
     error_root(ie, 1, "main [check2.c]",
@@ -207,8 +208,6 @@ int main(int argc, char *argv[])
     if (my_rank == 0)
       printf("\n");
   }
-
-  error_chk();
 
   if (my_rank == 0)
     fclose(flog);

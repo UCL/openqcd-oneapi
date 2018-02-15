@@ -3,7 +3,7 @@
 *
 * File time2.c
 *
-* Copyright (C) 2011-2013 Martin Luescher
+* Copyright (C) 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   int ncy, nmr, bs[4];
   int n, ie;
   float mu;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   double rbb, wt1, wt2, wdt;
   spinor **ps;
   FILE *flog = NULL, *fin = NULL;
@@ -59,7 +59,11 @@ int main(int argc, char *argv[])
 
 #if (defined x64)
 #if (defined AVX)
+#if (defined FMA3)
+    printf("Using AVX and FMA3 instructions\n");
+#else
     printf("Using AVX instructions\n");
+#endif
 #else
     printf("Using SSE3 instructions and 16 xmm registers\n");
 #endif
@@ -102,8 +106,11 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.34;
+  theta[1] = -1.25;
+  theta[2] = 0.58;
+  set_bc_parms(bc, 1.0, 1.0, 0.9012, 1.2034, phi, phi_prime, theta);
+  print_bc_parms(2);
 
   start_ranlux(0, 12345);
   geometry();
@@ -117,7 +124,7 @@ int main(int argc, char *argv[])
                1.0 / (double)(bs[2]) + 1.0 / (double)(bs[3]));
 
   random_ud();
-  chs_ubnd(-1);
+  set_ud_phase();
   sw_term(NO_PTS);
   assign_ud2ubgr(SAP_BLOCKS);
   assign_swd2swbgr(SAP_BLOCKS, NO_PTS);
@@ -149,7 +156,6 @@ int main(int argc, char *argv[])
     nt *= 2;
   }
 
-  error_chk();
   wdt = 2.0e6 * wdt / ((double)(nt) * (double)(ncy * VOLUME));
 
   if (my_rank == 0) {
@@ -186,7 +192,6 @@ int main(int argc, char *argv[])
     nt *= 2;
   }
 
-  error_chk();
   wdt = 2.0e6 * wdt / ((double)(nt) * (double)(ncy * VOLUME));
 
   if (my_rank == 0) {

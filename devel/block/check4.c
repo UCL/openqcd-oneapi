@@ -3,7 +3,7 @@
 *
 * File check4.c
 *
-* Copyright (C) 2005, 2011-2013 Martin Luescher
+* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 {
   int my_rank, bc, n, nb, isw;
   int iset, ifail, bs[4];
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   ptset_t set;
   block_t *b;
   FILE *flog = NULL, *fin = NULL;
@@ -184,8 +184,11 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 1.0, 1.0, 1.301, 0.789, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.0;
+  theta[1] = 0.0;
+  theta[2] = 0.0;
+  set_bc_parms(bc, 1.0, 1.0, 1.301, 0.789, phi, phi_prime, theta);
+  print_bc_parms(0);
 
   start_ranlux(0, 1234);
   geometry();
@@ -229,7 +232,6 @@ int main(int argc, char *argv[])
 
   error(ifail != 0, 1, "main [check4.c]",
         "Some of the inversions were not safe");
-  error_chk();
 
   if (my_rank == 0) {
     printf("No errors detected\n\n");

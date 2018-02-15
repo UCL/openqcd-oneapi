@@ -3,7 +3,7 @@
 *
 * File avx.h
 *
-* Copyright (C) 2013 Martin Luescher
+* Copyright (C) 2013, 2016 Martin Luescher, Isabel Campos
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -21,16 +21,16 @@
 #include "sse2.h"
 #endif
 
-typedef struct
+typedef struct __attribute__((aligned(32)))
 {
   float c1, c2, c3, c4;
   float c5, c6, c7, c8;
-} avx_float __attribute__((aligned(32)));
+} avx_float;
 
-typedef struct
+typedef struct __attribute__((aligned(32)))
 {
   double c1, c2, c3, c4;
-} avx_double __attribute__((aligned(32)));
+} avx_double;
 
 static avx_double _avx_sgn12_dble
     __attribute__((unused)) = {-1.0, -1.0, 1.0, 1.0};
@@ -795,6 +795,96 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 * ymm15 are changed on exit.
 */
 
+#if (defined FMA3)
+
+#define _avx_su3_pair_multiply(ul, uh)                                         \
+  __asm__ __volatile__("vpermilps $0xf5, %%ymm0, %%ymm6 \n\t"                  \
+                       "vpermilps $0xf5, %%ymm1, %%ymm7 \n\t"                  \
+                       "vpermilps $0xf5, %%ymm2, %%ymm8 \n\t"                  \
+                       "vpermilps $0xa0, %%ymm0, %%ymm0 \n\t"                  \
+                       "vpermilps $0xa0, %%ymm1, %%ymm1 \n\t"                  \
+                       "vpermilps $0xa0, %%ymm2, %%ymm2"                       \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2", "xmm6", "xmm7", "xmm8");      \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %1, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm11 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %4, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm14 \n\t"                         \
+                       "vblendps $0xf0, %%ymm12, %%ymm9, %%ymm9 \n\t"          \
+                       "vblendps $0xf0, %%ymm13, %%ymm10, %%ymm10 \n\t"        \
+                       "vblendps $0xf0, %%ymm14, %%ymm11, %%ymm11 \n\t"        \
+                       "vpermilps $0xb1, %%ymm9, %%ymm12 \n\t"                 \
+                       "vpermilps $0xb1, %%ymm10, %%ymm13 \n\t"                \
+                       "vpermilps $0xb1, %%ymm11, %%ymm14"                     \
+                       :                                                       \
+                       : "m"((ul).c11), "m"((ul).c22), "m"((ul).c33),          \
+                         "m"((uh).c11), "m"((uh).c22), "m"((uh).c33)           \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vmulps %%ymm6, %%ymm12, %%ymm3 \n\t"                   \
+                       "vmulps %%ymm7, %%ymm13, %%ymm4 \n\t"                   \
+                       "vmulps %%ymm8, %%ymm14, %%ymm5 \n\t"                   \
+                       "vfmaddsub231ps %%ymm0, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmaddsub231ps %%ymm1, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmaddsub231ps %%ymm2, %%ymm11, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5");                              \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %1, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm14 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %4, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm11 \n\t"                         \
+                       "vblendps $0xf0, %%ymm9, %%ymm12, %%ymm12 \n\t"         \
+                       "vblendps $0xf0, %%ymm10, %%ymm13, %%ymm13 \n\t"        \
+                       "vblendps $0xf0, %%ymm11, %%ymm14, %%ymm14 \n\t"        \
+                       "vpermilps $0xb1, %%ymm12, %%ymm9 \n\t"                 \
+                       "vpermilps $0xb1, %%ymm13, %%ymm10 \n\t"                \
+                       "vpermilps $0xb1, %%ymm14, %%ymm11"                     \
+                       :                                                       \
+                       : "m"((ul).c12), "m"((ul).c23), "m"((ul).c31),          \
+                         "m"((uh).c12), "m"((uh).c23), "m"((uh).c31)           \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vfmaddsub231ps %%ymm7, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmaddsub231ps %%ymm8, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmaddsub231ps %%ymm6, %%ymm11, %%ymm5 \n\t"           \
+                       "vfmaddsub231ps %%ymm1, %%ymm12, %%ymm3 \n\t"           \
+                       "vfmaddsub231ps %%ymm2, %%ymm13, %%ymm4 \n\t"           \
+                       "vfmaddsub231ps %%ymm0, %%ymm14, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5");                              \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %1, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm11 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %4, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm14 \n\t"                         \
+                       "vblendps $0xf0, %%ymm12, %%ymm9, %%ymm9 \n\t"          \
+                       "vblendps $0xf0, %%ymm13, %%ymm10, %%ymm10 \n\t"        \
+                       "vblendps $0xf0, %%ymm14, %%ymm11, %%ymm11 \n\t"        \
+                       "vpermilps $0xb1, %%ymm9, %%ymm12 \n\t"                 \
+                       "vpermilps $0xb1, %%ymm10, %%ymm13 \n\t"                \
+                       "vpermilps $0xb1, %%ymm11, %%ymm14"                     \
+                       :                                                       \
+                       : "m"((ul).c13), "m"((ul).c21), "m"((ul).c32),          \
+                         "m"((uh).c13), "m"((uh).c21), "m"((uh).c32)           \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vfmaddsub231ps %%ymm8, %%ymm12, %%ymm3 \n\t"           \
+                       "vfmaddsub231ps %%ymm6, %%ymm13, %%ymm4 \n\t"           \
+                       "vfmaddsub231ps %%ymm7, %%ymm14, %%ymm5 \n\t"           \
+                       "vfmaddsub231ps %%ymm2, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmaddsub231ps %%ymm0, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmaddsub231ps %%ymm1, %%ymm11, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5")
+
+#else
+
 #define _avx_su3_pair_multiply(ul, uh)                                         \
   __asm__ __volatile__("vbroadcastss %0, %%xmm3 \n\t"                          \
                        "vbroadcastss %1, %%xmm6 \n\t"                          \
@@ -924,6 +1014,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8",       \
                          "xmm9", "xmm10", "xmm11")
 
+#endif
+
 /*
 * Multiplies pairs of su3 vectors, stored in the low and high lanes of
 * ymm0,..,ymm2, by the su3 matrices ul^dagger and uh^dagger, respectively.
@@ -931,6 +1023,96 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 * in the same order in the registers ymm3,..,ymm5. All registers except for
 * ymm15 are changed on exit.
 */
+
+#if (defined FMA3)
+
+#define _avx_su3_pair_inverse_multiply(ul, uh)                                 \
+  __asm__ __volatile__("vpermilps $0xf5, %%ymm0, %%ymm6 \n\t"                  \
+                       "vpermilps $0xf5, %%ymm1, %%ymm7 \n\t"                  \
+                       "vpermilps $0xf5, %%ymm2, %%ymm8 \n\t"                  \
+                       "vpermilps $0xa0, %%ymm0, %%ymm0 \n\t"                  \
+                       "vpermilps $0xa0, %%ymm1, %%ymm1 \n\t"                  \
+                       "vpermilps $0xa0, %%ymm2, %%ymm2"                       \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2", "xmm6", "xmm7", "xmm8");      \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %1, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm11 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %4, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm14 \n\t"                         \
+                       "vblendps $0xf0, %%ymm12, %%ymm9, %%ymm9 \n\t"          \
+                       "vblendps $0xf0, %%ymm13, %%ymm10, %%ymm10 \n\t"        \
+                       "vblendps $0xf0, %%ymm14, %%ymm11, %%ymm11 \n\t"        \
+                       "vpermilps $0xb1, %%ymm9, %%ymm12 \n\t"                 \
+                       "vpermilps $0xb1, %%ymm10, %%ymm13 \n\t"                \
+                       "vpermilps $0xb1, %%ymm11, %%ymm14"                     \
+                       :                                                       \
+                       : "m"((ul).c11), "m"((ul).c22), "m"((ul).c33),          \
+                         "m"((uh).c11), "m"((uh).c22), "m"((uh).c33)           \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vmulps %%ymm0, %%ymm9, %%ymm3 \n\t"                    \
+                       "vmulps %%ymm1, %%ymm10, %%ymm4 \n\t"                   \
+                       "vmulps %%ymm2, %%ymm11, %%ymm5 \n\t"                   \
+                       "vfmsubadd231ps %%ymm6, %%ymm12, %%ymm3 \n\t"           \
+                       "vfmsubadd231ps %%ymm7, %%ymm13, %%ymm4 \n\t"           \
+                       "vfmsubadd231ps %%ymm8, %%ymm14, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5");                              \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %1, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm11 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %4, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm14 \n\t"                         \
+                       "vblendps $0xf0, %%ymm12, %%ymm9, %%ymm9 \n\t"          \
+                       "vblendps $0xf0, %%ymm13, %%ymm10, %%ymm10 \n\t"        \
+                       "vblendps $0xf0, %%ymm14, %%ymm11, %%ymm11 \n\t"        \
+                       "vpermilps $0xb1, %%ymm9, %%ymm12 \n\t"                 \
+                       "vpermilps $0xb1, %%ymm10, %%ymm13 \n\t"                \
+                       "vpermilps $0xb1, %%ymm11, %%ymm14"                     \
+                       :                                                       \
+                       : "m"((ul).c21), "m"((ul).c32), "m"((ul).c13),          \
+                         "m"((uh).c21), "m"((uh).c32), "m"((uh).c13)           \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vfmsubadd231ps %%ymm1, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmsubadd231ps %%ymm2, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmsubadd231ps %%ymm0, %%ymm11, %%ymm5 \n\t"           \
+                       "vfmsubadd231ps %%ymm7, %%ymm12, %%ymm3 \n\t"           \
+                       "vfmsubadd231ps %%ymm8, %%ymm13, %%ymm4 \n\t"           \
+                       "vfmsubadd231ps %%ymm6, %%ymm14, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5");                              \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %1, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm11 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %4, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm14 \n\t"                         \
+                       "vblendps $0xf0, %%ymm12, %%ymm9, %%ymm9 \n\t"          \
+                       "vblendps $0xf0, %%ymm13, %%ymm10, %%ymm10 \n\t"        \
+                       "vblendps $0xf0, %%ymm14, %%ymm11, %%ymm11 \n\t"        \
+                       "vpermilps $0xb1, %%ymm9, %%ymm12 \n\t"                 \
+                       "vpermilps $0xb1, %%ymm10, %%ymm13 \n\t"                \
+                       "vpermilps $0xb1, %%ymm11, %%ymm14"                     \
+                       :                                                       \
+                       : "m"((ul).c31), "m"((ul).c12), "m"((ul).c23),          \
+                         "m"((uh).c31), "m"((uh).c12), "m"((uh).c23)           \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vfmsubadd231ps %%ymm2, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmsubadd231ps %%ymm0, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmsubadd231ps %%ymm1, %%ymm11, %%ymm5 \n\t"           \
+                       "vfmsubadd231ps %%ymm8, %%ymm12, %%ymm3 \n\t"           \
+                       "vfmsubadd231ps %%ymm6, %%ymm13, %%ymm4 \n\t"           \
+                       "vfmsubadd231ps %%ymm7, %%ymm14, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5")
+
+#else
 
 #define _avx_su3_pair_inverse_multiply(ul, uh)                                 \
   __asm__ __volatile__("vbroadcastss %0, %%xmm6 \n\t"                          \
@@ -1063,6 +1245,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8",       \
                          "xmm9", "xmm10", "xmm11")
 
+#endif
+
 /*
 * Multiplies pairs of su3 vectors, stored in the low and high lanes of
 * ymm0,..,ymm2, by the su3 matrices ul and uh^dagger, respectively. The
@@ -1070,6 +1254,108 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 * in the same order in the registers ymm3,..,ymm5. All registers except
 * for ymm15 are changed on exit.
 */
+
+#if (defined FMA3)
+
+#define _avx_su3_pair_mixed_multiply(ul, uh)                                   \
+  __asm__ __volatile__("vpermilps $0xf5, %%ymm0, %%ymm6 \n\t"                  \
+                       "vpermilps $0xf5, %%ymm1, %%ymm7 \n\t"                  \
+                       "vpermilps $0xf5, %%ymm2, %%ymm8 \n\t"                  \
+                       "vpermilps $0xa0, %%ymm0, %%ymm0 \n\t"                  \
+                       "vpermilps $0xa0, %%ymm1, %%ymm1 \n\t"                  \
+                       "vpermilps $0xa0, %%ymm2, %%ymm2"                       \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2", "xmm6", "xmm7", "xmm8");      \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %1, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm11 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %4, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm14 \n\t"                         \
+                       "vmulps %6, %%xmm9, %%xmm9 \n\t"                        \
+                       "vmulps %6, %%xmm10, %%xmm10 \n\t"                      \
+                       "vmulps %6, %%xmm11, %%xmm11 \n\t"                      \
+                       "vblendps $0xf0, %%ymm12, %%ymm9, %%ymm9 \n\t"          \
+                       "vblendps $0xf0, %%ymm13, %%ymm10, %%ymm10 \n\t"        \
+                       "vblendps $0xf0, %%ymm14, %%ymm11, %%ymm11 \n\t"        \
+                       "vpermilps $0xb1, %%ymm9, %%ymm12 \n\t"                 \
+                       "vpermilps $0xb1, %%ymm10, %%ymm13 \n\t"                \
+                       "vpermilps $0xb1, %%ymm11, %%ymm14"                     \
+                       :                                                       \
+                       : "m"((ul).c11), "m"((ul).c22), "m"((ul).c33),          \
+                         "m"((uh).c11), "m"((uh).c22), "m"((uh).c33),          \
+                         "m"(_sse_sgn24)                                       \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vmulps %%ymm0, %%ymm9, %%ymm3 \n\t"                    \
+                       "vmulps %%ymm1, %%ymm10, %%ymm4 \n\t"                   \
+                       "vmulps %%ymm2, %%ymm11, %%ymm5 \n\t"                   \
+                       "vfmsubadd231ps %%ymm6, %%ymm12, %%ymm3 \n\t"           \
+                       "vfmsubadd231ps %%ymm7, %%ymm13, %%ymm4 \n\t"           \
+                       "vfmsubadd231ps %%ymm8, %%ymm14, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5");                              \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %1, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm11 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %4, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm14 \n\t"                         \
+                       "vmulps %6, %%xmm9, %%xmm9 \n\t"                        \
+                       "vmulps %6, %%xmm10, %%xmm10 \n\t"                      \
+                       "vmulps %6, %%xmm11, %%xmm11 \n\t"                      \
+                       "vblendps $0xf0, %%ymm12, %%ymm9, %%ymm9 \n\t"          \
+                       "vblendps $0xf0, %%ymm13, %%ymm10, %%ymm10 \n\t"        \
+                       "vblendps $0xf0, %%ymm14, %%ymm11, %%ymm11 \n\t"        \
+                       "vpermilps $0xb1, %%ymm9, %%ymm12 \n\t"                 \
+                       "vpermilps $0xb1, %%ymm10, %%ymm13 \n\t"                \
+                       "vpermilps $0xb1, %%ymm11, %%ymm14"                     \
+                       :                                                       \
+                       : "m"((ul).c12), "m"((ul).c23), "m"((ul).c31),          \
+                         "m"((uh).c21), "m"((uh).c32), "m"((uh).c13),          \
+                         "m"(_sse_sgn24)                                       \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vfmsubadd231ps %%ymm1, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmsubadd231ps %%ymm2, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmsubadd231ps %%ymm0, %%ymm11, %%ymm5 \n\t"           \
+                       "vfmsubadd231ps %%ymm7, %%ymm12, %%ymm3 \n\t"           \
+                       "vfmsubadd231ps %%ymm8, %%ymm13, %%ymm4 \n\t"           \
+                       "vfmsubadd231ps %%ymm6, %%ymm14, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5");                              \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %1, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm11 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %4, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm14 \n\t"                         \
+                       "vmulps %6, %%xmm9, %%xmm9 \n\t"                        \
+                       "vmulps %6, %%xmm10, %%xmm10 \n\t"                      \
+                       "vmulps %6, %%xmm11, %%xmm11 \n\t"                      \
+                       "vblendps $0xf0, %%ymm12, %%ymm9, %%ymm9 \n\t"          \
+                       "vblendps $0xf0, %%ymm13, %%ymm10, %%ymm10 \n\t"        \
+                       "vblendps $0xf0, %%ymm14, %%ymm11, %%ymm11 \n\t"        \
+                       "vpermilps $0xb1, %%ymm9, %%ymm12 \n\t"                 \
+                       "vpermilps $0xb1, %%ymm10, %%ymm13 \n\t"                \
+                       "vpermilps $0xb1, %%ymm11, %%ymm14"                     \
+                       :                                                       \
+                       : "m"((ul).c13), "m"((ul).c21), "m"((ul).c32),          \
+                         "m"((uh).c31), "m"((uh).c12), "m"((uh).c23),          \
+                         "m"(_sse_sgn24)                                       \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vfmsubadd231ps %%ymm2, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmsubadd231ps %%ymm0, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmsubadd231ps %%ymm1, %%ymm11, %%ymm5 \n\t"           \
+                       "vfmsubadd231ps %%ymm8, %%ymm12, %%ymm3 \n\t"           \
+                       "vfmsubadd231ps %%ymm6, %%ymm13, %%ymm4 \n\t"           \
+                       "vfmsubadd231ps %%ymm7, %%ymm14, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5")
+
+#else
 
 #define _avx_su3_pair_mixed_multiply(ul, uh)                                   \
   __asm__ __volatile__("vbroadcastss %0, %%xmm3 \n\t"                          \
@@ -1209,6 +1495,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8",       \
                          "xmm9", "xmm10", "xmm11")
 
+#endif
+
 /******************************************************************************
 *
 *  Macros for single precision Dirac spinors in linear order
@@ -1319,6 +1607,25 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 *  ymm3,..,ymm5 are used as workspace.
 */
 
+#if (defined FMA3)
+
+#define _avx_mulc_spinor(s)                                                    \
+  _avx_spinor_load(s);                                                         \
+  __asm__ __volatile__("vpermilps $0xb1, %%ymm0, %%ymm3 \n\t"                  \
+                       "vpermilps $0xb1, %%ymm1, %%ymm4 \n\t"                  \
+                       "vpermilps $0xb1, %%ymm2, %%ymm5 \n\t"                  \
+                       "vmulps %%ymm12, %%ymm0, %%ymm0 \n\t"                   \
+                       "vmulps %%ymm12, %%ymm1, %%ymm1 \n\t"                   \
+                       "vmulps %%ymm12, %%ymm2, %%ymm2 \n\t"                   \
+                       "vfmadd231ps %%ymm13, %%ymm3, %%ymm0 \n\t"              \
+                       "vfmadd231ps %%ymm13, %%ymm4, %%ymm1 \n\t"              \
+                       "vfmadd231ps %%ymm13, %%ymm5, %%ymm2"                   \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
+
+#else
+
 #define _avx_mulc_spinor(s)                                                    \
   _avx_spinor_load(s);                                                         \
   __asm__ __volatile__("vpermilps $0xb1, %%ymm0, %%ymm3 \n\t"                  \
@@ -1340,11 +1647,32 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        :                                                       \
                        : "xmm0", "xmm1", "xmm2")
 
+#endif
+
 /*
 *  Multiplies the spinor s by the complex number z and adds the result to
 *  ymm0,..,ymm2, assuming z was loaded using _avx_load_cmplx_up(z). The
 *  registers ymm3,..,ymm8 are used as workspace.
 */
+
+#if (defined FMA3)
+
+#define _avx_mulc_spinor_add(s)                                                \
+  _avx_spinor_load_up(s);                                                      \
+  __asm__ __volatile__("vpermilps $0xb1, %%ymm3, %%ymm6 \n\t"                  \
+                       "vpermilps $0xb1, %%ymm4, %%ymm7 \n\t"                  \
+                       "vpermilps $0xb1, %%ymm5, %%ymm8 \n\t"                  \
+                       "vfmadd231ps %%ymm14, %%ymm3, %%ymm0 \n\t"              \
+                       "vfmadd231ps %%ymm14, %%ymm4, %%ymm1 \n\t"              \
+                       "vfmadd231ps %%ymm14, %%ymm5, %%ymm2 \n\t"              \
+                       "vfmadd231ps %%ymm15, %%ymm6, %%ymm0 \n\t"              \
+                       "vfmadd231ps %%ymm15, %%ymm7, %%ymm1 \n\t"              \
+                       "vfmadd231ps %%ymm15, %%ymm8, %%ymm2"                   \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2", "xmm6", "xmm7", "xmm8")
+
+#else
 
 #define _avx_mulc_spinor_add(s)                                                \
   _avx_spinor_load_up(s);                                                      \
@@ -1368,8 +1696,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",       \
                          "xmm6", "xmm7", "xmm8")
 
+#endif
+
 /*
-*  Loads (c,c,..,c) to ymm12 and ymm13.
+*  Broadcasts the real number c to ymm12 and ymm13.
 */
 
 #define _avx_load_real(c)                                                      \
@@ -1380,7 +1710,7 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm12", "xmm13")
 
 /*
-*  Loads (c,c,..,c) to ymm14 and ymm15.
+*  Broadcasts the real number c to ymm14 and ymm15.
 */
 
 #define _avx_load_real_up(c)                                                   \
@@ -1410,6 +1740,19 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 *  registers ymm3,..,ymm5 are used as workspace.
 */
 
+#if (defined FMA3)
+
+#define _avx_mulr_spinor_add(s)                                                \
+  _avx_spinor_load_up(s);                                                      \
+  __asm__ __volatile__("vfmadd231ps %%ymm14, %%ymm3, %%ymm0 \n\t"              \
+                       "vfmadd231ps %%ymm15, %%ymm4, %%ymm1 \n\t"              \
+                       "vfmadd231ps %%ymm14, %%ymm5, %%ymm2"                   \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2")
+
+#else
+
 #define _avx_mulr_spinor_add(s)                                                \
   _avx_spinor_load_up(s);                                                      \
   __asm__ __volatile__("vmulps %%ymm14, %%ymm3, %%ymm3 \n\t"                   \
@@ -1421,6 +1764,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        :                                                       \
                        :                                                       \
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
+
+#endif
 
 /*******************************************************************************
 *
@@ -1580,6 +1925,18 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 * to ymm0,..,ymm2.
 */
 
+#if (defined FMA3)
+
+#define _avx_vector_addsub_dble()                                              \
+  __asm__ __volatile__("vfmadd231pd %0, %%ymm3, %%ymm0 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm4, %%ymm1 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm5, %%ymm2"                        \
+                       :                                                       \
+                       : "m"(_avx_sgn34_dble)                                  \
+                       : "xmm0", "xmm1", "xmm2")
+
+#else
+
 #define _avx_vector_addsub_dble()                                              \
   __asm__ __volatile__("vmulpd %0, %%ymm3, %%ymm3 \n\t"                        \
                        "vmulpd %0, %%ymm4, %%ymm4 \n\t"                        \
@@ -1591,10 +1948,24 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "m"(_avx_sgn34_dble)                                  \
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
+#endif
+
 /*
 * Multiplies the low lanes of ymm3,..,ymm5 by -1 and adds these registers
 * to ymm0,..,ymm2.
 */
+
+#if (defined FMA3)
+
+#define _avx_vector_subadd_dble()                                              \
+  __asm__ __volatile__("vfmadd231pd %0, %%ymm3, %%ymm0 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm4, %%ymm1 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm5, %%ymm2"                        \
+                       :                                                       \
+                       : "m"(_avx_sgn12_dble)                                  \
+                       : "xmm0", "xmm1", "xmm2")
+
+#else
 
 #define _avx_vector_subadd_dble()                                              \
   __asm__ __volatile__("vmulpd %0, %%ymm3, %%ymm3 \n\t"                        \
@@ -1606,6 +1977,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        :                                                       \
                        : "m"(_avx_sgn12_dble)                                  \
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
+
+#endif
 
 /*
 * Multiplies the registers ymm3,..,ymm5 by i and adds them to ymm0,..,ymm2.
@@ -1627,6 +2000,21 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 * ymm0,..,ymm2.
 */
 
+#if (defined FMA3)
+
+#define _avx_vector_i_sub_dble()                                               \
+  __asm__ __volatile__("vpermilpd $0x5, %%ymm3, %%ymm3 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm4, %%ymm4 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm5, %%ymm5 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm3, %%ymm0 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm4, %%ymm1 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm5, %%ymm2"                        \
+                       :                                                       \
+                       : "m"(_avx_sgn24_dble)                                  \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
+
+#else
+
 #define _avx_vector_i_sub_dble()                                               \
   __asm__ __volatile__("vpermilpd $0x5, %%ymm3, %%ymm3 \n\t"                   \
                        "vpermilpd $0x5, %%ymm4, %%ymm4 \n\t"                   \
@@ -1640,6 +2028,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        :                                                       \
                        : "m"(_avx_sgn24_dble)                                  \
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
+
+#endif
 
 /*
 * Exchanges the high and low lanes of ymm3,..,ymm5, multiplies them by i
@@ -1665,6 +2055,24 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 * and subtracts the result from ymm0,..,ymm2.
 */
 
+#if (defined FMA3)
+
+#define _avx_vector_xch_i_sub_dble()                                           \
+  __asm__ __volatile__("vpermilpd $0x5, %%ymm3, %%ymm3 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm4, %%ymm4 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm5, %%ymm5 \n\t"                   \
+                       "vperm2f128 $0x1, %%ymm3, %%ymm3, %%ymm3 \n\t"          \
+                       "vperm2f128 $0x1, %%ymm4, %%ymm4, %%ymm4 \n\t"          \
+                       "vperm2f128 $0x1, %%ymm5, %%ymm5, %%ymm5 \n\t"          \
+                       "vfmadd231pd %0, %%ymm3, %%ymm0 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm4, %%ymm1 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm5, %%ymm2"                        \
+                       :                                                       \
+                       : "m"(_avx_sgn24_dble)                                  \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
+
+#else
+
 #define _avx_vector_xch_i_sub_dble()                                           \
   __asm__ __volatile__("vpermilpd $0x5, %%ymm3, %%ymm3 \n\t"                   \
                        "vpermilpd $0x5, %%ymm4, %%ymm4 \n\t"                   \
@@ -1682,10 +2090,27 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "m"(_avx_sgn24_dble)                                  \
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
+#endif
+
 /*
 * Multiplies the low and high lanes of ymm3,..,ymm5 by i and -i
 * respectively and adds these registers to ymm0,..,ymm2.
 */
+
+#if (defined FMA3)
+
+#define _avx_vector_i_addsub_dble()                                            \
+  __asm__ __volatile__("vpermilpd $0x5, %%ymm3, %%ymm3 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm4, %%ymm4 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm5, %%ymm5 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm3, %%ymm0 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm4, %%ymm1 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm5, %%ymm2"                        \
+                       :                                                       \
+                       : "m"(_avx_sgn14_dble)                                  \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
+
+#else
 
 #define _avx_vector_i_addsub_dble()                                            \
   __asm__ __volatile__("vpermilpd $0x5, %%ymm3, %%ymm3 \n\t"                   \
@@ -1701,10 +2126,27 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "m"(_avx_sgn14_dble)                                  \
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
+#endif
+
 /*
 * Multiplies the low and high words of ymm3,..,ymm5 by -i and i
 * respectively and adds these registers to ymm0,..,ymm2.
 */
+
+#if (defined FMA3)
+
+#define _avx_vector_i_subadd_dble()                                            \
+  __asm__ __volatile__("vpermilpd $0x5, %%ymm3, %%ymm3 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm4, %%ymm4 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm5, %%ymm5 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm3, %%ymm0 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm4, %%ymm1 \n\t"                   \
+                       "vfmadd231pd %0, %%ymm5, %%ymm2"                        \
+                       :                                                       \
+                       : "m"(_avx_sgn23_dble)                                  \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
+
+#else
 
 #define _avx_vector_i_subadd_dble()                                            \
   __asm__ __volatile__("vpermilpd $0x5, %%ymm3, %%ymm3 \n\t"                   \
@@ -1719,6 +2161,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        :                                                       \
                        : "m"(_avx_sgn23_dble)                                  \
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
+
+#endif
 
 /*
 * Exchanges the high and low lanes of ymm3,..,ymm5.
@@ -1739,10 +2183,311 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 ******************************************************************************/
 
 /*
+* Multiplies an su3 vector s with an su3 matrix u, assuming s is
+* stored in  xmm0,xmm1,xmm2.
+*
+* On output the result is in xmm3,xmm4,xmm5 and all registers except
+* for xmm15 are changed.
+*/
+
+#if (defined FMA3)
+
+#define _avx_su3_multiply_dble(u)                                              \
+  __asm__ __volatile__("vpermpd $0x50, %%ymm0, %%ymm0 \n\t"                    \
+                       "vpermpd $0x50, %%ymm1, %%ymm1 \n\t"                    \
+                       "vpermpd $0x50, %%ymm2, %%ymm2 \n\t"                    \
+                       "vbroadcastf128 %0, %%ymm6 \n\t"                        \
+                       "vbroadcastf128 %1, %%ymm7 \n\t"                        \
+                       "vbroadcastf128 %2, %%ymm8 \n\t"                        \
+                       "vmulpd %%ymm0, %%ymm6, %%ymm3 \n\t"                    \
+                       "vmulpd %%ymm1, %%ymm7, %%ymm4 \n\t"                    \
+                       "vmulpd %%ymm2, %%ymm8, %%ymm5"                         \
+                       :                                                       \
+                       : "m"((u).c11), "m"((u).c22), "m"((u).c33)              \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",       \
+                         "xmm6", "xmm7", "xmm8");                              \
+  __asm__ __volatile__("vbroadcastf128 %0, %%ymm9 \n\t"                        \
+                       "vbroadcastf128 %1, %%ymm10 \n\t"                       \
+                       "vbroadcastf128 %2, %%ymm11 \n\t"                       \
+                       "vbroadcastf128 %3, %%ymm12 \n\t"                       \
+                       "vbroadcastf128 %4, %%ymm13 \n\t"                       \
+                       "vbroadcastf128 %5, %%ymm14 \n\t"                       \
+                       "vfmadd231pd %%ymm1, %%ymm9, %%ymm3 \n\t"               \
+                       "vfmadd231pd %%ymm2, %%ymm10, %%ymm4 \n\t"              \
+                       "vfmadd231pd %%ymm0, %%ymm11, %%ymm5 \n\t"              \
+                       "vfmadd231pd %%ymm2, %%ymm12, %%ymm3 \n\t"              \
+                       "vfmadd231pd %%ymm0, %%ymm13, %%ymm4 \n\t"              \
+                       "vfmadd231pd %%ymm1, %%ymm14, %%ymm5"                   \
+                       :                                                       \
+                       : "m"((u).c12), "m"((u).c23), "m"((u).c31),             \
+                         "m"((u).c13), "m"((u).c21), "m"((u).c32)              \
+                       : "xmm3", "xmm4", "xmm5", "xmm9", "xmm10", "xmm11",     \
+                         "xmm12", "xmm13", "xmm14");                           \
+  __asm__ __volatile__("vextractf128 $0x1, %%ymm3, %%xmm6 \n\t"                \
+                       "vextractf128 $0x1, %%ymm4, %%xmm7 \n\t"                \
+                       "vextractf128 $0x1, %%ymm5, %%xmm8 \n\t"                \
+                       "vpermilpd $0x1, %%xmm6, %%xmm6 \n\t"                   \
+                       "vpermilpd $0x1, %%xmm7, %%xmm7 \n\t"                   \
+                       "vpermilpd $0x1, %%xmm8, %%xmm8 \n\t"                   \
+                       "vaddsubpd %%xmm6, %%xmm3, %%xmm3 \n\t"                 \
+                       "vaddsubpd %%xmm7, %%xmm4, %%xmm4 \n\t"                 \
+                       "vaddsubpd %%xmm8, %%xmm5, %%xmm5"                      \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8")
+
+#else
+
+#define _avx_su3_multiply_dble(u)                                              \
+  __asm__ __volatile__("vinsertf128 $0x1, %%xmm0, %%ymm0, %%ymm0 \n\t"         \
+                       "vinsertf128 $0x1, %%xmm1, %%ymm1, %%ymm1 \n\t"         \
+                       "vinsertf128 $0x1, %%xmm2, %%ymm2, %%ymm2 \n\t"         \
+                       "vpermilpd $0xc, %%ymm0, %%ymm0 \n\t"                   \
+                       "vpermilpd $0xc, %%ymm1, %%ymm1 \n\t"                   \
+                       "vpermilpd $0xc, %%ymm2, %%ymm2 \n\t"                   \
+                       "vbroadcastf128 %0, %%ymm6 \n\t"                        \
+                       "vbroadcastf128 %1, %%ymm7 \n\t"                        \
+                       "vbroadcastf128 %2, %%ymm8 \n\t"                        \
+                       "vmulpd %%ymm0, %%ymm6, %%ymm3 \n\t"                    \
+                       "vmulpd %%ymm1, %%ymm7, %%ymm4 \n\t"                    \
+                       "vmulpd %%ymm2, %%ymm8, %%ymm5"                         \
+                       :                                                       \
+                       : "m"((u).c11), "m"((u).c22), "m"((u).c33)              \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",       \
+                         "xmm6", "xmm7", "xmm8");                              \
+  __asm__ __volatile__("vbroadcastf128 %0, %%ymm9 \n\t"                        \
+                       "vbroadcastf128 %1, %%ymm10 \n\t"                       \
+                       "vbroadcastf128 %2, %%ymm11 \n\t"                       \
+                       "vmulpd %%ymm1, %%ymm9, %%ymm12 \n\t"                   \
+                       "vmulpd %%ymm2, %%ymm10, %%ymm13 \n\t"                  \
+                       "vmulpd %%ymm0, %%ymm11, %%ymm14 \n\t"                  \
+                       "vaddpd %%ymm12, %%ymm3, %%ymm3 \n\t"                   \
+                       "vaddpd %%ymm13, %%ymm4, %%ymm4 \n\t"                   \
+                       "vaddpd %%ymm14, %%ymm5, %%ymm5"                        \
+                       :                                                       \
+                       : "m"((u).c12), "m"((u).c23), "m"((u).c31)              \
+                       : "xmm3", "xmm4", "xmm5", "xmm9", "xmm10", "xmm11",     \
+                         "xmm12", "xmm13", "xmm14");                           \
+  __asm__ __volatile__("vbroadcastf128 %0, %%ymm6 \n\t"                        \
+                       "vbroadcastf128 %1, %%ymm7 \n\t"                        \
+                       "vbroadcastf128 %2, %%ymm8 \n\t"                        \
+                       "vmulpd %%ymm2, %%ymm6, %%ymm9 \n\t"                    \
+                       "vmulpd %%ymm0, %%ymm7, %%ymm10 \n\t"                   \
+                       "vmulpd %%ymm1, %%ymm8, %%ymm11 \n\t"                   \
+                       "vaddpd %%ymm9, %%ymm3, %%ymm3 \n\t"                    \
+                       "vaddpd %%ymm10, %%ymm4, %%ymm4 \n\t"                   \
+                       "vaddpd %%ymm11, %%ymm5, %%ymm5"                        \
+                       :                                                       \
+                       : "m"((u).c13), "m"((u).c21), "m"((u).c32)              \
+                       : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8",       \
+                         "xmm9", "xmm10", "xmm11");                            \
+  __asm__ __volatile__("vextractf128 $0x1, %%ymm3, %%xmm6 \n\t"                \
+                       "vextractf128 $0x1, %%ymm4, %%xmm7 \n\t"                \
+                       "vextractf128 $0x1, %%ymm5, %%xmm8 \n\t"                \
+                       "vpermilpd $0x1, %%xmm6, %%xmm6 \n\t"                   \
+                       "vpermilpd $0x1, %%xmm7, %%xmm7 \n\t"                   \
+                       "vpermilpd $0x1, %%xmm8, %%xmm8 \n\t"                   \
+                       "vaddsubpd %%xmm6, %%xmm3, %%xmm3 \n\t"                 \
+                       "vaddsubpd %%xmm7, %%xmm4, %%xmm4 \n\t"                 \
+                       "vaddsubpd %%xmm8, %%xmm5, %%xmm5"                      \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8")
+
+#endif
+
+/*
+* Multiplies an su3 vector s with an su3 matrix u^dagger, assuming s is
+* stored in  xmm0,xmm1,xmm2.
+*
+* On output the result is in xmm3,xmm4,xmm5 and all registers except
+* for xmm15 are changed.
+*/
+
+#if (defined FMA3)
+
+#define _avx_su3_inverse_multiply_dble(u)                                      \
+  __asm__ __volatile__("vpermpd $0x50, %%ymm0, %%ymm0 \n\t"                    \
+                       "vpermpd $0x50, %%ymm1, %%ymm1 \n\t"                    \
+                       "vpermpd $0x50, %%ymm2, %%ymm2 \n\t"                    \
+                       "vbroadcastf128 %0, %%ymm6 \n\t"                        \
+                       "vbroadcastf128 %1, %%ymm7 \n\t"                        \
+                       "vbroadcastf128 %2, %%ymm8 \n\t"                        \
+                       "vmulpd %%ymm0, %%ymm6, %%ymm3 \n\t"                    \
+                       "vmulpd %%ymm1, %%ymm7, %%ymm4 \n\t"                    \
+                       "vmulpd %%ymm2, %%ymm8, %%ymm5"                         \
+                       :                                                       \
+                       : "m"((u).c11), "m"((u).c22), "m"((u).c33)              \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",       \
+                         "xmm6", "xmm7", "xmm8");                              \
+  __asm__ __volatile__("vbroadcastf128 %0, %%ymm9 \n\t"                        \
+                       "vbroadcastf128 %1, %%ymm10 \n\t"                       \
+                       "vbroadcastf128 %2, %%ymm11 \n\t"                       \
+                       "vbroadcastf128 %3, %%ymm12 \n\t"                       \
+                       "vbroadcastf128 %4, %%ymm13 \n\t"                       \
+                       "vbroadcastf128 %5, %%ymm14 \n\t"                       \
+                       "vfmadd231pd %%ymm1, %%ymm9, %%ymm3 \n\t"               \
+                       "vfmadd231pd %%ymm2, %%ymm10, %%ymm4 \n\t"              \
+                       "vfmadd231pd %%ymm0, %%ymm11, %%ymm5 \n\t"              \
+                       "vfmadd231pd %%ymm2, %%ymm12, %%ymm3 \n\t"              \
+                       "vfmadd231pd %%ymm0, %%ymm13, %%ymm4 \n\t"              \
+                       "vfmadd231pd %%ymm1, %%ymm14, %%ymm5"                   \
+                       :                                                       \
+                       : "m"((u).c21), "m"((u).c32), "m"((u).c13),             \
+                         "m"((u).c31), "m"((u).c12), "m"((u).c23)              \
+                       : "xmm3", "xmm4", "xmm5", "xmm9", "xmm10", "xmm11",     \
+                         "xmm12", "xmm13", "xmm14");                           \
+  __asm__ __volatile__("vextractf128 $0x1, %%ymm3, %%xmm6 \n\t"                \
+                       "vextractf128 $0x1, %%ymm4, %%xmm7 \n\t"                \
+                       "vextractf128 $0x1, %%ymm5, %%xmm8 \n\t"                \
+                       "vpermilpd $0x1, %%xmm3, %%xmm3 \n\t"                   \
+                       "vpermilpd $0x1, %%xmm4, %%xmm4 \n\t"                   \
+                       "vpermilpd $0x1, %%xmm5, %%xmm5 \n\t"                   \
+                       "vaddsubpd %%xmm3, %%xmm6, %%xmm6 \n\t"                 \
+                       "vaddsubpd %%xmm4, %%xmm7, %%xmm7 \n\t"                 \
+                       "vaddsubpd %%xmm5, %%xmm8, %%xmm8 \n\t"                 \
+                       "vpermilpd $0x1, %%xmm6, %%xmm3 \n\t"                   \
+                       "vpermilpd $0x1, %%xmm7, %%xmm4 \n\t"                   \
+                       "vpermilpd $0x1, %%xmm8, %%xmm5"                        \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8")
+
+#else
+
+#define _avx_su3_inverse_multiply_dble(u)                                      \
+  __asm__ __volatile__("vinsertf128 $0x1, %%xmm0, %%ymm0, %%ymm0 \n\t"         \
+                       "vinsertf128 $0x1, %%xmm1, %%ymm1, %%ymm1 \n\t"         \
+                       "vinsertf128 $0x1, %%xmm2, %%ymm2, %%ymm2 \n\t"         \
+                       "vpermilpd $0xc, %%ymm0, %%ymm0 \n\t"                   \
+                       "vpermilpd $0xc, %%ymm1, %%ymm1 \n\t"                   \
+                       "vpermilpd $0xc, %%ymm2, %%ymm2 \n\t"                   \
+                       "vbroadcastf128 %0, %%ymm6 \n\t"                        \
+                       "vbroadcastf128 %1, %%ymm7 \n\t"                        \
+                       "vbroadcastf128 %2, %%ymm8 \n\t"                        \
+                       "vmulpd %%ymm0, %%ymm6, %%ymm3 \n\t"                    \
+                       "vmulpd %%ymm1, %%ymm7, %%ymm4 \n\t"                    \
+                       "vmulpd %%ymm2, %%ymm8, %%ymm5"                         \
+                       :                                                       \
+                       : "m"((u).c11), "m"((u).c22), "m"((u).c33)              \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",       \
+                         "xmm6", "xmm7", "xmm8");                              \
+  __asm__ __volatile__("vbroadcastf128 %0, %%ymm9 \n\t"                        \
+                       "vbroadcastf128 %1, %%ymm10 \n\t"                       \
+                       "vbroadcastf128 %2, %%ymm11 \n\t"                       \
+                       "vmulpd %%ymm1, %%ymm9, %%ymm12 \n\t"                   \
+                       "vmulpd %%ymm2, %%ymm10, %%ymm13 \n\t"                  \
+                       "vmulpd %%ymm0, %%ymm11, %%ymm14 \n\t"                  \
+                       "vaddpd %%ymm12, %%ymm3, %%ymm3 \n\t"                   \
+                       "vaddpd %%ymm13, %%ymm4, %%ymm4 \n\t"                   \
+                       "vaddpd %%ymm14, %%ymm5, %%ymm5"                        \
+                       :                                                       \
+                       : "m"((u).c21), "m"((u).c32), "m"((u).c13)              \
+                       : "xmm3", "xmm4", "xmm5", "xmm9", "xmm10", "xmm11",     \
+                         "xmm12", "xmm13", "xmm14");                           \
+  __asm__ __volatile__("vbroadcastf128 %0, %%ymm6 \n\t"                        \
+                       "vbroadcastf128 %1, %%ymm7 \n\t"                        \
+                       "vbroadcastf128 %2, %%ymm8 \n\t"                        \
+                       "vmulpd %%ymm2, %%ymm6, %%ymm9 \n\t"                    \
+                       "vmulpd %%ymm0, %%ymm7, %%ymm10 \n\t"                   \
+                       "vmulpd %%ymm1, %%ymm8, %%ymm11 \n\t"                   \
+                       "vaddpd %%ymm9, %%ymm3, %%ymm3 \n\t"                    \
+                       "vaddpd %%ymm10, %%ymm4, %%ymm4 \n\t"                   \
+                       "vaddpd %%ymm11, %%ymm5, %%ymm5"                        \
+                       :                                                       \
+                       : "m"((u).c31), "m"((u).c12), "m"((u).c23)              \
+                       : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8",       \
+                         "xmm9", "xmm10", "xmm11");                            \
+  __asm__ __volatile__("vextractf128 $0x1, %%ymm3, %%xmm6 \n\t"                \
+                       "vextractf128 $0x1, %%ymm4, %%xmm7 \n\t"                \
+                       "vextractf128 $0x1, %%ymm5, %%xmm8 \n\t"                \
+                       "vpermilpd $0x1, %%xmm3, %%xmm3 \n\t"                   \
+                       "vpermilpd $0x1, %%xmm4, %%xmm4 \n\t"                   \
+                       "vpermilpd $0x1, %%xmm5, %%xmm5 \n\t"                   \
+                       "vaddsubpd %%xmm3, %%xmm6, %%xmm6 \n\t"                 \
+                       "vaddsubpd %%xmm4, %%xmm7, %%xmm7 \n\t"                 \
+                       "vaddsubpd %%xmm5, %%xmm8, %%xmm8 \n\t"                 \
+                       "vpermilpd $0x1, %%xmm6, %%xmm3 \n\t"                   \
+                       "vpermilpd $0x1, %%xmm7, %%xmm4 \n\t"                   \
+                       "vpermilpd $0x1, %%xmm8, %%xmm5"                        \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8")
+
+#endif
+
+/*
 * Multiplies a pair sl,sh of su3 vectors by an su3 matrix u, assuming sl and
 * sh are in the low and high lanes of ymm0,..,ymm2. On output the result is
-* in ymm3,..,ymm5 and all registers except for ymm12,..,ymm15 are changed.
+* in ymm3,..,ymm5 and all registers except for ymm15 are changed.
 */
+
+#if (defined FMA3)
+
+#define _avx_su3_multiply_pair_dble(u)                                         \
+  __asm__ __volatile__("vpermilpd $0x5, %%ymm0, %%ymm6 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm1, %%ymm7 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm2, %%ymm8 \n\t"                   \
+                       "vbroadcastsd %0, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %1, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm14 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %4, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm11"                              \
+                       :                                                       \
+                       : "m"((u).c11.im), "m"((u).c22.im), "m"((u).c33.im),    \
+                         "m"((u).c11.re), "m"((u).c22.re), "m"((u).c33.re)     \
+                       : "xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11",     \
+                         "xmm12", "xmm13", "xmm14");                           \
+  __asm__ __volatile__("vmulpd %%ymm6, %%ymm12, %%ymm3 \n\t"                   \
+                       "vmulpd %%ymm7, %%ymm13, %%ymm4 \n\t"                   \
+                       "vmulpd %%ymm8, %%ymm14, %%ymm5 \n\t"                   \
+                       "vfmaddsub231pd %%ymm0, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmaddsub231pd %%ymm1, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmaddsub231pd %%ymm2, %%ymm11, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5");                              \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %1, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm14 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %4, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm11"                              \
+                       :                                                       \
+                       : "m"((u).c12.im), "m"((u).c23.im), "m"((u).c31.im),    \
+                         "m"((u).c12.re), "m"((u).c23.re), "m"((u).c31.re)     \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vfmaddsub231pd %%ymm7, %%ymm12, %%ymm3 \n\t"           \
+                       "vfmaddsub231pd %%ymm8, %%ymm13, %%ymm4 \n\t"           \
+                       "vfmaddsub231pd %%ymm6, %%ymm14, %%ymm5 \n\t"           \
+                       "vfmaddsub231pd %%ymm1, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmaddsub231pd %%ymm2, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmaddsub231pd %%ymm0, %%ymm11, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5");                              \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %1, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm14 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %4, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm11"                              \
+                       :                                                       \
+                       : "m"((u).c13.im), "m"((u).c21.im), "m"((u).c32.im),    \
+                         "m"((u).c13.re), "m"((u).c21.re), "m"((u).c32.re)     \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vfmaddsub231pd %%ymm8, %%ymm12, %%ymm3 \n\t"           \
+                       "vfmaddsub231pd %%ymm6, %%ymm13, %%ymm4 \n\t"           \
+                       "vfmaddsub231pd %%ymm7, %%ymm14, %%ymm5 \n\t"           \
+                       "vfmaddsub231pd %%ymm2, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmaddsub231pd %%ymm0, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmaddsub231pd %%ymm1, %%ymm11, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5")
+
+#else
 
 #define _avx_su3_multiply_pair_dble(u)                                         \
   __asm__ __volatile__("vbroadcastsd %0, %%ymm3 \n\t"                          \
@@ -1825,11 +2570,80 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8",       \
                          "xmm9", "xmm10", "xmm11")
 
+#endif
+
 /*
 * Multiplies a pair sl,sh of su3 vectors by an su3 matrix u^dagger, assuming
 * sl and sh are in the low and high lanes of ymm0,..,ymm2. On output the
 * result is in ymm3,..,ymm5 and all registers are changed.
 */
+
+#if (defined FMA3)
+
+#define _avx_su3_inverse_multiply_pair_dble(u)                                 \
+  __asm__ __volatile__("vpermilpd $0x5, %%ymm0, %%ymm6 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm1, %%ymm7 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm2, %%ymm8 \n\t"                   \
+                       "vbroadcastsd %0, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %1, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm14 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %4, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm11"                              \
+                       :                                                       \
+                       : "m"((u).c11.im), "m"((u).c22.im), "m"((u).c33.im),    \
+                         "m"((u).c11.re), "m"((u).c22.re), "m"((u).c33.re)     \
+                       : "xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11",     \
+                         "xmm12", "xmm13", "xmm14");                           \
+  __asm__ __volatile__("vmulpd %%ymm6, %%ymm12, %%ymm3 \n\t"                   \
+                       "vmulpd %%ymm7, %%ymm13, %%ymm4 \n\t"                   \
+                       "vmulpd %%ymm8, %%ymm14, %%ymm5 \n\t"                   \
+                       "vfmsubadd231pd %%ymm0, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmsubadd231pd %%ymm1, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmsubadd231pd %%ymm2, %%ymm11, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5");                              \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %1, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm14 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %4, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm11"                              \
+                       :                                                       \
+                       : "m"((u).c21.im), "m"((u).c32.im), "m"((u).c13.im),    \
+                         "m"((u).c21.re), "m"((u).c32.re), "m"((u).c13.re)     \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vfmsubadd231pd %%ymm7, %%ymm12, %%ymm3 \n\t"           \
+                       "vfmsubadd231pd %%ymm8, %%ymm13, %%ymm4 \n\t"           \
+                       "vfmsubadd231pd %%ymm6, %%ymm14, %%ymm5 \n\t"           \
+                       "vfmsubadd231pd %%ymm1, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmsubadd231pd %%ymm2, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmsubadd231pd %%ymm0, %%ymm11, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5");                              \
+  __asm__ __volatile__("vbroadcastsd %0, %%ymm12 \n\t"                         \
+                       "vbroadcastsd %1, %%ymm13 \n\t"                         \
+                       "vbroadcastsd %2, %%ymm14 \n\t"                         \
+                       "vbroadcastsd %3, %%ymm9 \n\t"                          \
+                       "vbroadcastsd %4, %%ymm10 \n\t"                         \
+                       "vbroadcastsd %5, %%ymm11"                              \
+                       :                                                       \
+                       : "m"((u).c31.im), "m"((u).c12.im), "m"((u).c23.im),    \
+                         "m"((u).c31.re), "m"((u).c12.re), "m"((u).c23.re)     \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vfmsubadd231pd %%ymm8, %%ymm12, %%ymm3 \n\t"           \
+                       "vfmsubadd231pd %%ymm6, %%ymm13, %%ymm4 \n\t"           \
+                       "vfmsubadd231pd %%ymm7, %%ymm14, %%ymm5 \n\t"           \
+                       "vfmsubadd231pd %%ymm2, %%ymm9, %%ymm3 \n\t"            \
+                       "vfmsubadd231pd %%ymm0, %%ymm10, %%ymm4 \n\t"           \
+                       "vfmsubadd231pd %%ymm1, %%ymm11, %%ymm5"                \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm3", "xmm4", "xmm5")
+
+#else
 
 #define _avx_su3_inverse_multiply_pair_dble(u)                                 \
   __asm__ __volatile__("vbroadcastsd %0, %%ymm3 \n\t"                          \
@@ -1837,8 +2651,12 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        "vbroadcastsd %2, %%ymm4 \n\t"                          \
                        "vbroadcastsd %3, %%ymm7 \n\t"                          \
                        "vbroadcastsd %4, %%ymm5 \n\t"                          \
-                       "vbroadcastsd %5, %%ymm8 \n\t"                          \
-                       "vxorpd %%ymm15, %%ymm15, %%ymm15 \n\t"                 \
+                       "vbroadcastsd %5, %%ymm8"                               \
+                       :                                                       \
+                       : "m"((u).c11.re), "m"((u).c21.re), "m"((u).c12.re),    \
+                         "m"((u).c22.re), "m"((u).c13.re), "m"((u).c23.re)     \
+                       : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8");      \
+  __asm__ __volatile__("vxorpd %%ymm15, %%ymm15, %%ymm15 \n\t"                 \
                        "vmulpd %%ymm0, %%ymm3, %%ymm3 \n\t"                    \
                        "vmulpd %%ymm1, %%ymm6, %%ymm6 \n\t"                    \
                        "vmulpd %%ymm0, %%ymm4, %%ymm4 \n\t"                    \
@@ -1851,8 +2669,7 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        "vaddpd %%ymm8, %%ymm5, %%ymm5 \n\t"                    \
                        "vpermilpd $0x5, %%ymm0, %%ymm0"                        \
                        :                                                       \
-                       : "m"((u).c11.re), "m"((u).c21.re), "m"((u).c12.re),    \
-                         "m"((u).c22.re), "m"((u).c13.re), "m"((u).c23.re)     \
+                       :                                                       \
                        : "xmm0", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7",       \
                          "xmm8", "xmm15");                                     \
   __asm__ __volatile__("vbroadcastsd %0, %%ymm9 \n\t"                          \
@@ -1860,8 +2677,12 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        "vbroadcastsd %2, %%ymm11 \n\t"                         \
                        "vbroadcastsd %3, %%ymm12 \n\t"                         \
                        "vbroadcastsd %4, %%ymm13 \n\t"                         \
-                       "vbroadcastsd %5, %%ymm14 \n\t"                         \
-                       "vsubpd %%ymm1, %%ymm15, %%ymm1 \n\t"                   \
+                       "vbroadcastsd %5, %%ymm14"                              \
+                       :                                                       \
+                       : "m"((u).c31.re), "m"((u).c12.im), "m"((u).c33.re),    \
+                         "m"((u).c11.im), "m"((u).c32.re), "m"((u).c13.im)     \
+                       : "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14"); \
+  __asm__ __volatile__("vsubpd %%ymm1, %%ymm15, %%ymm1 \n\t"                   \
                        "vmulpd %%ymm2, %%ymm9, %%ymm9 \n\t"                    \
                        "vmulpd %%ymm0, %%ymm10, %%ymm10 \n\t"                  \
                        "vmulpd %%ymm2, %%ymm11, %%ymm11 \n\t"                  \
@@ -1875,8 +2696,7 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        "vmulpd %%ymm0, %%ymm14, %%ymm14 \n\t"                  \
                        "vpermilpd $0x5, %%ymm2, %%ymm2"                        \
                        :                                                       \
-                       : "m"((u).c31.re), "m"((u).c12.im), "m"((u).c33.re),    \
-                         "m"((u).c11.im), "m"((u).c32.re), "m"((u).c13.im)     \
+                       :                                                       \
                        : "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm9",       \
                          "xmm10", "xmm11", "xmm12", "xmm13", "xmm14");         \
   __asm__ __volatile__("vbroadcastsd %0, %%ymm6 \n\t"                          \
@@ -1884,8 +2704,12 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        "vbroadcastsd %2, %%ymm8 \n\t"                          \
                        "vbroadcastsd %3, %%ymm9 \n\t"                          \
                        "vbroadcastsd %4, %%ymm10 \n\t"                         \
-                       "vbroadcastsd %5, %%ymm11 \n\t"                         \
-                       "vmulpd %%ymm1, %%ymm6, %%ymm6 \n\t"                    \
+                       "vbroadcastsd %5, %%ymm11"                              \
+                       :                                                       \
+                       : "m"((u).c21.im), "m"((u).c32.im), "m"((u).c23.im),    \
+                         "m"((u).c31.im), "m"((u).c22.im), "m"((u).c33.im)     \
+                       : "xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11");    \
+  __asm__ __volatile__("vmulpd %%ymm1, %%ymm6, %%ymm6 \n\t"                    \
                        "vaddsubpd %%ymm12, %%ymm3, %%ymm3 \n\t"                \
                        "vmulpd %%ymm2, %%ymm7, %%ymm7 \n\t"                    \
                        "vaddpd %%ymm13, %%ymm4, %%ymm4 \n\t"                   \
@@ -1898,8 +2722,7 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        "vmulpd %%ymm2, %%ymm11, %%ymm11 \n\t"                  \
                        "vaddsubpd %%ymm8, %%ymm5, %%ymm5"                      \
                        :                                                       \
-                       : "m"((u).c21.im), "m"((u).c32.im), "m"((u).c23.im),    \
-                         "m"((u).c31.im), "m"((u).c22.im), "m"((u).c33.im)     \
+                       :                                                       \
                        : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8",       \
                          "xmm9", "xmm10", "xmm11");                            \
   __asm__ __volatile__("vaddsubpd %%ymm9, %%ymm3, %%ymm3 \n\t"                 \
@@ -1908,6 +2731,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        :                                                       \
                        :                                                       \
                        : "xmm3", "xmm4", "xmm5")
+
+#endif
 
 /******************************************************************************
 *
@@ -2019,6 +2844,38 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 * registers ymm6,..,ymm11 are used as workspace.
 */
 
+#if (defined FMA3)
+
+#define _avx_mulc_spinor_dble(s)                                               \
+  _avx_spinor_load_dble(s);                                                    \
+  __asm__ __volatile__("vpermilpd $0x5, %%ymm0, %%ymm6 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm1, %%ymm7 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm2, %%ymm8 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm3, %%ymm9 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm4, %%ymm10 \n\t"                  \
+                       "vpermilpd $0x5, %%ymm5, %%ymm11 \n\t"                  \
+                       "vmulpd %%ymm12, %%ymm0, %%ymm0 \n\t"                   \
+                       "vmulpd %%ymm12, %%ymm1, %%ymm1 \n\t"                   \
+                       "vmulpd %%ymm12, %%ymm2, %%ymm2 \n\t"                   \
+                       "vmulpd %%ymm12, %%ymm3, %%ymm3 \n\t"                   \
+                       "vmulpd %%ymm12, %%ymm4, %%ymm4 \n\t"                   \
+                       "vmulpd %%ymm12, %%ymm5, %%ymm5"                        \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",       \
+                         "xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11");    \
+  __asm__ __volatile__("vfmadd231pd %%ymm13, %%ymm6, %%ymm0 \n\t"              \
+                       "vfmadd231pd %%ymm13, %%ymm7, %%ymm1 \n\t"              \
+                       "vfmadd231pd %%ymm13, %%ymm8, %%ymm2 \n\t"              \
+                       "vfmadd231pd %%ymm13, %%ymm9, %%ymm3 \n\t"              \
+                       "vfmadd231pd %%ymm13, %%ymm10, %%ymm4 \n\t"             \
+                       "vfmadd231pd %%ymm13, %%ymm11, %%ymm5"                  \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
+
+#else
+
 #define _avx_mulc_spinor_dble(s)                                               \
   _avx_spinor_load_dble(s);                                                    \
   __asm__ __volatile__("vpermilpd $0x5, %%ymm0, %%ymm6 \n\t"                   \
@@ -2054,11 +2911,42 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",       \
                          "xmm9", "xmm10", "xmm11")
 
+#endif
+
 /*
 * Multiplies the spinor s by the complex number z and adds the result to
 * ymm0,..,ymm5, assuming z was loaded using _avx_load_cmplx_up_dble(z). The
 * registers ymm6,..,ymm11 are used as workspace.
 */
+
+#if (defined FMA3)
+
+#define _avx_mulc_spinor_add_dble(s)                                           \
+  _avx_spinor_load_up_dble(s);                                                 \
+  __asm__ __volatile__("vfmadd231pd %%ymm14, %%ymm6, %%ymm0 \n\t"              \
+                       "vfmadd231pd %%ymm14, %%ymm7, %%ymm1 \n\t"              \
+                       "vfmadd231pd %%ymm14, %%ymm8, %%ymm2 \n\t"              \
+                       "vfmadd231pd %%ymm14, %%ymm9, %%ymm3 \n\t"              \
+                       "vfmadd231pd %%ymm14, %%ymm10, %%ymm4 \n\t"             \
+                       "vfmadd231pd %%ymm14, %%ymm11, %%ymm5 \n\t"             \
+                       "vpermilpd $0x5, %%ymm6, %%ymm6 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm7, %%ymm7 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm8, %%ymm8 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm9, %%ymm9 \n\t"                   \
+                       "vpermilpd $0x5, %%ymm10, %%ymm10 \n\t"                 \
+                       "vpermilpd $0x5, %%ymm11, %%ymm11 \n\t"                 \
+                       "vfmadd231pd %%ymm15, %%ymm6, %%ymm0 \n\t"              \
+                       "vfmadd231pd %%ymm15, %%ymm7, %%ymm1 \n\t"              \
+                       "vfmadd231pd %%ymm15, %%ymm8, %%ymm2 \n\t"              \
+                       "vfmadd231pd %%ymm15, %%ymm9, %%ymm3 \n\t"              \
+                       "vfmadd231pd %%ymm15, %%ymm10, %%ymm4 \n\t"             \
+                       "vfmadd231pd %%ymm15, %%ymm11, %%ymm5"                  \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",       \
+                         "xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11")
+
+#else
 
 #define _avx_mulc_spinor_add_dble(s)                                           \
   __asm__ __volatile__("vmovapd %0, %%ymm6 \n\t"                               \
@@ -2114,8 +3002,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8",       \
                          "xmm9", "xmm10", "xmm11")
 
+#endif
+
 /*
-* Loads (c,c,c,c) to ymm12 and ymm13.
+* Broadcasts the real number c to ymm12 and ymm13.
 */
 
 #define _avx_load_real_dble(c)                                                 \
@@ -2126,7 +3016,7 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm12", "xmm13")
 
 /*
-* Loads (c,c,c,c) to ymm14 and ymm15.
+* Broadcasts the real number c to ymm14 and ymm15.
 */
 
 #define _avx_load_real_up_dble(c)                                              \
@@ -2151,13 +3041,29 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        "vmulpd %%ymm13, %%ymm5, %%ymm5"                        \
                        :                                                       \
                        :                                                       \
-                       : "xmm3", "xmm4", "xmm5", "xmm0", "xmm1", "xmm2")
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
 * Multiplies the spinor s by the real number c and adds the result to
 * ymm0,..,ymm5, assuming c was loaded using _avx_load_real_up_dble(c).
 * The registers ymm6,..,ymm11 are used as workspace.
 */
+
+#if (defined FMA3)
+
+#define _avx_mulr_spinor_add_dble(s)                                           \
+  _avx_spinor_load_up_dble(s);                                                 \
+  __asm__ __volatile__("vfmadd231pd %%ymm14, %%ymm6, %%ymm0 \n\t"              \
+                       "vfmadd231pd %%ymm15, %%ymm7, %%ymm1 \n\t"              \
+                       "vfmadd231pd %%ymm14, %%ymm8, %%ymm2 \n\t"              \
+                       "vfmadd231pd %%ymm15, %%ymm9, %%ymm3 \n\t"              \
+                       "vfmadd231pd %%ymm14, %%ymm10, %%ymm4 \n\t"             \
+                       "vfmadd231pd %%ymm15, %%ymm11, %%ymm5"                  \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
+
+#else
 
 #define _avx_mulr_spinor_add_dble(s)                                           \
   _avx_spinor_load_up_dble(s);                                                 \
@@ -2177,5 +3083,7 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        :                                                       \
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",       \
                          "xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11")
+
+#endif
 
 #endif

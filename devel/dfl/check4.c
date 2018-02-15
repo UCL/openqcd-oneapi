@@ -3,7 +3,7 @@
 *
 * File check4.c
 *
-* Copyright (C) 2011-2013 Martin Luescher
+* Copyright (C) 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -36,7 +36,7 @@ int bs_sap[4], nmr_sap, ncy_sap, nkv_gcr, nmx_gcr;
 int bs_dfl[4], Ns, nkv_dfl, nmx_dfl, nkv_dpr, nmx_dpr, eoflg, bc;
 int ninv_dgn, nmr_dgn, ncy_dgn;
 double kappa, csw, mu, cF, cF_prime;
-double phi[2], phi_prime[2], m0, res_gcr, res_dpr;
+double phi[2], phi_prime[2], theta[3], m0, res_gcr, res_dpr;
 double kappa_dgn, mu_dgn;
 char cnfg_dir[NAME_SIZE], cnfg_file[NAME_SIZE], nbase[NAME_SIZE];
 
@@ -105,6 +105,8 @@ int main(int argc, char *argv[])
     else
       cF_prime = cF;
 
+    read_dprms("theta", 3, theta);
+
     find_section("SAP");
     read_line("bs", "%d %d %d %d", bs_sap, bs_sap + 1, bs_sap + 2, bs_sap + 3);
     read_line("nmr", "%d", &nmr_sap);
@@ -151,6 +153,7 @@ int main(int argc, char *argv[])
   MPI_Bcast(phi_prime, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cF, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cF_prime, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(theta, 3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
   MPI_Bcast(bs_sap, 4, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&nmr_sap, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -176,8 +179,8 @@ int main(int argc, char *argv[])
   lat = set_lat_parms(5.5, 1.0, 1, &kappa, csw);
   print_lat_parms();
 
-  set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime);
-  print_bc_parms();
+  set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime, theta);
+  print_bc_parms(3);
 
   set_sap_parms(bs_sap, 1, nmr_sap, ncy_sap);
   m0 = lat.m0[0];
@@ -234,7 +237,7 @@ int main(int argc, char *argv[])
   for (icnfg = first; icnfg <= last; icnfg += step) {
     sprintf(cnfg_file, "%s/%sn%d", cnfg_dir, nbase, icnfg);
     import_cnfg(cnfg_file);
-    chs_ubnd(-1);
+    set_ud_phase();
 
     if (my_rank == 0) {
       printf("Configuration no %d\n", icnfg);
@@ -251,7 +254,6 @@ int main(int argc, char *argv[])
 
     rho = dfl_sap_gcr(nkv_gcr, nmx_gcr, res_gcr, mu, psd[0], psd[1], status);
 
-    error_chk();
     mulr_spinor_add_dble(VOLUME, psd[2], psd[0], -1.0);
     del = norm_square_dble(VOLUME, 1, psd[2]);
     error_root(del != 0.0, 1, "main [check4.c]",

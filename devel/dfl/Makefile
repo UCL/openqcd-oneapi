@@ -21,6 +21,14 @@ all: rmxeq mkdep mkxeq
 
 MAIN = check1 check2 check3 check4
 
+ARCHIVE = archive
+
+BLOCK = block blk_grid map_u2blk map_sw2blk map_s2blk
+
+DIRAC = Dw_dble Dw Dw_bnd
+
+DFL = dfl_geometry dfl_subspace ltl_gcr dfl_sap_gcr dfl_modes
+
 FLAGS = flags lat_parms sap_parms dfl_parms
 
 LATTICE = bcnds ftidx uidx geometry
@@ -29,33 +37,25 @@ LINALG = salg salg_dble valg valg_dble liealg cmatrix_dble cmatrix
 
 LINSOLV = fgcr fgcr4vd
 
+LITTLE = Aw_gen Aw_com Aw_ops Aw_dble Aw ltl_modes
+
 RANDOM = ranlux ranlxs ranlxd gauss
-
-UFLDS = plaq_sum shift uflds udcom
-
-SU3FCTS = chexp su3prod su3ren cm3x3 random_su3
-
-UTILS = endian mutils utils wspace
-
-SFLDS = sflds scom sdcom Pbnd Pbnd_dble
-
-TCHARGE = ftcom ftensor
-
-SW_TERM = pauli pauli_dble swflds sw_term
-
-DIRAC = Dw_dble Dw Dw_bnd
-
-BLOCK = block blk_grid map_u2blk map_sw2blk map_s2blk
 
 SAP = blk_solv sap_com sap sap_gcr
 
-ARCHIVE = archive
+SFLDS = sflds scom sdcom Pbnd Pbnd_dble
 
-DFL = dfl_geometry dfl_subspace ltl_gcr dfl_sap_gcr dfl_modes
+SU3FCTS = chexp su3prod su3ren cm3x3 random_su3
+
+SW_TERM = pauli pauli_dble swflds sw_term
+
+TCHARGE = ftcom ftensor
+
+UFLDS = plaq_sum shift uflds udcom
+
+UTILS = endian error hsum mutils utils wspace
 
 VFLDS = vflds vinit vcom vdcom
-
-LITTLE = Aw_gen Aw_com Aw_ops Aw_dble Aw ltl_modes
 
 MODULES = $(FLAGS) $(LATTICE) $(LINALG) $(LINSOLV) $(RANDOM) $(UFLDS) \
           $(SU3FCTS) $(UTILS) $(SFLDS) $(TCHARGE) $(SW_TERM) $(DIRAC) \
@@ -95,13 +95,15 @@ CFLAGS = -std=c89 -pedantic -fstrict-aliasing \
          -Wall -Wno-long-long -Wstrict-prototypes -Werror \
          -O -mno-avx -Dx64 -DPM
 
+LFLAGS =
+
 # -DFGCR_DBG -DFGCR4VD_DBG -DDFL_MODES_DBG
 
 
 ############################## do not change ###################################
 
 SHELL=/bin/bash
-CC=$(MPI_HOME)/bin/mpicc
+CC=mpicc
 CLINKER=$(CC)
 
 PGMS= $(MAIN) $(MODULES)
@@ -124,7 +126,7 @@ $(addsuffix .o,$(PGMS)): %.o: %.c Makefile
 # rule to link object files
 
 $(MAIN): %: %.o $(addsuffix .o,$(MODULES)) Makefile
-	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(CFLAGS) $(LOGOPTION) \
+	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(LFLAGS) $(LOGOPTION) \
         $(addprefix -L,$(LIBPATH)) $(addprefix -l,$(LIBS)) -o $@
 
 

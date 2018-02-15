@@ -34,8 +34,14 @@ typedef union
 } spin2_t;
 
 static pauli mp[4] ALIGNED16;
-static spin_t s1, s2, r1, r2 ALIGNED16;
-static spin2_t sd1, sd2, rd1, rd2 ALIGNED16;
+static spin_t s1 ALIGNED16;
+static spin_t s2 ALIGNED16;
+static spin_t r1 ALIGNED16;
+static spin_t r2 ALIGNED16;
+static spin2_t sd1 ALIGNED16;
+static spin2_t sd2 ALIGNED16;
+static spin2_t rd1 ALIGNED16;
+static spin2_t rd2 ALIGNED16;
 
 int main(void)
 {

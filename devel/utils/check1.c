@@ -3,13 +3,13 @@
 *
 * File check1.c
 *
-* Copyright (C) 2005, 2008 Martin Luescher
+* Copyright (C) 2005, 2008, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
 *
 * Copying of files. After running this program, one can verify that all
-* bytes have been copied correctly using the diff utility
+* bytes have been copied correctly using the diff utility.
 *
 *******************************************************************************/
 
@@ -31,7 +31,7 @@ static float r[NRAN];
 
 int main(int argc, char *argv[])
 {
-  int my_rank, n, err1, err2, iw;
+  int my_rank, n, iw;
   FILE *flog = NULL, *fdat = NULL;
 
   MPI_Init(&argc, &argv);
@@ -54,32 +54,29 @@ int main(int argc, char *argv[])
   ranlxs(r, NRAN);
 
   if (my_rank == 0) {
-    printf("Write 10 random numbers to check1.log (in asci format)\n");
-    printf("and %d numbers to check1.dat (in binary format)\n\n", NRAN);
+    printf("Write 10 random numbers to test.log (in asci format)\n");
+    printf("and %d numbers to test.dat (in binary format).\n\n", NRAN);
 
-    fdat = fopen("check1.dat", "wb");
+    fdat = fopen("test.log", "w");
+    error_root(fdat == NULL, 1, "main [check1.c]", "Unable to open file");
+    iw = 0;
+    for (n = 0; n < 10; n++)
+      iw |= (fprintf(fdat, "r[%d] = %.6e\n", n, r[n]) < 0);
+    error_root(iw != 0, 1, "main [check1.c]", "Incorrect write count");
+    fclose(fdat);
+
+    fdat = fopen("test.dat", "wb");
+    error_root(fdat == NULL, 1, "main [check1.c]", "Unable to open file");
     iw = fwrite(&r[0], sizeof(float), NRAN, fdat);
     error_root(iw != NRAN, 1, "main [check1.c]", "Incorrect write count");
     fclose(fdat);
 
-    for (n = 0; n < 10; n++)
-      printf("r[%d] = %.6e\n", n, r[n]);
+    printf("Copy the files to test.log~ and test.dat~, respectively.\n");
+    printf("The copying may then be verified using the diff utility.\n\n");
 
-    printf("\n");
-    printf("Copy the files to check1.log~ and check1.dat~ respectively.\n");
-    printf("The copying may then be verified using the diff utility\n\n");
-    fclose(flog);
-
-    err1 = copy_file("check1.log", "check1.log~");
-    err2 = copy_file("check1.dat", "check1.dat~");
-
-    flog = freopen("check1.log", "a", stdout);
-
-    if ((err1 != 0) || (err2 != 0))
-      printf("Copying failed: err1 = %d, err2 = %d\n", err1, err2);
+    copy_file("test.log", "test.log~");
+    copy_file("test.dat", "test.dat~");
   }
-
-  error_chk();
 
   if (my_rank == 0)
     fclose(flog);

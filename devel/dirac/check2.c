@@ -1,15 +1,15 @@
 /*******************************************************************************
- *
- * File check2.c
- *
- * Copyright (C) 2005, 2011-2013 Martin Luescher
- *
- * This software is distributed under the terms of the GNU General Public
- * License (GPL)
- *
- * Action of Dw() on plane waves.
- *
- *******************************************************************************/
+*
+* File check2.c
+*
+* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
+*
+* This software is distributed under the terms of the GNU General Public
+* License (GPL)
+*
+* Action of Dw() on plane waves.
+*
+*******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
   float ran[4];
   float mu, pi, d, dmax;
   float mp, pt, pv, p[4], sp[4];
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   complex z;
   spinor **ps, s0, s1, s2, s3, s4;
   sw_parms_t swp;
@@ -137,13 +137,17 @@ int main(int argc, char *argv[])
   phi[1] = 0.0;
   phi_prime[0] = 0.0;
   phi_prime[1] = 0.0;
-  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime);
-  set_ani_parms(1.0, 2.0);
+
+  theta[0] = 0.0;
+  theta[1] = 0.0;
+  theta[2] = 0.0;
+  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime, theta);
+  set_ani_parms(1, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+  print_bc_parms(2);
 
   ani_params_t ani = ani_parms();
   double gamma_f = (ani.xi / ani.nu);
   double one_over_gammaf = (ani.nu / ani.xi);
-  print_bc_parms();
 
   start_ranlux(0, 12345);
   geometry();
@@ -158,7 +162,7 @@ int main(int argc, char *argv[])
            swp.cF[0], swp.cF[1]);
 
   (void)udfld();
-  chs_ubnd(-1);
+  set_ud_phase();
   sw_term(NO_PTS);
   assign_ud2u();
   assign_swd2sw();
@@ -316,8 +320,6 @@ int main(int argc, char *argv[])
       printf("Normalized deviation = %.1e at p=(%d,%d,%d,%d)\n", d, np[0],
              np[1], np[2], np[3]);
   }
-
-  error_chk();
 
   if (my_rank == 0) {
     printf("\n");

@@ -28,6 +28,7 @@ cG           1.0
 cG'          1.0
 cF           1.0
 cF'          1.0
+theta        0.5 0.5 0.5
 
 [Random number generator]
 level        0

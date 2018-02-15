@@ -25,6 +25,7 @@ cG           1.10
 cG'          1.05
 cF           0.95
 cF'          0.90
+theta        0.5 1.0 -0.5
 
 [Anisotropy parameters]
 nu           1.0

@@ -3,7 +3,7 @@
 *
 * File ftcom.c
 *
-* Copyright (C) 2011, 2013 Martin Luescher
+* Copyright (C) 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)

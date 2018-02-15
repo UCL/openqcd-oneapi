@@ -3,7 +3,7 @@
 *
 * File check1.c
 *
-* Copyright (C) 2005, 2011-2013 Martin Luescher
+* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -235,7 +235,7 @@ static double cmp_sw2swd(ptset_t set)
 int main(int argc, char *argv[])
 {
   int my_rank, bc, ix, ie;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   double d, dmax;
   pauli *sw;
   pauli_dble *swd;
@@ -269,8 +269,11 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 1.0, 1.0, 1.301, 0.789, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.34;
+  theta[1] = -1.25;
+  theta[2] = 0.58;
+  set_bc_parms(bc, 1.0, 1.0, 1.301, 0.789, phi, phi_prime, theta);
+  print_bc_parms(2);
 
   start_ranlux(0, 123456);
   geometry();
@@ -290,20 +293,25 @@ int main(int argc, char *argv[])
   error(ie != 1, 1, "main [check1.c]",
         "SW fields are not correctly initialized");
 
-  print_flags();
   random_ud();
+  print_flags();
   sw_term(NO_PTS);
   ie = check_swbnd();
   error(ie != 1, 1, "main [check1.c]",
         "SW field has incorrect boundary values");
   save_swd();
 
-  chs_ubnd(-1);
+  set_ud_phase();
   sw_term(NO_PTS);
   d = cmp_swd(ALL_PTS);
-  error(d != 0.0, 1, "main [check1.c]",
-        "SW term changed after calling chs_ubnd(-1)");
+  MPI_Reduce(&d, &dmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
+  if (my_rank == 0) {
+    printf("After calling set_ud_phase()\n");
+    printf("Maximal deviation of swd = %.1e\n\n", dmax);
+  }
+
+  print_flags();
   ie = sw_term(EVEN_PTS);
   error(ie != 0, 1, "main [check1.c]", "Unsafe inversion of swd_e");
   d = cmp_iswd(EVEN_PTS);

@@ -113,6 +113,8 @@ cF           0.95                  # Fermion action improvement coefficient
                                    # at time 0
 cF'          0.90                  # Fermion action improvement coefficient
                                    # at time NPROC0*L0
+theta        0.5 1.0 -0.5          # Angles specifying the phase-periodic bc
+                                   # of the quark fields in space
 
 [Random number generator]
 level        0                     # Ranlux level

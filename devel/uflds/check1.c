@@ -3,7 +3,7 @@
 *
 * File check1.c
 *
-* Copyright (C) 2009, 2011, 2013 Martin Luescher
+* Copyright (C) 2009, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -19,6 +19,7 @@
 #include <math.h>
 #include "mpi.h"
 #include "su3.h"
+#include "su3fcts.h"
 #include "random.h"
 #include "flags.h"
 #include "utils.h"
@@ -31,9 +32,45 @@
 #define N2 (NPROC2 * L2)
 #define N3 (NPROC3 * L3)
 
-static complex_dble det_dble(su3_dble *u)
+static complex_dble pdet[4];
+
+static void set_pdet(void)
 {
-  complex_dble det1, det2, det3, detu;
+  double r;
+  bc_parms_t bcp;
+
+  pdet[0].re = 1.0;
+  pdet[0].im = 0.0;
+
+  if (query_flags(UD_PHASE_SET) == 1) {
+    bcp = bc_parms();
+
+    if (bcp.type == 3) {
+      pdet[0].re = -1.0;
+      pdet[0].im = 0.0;
+    }
+
+    r = 3.0 * bcp.theta[0] / (double)(N1);
+    pdet[1].re = cos(r);
+    pdet[1].im = sin(r);
+
+    r = 3.0 * bcp.theta[1] / (double)(N2);
+    pdet[2].re = cos(r);
+    pdet[2].im = sin(r);
+
+    r = 3.0 * bcp.theta[2] / (double)(N3);
+    pdet[3].re = cos(r);
+    pdet[3].im = sin(r);
+  } else {
+    pdet[1] = pdet[0];
+    pdet[2] = pdet[0];
+    pdet[3] = pdet[0];
+  }
+}
+
+static complex_dble udet(su3_dble *u)
+{
+  complex_dble det1, det2, det3, det;
 
   det1.re = ((*u).c22.re * (*u).c33.re - (*u).c22.im * (*u).c33.im) -
             ((*u).c23.re * (*u).c32.re - (*u).c23.im * (*u).c32.im);
@@ -48,47 +85,26 @@ static complex_dble det_dble(su3_dble *u)
   det3.im = ((*u).c21.re * (*u).c32.im + (*u).c21.im * (*u).c32.re) -
             ((*u).c22.re * (*u).c31.im + (*u).c22.im * (*u).c31.re);
 
-  detu.re = ((*u).c11.re * det1.re - (*u).c11.im * det1.im) -
-            ((*u).c12.re * det2.re - (*u).c12.im * det2.im) +
-            ((*u).c13.re * det3.re - (*u).c13.im * det3.im);
-  detu.im = ((*u).c11.re * det1.im + (*u).c11.im * det1.re) -
-            ((*u).c12.re * det2.im + (*u).c12.im * det2.re) +
-            ((*u).c13.re * det3.im + (*u).c13.im * det3.re);
+  det.re = ((*u).c11.re * det1.re - (*u).c11.im * det1.im) -
+           ((*u).c12.re * det2.re - (*u).c12.im * det2.im) +
+           ((*u).c13.re * det3.re - (*u).c13.im * det3.im);
+  det.im = ((*u).c11.re * det1.im + (*u).c11.im * det1.re) -
+           ((*u).c12.re * det2.im + (*u).c12.im * det2.re) +
+           ((*u).c13.re * det3.im + (*u).c13.im * det3.re);
 
-  return detu;
+  return det;
 }
 
-static double dev_unity(su3 *u)
+static double dev_zero(su3_dble *u)
 {
-  int i;
-  float r[18];
-  double d, dmax;
+  double d, dmax, *r, *rm;
 
-  r[0] = (*u).c11.re - 1.0f;
-  r[1] = (*u).c11.im;
-  r[2] = (*u).c12.re;
-  r[3] = (*u).c12.im;
-  r[4] = (*u).c13.re;
-  r[5] = (*u).c13.im;
-
-  r[6] = (*u).c21.re;
-  r[7] = (*u).c21.im;
-  r[8] = (*u).c22.re - 1.0f;
-  r[9] = (*u).c22.im;
-  r[10] = (*u).c23.re;
-  r[11] = (*u).c23.im;
-
-  r[12] = (*u).c31.re;
-  r[13] = (*u).c31.im;
-  r[14] = (*u).c32.re;
-  r[15] = (*u).c32.im;
-  r[16] = (*u).c33.re - 1.0f;
-  r[17] = (*u).c33.im;
-
+  r = (double *)(u);
+  rm = r + 18;
   dmax = 0.0;
 
-  for (i = 0; i < 18; i++) {
-    d = fabs((double)(r[i]));
+  for (; r < rm; r++) {
+    d = fabs(*r);
     if (d > dmax)
       dmax = d;
   }
@@ -96,180 +112,143 @@ static double dev_unity(su3 *u)
   return dmax;
 }
 
-static double dev_unity_dble(su3_dble *u)
+static double dev_unity(su3_dble *u)
 {
-  int i;
-  double r[18], d, dmax;
+  su3_dble v;
 
-  r[0] = (*u).c11.re - 1.0;
-  r[1] = (*u).c11.im;
-  r[2] = (*u).c12.re;
-  r[3] = (*u).c12.im;
-  r[4] = (*u).c13.re;
-  r[5] = (*u).c13.im;
+  v = (*u);
+  v.c11.re -= 1.0;
+  v.c22.re -= 1.0;
+  v.c33.re -= 1.0;
 
-  r[6] = (*u).c21.re;
-  r[7] = (*u).c21.im;
-  r[8] = (*u).c22.re - 1.0;
-  r[9] = (*u).c22.im;
-  r[10] = (*u).c23.re;
-  r[11] = (*u).c23.im;
-
-  r[12] = (*u).c31.re;
-  r[13] = (*u).c31.im;
-  r[14] = (*u).c32.re;
-  r[15] = (*u).c32.im;
-  r[16] = (*u).c33.re - 1.0;
-  r[17] = (*u).c33.im;
-
-  dmax = 0.0;
-
-  for (i = 0; i < 18; i++) {
-    d = fabs(r[i]);
-    if (d > dmax)
-      dmax = d;
-  }
-
-  return dmax;
+  return dev_zero(&v);
 }
 
-static double dev_zero_dble(su3_dble *u)
+static double dev_bval(int k, double *phi, su3_dble *u)
 {
-  int i;
-  double r[18], d, dmax;
+  double s[3], phi3;
 
-  r[0] = (*u).c11.re;
-  r[1] = (*u).c11.im;
-  r[2] = (*u).c12.re;
-  r[3] = (*u).c12.im;
-  r[4] = (*u).c13.re;
-  r[5] = (*u).c13.im;
+  su3_dble v;
 
-  r[6] = (*u).c21.re;
-  r[7] = (*u).c21.im;
-  r[8] = (*u).c22.re;
-  r[9] = (*u).c22.im;
-  r[10] = (*u).c23.re;
-  r[11] = (*u).c23.im;
-
-  r[12] = (*u).c31.re;
-  r[13] = (*u).c31.im;
-  r[14] = (*u).c32.re;
-  r[15] = (*u).c32.im;
-  r[16] = (*u).c33.re;
-  r[17] = (*u).c33.im;
-
-  dmax = 0.0;
-
-  for (i = 0; i < 18; i++) {
-    d = fabs(r[i]);
-    if (d > dmax)
-      dmax = d;
-  }
-
-  return dmax;
-}
-
-static double dev_bval_dble(int k, double *phi, su3_dble *u)
-{
-  int i;
-  double r[18], s[3], phi3, d, dmax;
-
+  v = (*u);
   s[0] = (double)(N1);
   s[1] = (double)(N2);
   s[2] = (double)(N3);
   phi3 = -phi[0] - phi[1];
 
-  r[0] = (*u).c11.re - cos(phi[0] / s[k - 1]);
-  r[1] = (*u).c11.im - sin(phi[0] / s[k - 1]);
-  r[2] = (*u).c12.re;
-  r[3] = (*u).c12.im;
-  r[4] = (*u).c13.re;
-  r[5] = (*u).c13.im;
+  v.c11.re -= cos(phi[0] / s[k - 1]);
+  v.c11.im -= sin(phi[0] / s[k - 1]);
+  v.c22.re -= cos(phi[1] / s[k - 1]);
+  v.c22.im -= sin(phi[1] / s[k - 1]);
+  v.c33.re -= cos(phi3 / s[k - 1]);
+  v.c33.im -= sin(phi3 / s[k - 1]);
 
-  r[6] = (*u).c21.re;
-  r[7] = (*u).c21.im;
-  r[8] = (*u).c22.re - cos(phi[1] / s[k - 1]);
-  r[9] = (*u).c22.im - sin(phi[1] / s[k - 1]);
-  r[10] = (*u).c23.re;
-  r[11] = (*u).c23.im;
+  return dev_zero(&v);
+}
 
-  r[12] = (*u).c31.re;
-  r[13] = (*u).c31.im;
-  r[14] = (*u).c32.re;
-  r[15] = (*u).c32.im;
-  r[16] = (*u).c33.re - cos(phi3 / s[k - 1]);
-  r[17] = (*u).c33.im - sin(phi3 / s[k - 1]);
+static double dev_u3(su3_dble *u)
+{
+  su3_dble v;
 
+  su3dagxsu3(u, u, &v);
+
+  return dev_unity(&v);
+}
+
+static double dev_udet(int t, int ifc, su3_dble *u)
+{
+  double d, dmax;
+  complex_dble w, det;
+
+  if ((ifc > 1) || ((ifc == 0) && (t == (N0 - 1))) ||
+      ((ifc == 1) && (t == 0))) {
+    w.re = pdet[ifc / 2].re;
+    w.im = pdet[ifc / 2].im;
+  } else {
+    w.re = 1.0;
+    w.im = 0.0;
+  }
+
+  det = udet(u);
   dmax = 0.0;
 
-  for (i = 0; i < 18; i++) {
-    d = fabs(r[i]);
+  d = fabs(w.re - det.re);
+  if (d > dmax)
+    dmax = d;
+  d = fabs(w.im - det.im);
+  if (d > dmax)
+    dmax = d;
+
+  return dmax;
+}
+
+static double dev_udu(su3_dble *ud, su3 *u)
+{
+  float *r, *rm;
+  double d, dmax, *rd;
+
+  rd = (double *)(ud);
+  r = (float *)(u);
+  rm = r + 18;
+  dmax = 0.0;
+
+  for (; r < rm; r++) {
+    d = fabs((*rd) - (double)(*r));
     if (d > dmax)
       dmax = d;
+    rd += 1;
   }
 
   return dmax;
 }
 
-static double dev_uudag_dble(su3_dble *u)
+static double dev_udud(su3_dble *u, su3_dble *v)
 {
-  su3_dble udag, w;
+  double d, dmax, *s, *r, *rm;
 
-  _su3_dagger(udag, (*u));
-  _su3_times_su3(w, (*u), udag);
-
-  return dev_unity_dble(&w);
-}
-
-static double dev_detu_dble(su3_dble *u)
-{
-  double d, dmax;
-  complex_dble detu;
-
-  detu = det_dble(u);
+  s = (double *)(u);
+  r = (double *)(v);
+  rm = r + 18;
   dmax = 0.0;
 
-  d = fabs(1.0 - detu.re);
-  if (d > dmax)
-    dmax = d;
-  d = fabs(detu.im);
-  if (d > dmax)
-    dmax = d;
+  for (; r < rm; r++) {
+    d = fabs((*s) - (*r));
+    if (d > dmax)
+      dmax = d;
+    s += 1;
+  }
 
   return dmax;
 }
 
-static double dev_udu_dble(su3_dble *ud, su3 *u)
+static double cmp_ud(su3_dble *usv)
 {
-  int i;
-  double r[18], d, dmax;
+  int bc, ix, ifc, x0;
+  double d, dmax;
+  su3_dble *ub, *u, *v, *um;
 
-  r[0] = (*ud).c11.re - (double)((*u).c11.re);
-  r[1] = (*ud).c11.im - (double)((*u).c11.im);
-  r[2] = (*ud).c12.re - (double)((*u).c12.re);
-  r[3] = (*ud).c12.im - (double)((*u).c12.im);
-  r[4] = (*ud).c13.re - (double)((*u).c13.re);
-  r[5] = (*ud).c13.im - (double)((*u).c13.im);
-  r[6] = (*ud).c21.re - (double)((*u).c21.re);
-  r[7] = (*ud).c21.im - (double)((*u).c21.im);
-  r[8] = (*ud).c22.re - (double)((*u).c22.re);
-  r[9] = (*ud).c22.im - (double)((*u).c22.im);
-  r[10] = (*ud).c23.re - (double)((*u).c23.re);
-  r[11] = (*ud).c23.im - (double)((*u).c23.im);
-  r[12] = (*ud).c31.re - (double)((*u).c31.re);
-  r[13] = (*ud).c31.im - (double)((*u).c31.im);
-  r[14] = (*ud).c32.re - (double)((*u).c32.re);
-  r[15] = (*ud).c32.im - (double)((*u).c32.im);
-  r[16] = (*ud).c33.re - (double)((*u).c33.re);
-  r[17] = (*ud).c33.im - (double)((*u).c33.im);
-
+  bc = bc_type();
+  ub = udfld();
+  um = ub + 4 * VOLUME;
+  v = usv;
   dmax = 0.0;
 
-  for (i = 0; i < 18; i++) {
-    d = fabs(r[i]);
+  for (u = ub; u < um; u++) {
+    ix = (u - ub);
+    ifc = (ix % 8);
+    ix = (ix / 8) + (VOLUME / 2);
+    x0 = global_time(ix);
+
+    if ((bc == 0) &&
+        (((x0 == 0) && (ifc == 1)) || ((x0 == (N0 - 1)) && (ifc == 0))))
+      d = dev_zero(u) + dev_zero(v);
+    else
+      d = dev_udud(u, v);
+
     if (d > dmax)
       dmax = d;
+
+    v += 1;
   }
 
   return dmax;
@@ -281,9 +260,10 @@ int main(int argc, char *argv[])
   int iu, ix, ifc, x0, k, ie;
   double d1, d2, dmax1, dmax2;
   double dmax1_all, dmax2_all;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   su3 *u, *ub, *um;
-  su3_dble *ud, *udb, *udm;
+  su3_dble vd, *ud, *udb, *udm;
+  su3_dble **wud;
   FILE *flog = NULL;
 
   MPI_Init(&argc, &argv);
@@ -313,18 +293,23 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.34;
+  theta[1] = -1.25;
+  theta[2] = 0.58;
+  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime, theta);
+  print_bc_parms(2);
 
   start_ranlux(0, 123456);
   geometry();
+  alloc_wud(1);
 
+  cm3x3_unity(1, &vd);
   ub = ufld();
   um = ub + 4 * VOLUME;
   dmax1 = 0.0;
 
   for (u = ub; u < um; u++) {
-    d1 = dev_unity(u);
+    d1 = dev_udu(&vd, u);
 
     if (d1 > dmax1)
       dmax1 = d1;
@@ -340,7 +325,6 @@ int main(int argc, char *argv[])
   print_flags();
 
   udb = udfld();
-
   ie = check_bc(0.0);
   error_root(ie == 0, 1, "main [check1.c]",
              "Boundary conditions not properly set");
@@ -357,15 +341,15 @@ int main(int argc, char *argv[])
 
     if ((bc == 0) &&
         (((x0 == 0) && (ifc == 1)) || ((x0 == (N0 - 1)) && (ifc == 0)))) {
-      d2 = dev_zero_dble(ud);
+      d2 = dev_zero(ud);
       if (d2 > dmax2)
         dmax2 = d2;
     } else if ((bc != 1) || (x0 > 0) || (ifc < 2)) {
-      d1 = dev_unity_dble(ud);
+      d1 = dev_unity(ud);
       if (d1 > dmax1)
         dmax1 = d1;
     } else {
-      d2 = dev_bval_dble(ifc / 2, phi, ud);
+      d2 = dev_bval(ifc / 2, phi, ud);
       if (d2 > dmax2)
         dmax2 = d2;
     }
@@ -375,7 +359,7 @@ int main(int argc, char *argv[])
     ud = udb + 4 * VOLUME + 7 * (BNDRY / 4);
 
     for (k = 1; k < 4; k++) {
-      d2 = dev_bval_dble(k, phi_prime, ud);
+      d2 = dev_bval(k, phi_prime, ud);
       ud += 1;
 
       if (d2 > dmax2)
@@ -398,7 +382,6 @@ int main(int argc, char *argv[])
 
   random_ud();
   assign_ud2u();
-
   ie = check_bc(0.0);
   error_root(ie == 0, 1, "main [check1.c]", "Boundary conditions changed");
 
@@ -408,7 +391,7 @@ int main(int argc, char *argv[])
   dmax1 = 0.0;
 
   for (ud = udb; ud < udm; ud++) {
-    d1 = dev_udu_dble(ud, u);
+    d1 = dev_udu(ud, u);
 
     if (d1 > dmax1)
       dmax1 = d1;
@@ -427,6 +410,7 @@ int main(int argc, char *argv[])
   print_flags();
 
   random_ud();
+  set_pdet();
   dmax1 = 0.0;
   dmax2 = 0.0;
 
@@ -438,11 +422,11 @@ int main(int argc, char *argv[])
 
     if ((bc == 0) &&
         (((x0 == 0) && (ifc == 1)) || ((x0 == (N0 - 1)) && (ifc == 0)))) {
-      d1 = dev_zero_dble(ud);
+      d1 = dev_zero(ud);
       d2 = d1;
     } else {
-      d1 = dev_uudag_dble(ud);
-      d2 = dev_detu_dble(ud);
+      d1 = dev_u3(ud);
+      d2 = dev_udet(x0, ifc, ud);
     }
 
     if (d1 > dmax1)
@@ -461,6 +445,56 @@ int main(int argc, char *argv[])
   }
 
   print_flags();
+
+  wud = reserve_wud(1);
+  cm3x3_assign(4 * VOLUME, udb, wud[0]);
+  set_ud_phase();
+  set_pdet();
+  dmax1 = 0.0;
+  dmax2 = 0.0;
+
+  for (ud = udb; ud < udm; ud++) {
+    iu = (ud - udb);
+    ix = iu / 8 + VOLUME / 2;
+    ifc = iu % 8;
+    x0 = global_time(ix);
+
+    if ((bc == 0) &&
+        (((x0 == 0) && (ifc == 1)) || ((x0 == (N0 - 1)) && (ifc == 0)))) {
+      d1 = dev_zero(ud);
+      d2 = d1;
+    } else {
+      d1 = dev_u3(ud);
+      d2 = dev_udet(x0, ifc, ud);
+    }
+
+    if (d1 > dmax1)
+      dmax1 = d1;
+    if (d2 > dmax2)
+      dmax2 = d2;
+  }
+
+  MPI_Reduce(&dmax1, &dmax1_all, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&dmax2, &dmax2_all, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+  if (my_rank == 0) {
+    printf("After set_ud_phase()\n");
+    printf("|u^dag*u-1|         = %.2e\n", dmax1_all);
+    printf("|det{u}-det{phase}| = %.2e\n\n", dmax2_all);
+  }
+
+  print_flags();
+  unset_ud_phase();
+  dmax1 = cmp_ud(wud[0]);
+  MPI_Reduce(&dmax1, &dmax1_all, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+  if (my_rank == 0) {
+    printf("After unset_ud_phase()\n");
+    printf("|u^dag*uold-1|      = %.2e\n\n", dmax1_all);
+  }
+
+  print_flags();
+  release_wud();
 
   if (my_rank == 0)
     fclose(flog);

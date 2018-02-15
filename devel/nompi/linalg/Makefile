@@ -19,7 +19,7 @@ all: rmxeq mkdep mkxeq
 
 # main programs and required modules
 
-MAIN = check1 check2 time1 time2 
+MAIN = check1 check2 time1 time2
 
 RANDOM = ranlxs ranlxd gauss
 
@@ -27,7 +27,7 @@ UTILS = utils
 
 LINALG = cmatrix cmatrix_dble
 
-MODULES = $(RANDOM) $(UTILS) $(LINALG) 
+MODULES = $(RANDOM) $(UTILS) $(LINALG)
 
 
 # search path for modules
@@ -55,7 +55,8 @@ CFLAGS = -std=c89 -pedantic -fstrict-aliasing -fno-inline \
          -Wall -Wno-long-long -Wstrict-prototypes -Werror \
          -O -mno-avx -Dx64 -DPM
 
-# -Dx64
+LFLAGS =
+
 
 ############################## do not change ###################################
 
@@ -77,7 +78,7 @@ LDFLAGS = $(addprefix -L,$(LIBPATH)) $(addprefix -l,$(LIBS))
 # rule to make dependencies
 
 $(addsuffix .d,$(PGMS)): %.d: %.c Makefile
-	@ $(CC) -MM -ansi $(INCDIRS) $< -o $@
+	@ $(GCC) -MM -ansi $(INCDIRS) $< -o $@
 
 
 # rule to compile source programs
@@ -89,7 +90,7 @@ $(addsuffix .o,$(PGMS)): %.o: %.c Makefile
 # rule to link object files
 
 $(MAIN): %: %.o $(OBJECTS) Makefile
-	$(CC) $< $(OBJECTS) $(CFLAGS) $(LDFLAGS) -o $@
+	$(CC) $< $(OBJECTS) $(LFLAGS) $(LDFLAGS) -o $@
 
 
 # produce executables

@@ -3,7 +3,7 @@
 *
 * File Dw_dble.c
 *
-* Copyright (C) 2005, 2011-2013 Martin Luescher
+* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -117,7 +117,10 @@ typedef union
 static double coe, ceo;
 static double gamma_f, one_over_gammaf;
 static double one_over_ut_fermion;
-static const spinor_dble sd0 = {{{0.0}}};
+static const spinor_dble sd0 = {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+                                {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+                                {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+                                {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}}};
 static spin_t rs ALIGNED32;
 
 #if (defined AVX)

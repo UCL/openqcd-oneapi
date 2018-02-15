@@ -21,6 +21,14 @@ all: rmxeq mkdep mkxeq
 
 MAIN = check1 check2 check3 check4
 
+ARCHIVE = archive
+
+BLOCK = block blk_grid map_u2blk map_sw2blk map_s2blk
+
+DFL = dfl_geometry
+
+DIRAC = Dw_dble Dw Dw_bnd
+
 FLAGS = flags lat_parms sap_parms dfl_parms
 
 LATTICE = bcnds ftidx uidx geometry
@@ -31,27 +39,19 @@ LINSOLV = fgcr
 
 RANDOM = ranlux ranlxs ranlxd gauss
 
-UFLDS = plaq_sum shift uflds udcom
-
-SU3FCTS = chexp su3prod su3ren cm3x3 random_su3
-
-UTILS = endian mutils utils wspace
+SAP = blk_solv sap_com sap sap_gcr
 
 SFLDS = sflds scom sdcom Pbnd Pbnd_dble
 
-TCHARGE = ftcom ftensor
+SU3FCTS = chexp su3prod su3ren cm3x3 random_su3
 
 SW_TERM = pauli pauli_dble swflds sw_term
 
-DIRAC = Dw_dble Dw Dw_bnd
+TCHARGE = ftcom ftensor
 
-BLOCK = block blk_grid map_u2blk map_sw2blk map_s2blk
+UFLDS = plaq_sum shift uflds udcom
 
-SAP = blk_solv sap_com sap sap_gcr
-
-ARCHIVE = archive
-
-DFL = dfl_geometry
+UTILS = endian error hsum mutils utils wspace
 
 VFLDS = vflds vinit vcom vdcom
 
@@ -93,11 +93,13 @@ CFLAGS = -std=c89 -pedantic -fstrict-aliasing \
          -Wall -Wno-long-long -Wstrict-prototypes -Werror \
          -O -mno-avx -Dx64 -DPM
 
+LFLAGS =
+
 
 ############################## do not change ###################################
 
 SHELL=/bin/bash
-CC=$(MPI_HOME)/bin/mpicc
+CC=mpicc
 CLINKER=$(CC)
 
 PGMS= $(MAIN) $(MODULES)
@@ -120,7 +122,7 @@ $(addsuffix .o,$(PGMS)): %.o: %.c Makefile
 # rule to link object files
 
 $(MAIN): %: %.o $(addsuffix .o,$(MODULES)) Makefile
-	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(CFLAGS) $(LOGOPTION) \
+	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(LFLAGS) $(LOGOPTION) \
         $(addprefix -L,$(LIBPATH)) $(addprefix -l,$(LIBS)) -o $@
 
 

@@ -3,12 +3,12 @@
 *
 * File check2.c
 *
-* Copyright (C) 2010, 2011, 2013 Martin Luescher
+* Copyright (C) 2010, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
 *
-* Check of the programs set_bc(), check_bc() and chs_ubnd().
+* Check of the programs set_bc() and check_bc().
 *
 *******************************************************************************/
 
@@ -51,6 +51,7 @@ static void new_fld(int ibnd)
   }
 
   set_flags(UPDATED_UD);
+  set_flags(UNSET_UD_PHASE);
 }
 
 static int cmp_ud(su3_dble *u, su3_dble *v)
@@ -195,215 +196,11 @@ static int check_bval(su3_dble *u)
   return ie;
 }
 
-static complex_dble detu(su3_dble *u)
-{
-  complex_dble z, w;
-
-  z.re = (*u).c22.re * (*u).c33.re - (*u).c22.im * (*u).c33.im -
-         (*u).c32.re * (*u).c23.re + (*u).c32.im * (*u).c23.im;
-
-  z.im = (*u).c22.re * (*u).c33.im + (*u).c22.im * (*u).c33.re -
-         (*u).c32.re * (*u).c23.im - (*u).c32.im * (*u).c23.re;
-
-  w.re = (*u).c11.re * z.re - (*u).c11.im * z.im;
-  w.im = (*u).c11.re * z.im + (*u).c11.im * z.re;
-
-  z.re = (*u).c32.re * (*u).c13.re - (*u).c32.im * (*u).c13.im -
-         (*u).c12.re * (*u).c33.re + (*u).c12.im * (*u).c33.im;
-
-  z.im = (*u).c32.re * (*u).c13.im + (*u).c32.im * (*u).c13.re -
-         (*u).c12.re * (*u).c33.im - (*u).c12.im * (*u).c33.re;
-
-  w.re += ((*u).c21.re * z.re - (*u).c21.im * z.im);
-  w.im += ((*u).c21.re * z.im + (*u).c21.im * z.re);
-
-  z.re = (*u).c12.re * (*u).c23.re - (*u).c12.im * (*u).c23.im -
-         (*u).c22.re * (*u).c13.re + (*u).c22.im * (*u).c13.im;
-
-  z.im = (*u).c12.re * (*u).c23.im + (*u).c12.im * (*u).c23.re -
-         (*u).c22.re * (*u).c13.im - (*u).c22.im * (*u).c13.re;
-
-  w.re += ((*u).c31.re * z.re - (*u).c31.im * z.im);
-  w.im += ((*u).c31.re * z.im + (*u).c31.im * z.re);
-
-  return w;
-}
-
-static double check_detu(int ibc, su3_dble *u)
-{
-  int bc, ix, t, ifc;
-  double d, dmax;
-  complex_dble z;
-
-  bc = bc_type();
-  dmax = 0.0;
-
-  for (ix = (VOLUME / 2); ix < VOLUME; ix++) {
-    t = global_time(ix);
-
-    if (t == 0) {
-      z = detu(u);
-      d = fabs(z.re - 1.0) + fabs(z.im);
-      if (d > dmax)
-        dmax = d;
-      u += 1;
-
-      z = detu(u);
-
-      if ((bc == 3) && (ibc == -1))
-        d = fabs(z.re + 1.0) + fabs(z.im);
-      else if (bc == 0)
-        d = fabs(z.re) + fabs(z.im);
-      else
-        d = fabs(z.re - 1.0) + fabs(z.im);
-
-      if (d > dmax)
-        dmax = d;
-      u += 1;
-
-      for (ifc = 2; ifc < 8; ifc++) {
-        z = detu(u);
-        d = fabs(z.re - 1.0) + fabs(z.im);
-        if (d > dmax)
-          dmax = d;
-        u += 1;
-      }
-    } else if (t == (N0 - 1)) {
-      z = detu(u);
-
-      if ((bc == 3) && (ibc == -1))
-        d = fabs(z.re + 1.0) + fabs(z.im);
-      else if (bc == 0)
-        d = fabs(z.re) + fabs(z.im);
-      else
-        d = fabs(z.re - 1.0) + fabs(z.im);
-
-      if (d > dmax)
-        dmax = d;
-      u += 1;
-
-      for (ifc = 1; ifc < 8; ifc++) {
-        z = detu(u);
-        d = fabs(z.re - 1.0) + fabs(z.im);
-        if (d > dmax)
-          dmax = d;
-        u += 1;
-      }
-    } else {
-      for (ifc = 0; ifc < 8; ifc++) {
-        z = detu(u);
-        d = fabs(z.re - 1.0) + fabs(z.im);
-        if (d > dmax)
-          dmax = d;
-        u += 1;
-      }
-    }
-  }
-
-  if (NPROC > 1) {
-    d = dmax;
-    MPI_Reduce(&d, &dmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&dmax, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  }
-
-  return dmax;
-}
-
-static int scmp_ud(su3_dble *u, su3_dble *v)
-{
-  int i;
-  double r[18];
-
-  r[0] = (*u).c11.re + (*v).c11.re;
-  r[1] = (*u).c11.im + (*v).c11.im;
-  r[2] = (*u).c12.re + (*v).c12.re;
-  r[3] = (*u).c12.im + (*v).c12.im;
-  r[4] = (*u).c13.re + (*v).c13.re;
-  r[5] = (*u).c13.im + (*v).c13.im;
-
-  r[6] = (*u).c21.re + (*v).c21.re;
-  r[7] = (*u).c21.im + (*v).c21.im;
-  r[8] = (*u).c22.re + (*v).c22.re;
-  r[9] = (*u).c22.im + (*v).c22.im;
-  r[10] = (*u).c23.re + (*v).c23.re;
-  r[11] = (*u).c23.im + (*v).c23.im;
-
-  r[12] = (*u).c31.re + (*v).c31.re;
-  r[13] = (*u).c31.im + (*v).c31.im;
-  r[14] = (*u).c32.re + (*v).c32.re;
-  r[15] = (*u).c32.im + (*v).c32.im;
-  r[16] = (*u).c33.re + (*v).c33.re;
-  r[17] = (*u).c33.im + (*v).c33.im;
-
-  for (i = 0; i < 18; i++) {
-    if (r[i] != 0.0)
-      return 1;
-  }
-
-  return 0;
-}
-
-static int cmp_all(int ibc, su3_dble *u, su3_dble *v)
-{
-  int ix, t, ifc, ie, bc;
-
-  bc = bc_type();
-  ie = 0;
-
-  for (ix = (VOLUME / 2); ix < (VOLUME); ix++) {
-    t = global_time(ix);
-
-    if (t == 0) {
-      ie |= cmp_ud(u, v);
-      u += 1;
-      v += 1;
-
-      if ((bc == 3) && (ibc == -1))
-        ie |= scmp_ud(u, v);
-      else
-        ie |= cmp_ud(u, v);
-
-      u += 1;
-      v += 1;
-
-      for (ifc = 2; ifc < 8; ifc++) {
-        ie |= cmp_ud(u, v);
-        u += 1;
-        v += 1;
-      }
-
-    } else if (t == (N0 - 1)) {
-      if ((bc == 3) && (ibc == -1))
-        ie |= scmp_ud(u, v);
-      else
-        ie |= cmp_ud(u, v);
-
-      u += 1;
-      v += 1;
-
-      for (ifc = 1; ifc < 8; ifc++) {
-        ie |= cmp_ud(u, v);
-        u += 1;
-        v += 1;
-      }
-    } else {
-      for (ifc = 0; ifc < 8; ifc++) {
-        ie |= cmp_ud(u, v);
-        u += 1;
-        v += 1;
-      }
-    }
-  }
-
-  return ie;
-}
-
 int main(int argc, char *argv[])
 {
   int my_rank, bc, ie;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   double cG, cG_prime, cF, cF_prime;
-  double dev0, dev1;
   su3_dble *udb, **usv;
   bc_parms_t bcp;
   FILE *flog = NULL;
@@ -438,8 +235,11 @@ int main(int argc, char *argv[])
   cG_prime = 1.056;
   cF = 0.82;
   cF_prime = 1.12;
-  set_bc_parms(bc, cG, cG_prime, cF, cF_prime, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.38;
+  theta[1] = -1.25;
+  theta[2] = 0.54;
+  set_bc_parms(bc, cG, cG_prime, cF, cF_prime, phi, phi_prime, theta);
+  print_bc_parms(3);
 
   start_ranlux(0, 12345);
   geometry();
@@ -479,6 +279,10 @@ int main(int argc, char *argv[])
     ie |= (bcp.phi[1][2] != -bcp.phi[1][0] - bcp.phi[1][1]);
   }
 
+  ie |= (bcp.theta[0] != theta[0]);
+  ie |= (bcp.theta[1] != theta[1]);
+  ie |= (bcp.theta[2] != theta[2]);
+
   error(ie, 1, "main [check2.c]", "Boundary parameters are not properly set");
 
   ie = check_bc(0.0);
@@ -506,29 +310,6 @@ int main(int argc, char *argv[])
   ie = check_bval(udb);
   error(ie != 0, 2, "main [check2.c]",
         "Boundary values are not properly set by set_bc()");
-
-  random_ud();
-  cm3x3_assign(4 * VOLUME, udb, usv[0]);
-  dev0 = check_detu(1, udb);
-  ie = chs_ubnd(-1);
-  error(((bc == 3) && (ie == 0)) || ((bc != 3) && (ie == 1)), 1,
-        "main [check2.c]", "Incorrect return value of chs_ubnd()");
-  dev1 = check_detu(-1, udb);
-
-  if (my_rank == 0) {
-    printf("Maximal deviation |1-det{U}|=%.1e (random field)\n", dev0);
-    printf("                            =%.1e (after chs_ubnd)\n\n", dev1);
-  }
-
-  ie = cmp_all(-1, udb, usv[0]);
-  error(ie != 0, 3, "main [check2.c]", "Incorrect action of chs_ubnd()");
-  ie = chs_ubnd(1);
-  error(((bc == 3) && (ie == 0)) || ((bc != 3) && (ie == 1)), 2,
-        "main [check2.c]", "Incorrect return value of chs_ubnd()");
-  ie = cmp_all(1, udb, usv[0]);
-  error(ie != 0, 4, "main [check2.c]", "Incorrect action of chs_ubnd()");
-  ie = chs_ubnd(1);
-  error(ie != 0, 3, "main [check2.c]", "Incorrect return value of chs_ubnd()");
 
   if (my_rank == 0) {
     printf("No errors detected --- all programs work correctly\n\n");

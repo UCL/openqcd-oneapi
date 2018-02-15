@@ -3,7 +3,7 @@
 *
 * File check4.c
 *
-* Copyright (C) 2005, 2011-2013 Martin Luescher
+* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -236,7 +236,7 @@ static void transform_sd(spinor_dble *pk, spinor_dble *pl)
 int main(int argc, char *argv[])
 {
   int my_rank, i;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   double mu, d;
   spinor_dble **psd;
   sw_parms_t swp;
@@ -271,9 +271,12 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime);
-  set_ani_parms(1.0, 2.0);
-  print_bc_parms();
+  theta[0] = 0.35;
+  theta[1] = -1.25;
+  theta[2] = 0.78;
+  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime, theta);
+  set_ani_parms(1, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+  print_bc_parms(2);
 
   start_ranlux(0, 12345);
   geometry();
@@ -296,7 +299,7 @@ int main(int argc, char *argv[])
 
   random_g();
   random_ud();
-  chs_ubnd(-1);
+  set_ud_phase();
   sw_term(NO_PTS);
 
   for (i = 0; i < 4; i++)
@@ -331,7 +334,6 @@ int main(int argc, char *argv[])
 
   mulr_spinor_add_dble(VOLUME, psd[3], psd[2], -1.0);
   d = norm_square_dble(VOLUME, 1, psd[3]) / norm_square_dble(VOLUME, 1, psd[0]);
-  error_chk();
 
   if (my_rank == 0) {
     printf("Normalized difference = %.2e\n", sqrt(d));

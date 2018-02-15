@@ -15,11 +15,6 @@
 *     are the integer offsets of the time-like link variables on the local
 *     lattice at global time NPROC0*L0-1.
 *
-*   int *bnd_bnd_lks(int *n)
-*     Returns the starting address of an array of length n whose elements
-*     are the integer offsets of the time-like link variables on the boundary
-*     lattice at global time NPROC0*L0-1.
-*
 *   int *bnd_pts(int *n)
 *     Returns the starting address of an array of length n whose elements
 *     are the indices of the points on the local lattice at global time 0
@@ -37,19 +32,6 @@
 *     the program returns 0. The parameter tol>=0.0 sets an upper bound on
 *     the tolerated difference of the boundary values of the gauge field from
 *     the expected ones in the case of SF and open-SF boundary conditions.
-*
-*   int chs_ubnd(int ibc)
-*     Multiplies the double-precision link variables on the time-like links
-*     at time NPROC0*L0-1 by -1 if the following conditions are met: (1) ibc
-*     and the determinants of the link variables have opposite sign, (2) the
-*     boundary conditions are of type 3 (periodic for the gauge field). The
-*     program returns 1 if the link variables are changed and 0 otherwise.
-*
-*     New:
-*     The routine will now also apply the boundary condition to links on the
-*     boundary, this means that it will first check and communicate the boundary
-*     if necessary, then it will update everything. This means that a changed
-*     boundary will not constitute at new configuration as previous.
 *
 *   void bnd_s2zero(ptset_t set,spinor *s)
 *     Sets the components of the single-precision spinor field s on the
@@ -90,8 +72,10 @@
 *
 * Then the program checks whether any active link variables are equal to
 * zero and, if some are found, aborts the program with an error message.
+* An error occurs if set_bc() or check_bc() is called when the gauge field
+* is phase-set (see set_ud_phase() [uflds.c]).
 *
-* The programs in this module act globally and should be called simultaneously
+* The programs in this module act globally and must be called simultaneously
 * on all MPI processes. After the first time, the programs bnd_s2zero() and
 * bnd_sd2zero() may be locally called.
 *
@@ -118,7 +102,7 @@ typedef union
   double r[18];
 } umat_t;
 
-static int init0 = 0, nlks, *lks, nbclks, *bclks;
+static int init0 = 0, nlks, *lks;
 static int init1 = 0, npts, *pts;
 static int init2 = 0;
 static const su3_dble ud0 = {{0.0}};
@@ -128,26 +112,18 @@ static su3_dble ubnd[2][3];
 
 static void alloc_lks(void)
 {
-  int ix, iy, t, *lk;
-  int pidx[4];
+  int ix, t, *lk;
 
   error(iup[0][0] == 0, 1, "alloc_lks [bcnds.c]",
         "Geometry arrays are not set");
 
   if ((cpr[0] == 0) || (cpr[0] == (NPROC0 - 1))) {
-    nlks = (L1 * L2 * L3) / 2;
-    nbclks = 0;
-
-    if (cpr[0] == (NPROC0 - 1)) {
-      nlks += (NPROC0 == 1) * (L1 * L2 * L3 / 2);
-      nbclks += (FACE0 > 0) * (L1 * L2 * L3 / 2);
-      nbclks += (FACE1 > 0) * L2 * L3;
-      nbclks += (FACE2 > 0) * L1 * L3;
-      nbclks += (FACE3 > 0) * L1 * L2;
-    }
+    if (NPROC0 > 1)
+      nlks = (L1 * L2 * L3) / 2;
+    else
+      nlks = L1 * L2 * L3;
 
     lks = malloc(nlks * sizeof(*lks));
-    bclks = malloc(nbclks * sizeof(*bclks));
 
     if (lks != NULL) {
       lk = lks;
@@ -164,61 +140,9 @@ static void alloc_lks(void)
         }
       }
     }
-
-    /* Links on the boundary that crosses the temporal boundary */
-    if ((nbclks != 0) && (bclks != NULL)) {
-      lk = bclks;
-
-      /* Type 1 links at FACE0 */
-      for (ix = 0; ix < FACE0 / 2; ix++) {
-        (*lk) = 4 * VOLUME + ix;
-        lk += 1;
-      }
-
-      /* Type 2 links at the spatial faces pointing in t-dir at the time
-       * boundary */
-
-      /* Type 2 links at FACE1 */
-      if (FACE1 != 0) {
-        for (ix = 0; ix < L2; ++ix) {
-          for (iy = 0; iy < L3; ++iy) {
-            plaq_uidx(0, ipt[iy + L3 * (ix + L2 * (L1 - 1 + L1 * (L0 - 1)))],
-                      pidx);
-            (*lk) = pidx[3];
-            lk += 1;
-          }
-        }
-      }
-
-      /* Type 2 links at FACE2 */
-      if (FACE2 != 0) {
-        for (ix = 0; ix < L1; ++ix) {
-          for (iy = 0; iy < L3; ++iy) {
-            plaq_uidx(1, ipt[iy + L3 * ((L2 - 1) + L2 * (ix + L1 * (L0 - 1)))],
-                      pidx);
-            (*lk) = pidx[3];
-            lk += 1;
-          }
-        }
-      }
-
-      /* Type 2 links at FACE3 */
-      if (FACE3 != 0) {
-        for (ix = 0; ix < L1; ++ix) {
-          for (iy = 0; iy < L2; ++iy) {
-            plaq_uidx(2, ipt[(L3 - 1) + L3 * (iy + L2 * (ix + L1 * (L0 - 1)))],
-                      pidx);
-            (*lk) = pidx[3];
-            lk += 1;
-          }
-        }
-      }
-    }
   } else {
     nlks = 0;
-    nbclks = 0;
     lks = NULL;
-    bclks = NULL;
   }
 
   error((nlks > 0) && (lks == NULL), 1, "alloc_lks [bcnds.c]",
@@ -272,16 +196,6 @@ int *bnd_lks(int *n)
   (*n) = nlks;
 
   return lks;
-}
-
-int *bnd_bnd_lks(int *n)
-{
-  if (init0 == 0)
-    alloc_lks();
-
-  (*n) = nbclks;
-
-  return bclks;
 }
 
 int *bnd_pts(int *n)
@@ -464,6 +378,8 @@ void set_bc(void)
 {
   int bc, it;
 
+  error_root(query_flags(UD_PHASE_SET) == 1, 1, "set_bc [bcnds.c]",
+             "Gauge configuration must not be phase-set");
   bc = bc_type();
 
   if (bc == 0)
@@ -474,7 +390,6 @@ void set_bc(void)
     openSF_bc();
 
   it = check_zero(bc);
-
   error(it != 1, 1, "set_bc [bcnds.c]",
         "Link variables vanish on an incorrect set of links");
 }
@@ -542,6 +457,9 @@ int check_bc(double tol)
   int bc, it, is;
   double dprms[1];
 
+  error_root(query_flags(UD_PHASE_SET) == 1, 1, "check_bc [bcnds.c]",
+             "Gauge configuration must not be phase-set");
+
   if (NPROC > 1) {
     dprms[0] = tol;
     MPI_Bcast(dprms, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -562,112 +480,6 @@ int check_bc(double tol)
   }
 
   return it;
-}
-
-static int sdet(su3_dble const *u)
-{
-  double r;
-  complex_dble z;
-
-  z.re = (*u).c22.re * (*u).c33.re - (*u).c22.im * (*u).c33.im -
-         (*u).c32.re * (*u).c23.re + (*u).c32.im * (*u).c23.im;
-
-  z.im = (*u).c22.re * (*u).c33.im + (*u).c22.im * (*u).c33.re -
-         (*u).c32.re * (*u).c23.im - (*u).c32.im * (*u).c23.re;
-
-  r = (*u).c11.re * z.re - (*u).c11.im * z.im;
-
-  z.re = (*u).c32.re * (*u).c13.re - (*u).c32.im * (*u).c13.im -
-         (*u).c12.re * (*u).c33.re + (*u).c12.im * (*u).c33.im;
-
-  z.im = (*u).c32.re * (*u).c13.im + (*u).c32.im * (*u).c13.re -
-         (*u).c12.re * (*u).c33.im - (*u).c12.im * (*u).c33.re;
-
-  r += ((*u).c21.re * z.re - (*u).c21.im * z.im);
-
-  z.re = (*u).c12.re * (*u).c23.re - (*u).c12.im * (*u).c23.im -
-         (*u).c22.re * (*u).c13.re + (*u).c22.im * (*u).c13.im;
-
-  z.im = (*u).c12.re * (*u).c23.im + (*u).c12.im * (*u).c23.re -
-         (*u).c22.re * (*u).c13.im - (*u).c22.im * (*u).c13.re;
-
-  r += ((*u).c31.re * z.re - (*u).c31.im * z.im);
-
-  if (r >= 0.0)
-    return 1;
-  else
-    return -1;
-}
-
-static int chs_links(int ibc, su3_dble *ub, int *links, int num_links)
-{
-  int i, *last_link;
-  umat_t *um;
-
-  if (sdet(ub + (*links)) != ibc) {
-    last_link = links + num_links;
-
-    for (; links < last_link; links++) {
-      um = (umat_t *)(ub + (*links));
-
-      for (i = 0; i < 18; i++)
-        (*um).r[i] = -(*um).r[i];
-    }
-
-    return 1;
-  }
-
-  return 0;
-}
-
-int chs_ubnd(int ibc)
-{
-  int iprms[1], ich, ichs, bcich, bcichs;
-  su3_dble *ub;
-
-  if (query_flags(UDBUF_UP2DATE) != 1)
-    copy_bnd_ud();
-
-  if (bc_type() == 3) {
-    if (NPROC > 1) {
-      iprms[0] = ibc;
-      MPI_Bcast(iprms, 1, MPI_INT, 0, MPI_COMM_WORLD);
-      error(iprms[0] != ibc, 1, "chs_ubnd [bcnds.c]",
-            "Parameter is not global");
-    }
-
-    if (init0 == 0)
-      alloc_lks();
-
-    if (ibc >= 0)
-      ibc = 1;
-    else
-      ibc = -1;
-
-    ub = udfld();
-    ich = 0;
-
-    /* Change boundaries of links in the bulk */
-    if (nlks > 0)
-      ich = chs_links(ibc, ub, lks, nlks);
-
-    bcich = 0;
-
-    /* Change boundaries of links on the boundary */
-    if (nbclks > 0)
-      bcich = chs_links(ibc, ub, bclks, nbclks);
-
-    MPI_Allreduce(&ich, &ichs, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
-    MPI_Allreduce(&bcich, &bcichs, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
-
-    error((nbclks != 0) && (ichs != bcichs), 1, "chs_bcnd [bcnds.c]",
-          "The boundaries in the volume and the boundaries on the boundary "
-          "were not changed in a consistent matter");
-
-    return ichs;
-  } else {
-    return 0;
-  }
 }
 
 void bnd_s2zero(ptset_t set, spinor *s)

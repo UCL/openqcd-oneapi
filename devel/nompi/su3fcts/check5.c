@@ -3,7 +3,7 @@
 *
 * File check5.c
 *
-* Copyright (C) 2009, 2011 Filippo Palombi, Martin Luescher
+* Copyright (C) 2009, 2011, 2016 Filippo Palombi, Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -11,14 +11,13 @@
 * Check of chexp_drv2() in the case of diagonal X
 *
 * This program verifies that eqs. (4.1)-(4.6) of the notes "SU(3) matrix
-* functions" are satisfied by the coefficients obtained by chexp_drv2()
+* functions" are satisfied by the coefficients obtained by chexp_drv2().
 *
 *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "su3.h"
 #include "utils.h"
 #include "random.h"
 #include "su3fcts.h"

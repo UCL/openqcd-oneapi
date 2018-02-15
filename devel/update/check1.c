@@ -3,7 +3,7 @@
 *
 * File check1.c
 *
-* Copyright (C) 2011-2013 Martin Luescher
+* Copyright (C) 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
 {
   int i, ie;
   int nop, ismear, iunsmear, itu, *iop;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   double kappa, *eps;
   mdstep_t *mds;
   FILE *flog = NULL, *fin = NULL;
@@ -139,11 +139,14 @@ int main(int argc, char *argv[])
 
   kappa = 0.1365;
   set_lat_parms(5.3, 1.6667, 1, &kappa, 1.789);
-  phi[0] = 0.378;
-  phi[1] = 0.012;
-  phi_prime[0] = 0.892;
-  phi_prime[1] = 0.912;
-  set_bc_parms(0, 1.23, 1.27, 0.98, 1.03, phi, phi_prime);
+  phi[0] = 0.0;
+  phi[1] = 0.0;
+  phi_prime[0] = 0.0;
+  phi_prime[1] = 0.0;
+  theta[0] = 0.0;
+  theta[1] = 0.0;
+  theta[2] = 0.0;
+  set_bc_parms(0, 1.0, 1.0, 1.0, 1.0, phi, phi_prime, theta);
 
   read_hmc_parms();
   read_integrator();

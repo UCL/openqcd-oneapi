@@ -21,23 +21,23 @@ all: rmxeq mkdep mkxeq
 
 MAIN = check1 check2 check3 check4 check5 check6
 
+ARCHIVE = archive sarchive
+
 FLAGS = flags lat_parms hmc_parms dfl_parms
 
-LATTICE = bcnds uidx geometry 
-
-ARCHIVE = archive sarchive
+LATTICE = bcnds uidx geometry
 
 LINALG = liealg cmatrix_dble salg_dble
 
-RANDOM = ranlux ranlxs ranlxd gauss 
-
-UFLDS = plaq_sum uflds udcom
+RANDOM = ranlux ranlxs ranlxd gauss
 
 SFLDS = sflds
 
-SU3FCTS = chexp cm3x3 random_su3 su3prod su3ren 
+SU3FCTS = chexp cm3x3 random_su3 su3prod su3ren
 
-UTILS = endian mutils utils wspace
+UFLDS = plaq_sum uflds udcom
+
+UTILS = endian error hsum mutils utils wspace
 
 MODULES = $(FLAGS) $(LATTICE) $(ARCHIVE) $(LINALG) $(RANDOM) $(UFLDS) \
           $(SFLDS) $(SU3FCTS) $(UTILS)
@@ -73,13 +73,15 @@ LIBPATH = $(MPI_HOME)/lib
 
 CFLAGS = -std=c89 -pedantic -fstrict-aliasing \
          -Wall -Wno-long-long -Wstrict-prototypes -Werror \
-         -O -mno-avx -Dx64 -DPM 
+         -O -mno-avx -Dx64 -DPM
+
+LFLAGS =
 
 
 ############################## do not change ###################################
 
 SHELL=/bin/bash
-CC=$(MPI_HOME)/bin/mpicc
+CC=mpicc
 CLINKER=$(CC)
 
 PGMS= $(MAIN) $(MODULES)
@@ -102,7 +104,7 @@ $(addsuffix .o,$(PGMS)): %.o: %.c Makefile
 # rule to link object files
 
 $(MAIN): %: %.o $(addsuffix .o,$(MODULES)) Makefile
-	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(CFLAGS) $(LOGOPTION) \
+	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(LFLAGS) $(LOGOPTION) \
         $(addprefix -L,$(LIBPATH)) $(addprefix -l,$(LIBS)) -o $@
 
 

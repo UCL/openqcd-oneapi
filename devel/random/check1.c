@@ -3,7 +3,7 @@
 *
 * File check1.c
 *
-* Copyright (C) 2013 Martin Luescher
+* Copyright (C) 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -73,7 +73,6 @@ int main(int argc, char *argv[])
     ied |= (rd[k] != rd[NRAN + k]);
   }
 
-  error_chk();
   error((ie != 0) || (ied != 0), 1, "main [check1.c]",
         "Export/import of the generator states failed");
 

@@ -3,7 +3,7 @@
 *
 * File check5.c
 *
-* Copyright (C) 2011-2013 Martin Luescher
+* Copyright (C) 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -35,7 +35,7 @@
 
 static int my_rank, bc, first, last, step, nmx;
 static double kappa, csw, mu, cF, cF_prime;
-static double phi[2], phi_prime[2], m0, res;
+static double phi[2], phi_prime[2], theta[3], m0, res;
 static char cnfg_dir[NAME_SIZE], cnfg_file[NAME_SIZE], nbase[NAME_SIZE];
 
 static void Dhatop_dble(spinor_dble *s, spinor_dble *r)
@@ -115,6 +115,8 @@ int main(int argc, char *argv[])
     else
       cF_prime = cF;
 
+    read_dprms("theta", 3, theta);
+
     find_section("CG");
     read_line("nmx", "%d", &nmx);
     read_line("res", "%lf", &res);
@@ -137,6 +139,7 @@ int main(int argc, char *argv[])
   MPI_Bcast(phi_prime, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cF, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cF_prime, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(theta, 3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
   MPI_Bcast(&nmx, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&res, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -144,8 +147,8 @@ int main(int argc, char *argv[])
   lat = set_lat_parms(5.5, 1.0, 1, &kappa, csw);
   print_lat_parms();
 
-  set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime);
-  print_bc_parms();
+  set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime, theta);
+  print_bc_parms(3);
 
   start_ranlux(0, 1234);
   geometry();
@@ -185,7 +188,7 @@ int main(int argc, char *argv[])
       fflush(flog);
     }
 
-    chs_ubnd(-1);
+    set_ud_phase();
     random_sd(VOLUME, psd[0], 1.0);
     bnd_sd2zero(ALL_PTS, psd[0]);
     nrm = sqrt(norm_square_dble(VOLUME, 1, psd[0]));
@@ -200,7 +203,6 @@ int main(int argc, char *argv[])
     wt2 = MPI_Wtime();
     wdt = wt2 - wt1;
 
-    error_chk();
     z.re = -1.0;
     z.im = 0.0;
     mulc_spinor_add_dble(VOLUME, psd[2], psd[0], z);
@@ -250,7 +252,6 @@ int main(int argc, char *argv[])
     wt2 = MPI_Wtime();
     wdt = wt2 - wt1;
 
-    error_chk();
     z.re = -1.0;
     z.im = 0.0;
     mulc_spinor_add_dble(VOLUME / 2, psd[2], psd[0], z);

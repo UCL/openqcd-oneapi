@@ -3,7 +3,7 @@
 *
 * File check3.c
 *
-* Copyright (C) 2011 Martin Luescher
+* Copyright (C) 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -32,7 +32,10 @@ typedef union
 
 static pauli m[2 * NM] ALIGNED16;
 static pauli_dble md[2 * NM] ALIGNED16;
-static spin_t sp1[NM], sp2[NM], rp1[NM], rp2[NM] ALIGNED16;
+static spin_t sp1[NM] ALIGNED16;
+static spin_t sp2[NM] ALIGNED16;
+static spin_t rp1[NM] ALIGNED16;
+static spin_t rp2[NM] ALIGNED16;
 static complex mv[36] ALIGNED16;
 
 static void random_pauli_dble(void)

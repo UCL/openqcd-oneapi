@@ -3,7 +3,7 @@
 *
 * File time2.c
 *
-* Copyright (C) 2005, 2008, 2009, 2011, 2013 Martin Luescher
+* Copyright (C) 2005, 2008, 2009, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -16,12 +16,13 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-#include "su3.h"
 #include "random.h"
 #include "su3fcts.h"
 
 static su3_dble u[4] ALIGNED16;
-static su3_vector_dble s[8], r[8], t[8] ALIGNED16;
+static su3_vector_dble s[8] ALIGNED16;
+static su3_vector_dble r[8] ALIGNED16;
+static su3_vector_dble t[8] ALIGNED16;
 
 #if (defined x64)
 #if (defined AVX)
@@ -144,7 +145,11 @@ int main(void)
   printf("-------------------------------------------------------------\n\n");
 
 #if (defined AVX)
+#if (defined FMA3)
+  printf("Using AVX and FMA3 instructions\n");
+#else
   printf("Using AVX instructions\n");
+#endif
 #elif (defined x64)
   printf("Using SSE3 instructions and up to 16 xmm registers\n");
 #endif
@@ -176,7 +181,7 @@ int main(void)
 
   dt *= 1.0e6 / (double)(4 * n);
 
-  printf("The time per v=U*w is     %4.3f micro sec", dt);
+  printf("The time per v=U*w is     %4.3f nsec", 1.0e3 * dt);
   printf(" [%d Mflops]\n", (int)(66.0 / dt));
 
   n = (int)(1.0e6);
@@ -193,7 +198,7 @@ int main(void)
 
   dt *= 1.0e6 / (double)(4 * n);
 
-  printf("The time per v=U^dag*w is %4.3f micro sec", dt);
+  printf("The time per v=U^dag*w is %4.3f nsec", 1.0e3 * dt);
   printf(" [%d Mflops]\n", (int)(66.0 / dt));
 
 #endif
@@ -213,7 +218,7 @@ int main(void)
   dt *= 1.0e6 / (double)(4 * n);
 
   printf("Using x87 FPU instructions:\n");
-  printf("The time per v=U*w is     %4.3f micro sec", dt);
+  printf("The time per v=U*w is     %4.3f nsec", 1.0e3 * dt);
   printf(" [%d Mflops]\n", (int)(66.0 / dt));
 
 #if (defined x64)

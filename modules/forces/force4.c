@@ -123,20 +123,22 @@
 #include "global.h"
 
 #define N0 (NPROC0 * L0)
-#define MAX_LEVELS 8
-#define BLK_LENGTH 8
 
-static int cnt[MAX_LEVELS];
-static double smx[MAX_LEVELS];
+static int isx, init = 0;
 
 static double sdet(void)
 {
-  int bc, ix, iy, t, n, ie;
-  double c, p;
+  int bc, ix, iy, t, ie;
+  double c, p, smx;
   complex_dble z;
   pauli_dble *m;
   sw_parms_t swp;
   ani_params_t ani;
+
+  if (init == 0) {
+    isx = init_hsum(1);
+    init = 1;
+  }
 
   swp = sw_parms();
   ani = ani_parms();
@@ -146,12 +148,8 @@ static double sdet(void)
   else
     c = 1.0;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smx[n] = 0.0;
-  }
-
   sw_term(NO_PTS);
+  reset_hsum(isx);
   m = swdfld() + VOLUME;
   bc = bc_type();
   ix = (VOLUME / 2);
@@ -159,7 +157,7 @@ static double sdet(void)
 
   while (ix < VOLUME) {
     p = 1.0;
-    iy = ix + BLK_LENGTH;
+    iy = ix + 8;
     if (iy > VOLUME)
       iy = VOLUME;
 
@@ -186,26 +184,17 @@ static double sdet(void)
     }
 
     if (p != 0.0) {
-      cnt[0] += 1;
-      smx[0] -= 2.0 * log(p);
-
-      for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-        cnt[n] += 1;
-        smx[n] += smx[n - 1];
-
-        cnt[n - 1] = 0;
-        smx[n - 1] = 0.0;
-      }
+      smx = -2.0 * log(p);
+      add_to_hsum(isx, &smx);
     } else
       ie = 1;
   }
 
-  error(ie != 0, 1, "sdet [force4.c]", "SW term has vanishing determinant");
+  error(ie != 0, 1, "sdet [force4.c]",
+        "SW term has negative or vanishing determinant");
+  local_hsum(isx, &smx);
 
-  for (n = 1; n < MAX_LEVELS; n++)
-    smx[0] += smx[n];
-
-  return smx[0];
+  return smx;
 }
 
 double setpf4(double mu, int ipf, int isw, int icom)

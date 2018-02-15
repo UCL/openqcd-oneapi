@@ -32,7 +32,11 @@ int main(void)
   printf("--------------------------------------------------------\n\n");
 
 #if (defined AVX)
+#if (defined FMA3)
+  printf("Using AVX and FMA3 instructions\n\n");
+#else
   printf("Using AVX instructions\n\n");
+#endif
 #elif (defined x64)
   printf("Using SSE3 instructions and up to 16 xmm registers\n\n");
 #endif

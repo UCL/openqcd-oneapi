@@ -3,7 +3,7 @@
 *
 * File ms1.c
 *
-* Copyright (C) 2012-2014 Martin Luescher
+* Copyright (C) 2012-2014, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -411,7 +411,7 @@ static void read_bc_parms(void)
 {
   int bc;
   double cF, cF_prime;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
 
   if (my_rank == 0) {
     find_section("Boundary conditions");
@@ -435,6 +435,8 @@ static void read_bc_parms(void)
 
     if (bc == 2)
       read_line("cF'", "%lf", &cF_prime);
+
+    read_dprms("theta", 3, theta);
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -442,8 +444,9 @@ static void read_bc_parms(void)
   MPI_Bcast(phi_prime, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cF, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cF_prime, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(theta, 3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-  bcp = set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime);
+  bcp = set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime, theta);
 
   if (append)
     check_bc_parms(fdat);
@@ -805,7 +808,7 @@ static void check_files(void)
 
 static void print_info(void)
 {
-  int isap, idfl, ik, n[3];
+  int isap, idfl, ik, n;
   long ip;
 
   if (my_rank == 0) {
@@ -874,55 +877,18 @@ static void print_info(void)
       printf("Lattice parameters:\n");
 
       for (ik = 0; ik < lat.nk; ik++) {
-        n[0] = fdigits(lat.kappa[ik]);
+        n = fdigits(lat.kappa[ik]);
 
         if (lat.nk >= 11)
-          printf("kappa[%2d] = %.*f\n", ik, IMAX(n[0], 6), lat.kappa[ik]);
+          printf("kappa[%2d] = %.*f\n", ik, IMAX(n, 6), lat.kappa[ik]);
         else
-          printf("kappa[%1d] = %.*f\n", ik, IMAX(n[0], 6), lat.kappa[ik]);
+          printf("kappa[%1d] = %.*f\n", ik, IMAX(n, 6), lat.kappa[ik]);
       }
 
-      n[0] = fdigits(lat.csw);
-      printf("csw = %.*f\n\n", IMAX(n[0], 1), lat.csw);
+      n = fdigits(lat.csw);
+      printf("csw = %.*f\n\n", IMAX(n, 1), lat.csw);
 
-      if (bcp.type == 0) {
-        printf("Open boundary conditions\n");
-
-        n[0] = fdigits(bcp.cF[0]);
-        printf("cF = %.*f\n\n", IMAX(n[0], 1), bcp.cF[0]);
-      } else if (bcp.type == 1) {
-        printf("SF boundary conditions\n");
-
-        n[0] = fdigits(bcp.cF[0]);
-        printf("cF = %.*f\n", IMAX(n[0], 1), bcp.cF[0]);
-
-        n[0] = fdigits(bcp.phi[0][0]);
-        n[1] = fdigits(bcp.phi[0][1]);
-        n[2] = fdigits(bcp.phi[0][2]);
-        printf("phi = %.*f,%.*f,%.*f\n", IMAX(n[0], 1), bcp.phi[0][0],
-               IMAX(n[1], 1), bcp.phi[0][1], IMAX(n[2], 1), bcp.phi[0][2]);
-
-        n[0] = fdigits(bcp.phi[1][0]);
-        n[1] = fdigits(bcp.phi[1][1]);
-        n[2] = fdigits(bcp.phi[1][2]);
-        printf("phi' = %.*f,%.*f,%.*f\n\n", IMAX(n[0], 1), bcp.phi[1][0],
-               IMAX(n[1], 1), bcp.phi[1][1], IMAX(n[2], 1), bcp.phi[1][2]);
-      } else if (bcp.type == 2) {
-        printf("Open-SF boundary conditions\n");
-
-        n[0] = fdigits(bcp.cF[0]);
-        printf("cF = %.*f\n", IMAX(n[0], 1), bcp.cF[0]);
-        n[1] = fdigits(bcp.cF[1]);
-        printf("cF' = %.*f\n", IMAX(n[1], 1), bcp.cF[1]);
-
-        n[0] = fdigits(bcp.phi[1][0]);
-        n[1] = fdigits(bcp.phi[1][1]);
-        n[2] = fdigits(bcp.phi[1][2]);
-        printf("phi' = %.*f,%.*f,%.*f\n\n", IMAX(n[0], 1), bcp.phi[1][0],
-               IMAX(n[1], 1), bcp.phi[1][1], IMAX(n[2], 1), bcp.phi[1][2]);
-      } else
-        printf("Periodic boundary conditions\n\n");
-
+      print_bc_parms(2);
       print_rw_parms();
       print_rat_parms();
       print_solver_parms(&isap, &idfl);
@@ -1285,7 +1251,7 @@ int main(int argc, char *argv[])
       import_cnfg(cnfg_file);
     }
 
-    chs_ubnd(-1);
+    set_ud_phase();
 
     if (dfl.Ns) {
       dfl_modes(&status);
@@ -1303,7 +1269,6 @@ int main(int argc, char *argv[])
     }
 
     export_ranlux(nc, rng_file);
-    error_chk();
 
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();

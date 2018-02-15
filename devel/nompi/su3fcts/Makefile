@@ -22,13 +22,13 @@ all: rmxeq mkdep mkxeq
 MAIN = check1 check2 check3 check4 check5 check6 check7 check8\
        time1 time2 time3 time4 time5
 
-RANDOM = ranlxs ranlxd gauss 
+RANDOM = ranlxs ranlxd gauss
 
 UTILS = utils
 
-SU3FCTS = random_su3 chexp cm3x3 su3prod su3ren 
+SU3FCTS = random_su3 chexp cm3x3 su3prod su3ren
 
-MODULES = $(RANDOM) $(UTILS) $(SU3FCTS) 
+MODULES = $(RANDOM) $(UTILS) $(SU3FCTS)
 
 
 # search path for modules
@@ -57,11 +57,12 @@ CFLAGS = -std=c89 -pedantic -fstrict-aliasing -fno-inline \
          -Wall -Wno-long-long -Wstrict-prototypes -Werror \
          -O -mno-avx -Dx64
 
+LFLAGS =
+
 
 ############################## do not change ###################################
 
 SHELL=/bin/bash
-
 CC=$(GCC)
 
 PGMS= $(MAIN) $(MODULES)
@@ -78,7 +79,7 @@ LDFLAGS = $(addprefix -L,$(LIBPATH)) $(addprefix -l,$(LIBS))
 # rule to make dependencies
 
 $(addsuffix .d,$(PGMS)): %.d: %.c Makefile
-	@ $(CC) -MM -ansi $(INCDIRS) $< -o $@
+	@ $(GCC) -MM -ansi $(INCDIRS) $< -o $@
 
 
 # rule to compile source programs
@@ -90,7 +91,7 @@ $(addsuffix .o,$(PGMS)): %.o: %.c Makefile
 # rule to link object files
 
 $(MAIN): %: %.o $(OBJECTS) Makefile
-	$(CC) $< $(OBJECTS) $(CFLAGS) $(LDFLAGS) -o $@
+	$(CC) $< $(OBJECTS) $(LFLAGS) $(LDFLAGS) -o $@
 
 
 # produce executables

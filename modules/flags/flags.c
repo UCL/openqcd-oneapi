@@ -3,7 +3,7 @@
 *
 * File flags.c
 *
-* Copyright (C) 2009, 2011, 2012 Martin Luescher
+* Copyright (C) 2009, 2011, 2012, 2016 Martin Luescher, Isabel Campos
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -68,7 +68,7 @@
 #include "flags.h"
 #include "global.h"
 
-#define NFLGS (11 + 4 * (int)(BLK_GRIDS))
+#define NFLGS (12 + 4 * (int)(BLK_GRIDS))
 
 static struct
 {
@@ -78,7 +78,8 @@ static struct
   int aw, awh;
   int smeared_tag;
   int is_smeared;
-} lat = {0, 0, 0, 0, 0, {0, 0, 0}, {0, 0, 0}, 0, 0, 0, 0};
+  int phase;
+} lat = {0, 0, 0, 0, 0, {0, 0, 0}, {0, 0, 0}, 0, 0, 0, 0, 0};
 
 typedef struct
 {
@@ -108,8 +109,9 @@ static void set_flgs(void)
   flgs[8] = lat.awh;
   flgs[9] = lat.smeared_tag;
   flgs[10] = lat.is_smeared;
+  flgs[11] = lat.phase;
 
-  n = 11;
+  n = 12;
 
   for (igr = 0; igr < (int)(BLK_GRIDS); igr++) {
     flgs[n++] = gfs[igr].u;
@@ -181,8 +183,9 @@ static void compress_flags(void)
   lat.awh = flgs[8];
   lat.smeared_tag = flgs[9];
   lat.is_smeared = flgs[10];
+  lat.phase = flgs[11];
 
-  n = 11;
+  n = 12;
 
   for (igr = 0; igr < (int)(BLK_GRIDS); igr++) {
     gfs[igr].u = flgs[n++];
@@ -335,6 +338,7 @@ void print_flags(void)
     printf("aw,awh     = %d,%d\n", lat.aw, lat.awh);
     printf("smeared_tag (is_smeared) = %d (%d)\n", lat.smeared_tag,
            lat.is_smeared);
+    printf("phase      = %d\n", lat.phase);
     printf("\n");
   }
 }

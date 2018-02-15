@@ -53,13 +53,6 @@ int check_bc(double tol)
   the tolerated difference of the boundary values of the gauge field from
   the expected ones in the case of SF and open-SF boundary conditions.
 
-int chs_ubnd(int ibc)
-  Multiplies the double-precision link variables on the time-like links
-  at time NPROC0*L0-1 by -1 if the following conditions are met: (1) ibc
-  and the determinants of the link variables have opposite sign, (2) the
-  boundary conditions are of type 3 (periodic for the gauge field). The
-  program returns 1 if the link variables are changed and 0 otherwise.
-
 void bnd_s2zero(ptset_t set,spinor *s)
   Sets the components of the single-precision spinor field s on the
   specified set of points at global time 0 and T (in the case of

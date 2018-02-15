@@ -3,7 +3,7 @@
 *
 * File flags/queries.h
 *
-* Copyright (C) 2009, 2010, 2011, 2012 Martin Luescher
+* Copyright (C) 2009-2012, 2016 Martin Luescher, Isabel Campos
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -64,6 +64,8 @@ static int QueryUdIsSmeared(void) { return lat.is_smeared; }
 
 static int QueryUdSmearingUp2date(void) { return (lat.smeared_tag == lat.ud); }
 
+static int QueryUdPhaseSet(void) { return (lat.phase == 1); }
+
 static void set_queries(void)
 {
   query_fcts[(int)(U_MATCH_UD)] = QueryUMatchUd;
@@ -80,6 +82,7 @@ static void set_queries(void)
   query_fcts[(int)(AWHAT_UP2DATE)] = QueryAwhatUp2date;
   query_fcts[(int)(UD_IS_SMEARED)] = QueryUdIsSmeared;
   query_fcts[(int)(SMEARED_UD_UP2DATE)] = QueryUdSmearingUp2date;
+  query_fcts[(int)(UD_PHASE_SET)] = QueryUdPhaseSet;
 }
 
 #endif

@@ -3,7 +3,7 @@
 *
 * File check6.c
 *
-* Copyright (C) 2012-2014 Stefan Schaefer, Martin Luescher
+* Copyright (C) 2012-2014, 2016 Stefan Schaefer, Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 {
   int my_rank, bc, irw, isp, status[6], mnkv;
   int bs[4], Ns, nmx, nkv, nmr, ncy, ninv;
-  double chi[2], chi_prime[2];
+  double chi[2], chi_prime[2], theta[3];
   double kappa, mu, res;
   double mu1, mu2, act0, act1, sqn0, sqn1;
   double da, ds, damx, dsmx;
@@ -148,8 +148,11 @@ int main(int argc, char *argv[])
   chi[1] = -0.534;
   chi_prime[0] = 0.912;
   chi_prime[1] = 0.078;
-  set_bc_parms(bc, 1.0, 1.0, 0.953, 1.203, chi, chi_prime);
-  print_bc_parms();
+  theta[0] = 0.34;
+  theta[1] = -1.25;
+  theta[2] = 0.58;
+  set_bc_parms(bc, 1.0, 1.0, 0.953, 1.203, chi, chi_prime, theta);
+  print_bc_parms(2);
 
   mnkv = 0;
 
@@ -255,7 +258,7 @@ int main(int argc, char *argv[])
       }
 
       random_ud();
-      chs_ubnd(-1);
+      set_ud_phase();
 
       if (isp == 2) {
         dfl_modes(status);
@@ -325,8 +328,6 @@ int main(int argc, char *argv[])
 
         printf("|1-act1/act0| = %.1e, |1-sqn1/sqn0| = %.1e\n\n", da, ds);
       }
-
-      error_chk();
     }
   }
 

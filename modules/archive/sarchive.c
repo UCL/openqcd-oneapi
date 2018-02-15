@@ -96,7 +96,6 @@ void write_sfld(char *out, spinor_dble *sd)
   fout = fopen(out, "wb");
   error_loc(fout == NULL, 1, "write_sfld [sarchive.c]",
             "Unable to open output file");
-  error_chk();
 
   ldat[0] = NPROC0;
   ldat[1] = NPROC1;
@@ -125,7 +124,6 @@ void write_sfld(char *out, spinor_dble *sd)
 
   error_loc(iw != (17 + VOLUME), 1, "write_sfld [sarchive.c]",
             "Incorrect write count");
-  error_chk();
   fclose(fout);
 }
 
@@ -143,7 +141,6 @@ void read_sfld(char *in, spinor_dble *sd)
   fin = fopen(in, "rb");
   error_loc(fin == NULL, 1, "read_sfld [sarchive.c]",
             "Unable to open input file");
-  error_chk();
 
   ir = fread(ldat, sizeof(int), 16, fin);
 
@@ -163,14 +160,12 @@ void read_sfld(char *in, spinor_dble *sd)
 
   error_loc(ir != (17 + VOLUME), 1, "read_sfld [sarchive.c]",
             "Incorrect read count");
-  error_chk();
   fclose(fin);
 
   norm1 = norm_square_dble(VOLUME, 0, sd);
   eps = sqrt(64.0 * (double)(VOLUME)) * DBL_EPSILON;
   error_loc(fabs(norm1 - norm0) > (eps * norm0), 1, "read_sfld [sarchive.c]",
             "Incorrect square norm");
-  error_chk();
 }
 
 static void check_machine(void)

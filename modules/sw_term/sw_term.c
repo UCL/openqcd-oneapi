@@ -3,7 +3,7 @@
 *
 * File sw_term.c
 *
-* Copyright (C) 2011, 2013 Martin Luescher
+* Copyright (C) 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -71,7 +71,7 @@
 #define N0 (NPROC0 * L0)
 
 static double c1, c2, c3[2];
-static u3_alg_dble X ALIGNED16;
+static u3_alg_dble X;
 static const pauli_dble sw0 = {{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0,
                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,

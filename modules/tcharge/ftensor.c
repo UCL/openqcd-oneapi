@@ -3,7 +3,7 @@
 *
 * File ftensor.c
 *
-* Copyright (C) 2010-2013 Martin Luescher
+* Copyright (C) 2010-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -70,7 +70,8 @@
 #define N0 (NPROC0 * L0)
 
 static u3_alg_dble **fts = NULL, **ft, X;
-static su3_dble w1, w2 ALIGNED16;
+static su3_dble w1 ALIGNED16;
+static su3_dble w2 ALIGNED16;
 static ftidx_t *idx;
 
 static void alloc_fts(void)

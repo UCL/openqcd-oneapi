@@ -45,6 +45,8 @@ extern void remove_ani_u(void);
 extern void random_u(void);
 extern void random_ud(void);
 extern void renormalize_u(void);
+extern void set_ud_phase(void);
+extern void unset_ud_phase(void);
 extern void renormalize_ud(void);
 extern void assign_ud2u(void);
 extern void swap_udfld(su3_dble **new_field);
