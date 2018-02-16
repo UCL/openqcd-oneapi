@@ -3,7 +3,7 @@
 *
 * File utils.c
 *
- * Copyright (C) 2005, 2008, 2011 Martin Luescher, 2013 Hubert Simma
+* Copyright (C) 2005, 2008, 2011, 2016 Martin Luescher, 2013 Hubert Simma
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -28,15 +28,15 @@
 *     address previously returned by amalloc, the program does not do
 *     anything
 *
- *   double amem_use_mb()
- *     Returns the current size in MByte of the total memory area which
- *     has been allocated through amalloc (but not yet freed by afree)
- *
- *   double amem_max_mb()
- *     Returns the maximum size in MByte of the total memory area which
- *     has been allocated through amalloc at any moment since the start
- *     of the program execution and until the current call to amem_max_mb()
- *
+*   double amem_use_mb()
+*     Returns the current size in MByte of the total memory area which
+*     has been allocated through amalloc (but not yet freed by afree)
+*
+*   double amem_max_mb()
+*     Returns the maximum size in MByte of the total memory area which
+*     has been allocated through amalloc at any moment since the start
+*     of the program execution and until the current call to amem_max_mb()
+*
 *   int mpi_permanent_tag(void)
 *     Returns a new send tag that is guaranteed to be unique and which
 *     is therefore suitable for use in permanent communication requests.
@@ -47,52 +47,26 @@
 *     Note that the counter for these tags wraps around after 16384
 *     tags have been delivered
 *
-*   void error(int test,int no,char *name,char *format,...)
-*     Checks whether "test"=0 on all processes and, if not, aborts the
-*     program gracefully with error number "no" after printing the "name"
-*     of the calling program and an error message to stdout from process 0.
-*     The message is formed on process 0 using the "format" string and any
-*     additional arguments, exactly as in a printf statement
-*
-*   void error_root(int test,int no,char *name,char *format,...)
-*     Same as the error() function except that "test" is examined on
-*     process 0 only
-*
-*   int error_loc(int test,int no,char *name,char *message)
-*     Checks whether "test"=0 on the local process and, if not, writes
-*     the error number "no", the program "name" and the error "message"
-*     to an internal buffer. Only the data of the first instance where
-*     this happens are recorded. Note that saved program names and error
-*     messages are truncated to 127 and 511 bytes, respectively. In all
-*     cases, the program returns the value of "test"
-*
-*   void error_chk(void)
-*     Checks the status of the data saved by error_loc() and aborts the
-*     program gracefully, with error number 1, if an error is recorded on
-*     some of the processes. Before abortion the error numbers, program
-*     names and error messages saved on these processes are printed to
-*     stdout from process 0
-*
 *   void message(char *format,...)
 *     Prints a message from process 0 to stdout. The usage and argument
 *     list is the same as in the case of the printf function
 *
- *   void mpc_gsum_d(double *src, double *dst, int num)
- *     Compute global sum of num double precision values from src and
- *     store results in dst
- *
- *    void mpc_bcast_c(char *buf, int num)
- *     Broadcast num char values from buf of rank 0
- *
- *    void mpc_bcast_d(double *buf, int num)
- *     Broadcast num double values from buf of rank 0
- *
- *    void mpc_bcast_i(int *buf, int num)
- *     Broadcast num int values from buf of rank 0
- *
- *    void mpc_print_info()
- *     Print info how mpc functions are implemented
- *
+*   void mpc_gsum_d(double *src, double *dst, int num)
+*     Compute global sum of num double precision values from src and
+*     store results in dst
+*
+*   void mpc_bcast_c(char *buf, int num)
+*     Broadcast num char values from buf of rank 0
+*
+*   void mpc_bcast_d(double *buf, int num)
+*     Broadcast num double values from buf of rank 0
+*
+*   void mpc_bcast_i(int *buf, int num)
+*     Broadcast num int values from buf of rank 0
+*
+*   void mpc_print_info()
+*     Print info how mpc functions are implemented
+*
 * Notes:
 *
 * If an error is detected in a locally operating program, it is not possible
@@ -127,8 +101,6 @@ static int mpcBuf[MPC_BUF_LEN];
 static int mpcRank = -1;
 
 static int pcmn_cnt = -1, cmn_cnt = MAX_TAG;
-static int err_no, err_flg = 0;
-static char prog_name[128], err_msg[512];
 
 static long long int amem_use = 0;
 static long long int amem_max = 0;
@@ -214,66 +186,6 @@ double amem_use_mb() { return ((double)amem_use) / (1024 * 1024); }
 
 double amem_max_mb() { return ((double)amem_max) / (1024 * 1024); }
 
-void error(int test, int no, char *name, char *format, ...)
-{
-  int i, all, my_rank;
-  va_list args;
-
-  i = (test != 0);
-  MPI_Allreduce(&i, &all, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-
-  if (all == 0)
-    return;
-
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
-  if (my_rank == 0) {
-    printf("\nError in %s:\n", name);
-    va_start(args, format);
-    vprintf(format, args);
-    va_end(args);
-    printf("\nProgram aborted\n\n");
-    fflush(stdout);
-
-    MPI_Abort(MPI_COMM_WORLD, no);
-  } else
-    for (i = 1; i < 2; i = safe_mod(i, 2))
-      ;
-}
-
-void error_root(int test, int no, char *name, char *format, ...)
-{
-  int my_rank;
-  va_list args;
-
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
-  if ((my_rank == 0) && (test != 0)) {
-    printf("\nError in %s:\n", name);
-    va_start(args, format);
-    vprintf(format, args);
-    va_end(args);
-    printf("\nProgram aborted\n\n");
-    fflush(stdout);
-
-    MPI_Abort(MPI_COMM_WORLD, no);
-  }
-}
-
-int error_loc(int test, int no, char *name, char *message)
-{
-  if ((test != 0) && (err_flg == 0)) {
-    err_no = no;
-    strncpy(prog_name, name, 128);
-    strncpy(err_msg, message, 512);
-    prog_name[127] = '\0';
-    err_msg[511] = '\0';
-    err_flg = 1;
-  }
-
-  return test;
-}
-
 int mpi_permanent_tag(void)
 {
   if (pcmn_cnt < MAX_PERMANENT_TAG)
@@ -293,61 +205,6 @@ int mpi_tag(void)
   cmn_cnt += 1;
 
   return cmn_cnt;
-}
-
-void error_chk(void)
-{
-  int i, n, my_rank, tag1, tag2, tag3;
-  int err[2];
-  MPI_Status stat;
-
-  MPI_Allreduce(&err_flg, &i, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-
-  if (i == 0)
-    return;
-
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-  err[0] = err_flg;
-  err[1] = err_no;
-
-  if (my_rank == 0)
-    printf("Errors were detected on the following processes:\n\n");
-
-  for (n = 0; n < NPROC; n++) {
-    if (n > 0) {
-      MPI_Barrier(MPI_COMM_WORLD);
-
-      tag1 = mpi_tag();
-      tag2 = mpi_tag();
-      tag3 = mpi_tag();
-
-      if (my_rank == n) {
-        MPI_Send(err, 2, MPI_INT, 0, tag1, MPI_COMM_WORLD);
-        MPI_Send(prog_name, 127, MPI_CHAR, 0, tag2, MPI_COMM_WORLD);
-        MPI_Send(err_msg, 511, MPI_CHAR, 0, tag3, MPI_COMM_WORLD);
-      }
-
-      if (my_rank == 0) {
-        MPI_Recv(err, 2, MPI_INT, n, tag1, MPI_COMM_WORLD, &stat);
-        MPI_Recv(prog_name, 127, MPI_CHAR, n, tag2, MPI_COMM_WORLD, &stat);
-        MPI_Recv(err_msg, 511, MPI_CHAR, n, tag3, MPI_COMM_WORLD, &stat);
-      }
-    }
-
-    if ((err[0] == 1) && (my_rank == 0)) {
-      printf("%3d: in %s:\n", n, prog_name);
-      printf("     %s (error number %d)\n", err_msg, err[1]);
-    }
-  }
-
-  if (my_rank == 0) {
-    printf("\nProgram aborted\n\n");
-    fflush(stdout);
-
-    MPI_Abort(MPI_COMM_WORLD, 1);
-  } else
-    for (i = 1; i < 2; i = safe_mod(i, 2))
-      ;
 }
 
 void message(char *format, ...)

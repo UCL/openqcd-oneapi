@@ -40,6 +40,7 @@ struct
    int udbuf,bstap,fts;
    int sw[3],swd[3];
    int aw,awh;
+   int phase;
 } lat
 
 with the following elements:
@@ -84,14 +85,19 @@ lat.aw                      Tag of the double-precision gauge field when the
                             little Dirac operator was last calculated.
 
 lat.awh                     Tag of the double-precision gauge field when the
-                            even-odd preconditioned little Dirac operator was 
+                            even-odd preconditioned little Dirac operator was
                             last calculated.
+
+lat.phase                   Indicates whether the double-precision gauge field
+                            is phase shifted (lat.phase=1) or not (lat.phase=0)
+                            [cf. set_ud_phase() in uflds/uflds.c].
+
 
 Block-grid flags
 ----------------
 
 The data base monitors the fields on the block grids too. Flags are currently
-set for two block grids (GCR_BLOCKS and DFL_BLOCKS), but further grids could
+set for two block grids (SAP_BLOCKS and DFL_BLOCKS), but further grids could
 easily be incorporated.
 
 A complication arises from the fact that blocks may share some of the fields.
@@ -110,13 +116,13 @@ typedef struct
 with the following elements:
 
 gf.shf                      Share flags of the blocks on the block grid.
-                            The bits b1,b2 (counting from the lowest) in 
+                            The bits b1,b2 (counting from the lowest) in
                             this number are
 
                             b1=1:  b.u and bb.u are shared,
                             b2=1:  b.ud and bb.ud are shared.
 
-			    All other bits are set to zero. 
+			    All other bits are set to zero.
 
 gf.u                        Tag of the single-precision gauge field on the
                             blocks (=0 if the field is shared).

@@ -3,7 +3,7 @@
 *
 * File check1.c
 *
-* Copyright (C) 2005, 2011, 2013 Martin Luescher
+* Copyright (C) 2005, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -406,7 +406,7 @@ static void test5(blk_grid_t grid)
 int main(int argc, char *argv[])
 {
   int my_rank, bc, igr, bs[4];
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   blk_grid_t grid;
   FILE *flog = NULL, *fin = NULL;
 
@@ -444,8 +444,11 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.38;
+  theta[1] = 1.57;
+  theta[2] = -0.54;
+  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime, theta);
+  print_bc_parms(3);
 
   geometry();
   set_sap_parms(bs, 0, 1, 1);
@@ -468,8 +471,6 @@ int main(int argc, char *argv[])
     test4(grid);
     test5(grid);
   }
-
-  error_chk();
 
   if (my_rank == 0) {
     printf("No errors detected\n\n");

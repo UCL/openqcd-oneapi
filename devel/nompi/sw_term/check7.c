@@ -3,7 +3,7 @@
 *
 * File check7.c
 *
-* Copyright (C) 2005, 2009, 2011 Martin Luescher
+* Copyright (C) 2005, 2009, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -24,7 +24,10 @@
 #define NM 10000
 
 static double dd[6] ALIGNED16;
-static complex_dble aa[36], bb[36], vv[36], ww[36] ALIGNED16;
+static complex_dble aa[36] ALIGNED16;
+static complex_dble bb[36] ALIGNED16;
+static complex_dble vv[36] ALIGNED16;
+static complex_dble ww[36] ALIGNED16;
 
 static complex_dble random_dd(double mu)
 {

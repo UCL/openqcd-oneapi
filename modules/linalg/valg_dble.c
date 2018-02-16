@@ -3,7 +3,7 @@
 *
 * File valg_dble.c
 *
-* Copyright (C) 2007, 2011 Martin Luescher
+* Copyright (C) 2007, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -56,14 +56,13 @@
 #include "mpi.h"
 #include "utils.h"
 #include "linalg.h"
+#include "vflds.h"
 #include "global.h"
 
-#define MAX_LEVELS 8
-#define BLK_LENGTH 32
-
-static int nrot = 0, ifail = 0;
-static int cnt[MAX_LEVELS];
-static double smx[MAX_LEVELS], smy[MAX_LEVELS];
+static int nrot = 0;
+static int isx, isz, init = 0;
+static double smx ALIGNED8;
+static complex_dble smz ALIGNED16;
 static complex_dble *psi;
 
 static void alloc_wrotate(int n)
@@ -72,121 +71,80 @@ static void alloc_wrotate(int n)
     afree(psi);
 
   psi = amalloc(n * sizeof(*psi), ALIGN);
-
-  if (psi == NULL) {
-    error_loc(1, 1, "alloc_wrotate [valg_dble.c]",
-              "Unable to allocate workspace");
-    nrot = 0;
-    ifail = 1;
-  } else
-    nrot = n;
+  error_loc(psi == NULL, 1, "alloc_wrotate [valg_dble.c]",
+            "Unable to allocate workspace");
+  set_vd2zero(n, psi);
+  nrot = n;
 }
 
 complex_dble vprod_dble(int n, int icom, complex_dble *v, complex_dble *w)
 {
-  int k;
-  complex_dble s, t;
   complex_dble *vm, *vb;
 
-  for (k = 0; k < MAX_LEVELS; k++) {
-    cnt[k] = 0;
-    smx[k] = 0.0;
-    smy[k] = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isz);
   vm = v + n;
 
   for (vb = v; vb < vm;) {
-    vb += BLK_LENGTH;
+    vb += 32;
     if (vb > vm)
       vb = vm;
-    s.re = 0.0;
-    s.im = 0.0;
+    smz.re = 0.0;
+    smz.im = 0.0;
 
     for (; v < vb; v++) {
-      s.re += ((*v).re * (*w).re + (*v).im * (*w).im);
-      s.im += ((*v).re * (*w).im - (*v).im * (*w).re);
+      smz.re += ((*v).re * (*w).re + (*v).im * (*w).im);
+      smz.im += ((*v).re * (*w).im - (*v).im * (*w).re);
       w += 1;
     }
 
-    cnt[0] += 1;
-    smx[0] += s.re;
-    smy[0] += s.im;
-
-    for (k = 1; (cnt[k - 1] >= BLK_LENGTH) && (k < MAX_LEVELS); k++) {
-      cnt[k] += 1;
-      smx[k] += smx[k - 1];
-      smy[k] += smy[k - 1];
-
-      cnt[k - 1] = 0;
-      smx[k - 1] = 0.0;
-      smy[k - 1] = 0.0;
-    }
+    add_to_hsum(isz, (double *)(&smz));
   }
 
-  s.re = 0.0;
-  s.im = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isz, (double *)(&smz));
+  else
+    local_hsum(isz, (double *)(&smz));
 
-  for (k = 0; k < MAX_LEVELS; k++) {
-    s.re += smx[k];
-    s.im += smy[k];
-  }
-
-  if ((icom != 1) || (NPROC == 1))
-    return s;
-  else {
-    MPI_Reduce(&s.re, &t.re, 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&t.re, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return t;
-  }
+  return smz;
 }
 
 double vnorm_square_dble(int n, int icom, complex_dble *v)
 {
-  int k;
-  double s, t;
   complex_dble *vm, *vb;
 
-  for (k = 0; k < MAX_LEVELS; k++) {
-    cnt[k] = 0;
-    smx[k] = 0.0;
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
   }
 
+  reset_hsum(isx);
   vm = v + n;
 
   for (vb = v; vb < vm;) {
-    vb += BLK_LENGTH;
+    vb += 32;
     if (vb > vm)
       vb = vm;
-    s = 0.0;
+    smx = 0.0;
 
     for (; v < vb; v++)
-      s += ((*v).re * (*v).re + (*v).im * (*v).im);
+      smx += ((*v).re * (*v).re + (*v).im * (*v).im);
 
-    cnt[0] += 1;
-    smx[0] += s;
-
-    for (k = 1; (cnt[k - 1] >= BLK_LENGTH) && (k < MAX_LEVELS); k++) {
-      cnt[k] += 1;
-      smx[k] += smx[k - 1];
-
-      cnt[k - 1] = 0;
-      smx[k - 1] = 0.0;
-    }
+    add_to_hsum(isx, &smx);
   }
 
-  s = 0.0;
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(isx, &smx);
+  else
+    local_hsum(isx, &smx);
 
-  for (k = 0; k < MAX_LEVELS; k++)
-    s += smx[k];
-
-  if ((icom != 1) || (NPROC == 1))
-    return s;
-  else {
-    MPI_Reduce(&s, &t, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&t, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    return t;
-  }
+  return smx;
 }
 
 void mulc_vadd_dble(int n, complex_dble *v, complex_dble *w, complex_dble z)
@@ -231,13 +189,11 @@ double vnormalize_dble(int n, int icom, complex_dble *v)
   r = vnorm_square_dble(n, icom, v);
   r = sqrt(r);
 
-  if (r == 0.0) {
-    error_loc(r == 0.0, 1, "vnormalize_dble [valg_dble.c]",
+  if (r != 0.0)
+    vscale_dble(n, 1.0 / r, v);
+  else
+    error_loc(1, 1, "vnormalize_dble [valg_dble.c]",
               "Vector field has vanishing norm");
-    return 0.0;
-  }
-
-  vscale_dble(n, 1.0 / r, v);
 
   return r;
 }
@@ -247,31 +203,29 @@ void vrotate_dble(int n, int nv, complex_dble **pv, complex_dble *a)
   int i, k, j;
   complex_dble s, *z, *vj;
 
-  if ((nv > nrot) && (ifail == 0))
+  if (nv > nrot)
     alloc_wrotate(nv);
 
-  if ((nv > 0) && (ifail == 0)) {
-    for (i = 0; i < n; i++) {
-      for (k = 0; k < nv; k++) {
-        z = a + k;
-        s.re = 0.0;
-        s.im = 0.0;
+  for (i = 0; i < n; i++) {
+    for (k = 0; k < nv; k++) {
+      z = a + k;
+      s.re = 0.0;
+      s.im = 0.0;
 
-        for (j = 0; j < nv; j++) {
-          vj = pv[j] + i;
-          s.re += ((*z).re * (*vj).re - (*z).im * (*vj).im);
-          s.im += ((*z).re * (*vj).im + (*z).im * (*vj).re);
-          z += nv;
-        }
-
-        psi[k].re = s.re;
-        psi[k].im = s.im;
+      for (j = 0; j < nv; j++) {
+        vj = pv[j] + i;
+        s.re += ((*z).re * (*vj).re - (*z).im * (*vj).im);
+        s.im += ((*z).re * (*vj).im + (*z).im * (*vj).re);
+        z += nv;
       }
 
-      for (k = 0; k < nv; k++) {
-        pv[k][i].re = psi[k].re;
-        pv[k][i].im = psi[k].im;
-      }
+      psi[k].re = s.re;
+      psi[k].im = s.im;
+    }
+
+    for (k = 0; k < nv; k++) {
+      pv[k][i].re = psi[k].re;
+      pv[k][i].im = psi[k].im;
     }
   }
 }

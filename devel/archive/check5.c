@@ -3,7 +3,7 @@
 *
 * File check5.c
 *
-* Copyright (C) 2007, 2008, 2011, 2013 Martin Luescher
+* Copyright (C) 2007, 2008, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -119,7 +119,6 @@ int main(int argc, char *argv[])
       dmax = d;
   }
 
-  error_chk();
   MPI_Reduce(&d, &dmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
   if (my_rank == 0) {

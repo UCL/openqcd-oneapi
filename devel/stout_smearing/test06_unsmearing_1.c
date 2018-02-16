@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 {
   int my_rank, ix, mu;
   double t_diff, s_diff, diff_total;
+  double theta[3] = {0.0, 0.0, 0.0};
   su3_alg_dble *force, *force_copy;
   su3_alg_dble const_force;
 
@@ -48,8 +49,8 @@ int main(int argc, char *argv[])
     printf("-------------------------------------------\n\n");
   }
 
-  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL);
-  set_stout_smearing_parms(4, 0., 0.25);
+  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL, theta);
+  set_stout_smearing_parms(4, 0., 0.25, 1, 1);
 
   geometry();
 

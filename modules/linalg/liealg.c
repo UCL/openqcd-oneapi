@@ -3,7 +3,7 @@
 *
 * File liealg.c
 *
-* Copyright (C) 2005, 2009, 2010, 2011 Martin Luescher
+* Copyright (C) 2005, 2009-2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -82,12 +82,8 @@
 #include "linalg.h"
 #include "global.h"
 
-#define MAX_LEVELS 12
-#define BLK_LENGTH 8
-
-static int cnt[MAX_LEVELS];
-static double smx[MAX_LEVELS];
-static double c1 = 0.0, c2, c3, rb[8], sm;
+static int ism, init = 0;
+static double c1 = 0.0, c2, c3, rb[8];
 
 void random_alg(int vol, su3_alg_dble *X)
 {
@@ -117,14 +113,15 @@ void random_alg(int vol, su3_alg_dble *X)
 
 double norm_square_alg(int vol, int icom, su3_alg_dble *X)
 {
-  int n;
+  double sm;
   su3_alg_dble *Xm;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smx[n] = 0.0;
+  if (init == 0) {
+    ism = init_hsum(1);
+    init = 1;
   }
 
+  reset_hsum(ism);
   Xm = X + vol;
 
   for (; X < Xm; X++) {
@@ -132,40 +129,28 @@ double norm_square_alg(int vol, int icom, su3_alg_dble *X)
          (*X).c3 * (*X).c3 + (*X).c4 * (*X).c4 + (*X).c5 * (*X).c5 +
          (*X).c6 * (*X).c6 + (*X).c7 * (*X).c7 + (*X).c8 * (*X).c8;
 
-    cnt[0] += 1;
-    smx[0] += sm;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smx[n] += smx[n - 1];
-
-      cnt[n - 1] = 0;
-      smx[n - 1] = 0.0;
-    }
+    add_to_hsum(ism, &sm);
   }
 
-  for (n = 1; n < MAX_LEVELS; n++)
-    smx[0] += smx[n];
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(ism, &sm);
+  else
+    local_hsum(ism, &sm);
 
-  if ((icom == 1) && (NPROC > 1)) {
-    sm = smx[0];
-    MPI_Reduce(&sm, smx, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(smx, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  }
-
-  return 4.0 * smx[0];
+  return 4.0 * sm;
 }
 
 double scalar_prod_alg(int vol, int icom, su3_alg_dble *X, su3_alg_dble *Y)
 {
-  int n;
+  double sm;
   su3_alg_dble *Xm;
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smx[n] = 0.0;
+  if (init == 0) {
+    ism = init_hsum(1);
+    init = 1;
   }
 
+  reset_hsum(ism);
   Xm = X + vol;
 
   for (; X < Xm; X++) {
@@ -175,28 +160,15 @@ double scalar_prod_alg(int vol, int icom, su3_alg_dble *X, su3_alg_dble *Y)
                 (*X).c6 * (*Y).c6 + (*X).c7 * (*Y).c7 + (*X).c8 * (*Y).c8);
 
     Y += 1;
-    cnt[0] += 1;
-    smx[0] += sm;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smx[n] += smx[n - 1];
-
-      cnt[n - 1] = 0;
-      smx[n - 1] = 0.0;
-    }
+    add_to_hsum(ism, &sm);
   }
 
-  for (n = 1; n < MAX_LEVELS; n++)
-    smx[0] += smx[n];
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(ism, &sm);
+  else
+    local_hsum(ism, &sm);
 
-  if ((icom == 1) && (NPROC > 1)) {
-    sm = smx[0];
-    MPI_Reduce(&sm, smx, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(smx, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  }
-
-  return smx[0];
+  return sm;
 }
 
 void set_alg2zero(int vol, su3_alg_dble *X)

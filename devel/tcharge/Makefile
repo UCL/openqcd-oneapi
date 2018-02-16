@@ -21,11 +21,11 @@ all: rmxeq mkdep mkxeq
 
 MAIN = check1 check2 check3 check4 check5 check6
 
-FORCES = force0
-
 FLAGS = flags lat_parms hmc_parms dfl_parms
 
-LATTICE = bcnds uidx ftidx geometry 
+FORCES = force0
+
+LATTICE = bcnds uidx ftidx geometry
 
 LINALG = liealg cmatrix_dble
 
@@ -41,7 +41,7 @@ TCHARGE = ftcom ftensor tcharge ym_action
 
 UFLDS = plaq_sum shift uflds udcom bstap
 
-UTILS = endian mutils utils wspace
+UTILS = error endian hsum mutils utils wspace
 
 WFLOW = wflow
 
@@ -83,11 +83,13 @@ CFLAGS = -std=c89 -pedantic -fstrict-aliasing \
          -Wall -Wno-long-long -Wstrict-prototypes -Werror \
          -O -mno-avx -Dx64 -DPM
 
+LFLAGS =
+
 
 ############################## do not change ###################################
 
 SHELL=/bin/bash
-CC=$(MPI_HOME)/bin/mpicc
+CC=mpicc
 CLINKER=$(CC)
 
 PGMS= $(MAIN) $(MODULES)
@@ -110,7 +112,7 @@ $(addsuffix .o,$(PGMS)): %.o: %.c Makefile
 # rule to link object files
 
 $(MAIN): %: %.o $(addsuffix .o,$(MODULES)) Makefile
-	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(CFLAGS) $(LOGOPTION) \
+	$(CLINKER) $< $(addsuffix .o,$(MODULES)) $(LFLAGS) $(LOGOPTION) \
         $(addprefix -L,$(LIBPATH)) $(addprefix -l,$(LIBS)) -o $@
 
 

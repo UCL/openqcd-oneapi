@@ -1,20 +1,12 @@
 #define TEST_COUNTER_C
 
 #include "test_counter.h"
+#include "printing_macros.h"
 #include <string.h>
 #include <stdio.h>
 
 #define MAX_NUM_TESTS 64
 #define MAX_NAME_LENGTH 256
-
-#define KNRM  "\x1B[0m"
-#define KRED  "\x1B[31m"
-#define KGRN  "\x1B[32m"
-#define KYEL  "\x1B[33m"
-#define KBLU  "\x1B[34m"
-#define KMAG  "\x1B[35m"
-#define KCYN  "\x1B[36m"
-#define KWHT  "\x1B[37m"
 
 static int num_failed_tests, num_registered_tests;
 static int failed_tests[MAX_NUM_TESTS+1], registered_tests[MAX_NUM_TESTS+1];

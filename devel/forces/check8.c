@@ -3,7 +3,7 @@
 *
 * File check8.c
 *
-* Copyright (C) 2012, 2013 Martin Luescher
+* Copyright (C) 2012, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -35,7 +35,7 @@
 static int my_rank, bc, first, last, step;
 static int nmu, nmx;
 static double kappa, csw, *mu, cF, cF_prime;
-static double uphi[2], uphi_prime[2], m0, *res;
+static double uphi[2], uphi_prime[2], theta[3], m0, *res;
 static char cnfg_dir[NAME_SIZE], cnfg_file[NAME_SIZE], nbase[NAME_SIZE];
 
 int main(int argc, char *argv[])
@@ -98,6 +98,8 @@ int main(int argc, char *argv[])
       read_line("cF'", "%lf", &cF_prime);
     else
       cF_prime = cF;
+
+    read_dprms("theta", 3, theta);
   }
 
   MPI_Bcast(nbase, NAME_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);
@@ -115,6 +117,7 @@ int main(int argc, char *argv[])
   MPI_Bcast(uphi_prime, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cF, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&cF_prime, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(theta, 3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
   mu = malloc(2 * nmu * sizeof(*mu));
   error(mu == NULL, 1, "main [check8.c]",
@@ -141,8 +144,8 @@ int main(int argc, char *argv[])
   lat = set_lat_parms(5.5, 1.0, 1, &kappa, csw);
   print_lat_parms();
 
-  set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, uphi, uphi_prime);
-  print_bc_parms();
+  set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, uphi, uphi_prime, theta);
+  print_bc_parms(2);
 
   start_ranlux(0, 1234);
   geometry();
@@ -195,7 +198,7 @@ int main(int argc, char *argv[])
       fflush(flog);
     }
 
-    chs_ubnd(-1);
+    set_ud_phase();
     random_sd(VOLUME, eta, 1.0);
     bnd_sd2zero(ALL_PTS, eta);
     nrm = sqrt(norm_square_dble(VOLUME / 2, 1, eta));
@@ -210,7 +213,6 @@ int main(int argc, char *argv[])
     wt2 = MPI_Wtime();
     wdt = wt2 - wt1;
 
-    error_chk();
     mulr_spinor_add_dble(VOLUME, chi, eta, -1.0);
     del = norm_square_dble(VOLUME, 1, chi);
     error_root(del != 0.0, 1, "main [check8.c]",

@@ -34,9 +34,8 @@
 *   void error_root(int test,int no,char *name,char *format,...)
 *     Same as error(), provided for compatibility
 *
-*   int error_loc(int test,int no,char *name,char *format,...)
-*     Same as error(), except that "test" is returned. Provided for
-*     compatibility
+*   void error_loc(int test,int no,char *name,char *format,...)
+*     Same as error(), provided for compatibility
 *
 *   void message(char *format,...)
 *     Same as printf(), provided for compatibility
@@ -170,7 +169,7 @@ void error_root(int test, int no, char *name, char *format, ...)
   }
 }
 
-int error_loc(int test, int no, char *name, char *format, ...)
+void error_loc(int test, int no, char *name, char *format, ...)
 {
   va_list args;
 
@@ -182,8 +181,6 @@ int error_loc(int test, int no, char *name, char *format, ...)
     printf("\nProgram aborted\n\n");
     exit(no);
   }
-
-  return test;
 }
 
 void message(char *format, ...)

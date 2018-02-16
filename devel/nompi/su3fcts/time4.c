@@ -3,7 +3,7 @@
 *
 * File time4.c
 *
-* Copyright (C) 2005, 2009, 2011, 2013 Martin Luescher
+* Copyright (C) 2005, 2009, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -17,7 +17,6 @@
 #include <math.h>
 #include <time.h>
 #include "random.h"
-#include "su3.h"
 #include "utils.h"
 #include "su3fcts.h"
 
@@ -34,7 +33,11 @@ int main(void)
   printf("---------------------------------------------------\n\n");
 
 #if (defined AVX)
+#if (defined FMA3)
+  printf("Using AVX and FMA3 instructions\n");
+#else
   printf("Using AVX instructions\n");
+#endif
 #elif (defined x64)
   printf("Using SSE3 instructions and up to 16 xmm registers\n");
 #endif
@@ -69,7 +72,8 @@ int main(void)
   dt *= 2.0e6 / (double)(n);
 
   printf("The times per application are:\n");
-  printf("prod2su3alg:   %.2e micro sec (%d Mflops)\n", dt, (int)(212.0 / dt));
+  printf("prod2su3alg:   %4.3f nsec [%d Mflops]\n", 1.0e3 * dt,
+         (int)(212.0 / dt));
 
   n = (int)(1.0e6);
   dt = 0.0;
@@ -85,7 +89,8 @@ int main(void)
 
   dt *= 2.0e6 / (double)(n);
 
-  printf("prod2u3alg:    %.2e micro sec (%d Mflops)\n", dt, (int)(207.0 / dt));
+  printf("prod2u3alg:    %4.3f nsec [%d Mflops]\n", 1.0e3 * dt,
+         (int)(207.0 / dt));
 
   n = (int)(1.0e6);
   dt = 0.0;
@@ -101,7 +106,7 @@ int main(void)
 
   dt *= 2.0e6 / (double)(n);
 
-  printf("rotate_su3alg: %.2e micro sec (%d Mflops)\n\n", dt,
+  printf("rotate_su3alg: %4.3f nsec [%d Mflops]\n\n", 1.0e3 * dt,
          (int)(274.0 / dt));
   exit(0);
 }

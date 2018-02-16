@@ -3,7 +3,7 @@
 *
 * File swflds.c
 *
-* Copyright (C) 2006, 2011, 2013 Martin Luescher
+* Copyright (C) 2006, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -44,13 +44,12 @@
 #include "sw_term.h"
 #include "global.h"
 
-static const pauli sw0 = {{0.0f}};
-static const pauli_dble swd0 = {{0.0}};
 static pauli *swb = NULL;
 static pauli_dble *swdb = NULL;
 
 static void alloc_sw(void)
 {
+  int i;
   pauli *sw, *sm, unity;
 
   error_root(sizeof(pauli) != (36 * sizeof(float)), 1, "alloc_sw [swflds.c]",
@@ -60,13 +59,15 @@ static void alloc_sw(void)
   error(swb == NULL, 1, "alloc_sw [swflds.c]",
         "Unable to allocate the global single-precision SW field");
 
-  unity = sw0;
   unity.u[0] = 1.0f;
   unity.u[1] = 1.0f;
   unity.u[2] = 1.0f;
   unity.u[3] = 1.0f;
   unity.u[4] = 1.0f;
   unity.u[5] = 1.0f;
+
+  for (i = 6; i < 36; i++)
+    unity.u[i] = 0.0f;
 
   sw = swb;
   sm = sw + 2 * VOLUME;
@@ -85,6 +86,7 @@ pauli *swfld(void)
 
 static void alloc_swd(void)
 {
+  int i;
   pauli_dble *sw, *sm, unity;
 
   error_root(sizeof(pauli_dble) != (36 * sizeof(double)), 1,
@@ -95,13 +97,15 @@ static void alloc_swd(void)
   error(swdb == NULL, 1, "alloc_swd [swflds.c]",
         "Unable to allocate the global double-precision SW field");
 
-  unity = swd0;
   unity.u[0] = 1.0;
   unity.u[1] = 1.0;
   unity.u[2] = 1.0;
   unity.u[3] = 1.0;
   unity.u[4] = 1.0;
   unity.u[5] = 1.0;
+
+  for (i = 6; i < 36; i++)
+    unity.u[i] = 0.0;
 
   sw = swdb;
   sm = sw + 2 * VOLUME;

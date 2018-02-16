@@ -72,6 +72,8 @@ cF           0.95                  # Fermion action improvement coefficient
                                    # at time 0
 cF'          0.90                  # Fermion action improvement coefficient
                                    # at time NPROC0*L0
+theta        0.5 1.0 -0.5          # Angles specifying the phase-periodic bc
+                                   # of the quark fields in space
 
 [Source fields]
 x0           20                    # Time at which the random source fields
@@ -198,4 +200,3 @@ The program can be stopped gracefully by touching a file in the log directory
 with the same name as the log file but with extension .end instead of .log. It
 may take a while until the program exits, because it will only do so when the
 current field configuration is fully processed.
-

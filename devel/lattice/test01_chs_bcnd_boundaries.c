@@ -24,9 +24,9 @@
 int main(int argc, char *argv[])
 {
   int my_rank, ix, num_links_bnd;
+  double theta[3] = {0.0, 0.0, 0.0};
   double diff, total_diff;
   su3_dble *udb, *boundary_copy;
-  int pidx[4];
 
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf("Checks of the programs in the module stout_smearing\n");
+    printf("Checks of the programs in the module lattice\n");
     printf("-------------------------------------------\n\n");
 
     printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
@@ -45,17 +45,22 @@ int main(int argc, char *argv[])
   }
 
   num_links_bnd = 7 * (BNDRY / 4);
+  /*num_links_bnd = BNDRY / 4;*/
   boundary_copy = malloc(num_links_bnd * sizeof(*boundary_copy));
 
-  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL);
+  theta[0] = 0.35;
+  theta[1] = -1.25;
+  theta[2] = 0.78;
+
+  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL, theta);
   geometry();
 
   random_ud();
   copy_bnd_ud();
-  chs_ubnd(-1);
+
+  set_ud_phase();
 
   udb = udfld();
-
   cm3x3_assign(num_links_bnd, udb + 4*VOLUME, boundary_copy);
 
   copy_bnd_ud();
@@ -69,11 +74,28 @@ int main(int argc, char *argv[])
   MPI_Reduce(&diff, &total_diff, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
   if (my_rank == 0) {
-    register_test(1, "Sign of boundary links after chs_ubnd(-1)");
+    register_test(1, "Sign of boundary links after set_ud_phase()");
     print_test_header(1);
 
     printf("Total diff: %.2e (should be 0.0)\n", total_diff);
     fail_test_if(1, total_diff > 1e-10);
+
+    printf("\n-------------------------------------------\n\n");
+  }
+
+  unset_ud_phase();
+
+  udb = udfld();
+  cm3x3_assign(num_links_bnd, udb + 4*VOLUME, boundary_copy);
+
+  copy_bnd_ud();
+
+  if (my_rank == 0) {
+    register_test(2, "Sign of boundary links after unset_ud_phase()");
+    print_test_header(2);
+
+    printf("Total diff: %.2e (should be 0.0)\n", total_diff);
+    fail_test_if(2, total_diff > 1e-10);
 
     printf("\n-------------------------------------------\n\n");
   }

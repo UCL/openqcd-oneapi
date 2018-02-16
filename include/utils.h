@@ -3,7 +3,7 @@
 *
 * File utils.h
 *
-* Copyright (C) 2011 Martin Luescher
+* Copyright (C) 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -55,6 +55,19 @@ extern int endianness(void);
 extern void bswap_int(int n, void *a);
 extern void bswap_double(int n, void *a);
 
+/* ERROR_C */
+extern void set_error_file(char *path, int loc_flag);
+extern void error(int test, int no, char *name, char *format, ...);
+extern void error_root(int test, int no, char *name, char *format, ...);
+extern void error_loc(int test, int no, char *name, char *format, ...);
+
+/* HSUM_C */
+extern int init_hsum(int n);
+extern void reset_hsum(int id);
+extern void add_to_hsum(int id, double *x);
+extern void local_hsum(int id, double *sx);
+extern void global_hsum(int id, double *sx);
+
 /* MUTILS_C */
 extern int find_opt(int argc, char *argv[], char *opt);
 extern int fdigits(double x);
@@ -68,7 +81,7 @@ extern long read_optional_line(char *tag, char *format, ...);
 extern int count_tokens(char *tag);
 extern void read_iprms(char *tag, int n, int *iprms);
 extern void read_dprms(char *tag, int n, double *dprms);
-extern int copy_file(char *in, char *out);
+extern void copy_file(char *in, char *out);
 
 extern long const No_Section_Found;
 
@@ -80,10 +93,6 @@ extern double amem_use_mb(void);
 extern double amem_max_mb(void);
 extern int mpi_permanent_tag(void);
 extern int mpi_tag(void);
-extern void error(int test, int no, char *name, char *format, ...);
-extern void error_root(int test, int no, char *name, char *format, ...);
-extern int error_loc(int test, int no, char *name, char *message);
-extern void error_chk(void);
 extern void message(char *format, ...);
 extern void mpc_bcast_c(char *buf, int num);
 extern void mpc_bcast_d(double *buf, int num);

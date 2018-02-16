@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
 {
   int my_rank, ix, mu;
   double expected_value = 0.;
+  double theta[3] = {0.0, 0.0, 0.0};
   su3_dble *ud;
   double total_diff, rho_t, rho_s;
 
@@ -49,8 +50,8 @@ int main(int argc, char *argv[])
     printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
   }
 
-  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL);
-  set_stout_smearing_parms(1, 1., 1.);
+  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL, theta);
+  set_stout_smearing_parms(1, 1., 1., 1, 1);
 
   geometry();
 
@@ -95,7 +96,7 @@ int main(int argc, char *argv[])
   rho_t = 0.24;
   rho_s = 0.79;
 
-  set_stout_smearing_parms(1, rho_t, rho_s);
+  set_stout_smearing_parms(1, rho_t, rho_s, 1, 1);
   compute_omega_field(ud);
 
   total_diff = 0.;

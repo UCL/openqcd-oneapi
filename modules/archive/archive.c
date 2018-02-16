@@ -126,21 +126,22 @@ static void alloc_state(void)
 
 void write_cnfg(char *out)
 {
-  int ldat[16], iw, ie;
+  int ldat[16], iw;
   double plaq;
   FILE *fout;
+
+  error_root(query_flags(UD_IS_CLEAN) == 0, 1, "write_cnfg [archive.c]",
+             "Attempt to write modified (phase|smearing) gauge field");
+
+  fout = fopen(out, "wb");
+  error_loc(fout == NULL, 1, "write_cnfg [archive.c]",
+            "Unable to open output file");
 
   if (state == NULL)
     alloc_state();
 
   udb = udfld();
-  ie = chs_ubnd(1);
-  error_root(ie == 1, 1, "write_cnfg [archive.c]",
-             "Attempt to write sign-flipped link variables");
-  fout = fopen(out, "wb");
-  error_loc(fout == NULL, 1, "write_cnfg [archive.c]",
-            "Unable to open output file");
-  error_chk();
+  plaq = plaq_sum_dble(0);
 
   ldat[0] = NPROC0;
   ldat[1] = NPROC1;
@@ -167,13 +168,11 @@ void write_cnfg(char *out)
   iw += fwrite(state, sizeof(int), ns, fout);
   rlxd_get(state);
   iw += fwrite(state, sizeof(int), nd, fout);
-  plaq = plaq_sum_dble(0);
   iw += fwrite(&plaq, sizeof(double), 1, fout);
   iw += fwrite(udb, sizeof(su3_dble), 4 * VOLUME, fout);
 
   error_loc(iw != (17 + ns + nd + 4 * VOLUME), 1, "write_cnfg [archive.c]",
             "Incorrect write count");
-  error_chk();
   fclose(fout);
 }
 
@@ -187,10 +186,11 @@ void read_cnfg(char *in)
     alloc_state();
 
   udb = udfld();
+  unset_ud_phase();
+
   fin = fopen(in, "rb");
   error_loc(fin == NULL, 1, "read_cnfg [archive.c]",
             "Unable to open input file");
-  error_chk();
 
   ir = fread(ldat, sizeof(int), 16, fin);
 
@@ -214,7 +214,6 @@ void read_cnfg(char *in)
 
   error_loc(ir != (17 + ns + nd + 4 * VOLUME), 1, "read_cnfg [archive.c]",
             "Incorrect read count");
-  error_chk();
   fclose(fin);
 
   set_flags(UPDATED_UD);
@@ -232,7 +231,6 @@ void read_cnfg(char *in)
   plaq1 = plaq_sum_dble(0) / nplaq;
   ie |= (fabs(plaq1 - plaq0) > eps);
   error_loc(ie != 0, 1, "read_cnfg [archive.c]", "Incorrect average plaquette");
-  error_chk();
 }
 
 static void check_machine(void)
@@ -307,7 +305,7 @@ static void set_links(int iy)
 
 void export_cnfg(char *out)
 {
-  int my_rank, np[4], n, iw, ie;
+  int my_rank, np[4], n, iw;
   int iwa, dmy, tag0, tag1;
   int x0, x1, x2, x3, y0, y1, y2, ix, iy;
   stdint_t lsize[4];
@@ -317,6 +315,9 @@ void export_cnfg(char *out)
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
+  error_root(query_flags(UD_IS_CLEAN) == 0, 1, "export_cnfg [archive.c]",
+             "Attempt to export a modified (phase|smearing) gauge field");
+
   if (ubuf == NULL) {
     check_machine();
     alloc_ubuf(my_rank);
@@ -325,10 +326,6 @@ void export_cnfg(char *out)
   dmy = 1;
   tag0 = mpi_tag();
   tag1 = mpi_tag();
-  udb = udfld();
-  ie = chs_ubnd(1);
-  error_root(ie == 1, 1, "export_cnfg [archive.c]",
-             "Attempt to write sign-flipped link variables");
   nplaq = (double)(6 * N0 * N1) * (double)(N2 * N3);
   plaq = plaq_sum_dble(1) / nplaq;
 
@@ -354,6 +351,7 @@ void export_cnfg(char *out)
   }
 
   iwa = 0;
+  udb = udfld();
 
   for (ix = 0; ix < (N0 * N1 * N2); ix++) {
     x0 = ix / (N1 * N2);
@@ -424,6 +422,7 @@ void import_cnfg(char *in)
   tag0 = mpi_tag();
   tag1 = mpi_tag();
   udb = udfld();
+  unset_ud_phase();
 
   if (my_rank == 0) {
     fin = fopen(in, "rb");

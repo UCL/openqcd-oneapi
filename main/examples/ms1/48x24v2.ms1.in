@@ -31,6 +31,7 @@ csw          1.90952
 
 [Boundary conditions]
 type         3
+theta        0.0 0.0 0.0
 
 [Reweighting factor 0]
 rwfact       RWTM2

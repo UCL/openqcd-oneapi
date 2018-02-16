@@ -3,7 +3,7 @@
 *
 * File check2.c
 *
-* Copyright (C) 2005, 2009, 2011 Martin Luescher
+* Copyright (C) 2005, 2009, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -36,11 +36,17 @@ typedef union
 
 #if (defined AVX)
 static pauli_dble mp ALIGNED32;
-static spin_t s1, s2, r1, r2 ALIGNED32;
+static spin_t s1 ALIGNED32;
+static spin_t s2 ALIGNED32;
+static spin_t r1 ALIGNED32;
+static spin_t r2 ALIGNED32;
 static mat_t mv ALIGNED32;
 #else
 static pauli_dble mp ALIGNED16;
-static spin_t s1, s2, r1, r2 ALIGNED16;
+static spin_t s1 ALIGNED16;
+static spin_t s2 ALIGNED16;
+static spin_t r1 ALIGNED16;
+static spin_t r2 ALIGNED16;
 static mat_t mv ALIGNED16;
 #endif
 

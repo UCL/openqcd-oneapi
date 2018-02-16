@@ -3,7 +3,7 @@
 *
 * File flags.c
 *
-* Copyright (C) 2009, 2011, 2012 Martin Luescher
+* Copyright (C) 2009, 2011, 2012, 2016 Martin Luescher, Isabel Campos
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -68,54 +68,68 @@
 #include "flags.h"
 #include "global.h"
 
-#define NFLGS (11 + 4 * (int)(BLK_GRIDS))
+#define NFLGS (10 + 4 * (int)(BLK_GRIDS))
+
+const int SMEARED_STATE_BIT = 1;
+const int PHASE_STATE_BIT = (1 << 1);
+
+typedef struct
+{
+  int tag;
+  int state;
+} cfg_state_t;
+
+typedef struct
+{
+  cfg_state_t state;
+  int even_flag, odd_flag;
+} sw_state_t;
 
 static struct
 {
-  int u, ud, udbuf;
-  int bstap, fts;
-  int sw[3], swd[3];
-  int aw, awh;
+  cfg_state_t u, ud, udbuf;
+  cfg_state_t bstap, fts;
+  sw_state_t sw, swd;
+  cfg_state_t aw, awh;
   int smeared_tag;
-  int is_smeared;
-} lat = {0, 0, 0, 0, 0, {0, 0, 0}, {0, 0, 0}, 0, 0, 0, 0};
+} lat = {{0, 0},         {0, 0},         {0, 0}, {0, 0}, {0, 0},
+         {{0, 0}, 0, 0}, {{0, 0}, 0, 0}, {0, 0}, {0, 0}, 0};
 
 typedef struct
 {
   int shf;
-  int u, ud;
-  int sw[3], swd[3];
+  cfg_state_t u, ud;
+  sw_state_t sw, swd;
 } grid_flags_t;
 
 static int init = 0, tag = 0;
 static int flgs[NFLGS];
 static grid_flags_t gfs[(int)(BLK_GRIDS) + 1] = {
-    {0x0, 0, 0, {0, 0, 0}, {0, 0, 0}}};
+    {0x0, {0, 0}, {0, 0}, {{0, 0}, 0, 0}, {{0, 0}, 0, 0}}};
 static grid_flags_t *gf;
 
 static void set_flgs(void)
 {
   int n, igr;
 
-  flgs[0] = lat.u;
-  flgs[1] = lat.ud;
-  flgs[2] = lat.udbuf;
-  flgs[3] = lat.bstap;
-  flgs[4] = lat.fts;
-  flgs[5] = lat.sw[0];
-  flgs[6] = lat.swd[0];
-  flgs[7] = lat.aw;
-  flgs[8] = lat.awh;
+  flgs[0] = lat.u.tag;
+  flgs[1] = lat.ud.tag;
+  flgs[2] = lat.udbuf.tag;
+  flgs[3] = lat.bstap.tag;
+  flgs[4] = lat.fts.tag;
+  flgs[5] = lat.sw.state.tag;
+  flgs[6] = lat.swd.state.tag;
+  flgs[7] = lat.aw.tag;
+  flgs[8] = lat.awh.tag;
   flgs[9] = lat.smeared_tag;
-  flgs[10] = lat.is_smeared;
 
-  n = 11;
+  n = 10;
 
   for (igr = 0; igr < (int)(BLK_GRIDS); igr++) {
-    flgs[n++] = gfs[igr].u;
-    flgs[n++] = gfs[igr].ud;
-    flgs[n++] = gfs[igr].sw[0];
-    flgs[n++] = gfs[igr].swd[0];
+    flgs[n++] = gfs[igr].u.tag;
+    flgs[n++] = gfs[igr].ud.tag;
+    flgs[n++] = gfs[igr].sw.state.tag;
+    flgs[n++] = gfs[igr].swd.state.tag;
   }
 }
 
@@ -170,25 +184,24 @@ static void compress_flags(void)
       flgs[k] -= d;
   }
 
-  lat.u = flgs[0];
-  lat.ud = flgs[1];
-  lat.udbuf = flgs[2];
-  lat.bstap = flgs[3];
-  lat.fts = flgs[4];
-  lat.sw[0] = flgs[5];
-  lat.swd[0] = flgs[6];
-  lat.aw = flgs[7];
-  lat.awh = flgs[8];
+  lat.u.tag = flgs[0];
+  lat.ud.tag = flgs[1];
+  lat.udbuf.tag = flgs[2];
+  lat.bstap.tag = flgs[3];
+  lat.fts.tag = flgs[4];
+  lat.sw.state.tag = flgs[5];
+  lat.swd.state.tag = flgs[6];
+  lat.aw.tag = flgs[7];
+  lat.awh.tag = flgs[8];
   lat.smeared_tag = flgs[9];
-  lat.is_smeared = flgs[10];
 
-  n = 11;
+  n = 10;
 
   for (igr = 0; igr < (int)(BLK_GRIDS); igr++) {
-    gfs[igr].u = flgs[n++];
-    gfs[igr].ud = flgs[n++];
-    gfs[igr].sw[0] = flgs[n++];
-    gfs[igr].swd[0] = flgs[n++];
+    gfs[igr].u.tag = flgs[n++];
+    gfs[igr].ud.tag = flgs[n++];
+    gfs[igr].sw.state.tag = flgs[n++];
+    gfs[igr].swd.state.tag = flgs[n++];
   }
 
   tag -= d;
@@ -201,6 +214,21 @@ static int next_tag(void)
   tag += 1;
 
   return tag;
+}
+
+static void enable_bit_state(int *bitmap, int state_bit)
+{
+  *bitmap |= state_bit;
+}
+
+static void disable_bit_state(int *bitmap, int state_bit)
+{
+  *bitmap &= (~state_bit);
+}
+
+static int check_bit_state(int bitmap, int state_bit)
+{
+  return (bitmap & state_bit) != 0;
 }
 
 #include "flags/events.h"
@@ -327,14 +355,18 @@ void print_flags(void)
 
   if (my_rank == 0) {
     printf("Full lattice flags:\n");
-    printf("u          = %d\n", lat.u);
-    printf("ud,udbuf   = %d,%d\n", lat.ud, lat.udbuf);
-    printf("bstap,fts  = %d,%d\n", lat.bstap, lat.fts);
-    printf("sw         = %d,%d,%d\n", lat.sw[0], lat.sw[1], lat.sw[2]);
-    printf("swd        = %d,%d,%d\n", lat.swd[0], lat.swd[1], lat.swd[2]);
-    printf("aw,awh     = %d,%d\n", lat.aw, lat.awh);
-    printf("smeared_tag (is_smeared) = %d (%d)\n", lat.smeared_tag,
-           lat.is_smeared);
+    printf("u           = %d(%d)\n", lat.u.tag, lat.u.state);
+    printf("ud,udbuf    = %d(%d),%d(%d)\n", lat.ud.tag, lat.ud.state,
+           lat.udbuf.tag, lat.udbuf.state);
+    printf("bstap,fts   = %d(%d),%d(%d)\n", lat.bstap.tag, lat.bstap.state,
+           lat.fts.tag, lat.fts.state);
+    printf("sw          = %d(%d),%d,%d\n", lat.sw.state.tag, lat.sw.state.state,
+           lat.sw.even_flag, lat.sw.odd_flag);
+    printf("swd         = %d(%d),%d,%d\n", lat.swd.state.tag,
+           lat.swd.state.state, lat.swd.even_flag, lat.swd.odd_flag);
+    printf("aw,awh      = %d(%d),%d(%d)\n", lat.aw.tag, lat.aw.state,
+           lat.awh.tag, lat.awh.state);
+    printf("smeared_tag = %d\n", lat.smeared_tag);
     printf("\n");
   }
 }
@@ -359,10 +391,12 @@ void print_grid_flags(blk_grid_t grid)
       error_root(1, 1, "print_grid_flags [flags.c]", "Unknown block grid");
 
     printf("shf        = %#x\n", (*gf).shf);
-    printf("u          = %d\n", (*gf).u);
-    printf("ud         = %d\n", (*gf).ud);
-    printf("sw         = %d,%d,%d\n", (*gf).sw[0], (*gf).sw[1], (*gf).sw[2]);
-    printf("swd        = %d,%d,%d\n", (*gf).swd[0], (*gf).swd[1], (*gf).swd[2]);
+    printf("u          = %d(%d)\n", (*gf).u.tag, (*gf).u.state);
+    printf("ud         = %d(%d)\n", (*gf).ud.tag, (*gf).ud.state);
+    printf("sw         = %d(%d),%d,%d\n", (*gf).sw.state.tag,
+           (*gf).sw.state.state, (*gf).sw.even_flag, (*gf).sw.odd_flag);
+    printf("swd        = %d(%d),%d,%d\n", (*gf).swd.state.tag,
+           (*gf).swd.state.state, (*gf).swd.even_flag, (*gf).swd.odd_flag);
     printf("\n");
   }
 }

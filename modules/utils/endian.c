@@ -27,10 +27,10 @@
 * Notes:
 *
 * The integer types that are guaranteed to be 4 byte long are stdint_t
-* and stduint_t. These are defined in the header file misc.h.
+* and stduint_t. These are defined in the header file utils.h.
 *
 * On machines complying with the IEEE-754 standard, double precision
-* floating-point numbers are 8 byte long. When the header file misc.h
+* floating-point numbers are 8 byte long. When the header file utils.h
 * is read, the compiler checks whether the machine complies with the
 * standard.
 

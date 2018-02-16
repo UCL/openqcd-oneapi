@@ -21,13 +21,13 @@ all: rmxeq mkdep mkxeq
 
 MAIN = check1 check2 check3 table1
 
-RANDOM = ranlxd 
+RANDOM = ranlxd
 
 UTILS = utils
 
 RATFCTS = elliptic zolotarev
 
-MODULES = $(RANDOM) $(UTILS) $(RATFCTS) 
+MODULES = $(RANDOM) $(UTILS) $(RATFCTS)
 
 
 # search path for modules
@@ -56,11 +56,12 @@ CFLAGS = -std=c89 -pedantic -fstrict-aliasing \
          -Wall -Wno-long-long -Wstrict-prototypes -Werror \
          -O -mno-avx -Dx64
 
+LFLAGS =
+
 
 ############################## do not change ###################################
 
 SHELL=/bin/bash
-
 CC=$(GCC)
 
 PGMS= $(MAIN) $(MODULES)
@@ -77,7 +78,7 @@ LDFLAGS = $(addprefix -L,$(LIBPATH)) $(addprefix -l,$(LIBS))
 # rule to make dependencies
 
 $(addsuffix .d,$(PGMS)): %.d: %.c Makefile
-	@ $(CC) -MM -ansi $(INCDIRS) $< -o $@
+	@ $(GCC) -MM -ansi $(INCDIRS) $< -o $@
 
 
 # rule to compile source programs
@@ -89,7 +90,7 @@ $(addsuffix .o,$(PGMS)): %.o: %.c Makefile
 # rule to link object files
 
 $(MAIN): %: %.o $(OBJECTS) Makefile
-	$(CC) $< $(OBJECTS) $(CFLAGS) $(LDFLAGS) -o $@
+	$(CC) $< $(OBJECTS) $(LFLAGS) $(LDFLAGS) -o $@
 
 
 # produce executables

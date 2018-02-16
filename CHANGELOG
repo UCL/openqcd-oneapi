@@ -1,4 +1,83 @@
 
+xx. yyyy 2016
+
+Version 1.6: 4th public release.
+
+- Added phase-periodic boundary conditions in the space directions for
+  the quark fields (thanks to Isabel Campos). See doc/dirac.pdf and
+  doc/parms.pdf for details.
+
+- The function chs_ubnd() [lattice/bcnds.c] has been removed since its
+  functionality is now contained in set_ud_phase() and unset_ud_phase()
+  [uflds/uflds.c].
+
+- The error functions have been moved to a new module utils/error.c and
+  the error_loc() function has been changed so that it calls MPI_Abort()
+  when an error occurs in the calling MPI process. There is then no use
+  for the error_chk() function anymore and so it has been removed.
+
+- There is a new module utils/hsum.c providing generic hierarchical
+  summation routines. These are now used in most programs where such
+  sums are performed, thus leading to an important simplification of
+  the programs (see linalg/salg_dble.c, for example).
+
+- Corrected flags/rw_parms.c so as to get rid of compiler warnings when
+  NPROC=1.
+
+- Corrected notes in utils/endian.c.
+
+- In main/ym1.c delete superfluous second call of alloc_data() in the
+  main program.
+
+- In main/ms4.c replaced "x0=(N0-1)" by "x0==(N0-1)" on line 185 and
+  "if (sp.solver==SAP_GCR)" by "else if (sp.solver==SAP_GCR)" on line
+  491 (thanks to Abdou Abdel-Rehim for noting this bug).
+
+- In random/ranlux.c inserted error message in check_machine() to
+  make sure the number of actual MPI processes matches NPROC.
+
+- In the main programs qcd1.c and ym1.c interchanged the order of init_ud()
+  and init_rng().
+
+- Corrected avx.h in order to get rid of some Intel compiler warnings.
+
+- Corrected a bug in cmat_vec() and cmat_vec_assign() [linalg/cmatrix.c]
+  that could lead to a segmentation fault if the option -DAVX is set,
+  the argument "n" is odd and if the matrix "a" is not aligned to a 16
+  byte boundary (thanks to Agostino Patella).
+
+- Corrected the use of alignment data attributes so as to fully comply
+  with the syntactic rules described in the gcc manuals.
+
+- Reworked the module su3fcts/chexp.c in order to make it safer against
+  aggressively optimizing compilers.
+
+- Included the AVX su3_multiply_dble and su3_inverse_multiply_dble macros
+  in the module su3fcts/su3prod.c. Modified the inline assembly code in
+  prod2su3alg() in order to make it safer against aggressively optimizing
+  compilers.
+
+- Included new inline assembly code in avx.h that makes use of fused
+  multiply-add (FMA3) instructions. These can be activated by setting
+  the compiler option -DFMA3 together with -DAVX. Several modules now
+  include such instructions, notably cmatrix.c, cmatrix_dble.c, salg.c
+  and salg_dble.c.
+
+- Adapted all check programs to the changes in the modules.
+
+- Modified devel/nompi/su3fcts/time1.c so as to more accurately measure
+  the time required for su3xsu3_vector multiplications.
+
+- Added an "LFLAGS" variable to the Makefiles that allows the compiler
+  options in the link step to be set to a value different from CFLAGS.
+
+- Revised the documentation files doc/dirac.pdf and doc/parms.pdf.
+
+- Revised the top README file.
+
+- Revised modules/flags/README.
+
+
 22. April 2014
 
 Version 1.4: 3rd public release.
@@ -133,4 +212,3 @@ Version 1.2: 2nd public release.
 14. June 2012
 
 Version 1.0: Initial public release.
-

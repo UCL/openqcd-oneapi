@@ -3,7 +3,7 @@
 *
 * File check2.c
 *
-* Copyright (C) 2005, 2011 Martin Luescher
+* Copyright (C) 2005, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -379,8 +379,6 @@ int main(int argc, char *argv[])
       }
     }
   }
-
-  error_chk();
 
   if (my_rank == 0) {
     printf("Maximal deviation in all tests: %.2e\n\n", dall);

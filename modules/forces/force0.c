@@ -3,7 +3,7 @@
 *
 * File force0.c
 *
-* Copyright (C) 2005, 2009-2014 Martin Luescher, John Bulava
+* Copyright (C) 2005, 2009-2014, 2016 Martin Luescher, John Bulava
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -65,14 +65,12 @@
 #include "global.h"
 
 #define N0 (NPROC0 * L0)
-#define MAX_LEVELS 8
-#define BLK_LENGTH 8
 
 static const int plns[6][2] = {{0, 1}, {0, 2}, {0, 3}, {2, 3}, {3, 1}, {1, 2}};
-static int nfc[8], ofs[8], hofs[8], cnt[MAX_LEVELS], init = 0;
-static double smx[MAX_LEVELS];
+static int nfc[8], ofs[8], hofs[8], ism, init = 0;
 static su3_dble *udb, *hdb;
-static su3_dble wd[3], vd[4] ALIGNED16;
+static su3_dble wd[3] ALIGNED16;
+static su3_dble vd[4] ALIGNED16;
 static su3_alg_dble X ALIGNED16;
 static su3_alg_dble *force_buffer = NULL;
 
@@ -123,7 +121,7 @@ static void set_ofs(void)
   hofs[6] = hofs[5] + 3 * FACE2;
   hofs[7] = hofs[6] + 3 * FACE3;
 
-  init = 1;
+  init += 2;
 }
 
 static void set_staples(int n, int ix, int ia)
@@ -351,7 +349,7 @@ void force0(double c)
       aniso_plaq_weight = (1.0 - 4 * c1) / c0;
     }
 
-    if (init == 0)
+    if ((init & 0x2) == 0)
       set_ofs();
 
     if (query_flags(BSTAP_UP2DATE) != 1)
@@ -620,7 +618,7 @@ static void wloops(int n, int ix, int t, double c0, double *trU)
 
 double action0(int icom)
 {
-  int bc, n, ix, t;
+  int bc, ix, t, n;
   double c0, c1, *cG;
   double r0, r1, trU[4], act;
   double gamma_g, one_over_gamma_g;
@@ -669,7 +667,7 @@ double action0(int icom)
       aniso_plaq_weight = (1.0 - 4 * c1) / c0;
     }
 
-    if (init == 0)
+    if ((init & 0x2) == 0)
       set_ofs();
 
     if (query_flags(BSTAP_UP2DATE) != 1)
@@ -677,10 +675,12 @@ double action0(int icom)
     hdb = bstap();
   }
 
-  for (n = 0; n < MAX_LEVELS; n++) {
-    cnt[n] = 0;
-    smx[n] = 0.0;
+  if ((init & 0x1) == 0) {
+    ism = init_hsum(1);
+    init += 1;
   }
+
+  reset_hsum(ism);
 
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
@@ -725,27 +725,13 @@ double action0(int icom)
       }
     }
 
-    cnt[0] += 1;
-    smx[0] += act;
-
-    for (n = 1; (cnt[n - 1] >= BLK_LENGTH) && (n < MAX_LEVELS); n++) {
-      cnt[n] += 1;
-      smx[n] += smx[n - 1];
-
-      cnt[n - 1] = 0;
-      smx[n - 1] = 0.0;
-    }
+    add_to_hsum(ism, &act);
   }
 
-  for (n = 1; n < MAX_LEVELS; n++)
-    smx[0] += smx[n];
-
-  if (icom == 1) {
-    MPI_Reduce(smx, &act, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-    MPI_Bcast(&act, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  } else {
-    act = smx[0];
-  }
+  if ((icom == 1) && (NPROC > 1))
+    global_hsum(ism, &act);
+  else
+    local_hsum(ism, &act);
 
   return (lat.beta / 3.0) * act;
 }

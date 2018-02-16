@@ -3,7 +3,7 @@
 *
 * File time2.c
 *
-* Copyright (C) 2005, 2011 Martin Luescher
+* Copyright (C) 2005, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -28,11 +28,19 @@ typedef union
 } spin_t;
 
 #if (defined AVX)
-static pauli_dble mp1, mp2 ALIGNED32;
-static spin_t s1, s2, r1, r2 ALIGNED32;
+static pauli_dble mp1 ALIGNED32;
+static pauli_dble mp2 ALIGNED32;
+static spin_t s1 ALIGNED32;
+static spin_t s2 ALIGNED32;
+static spin_t r1 ALIGNED32;
+static spin_t r2 ALIGNED32;
 #else
-static pauli_dble mp1, mp2 ALIGNED16;
-static spin_t s1, s2, r1, r2 ALIGNED16;
+static pauli_dble mp1 ALIGNED16;
+static pauli_dble mp2 ALIGNED16;
+static spin_t s1 ALIGNED16;
+static spin_t s2 ALIGNED16;
+static spin_t r1 ALIGNED16;
+static spin_t r2 ALIGNED16;
 #endif
 
 int main(void)

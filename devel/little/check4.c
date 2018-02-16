@@ -3,7 +3,7 @@
 *
 * File check4.c
 *
-* Copyright (C) 2007, 2011-2013 Martin Luescher
+* Copyright (C) 2007, 2011-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 {
   int my_rank, iop, ifail;
   int bs[4], nb, nv, nvh;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   double mu, d;
   complex **wv, z;
   complex_dble **wvd, zd;
@@ -168,8 +168,11 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.38;
+  theta[1] = -1.25;
+  theta[2] = 0.54;
+  set_bc_parms(bc, 1.0, 1.0, 0.9012, 1.2034, phi, phi_prime, theta);
+  print_bc_parms(2);
 
   set_sw_parms(0.125);
   set_dfl_parms(bs, Ns);
@@ -189,7 +192,7 @@ int main(int argc, char *argv[])
   nvh = nv / 2;
 
   random_ud();
-  chs_ubnd(-1);
+  set_ud_phase();
   random_basis(Ns);
 
   ifail = set_Awhat(mu);
@@ -368,7 +371,6 @@ int main(int argc, char *argv[])
   ifail = check_bndAwop();
   error(ifail != 0, 1, "main [check4.c]",
         "Hopping terms Aoe,Aeo at the lattice boundaries do not vanish");
-  error_chk();
 
   if (my_rank == 0)
     fclose(flog);

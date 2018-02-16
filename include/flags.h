@@ -3,7 +3,7 @@
 *
 * File flags.h
 *
-* Copyright (C) 2009-2014 Martin Luescher
+* Copyright (C) 2009-2014, 2016 Martin Luescher, Isabel Campos
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -44,6 +44,8 @@ typedef enum {
   COMPUTED_AWHAT,
   SMEARED_UD,
   UNSMEARED_UD,
+  SET_UD_PHASE,
+  UNSET_UD_PHASE,
   EVENTS
 } event_t;
 
@@ -62,8 +64,10 @@ typedef enum {
   SWD_O_INVERTED,
   AW_UP2DATE,
   AWHAT_UP2DATE,
+  UD_IS_CLEAN,
   UD_IS_SMEARED,
   SMEARED_UD_UP2DATE,
+  UD_PHASE_SET,
   QUERIES
 } query_t;
 
@@ -111,6 +115,7 @@ typedef struct
   int type;
   double cG[2], cF[2];
   double phi[2][3];
+  double theta[3];
 } bc_parms_t;
 
 typedef struct
@@ -304,9 +309,10 @@ extern void print_lat_parms(void);
 extern void write_lat_parms(FILE *fdat);
 extern void check_lat_parms(FILE *fdat);
 extern bc_parms_t set_bc_parms(int type, double cG, double cG_prime, double cF,
-                               double cF_prime, double *phi, double *phi_prime);
+                               double cF_prime, double *phi, double *phi_prime,
+                               double *theta);
 extern bc_parms_t bc_parms(void);
-extern void print_bc_parms(void);
+extern void print_bc_parms(int ipr);
 extern void write_bc_parms(FILE *fdat);
 extern void check_bc_parms(FILE *fdat);
 extern double sea_quark_mass(int im0);

@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
 {
   int first, last, step;
   int bc, n, rule, icnfg, ncnfg, nsize;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   double eps, dE[3], dQ[3], dU[2];
   double act[2], qtop[2], dev[2], nplaq;
   double wt1, wt2, wtavg;
@@ -204,8 +204,11 @@ int main(int argc, char *argv[])
   MPI_Bcast(&eps, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&rule, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.0;
+  theta[1] = 0.0;
+  theta[2] = 0.0;
+  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime, theta);
+  print_bc_parms(0);
 
   start_ranlux(0, 1234);
   geometry();
@@ -334,8 +337,6 @@ int main(int argc, char *argv[])
     if (check_end())
       break;
   }
-
-  error_chk();
 
   ncnfg = (last - first) / step + 1;
   dE[1] /= (double)(ncnfg);

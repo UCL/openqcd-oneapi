@@ -3,7 +3,7 @@
 *
 * File check6.c
 *
-* Copyright (C) 2005, 2009, 2010 Martin Luescher
+* Copyright (C) 2005, 2009, 2010, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -37,8 +37,10 @@ typedef union
 
 static spin_t vs ALIGNED16;
 static spin_dble_t vd ALIGNED16;
-static const weyl vs0 = {{{0.0f}}};
-static const weyl_dble vd0 = {{{0.0}}};
+static const weyl vs0 = {{{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}},
+                         {{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}}};
+static const weyl_dble vd0 = {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
+                              {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}}};
 
 int main(void)
 {

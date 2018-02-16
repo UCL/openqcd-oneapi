@@ -3,7 +3,7 @@
 *
 * File check2.c
 *
-* Copyright (C) 2005, 2007, 2010, 2011, 2013 Martin Luescher
+* Copyright (C) 2005, 2007, 2010-2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -77,7 +77,7 @@ static int check_ud(su3_dble *usv)
 int main(int argc, char *argv[])
 {
   int my_rank, bc, nsize, ie;
-  double phi[2], phi_prime[2];
+  double phi[2], phi_prime[2], theta[3];
   su3_dble *udb, **usv;
   char cnfg_dir[NAME_SIZE], cnfg[NAME_SIZE];
   FILE *flog = NULL, *fin = NULL;
@@ -115,8 +115,11 @@ int main(int argc, char *argv[])
   phi[1] = -0.534;
   phi_prime[0] = 0.912;
   phi_prime[1] = 0.078;
-  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime);
-  print_bc_parms();
+  theta[0] = 0.5;
+  theta[1] = 1.0;
+  theta[2] = -0.5;
+  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime, theta);
+  print_bc_parms(1);
 
   start_ranlux(0, 123456);
   geometry();
@@ -145,7 +148,6 @@ int main(int argc, char *argv[])
 
   random_ud();
   import_cnfg(cnfg);
-  error_chk();
 
   ie = (check_bc(0.0) ^ 0x1);
   ie |= check_ud(usv[0]);

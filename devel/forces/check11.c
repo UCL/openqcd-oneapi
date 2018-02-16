@@ -3,7 +3,7 @@
 *
 * File check11.c
 *
-* Copyright (C) 2012, 2013 Martin Luescher, Stefan Schaefer
+* Copyright (C) 2012, 2013, 2016 Martin Luescher, Stefan Schaefer
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
   int my_rank, bc, isw, isp, status[6], mnkv;
   int bs[4], Ns, nmx, nkv, nmr, ncy, ninv;
   int isap, idfl;
-  double chi[2], chi_prime[2];
+  double chi[2], chi_prime[2], theta[3];
   double kappa, mu, mu0, mu1, res;
   double eps, act0, act1, dact, dsdt;
   double dev_act[2], dev_frc, sig_loss, rdmy;
@@ -218,8 +218,11 @@ int main(int argc, char *argv[])
   chi[1] = -0.534;
   chi_prime[0] = 0.912;
   chi_prime[1] = 0.078;
-  set_bc_parms(bc, 1.0, 1.0, 0.953, 1.203, chi, chi_prime);
-  print_bc_parms();
+  theta[0] = 0.38;
+  theta[1] = -1.25;
+  theta[2] = 0.54;
+  set_bc_parms(bc, 1.0, 1.0, 0.953, 1.203, chi, chi_prime, theta);
+  print_bc_parms(2);
 
   if (my_rank == 0) {
     find_section("SAP");
@@ -317,7 +320,7 @@ int main(int argc, char *argv[])
       }
 
       random_ud();
-      chs_ubnd(-1);
+      set_ud_phase();
       random_mom();
 
       if (isp == 2) {
@@ -391,8 +394,6 @@ int main(int argc, char *argv[])
       rdmy = sig_loss;
       MPI_Reduce(&rdmy, &sig_loss, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
       MPI_Bcast(&sig_loss, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-      error_chk();
 
       if (my_rank == 0) {
         printf("Relative deviation of dS/dt = %.2e ", fabs(dev_frc / dsdt));

@@ -3,7 +3,7 @@
 *
 * File ranlxd.c
 *
-* Copyright (C) 2005, 2008, 2011 Martin Luescher
+* Copyright (C) 2005, 2008, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -48,17 +48,17 @@
 #include "utils.h"
 #include "random.h"
 
-#if (defined x64)
+#if ((defined AVX) || (defined x64))
 
-typedef struct
+typedef struct __attribute__((aligned(16)))
 {
   float c1, c2, c3, c4;
-} vec_t __attribute__((aligned(16)));
+} vec_t;
 
 typedef struct
 {
   vec_t c1, c2;
-} dble_vec_t __attribute__((aligned(16)));
+} dble_vec_t;
 
 static int init = 0, pr, prm, ir, jr, is, is_old, next[96];
 static vec_t one, one_bit, carry;
@@ -67,7 +67,7 @@ static union
 {
   dble_vec_t vec[12];
   float num[96];
-} x __attribute__((aligned(16)));
+} x;
 
 #define STEP(pi, pj)                                                           \
   __asm__ __volatile__("movaps %4, %%xmm4 \n\t"                                \

@@ -3,7 +3,7 @@
 *
 * File check3.c
 *
-* Copyright (C) 2013 Martin Luescher
+* Copyright (C) 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -124,8 +124,7 @@ static int check_sbnd_dble(ptset_t set, spinor_dble *s)
 int main(int argc, char *argv[])
 {
   int my_rank, bc, ie, is, k;
-  double phi[2], phi_prime[2];
-  double cG, cG_prime, cF, cF_prime;
+  double phi[2], phi_prime[2], theta[3];
   spinor **ps;
   spinor_dble **psd;
   ptset_t set;
@@ -153,16 +152,15 @@ int main(int argc, char *argv[])
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  phi[0] = 0.123;
-  phi[1] = -0.534;
-  phi_prime[0] = 0.912;
-  phi_prime[1] = 0.078;
-  cG = 0.97;
-  cG_prime = 1.056;
-  cF = 0.82;
-  cF_prime = 1.12;
-  set_bc_parms(bc, cG, cG_prime, cF, cF_prime, phi, phi_prime);
-  print_bc_parms();
+  phi[0] = 0.0;
+  phi[1] = 0.0;
+  phi_prime[0] = 0.0;
+  phi_prime[1] = 0.0;
+  theta[0] = 0.0;
+  theta[1] = 0.0;
+  theta[2] = 0.0;
+  set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime, theta);
+  print_bc_parms(0);
 
   start_ranlux(0, 12345);
   geometry();

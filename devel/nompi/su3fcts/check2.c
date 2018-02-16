@@ -3,7 +3,7 @@
 *
 * File check2.c
 *
-* Copyright (C) 2005, 2009, 2011, 2013 Martin Luescher
+* Copyright (C) 2005, 2009, 2011, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -15,14 +15,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "su3.h"
 #include "random.h"
 #include "utils.h"
 #include "su3fcts.h"
 
-static const su3_vector_dble vd0 = {{0.0}};
-static const spinor_dble sd0 = {{{0.0}}};
-static su3_dble Q, u, v ALIGNED16;
+static su3_dble Q ALIGNED16;
+static su3_dble u ALIGNED16;
+static su3_dble v ALIGNED16;
 static su3_alg_dble X ALIGNED16;
 static u3_alg_dble Y;
 
@@ -93,7 +92,11 @@ int main(void)
   printf("--------------------------------------\n\n");
 
 #if (defined AVX)
+#if (defined FMA3)
+  printf("Using AVX and FMA3 instructions\n\n");
+#else
   printf("Using AVX instructions\n\n");
+#endif
 #elif (defined x64)
   printf("Using SSE3 instructions and up to 16 xmm registers\n\n");
 #endif

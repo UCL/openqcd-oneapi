@@ -108,7 +108,7 @@ void compute_xi_fixed_lambda(su3_dble const *gfield)
   int num_links, plane_id, ix;
   stout_smearing_params_t smear_params;
 
-  smear_params = sout_smearing_parms();
+  smear_params = stout_smearing_parms();
 
   if (xi_field == NULL)
     alloc_xi_field();
@@ -142,6 +142,7 @@ int main(int argc, char *argv[])
   int test_failed;
   int staple_idx_array[6], plaq_ids[4];
   double diff;
+  double theta[3] = {0.0, 0.0, 0.0};
   su3_dble *staples[12];
   su3_alg_dble *lambda_staples[12];
   su3_dble expected_Xi;
@@ -169,8 +170,8 @@ int main(int argc, char *argv[])
     printf("\n-------------------------------------------\n\n");
   }
 
-  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL);
-  set_stout_smearing_parms(1, 0., 0.14);
+  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL, theta);
+  set_stout_smearing_parms(1, 0., 0.14, 1, 1);
 
   geometry();
 

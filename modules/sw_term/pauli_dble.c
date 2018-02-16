@@ -82,8 +82,10 @@ typedef union
   complex_dble c[12];
 } spin_t;
 
-static double rr[5] ALIGNED16;
-static complex_dble aa[36], cc[6], dd[6] ALIGNED16;
+static double rr[5] ALIGNED8;
+static complex_dble aa[36] ALIGNED16;
+static complex_dble cc[6] ALIGNED16;
+static complex_dble dd[6] ALIGNED16;
 
 #if (defined x64)
 #include "sse2.h"

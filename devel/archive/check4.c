@@ -3,7 +3,7 @@
 *
 * File check4.c
 *
-* Copyright (C) 2007, 2013 Martin Luescher
+* Copyright (C) 2007, 2013, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -89,8 +89,6 @@ int main(int argc, char *argv[])
     if (d > dmax)
       dmax = d;
   }
-
-  error_chk();
 
   if (my_rank == 0) {
     printf("Wrote 3 spinor fields to the files\n"

@@ -27,6 +27,7 @@ type         2
 phi'         0.92 0.76
 cF           0.95
 cF'          0.90
+theta        0.5 1.0 -0.5
 
 [Reweighting factor 0]
 rwfact       RWTM2

@@ -3,7 +3,7 @@
 *
 * File check2.c
 *
-* Copyright (C) 2005, 2011 Martin Luescher
+* Copyright (C) 2005, 2011, 2016 Martin Luescher
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
@@ -22,18 +22,22 @@
 #include "sw_term.h"
 #include "forces.h"
 
+#define _re(z, w) ((z).re * (w).re + (z).im * (w).im)
+#define _im(z, w) ((z).im * (w).re - (z).re * (w).im)
+
 typedef union
 {
   su3_dble u;
   complex_dble c[9];
 } umat_t;
 
-static const su3_dble ud0 = {{0.0}};
-static su3_dble u, v ALIGNED16;
-static spinor_dble rx, ry, sx, sy, sw ALIGNED16;
-
-#define _re(z, w) ((z).re * (w).re + (z).im * (w).im)
-#define _im(z, w) ((z).im * (w).re - (z).re * (w).im)
+static su3_dble u ALIGNED16;
+static su3_dble v ALIGNED16;
+static spinor_dble rx ALIGNED16;
+static spinor_dble ry ALIGNED16;
+static spinor_dble sx ALIGNED16;
+static spinor_dble sy ALIGNED16;
+static spinor_dble sw ALIGNED16;
 
 static su3_vector_dble mul_cplx(complex_dble z, su3_vector_dble s)
 {
@@ -156,7 +160,7 @@ int main(void)
 
   for (mu = 0; mu < 4; mu++) {
     prod2xv[mu](&rx, &ry, &sx, &sy, &u);
-    v = ud0;
+    cm3x3_zero(1, &v);
 
     sw = mul_gamma(mu, ry);
     _vector_sub(sw.c1, ry.c1, sw.c1);
