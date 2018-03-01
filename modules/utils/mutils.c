@@ -416,15 +416,9 @@ static long find_section_impl(char *title, int optional)
   }
 }
 
-long find_section(char *title)
-{
-  return find_section_impl(title, 0);
-}
+long find_section(char *title) { return find_section_impl(title, 0); }
 
-long find_optional_section(char *title)
-{
-  return find_section_impl(title, 1);
-}
+long find_optional_section(char *title) { return find_section_impl(title, 1); }
 
 static void check_tag(char *tag)
 {
@@ -481,7 +475,7 @@ static long find_tag_impl(char *tag, int optional)
 
   error_root(ie != 0, 1, "find_tag [mutils.c]",
              "Tag %s occurs more than once in the current section", tag);
-  
+
   if (tofs != -1L) {
     ie = fseek(stdin, tofs, SEEK_SET);
     error_root(ie != 0, 1, "find_tag [mutils.c]",
@@ -536,7 +530,7 @@ static long read_line_impl(int optional, char *tag, char *format, va_list args)
       if (use_optional == 0) {
         ic = sscanf(pl, "%s", va_arg(args, char *));
       } else {
-        str_src = va_arg(args, char*);
+        str_src = va_arg(args, char *);
         strcpy(str_src, va_arg(args, char *));
       }
     } else if (p == strstr(p, "%d")) {

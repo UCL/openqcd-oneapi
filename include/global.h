@@ -15,20 +15,24 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define NPROC0 2
-#define NPROC1 2
-#define NPROC2 1
-#define NPROC3 1
+/*
+THESE QUANTITIES ARE NOW DEFINED IN A TEXT FILE READ BY THE MAKEFILE
+
+#define NPROC0 4
+#define NPROC1 8
+#define NPROC2 8
+#define NPROC3 8
 
 #define L0 8
-#define L1 8
-#define L2 16
-#define L3 16
+#define L1 4
+#define L2 4
+#define L3 4
 
-#define NPROC0_BLK 1
-#define NPROC1_BLK 1
-#define NPROC2_BLK 1
-#define NPROC3_BLK 1
+#define NPROC0_BLK 2
+#define NPROC1_BLK 2
+#define NPROC2_BLK 2
+#define NPROC3_BLK 2
+*/
 
 #define NAME_SIZE 128
 
@@ -59,7 +63,6 @@
 #if (NAME_SIZE < 128)
 #error : NAME_SIZE must be greater or equal to 128
 #endif
-
 #define NPROC (NPROC0 * NPROC1 * NPROC2 * NPROC3)
 #define VOLUME (L0 * L1 * L2 * L3)
 #define FACE0 ((1 - (NPROC0 % 2)) * L1 * L2 * L3)
@@ -87,6 +90,35 @@ EXTERN int ipt[VOLUME];
 EXTERN int iup[VOLUME][4];
 EXTERN int idn[VOLUME][4];
 EXTERN int map[BNDRY + NPROC % 2];
+
+#ifdef dirac_counters
+/* Counters for call to the Dirac operator  */
+EXTERN int Dw_dble_counter;
+EXTERN int Dwee_dble_counter;
+EXTERN int Dwoo_dble_counter;
+EXTERN int Dwoe_dble_counter;
+EXTERN int Dweo_dble_counter;
+EXTERN int Dwhat_dble_counter;
+EXTERN int Dw_blk_dble_counter;
+EXTERN int Dwee_blk_dble_counter;
+EXTERN int Dwoo_blk_dble_counter;
+EXTERN int Dwoe_blk_dble_counter;
+EXTERN int Dweo_blk_dble_counter;
+EXTERN int Dwhat_blk_dble_counter;
+
+EXTERN int Dw_counter;
+EXTERN int Dwee_counter;
+EXTERN int Dwoo_counter;
+EXTERN int Dwoe_counter;
+EXTERN int Dweo_counter;
+EXTERN int Dwhat_counter;
+EXTERN int Dw_blk_counter;
+EXTERN int Dwee_blk_counter;
+EXTERN int Dwoo_blk_counter;
+EXTERN int Dwoe_blk_counter;
+EXTERN int Dweo_blk_counter;
+EXTERN int Dwhat_blk_counter;
+#endif
 
 #undef EXTERN
 

@@ -237,30 +237,57 @@ void random_ud(void)
     t = global_time(ix);
 
     if (t == 0) {
+#ifdef SITERANDOM
+      random_su3_dble(ud, ix);
+#else
       random_su3_dble(ud);
+#endif
       ud += 1;
 
-      if (bc != 0)
+      if (bc != 0) {
+#ifdef SITERANDOM
+        random_su3_dble(ud, ix);
+#else
         random_su3_dble(ud);
+#endif
+      }
       ud += 1;
 
       for (ifc = 2; ifc < 8; ifc++) {
-        if (bc != 1)
+        if (bc != 1) {
+#ifdef SITERANDOM
+          random_su3_dble(ud, ix);
+#else
           random_su3_dble(ud);
+#endif
+        }
         ud += 1;
       }
     } else if (t == (N0 - 1)) {
-      if (bc != 0)
+      if (bc != 0) {
+#ifdef SITERANDOM
+        random_su3_dble(ud, ix);
+#else
         random_su3_dble(ud);
+#endif
+      }
       ud += 1;
 
       for (ifc = 1; ifc < 8; ifc++) {
+#ifdef SITERANDOM
+        random_su3_dble(ud, ix);
+#else
         random_su3_dble(ud);
+#endif
         ud += 1;
       }
     } else {
       for (ifc = 0; ifc < 8; ifc++) {
+#ifdef SITERANDOM
+        random_su3_dble(ud, ix);
+#else
         random_su3_dble(ud);
+#endif
         ud += 1;
       }
     }

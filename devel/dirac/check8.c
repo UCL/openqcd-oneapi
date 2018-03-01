@@ -96,6 +96,7 @@ int main(int argc, char *argv[])
                  "Syntax: check8 [-bc <type>]");
   }
 
+  set_ani_parms(1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
   set_lat_parms(5.5, 1.0, 0, NULL, 1.978);
   print_lat_parms();
 
@@ -112,8 +113,12 @@ int main(int argc, char *argv[])
   set_ani_parms(1, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
   print_bc_parms(2);
 
-  start_ranlux(0, 1234);
   geometry();
+#ifndef SITERANDOM
+  start_ranlux(0, 12345);
+#else
+  start_ranlux_site(0, 12345);
+#endif
   set_dfl_parms(bs, 2);
   alloc_bgr(DFL_BLOCKS);
   alloc_wsd(4);

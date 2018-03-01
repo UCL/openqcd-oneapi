@@ -113,7 +113,11 @@ static void random_g(void)
     t = global_time(ix);
 
     if ((t > 0) || (bc != 1))
+#ifdef SITERAND
+      random_su3_dble(gx, 0);
+#else
       random_su3_dble(gx);
+#endif
     else
       (*gx) = unity;
 
@@ -245,7 +249,6 @@ int main(int argc, char *argv[])
 
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
   if (my_rank == 0) {
     flog = freopen("check1.log", "w", stdout);
     printf("\n");
@@ -264,6 +267,7 @@ int main(int argc, char *argv[])
                  "Syntax: check1 [-bc <type>]");
   }
 
+  set_ani_parms(1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
   set_lat_parms(5.5, 1.0, 0, NULL, 1.978);
   print_lat_parms();
 
@@ -279,8 +283,12 @@ int main(int argc, char *argv[])
   set_ani_parms(1, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
   print_bc_parms(2);
 
-  start_ranlux(0, 12345);
   geometry();
+#ifndef SITERANDOM
+  start_ranlux(0, 12345);
+#else
+  start_ranlux_site(0, 12345);
+#endif
   alloc_wsd(5);
   alloc_ws(5);
   ps = reserve_ws(5);

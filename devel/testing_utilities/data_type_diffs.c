@@ -4,10 +4,7 @@
 #include <math.h>
 #include <utils.h>
 
-double abs_diff_double(double l, double r)
-{
-  return fabs(l - r);
-}
+double abs_diff_double(double l, double r) { return fabs(l - r); }
 
 double abs_diff_complex(complex_dble l, complex_dble r)
 {
@@ -55,7 +52,7 @@ double norm_diff_array_complex(complex_dble l[], complex_dble r[], size_t N)
 double abs_diff_su3(su3_dble const *l, su3_dble const *r)
 {
   double result = 0.;
-  
+
   result += abs_diff_complex((*l).c11, (*r).c11);
   result += abs_diff_complex((*l).c12, (*r).c12);
   result += abs_diff_complex((*l).c13, (*r).c13);
@@ -74,7 +71,7 @@ double abs_diff_su3(su3_dble const *l, su3_dble const *r)
 double norm_diff_su3(su3_dble const *l, su3_dble const *r)
 {
   double result = 0.;
-  
+
   result += norm_diff_complex((*l).c11, (*r).c11);
   result += norm_diff_complex((*l).c12, (*r).c12);
   result += norm_diff_complex((*l).c13, (*r).c13);

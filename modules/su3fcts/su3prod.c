@@ -87,7 +87,10 @@ static double tr ALIGNED8;
 
 static void su3xsu3vec(su3_dble const *u) { _avx_su3_multiply_dble(*u); }
 
-static void su3xsu3vec_pair(su3_dble const *u) { _avx_su3_multiply_pair_dble(*u); }
+static void su3xsu3vec_pair(su3_dble const *u)
+{
+  _avx_su3_multiply_pair_dble(*u);
+}
 
 static void su3dagxsu3vec(su3_dble const *u) { _avx_su3_inverse_multiply_dble(*u); }
 
@@ -725,7 +728,10 @@ static double tr ALIGNED8;
 
 static void su3xsu3vec(su3_dble const *u) { _sse_su3_multiply_dble(*u); }
 
-static void su3dagxsu3vec(su3_dble const *u) { _sse_su3_inverse_multiply_dble(*u); }
+static void su3dagxsu3vec(su3_dble const *u)
+{
+  _sse_su3_inverse_multiply_dble(*u);
+}
 
 void su3xsu3(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {
@@ -1390,7 +1396,10 @@ static su3_dble uX;
 
 static void su3xsu3vec(su3_dble const *u) { _su3_multiply(chi, *u, psi); }
 
-static void su3dagxsu3vec(su3_dble const *u) { _su3_inverse_multiply(chi, *u, psi); }
+static void su3dagxsu3vec(su3_dble const *u)
+{
+  _su3_inverse_multiply(chi, *u, psi);
+}
 
 void su3xsu3(su3_dble const *u, su3_dble const *v, su3_dble *w)
 {

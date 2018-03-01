@@ -76,6 +76,7 @@
 #include <math.h>
 #include "su3.h"
 #include "random.h"
+#include "global.h"
 #include "sflds.h"
 
 #if (defined x64)
@@ -838,11 +839,24 @@ void random_s(int vol, spinor *s, float sigma)
 {
   float r[24];
   spinor *sm;
+#ifdef SITERANDOM
+  int ix = 0;
+  int divide_by = vol / (VOLUME / 2);
+  if (divide_by == 0) {
+    divide_by = 1;
+    printf("WARNING: possible non-reproducibility, %s ,%d\n", __FILE__,
+           __LINE__);
+  }
+#endif
 
   sm = s + vol;
-
   for (; s < sm; s++) {
+
+#ifdef SITERANDOM
+    gauss(r, 24, (ix++) / divide_by);
+#else
     gauss(r, 24);
+#endif
 
     (*s).c1.c1.re = sigma * r[0];
     (*s).c1.c1.im = sigma * r[1];
@@ -878,11 +892,26 @@ void random_sd(int vol, spinor_dble *sd, double sigma)
 {
   double r[24];
   spinor_dble *sm;
+#ifdef SITERANDOM
+  int ix = 0;
+  int divide_by = vol / (VOLUME / 2);
+
+  if (divide_by == 0) {
+    divide_by = 1;
+    printf("WARNING: possible non-reproducibility, %s ,%d\n", __FILE__,
+           __LINE__);
+  }
+#endif
 
   sm = sd + vol;
 
   for (; sd < sm; sd++) {
+
+#ifdef SITERANDOM
+    gauss_dble(r, 24, (ix++) / divide_by);
+#else
     gauss_dble(r, 24);
+#endif
 
     (*sd).c1.c1.re = sigma * r[0];
     (*sd).c1.c1.im = sigma * r[1];

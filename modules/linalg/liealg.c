@@ -42,7 +42,7 @@
 *     stores the result in X. The projection formula is
 *
 *     X = P{U} = 1/2 (U - U^dag) - 1/6 tr (U - U^dag)
-*   
+*
 *   void su3alg_to_cm3x3(su3_alg_dble const *X, su3_dble *u)
 *     Computes the corresponding complex 3x3 matrix from the generator
 *     representation of an su3 algebra object.
@@ -88,6 +88,10 @@ static double c1 = 0.0, c2, c3, rb[8];
 void random_alg(int vol, su3_alg_dble *X)
 {
   su3_alg_dble *Xm;
+#ifdef SITERANDOM
+  int ix = VOLUME / 2;
+  int divide_by = vol / (VOLUME / 2);
+#endif
 
   if (c1 == 0.0) {
     c1 = (sqrt(3.0) + 1.0) / 6.0;
@@ -98,7 +102,11 @@ void random_alg(int vol, su3_alg_dble *X)
   Xm = X + vol;
 
   for (; X < Xm; X++) {
+#ifdef SITERANDOM
+    gauss_dble(rb, 8, ix++ / divide_by);
+#else
     gauss_dble(rb, 8);
+#endif
 
     (*X).c1 = c1 * rb[0] + c2 * rb[1];
     (*X).c2 = c1 * rb[1] + c2 * rb[0];
@@ -290,10 +298,10 @@ void add_alg(int vol, su3_alg_dble const *X, su3_alg_dble *Y)
 
     Y += 1;
   }
-
 }
 
-void muladd_assign_alg(int vol, double r, su3_alg_dble const *X, su3_alg_dble *Y)
+void muladd_assign_alg(int vol, double r, su3_alg_dble const *X,
+                       su3_alg_dble *Y)
 {
   su3_alg_dble const *Xm;
 

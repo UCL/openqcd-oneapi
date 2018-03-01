@@ -178,7 +178,6 @@ int main(int argc, char *argv[])
   alloc_lambda_field();
   alloc_xi_field();
 
-
   { /* Test 0 */
     if (my_rank == 0) {
       register_test(0, "Test index manipulation");

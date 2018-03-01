@@ -71,8 +71,13 @@ extern void cm3x3_lc1(complex_dble const *c, su3_dble const *u, su3_dble *v);
 extern void cm3x3_lc2(complex_dble const *c, su3_dble const *u, su3_dble *v);
 
 /* RANDOM_SU3_C */
+#ifdef SITERANDOM
+extern void random_su3(su3 *u, int ix);
+extern void random_su3_dble(su3_dble *u, int ix);
+#else
 extern void random_su3(su3 *u);
 extern void random_su3_dble(su3_dble *u);
+#endif
 
 /* SU3REN_C */
 extern void project_to_su3(su3 *u);

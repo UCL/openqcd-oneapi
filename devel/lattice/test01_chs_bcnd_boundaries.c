@@ -45,7 +45,6 @@ int main(int argc, char *argv[])
   }
 
   num_links_bnd = 7 * (BNDRY / 4);
-  /*num_links_bnd = BNDRY / 4;*/
   boundary_copy = malloc(num_links_bnd * sizeof(*boundary_copy));
 
   theta[0] = 0.35;
@@ -61,13 +60,13 @@ int main(int argc, char *argv[])
   set_ud_phase();
 
   udb = udfld();
-  cm3x3_assign(num_links_bnd, udb + 4*VOLUME, boundary_copy);
+  cm3x3_assign(num_links_bnd, udb + 4 * VOLUME, boundary_copy);
 
   copy_bnd_ud();
 
   diff = 0.;
   for (ix = 0; ix < num_links_bnd; ++ix) {
-    diff += norm_diff_su3(boundary_copy + ix, udb + 4*VOLUME + ix);
+    diff += norm_diff_su3(boundary_copy + ix, udb + 4 * VOLUME + ix);
   }
 
   total_diff = 0.;
@@ -86,7 +85,7 @@ int main(int argc, char *argv[])
   unset_ud_phase();
 
   udb = udfld();
-  cm3x3_assign(num_links_bnd, udb + 4*VOLUME, boundary_copy);
+  cm3x3_assign(num_links_bnd, udb + 4 * VOLUME, boundary_copy);
 
   copy_bnd_ud();
 

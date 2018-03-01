@@ -106,7 +106,11 @@ void random_v(int n, complex *v, float sigma)
   vm = v + (n - m);
 
   while (v < vm) {
+#ifdef SITERANDOM
+    gauss(r, 8, -1);
+#else
     gauss(r, 8);
+#endif
     v[0].re = sigma * r[0];
     v[0].im = sigma * r[1];
     v[1].re = sigma * r[2];
@@ -121,7 +125,11 @@ void random_v(int n, complex *v, float sigma)
   vm = v + m;
 
   while (v < vm) {
+#ifdef SITERANDOM
+    gauss(r, 2, -1);
+#else
     gauss(r, 2);
+#endif
     v[0].re = sigma * r[0];
     v[0].im = sigma * r[1];
     v += 1;
@@ -138,7 +146,11 @@ void random_vd(int n, complex_dble *vd, double sigma)
   vm = vd + (n - m);
 
   while (vd < vm) {
+#ifdef SITERANDOM
+    gauss_dble(rd, 8, -1);
+#else
     gauss_dble(rd, 8);
+#endif
     vd[0].re = sigma * rd[0];
     vd[0].im = sigma * rd[1];
     vd[1].re = sigma * rd[2];
@@ -153,7 +165,11 @@ void random_vd(int n, complex_dble *vd, double sigma)
   vm = vd + m;
 
   while (vd < vm) {
+#ifdef SITERANDOM
+    gauss_dble(rd, 2, -1);
+#else
     gauss_dble(rd, 2);
+#endif
     vd[0].re = sigma * rd[0];
     vd[0].im = sigma * rd[1];
     vd += 1;

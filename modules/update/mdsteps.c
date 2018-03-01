@@ -606,7 +606,8 @@ static void sort_forces(void)
     gauge_pos = 0;
 
     if (begin != 0) {
-      error(begin != 1, 1, "sort_forces [mdsteps.c]",
+      error(
+          begin != 1, 1, "sort_forces [mdsteps.c]",
           "The smearing operations is not ordered correctly in the integrator");
 
       end = smear_block_end(s + begin) + begin;
