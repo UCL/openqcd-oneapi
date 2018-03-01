@@ -348,7 +348,10 @@ static void print_info(void)
     printf("Computation of quark propagators\n");
     printf("--------------------------------\n\n");
 
-    printf("Program version %s\n", openQCD_RELEASE);
+    printf("Program major version: %s\n", openQCD_RELEASE);
+    printf("Program build date: %s\n", build_date);
+    printf("Program git SHA: %s\n", build_git_sha);
+    printf("Program user CFLAGS: %s\n", build_user_cflags);
 
     if (endian == LITTLE_ENDIAN)
       printf("The machine is little endian\n");
