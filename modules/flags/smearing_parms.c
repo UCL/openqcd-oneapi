@@ -73,9 +73,9 @@ void print_smearing_parms(void)
     printf("Smearing parameters:\n");
     printf("n_smear = %d\n", ssp.num_smear);
     n = fdigits(ssp.rho_temporal);
-    printf("rho_t = %.*f\n", IMAX(n,1), ssp.rho_temporal);
+    printf("rho_t = %.*f\n", IMAX(n, 1), ssp.rho_temporal);
     n = fdigits(ssp.rho_spatial);
-    printf("rho_s = %.*f\n", IMAX(n,1), ssp.rho_spatial);
+    printf("rho_s = %.*f\n", IMAX(n, 1), ssp.rho_spatial);
     printf("gauge = %s\n", (ssp.smear_gauge == 1) ? "true" : "false");
     printf("fermion = %s\n\n", (ssp.smear_fermion == 1) ? "true" : "false");
   }

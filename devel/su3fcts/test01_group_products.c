@@ -265,7 +265,7 @@ void get_solution_su3dagsu3alg(su3_dble *u)
 void get_solution_tracesu3algsu3(complex_dble *c)
 {
   (*c).re = 1.7583865954637918;
-  (*c).im = - 0.2238176754231529;
+  (*c).im = -0.2238176754231529;
 }
 
 int main(int argc, char *argv[])
@@ -321,7 +321,7 @@ int main(int argc, char *argv[])
   get_solution_su3algsu3(&correct_result);
 
   if (my_rank == 0) {
-    register_test(2,"Check of the matrix product su3algxsu3");
+    register_test(2, "Check of the matrix product su3algxsu3");
     print_test_header(2);
 
     diff = norm_diff_su3(&output_matrix, &correct_result);
@@ -343,7 +343,7 @@ int main(int argc, char *argv[])
   get_solution_su3algsu3dag(&correct_result);
 
   if (my_rank == 0) {
-    register_test(3,"Check of the matrix product su3algxsu3dag");
+    register_test(3, "Check of the matrix product su3algxsu3dag");
     print_test_header(3);
 
     diff = norm_diff_su3(&output_matrix, &correct_result);
@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
   get_solution_su3dagsu3alg(&correct_result);
 
   if (my_rank == 0) {
-    register_test(4,"Check of the matrix product su3dagxsu3alg");
+    register_test(4, "Check of the matrix product su3dagxsu3alg");
     print_test_header(4);
 
     diff = norm_diff_su3(&output_matrix, &correct_result);
@@ -379,7 +379,6 @@ int main(int argc, char *argv[])
 
     printf("\n-----\n\n");
   }
-
 
   get_input_tracesu3algxsu3(&input_matrix, &input_alg);
 

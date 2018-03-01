@@ -1,7 +1,7 @@
 
 /*
  * Created: 08-08-2017
- * Modified: 
+ * Modified:
  * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
  */
 
@@ -47,7 +47,8 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf("Test on the mdsteps integrator generation with two smeared actions\n");
+    printf(
+        "Test on the mdsteps integrator generation with two smeared actions\n");
     printf("-------------------------------------------\n\n");
 
     printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
@@ -118,19 +119,19 @@ int main(int argc, char *argv[])
   set_force_parms(4, force_type, 0, 0, irat, imu, isp, ncr);
 
   /* Register integrator 0 */
-  
+
   ifr[0] = 0;
   ifr[1] = 1;
   set_mdint_parms(0, LPFR, 0.0, 4, 2, ifr);
 
   /* Register integrator 1 */
-  
+
   ifr[0] = 2;
   ifr[1] = 3;
   set_mdint_parms(1, LPFR, 0.0, 4, 2, ifr);
 
   /* Register integrator 2 */
-  
+
   ifr[0] = 4;
   set_mdint_parms(2, LPFR, 0.0, 10, 1, ifr);
 
@@ -144,7 +145,7 @@ int main(int argc, char *argv[])
   get_steplist(s, sm, computed_steplist);
 
   /* Construct expected steporder */
-  
+
   expected_steplist = malloc(1000 * sizeof *expected_steplist);
 
   n = 0;
@@ -159,7 +160,7 @@ int main(int argc, char *argv[])
 
   for (i = 0; i < 10; ++i) {
     for (j = 0; j < 4; ++j) {
-      for (k = 0; k < (4-1); ++k) {
+      for (k = 0; k < (4 - 1); ++k) {
         expected_steplist[n++] = ismear;
         expected_steplist[n++] = 1;
         expected_steplist[n++] = iunsmear;
@@ -177,17 +178,17 @@ int main(int argc, char *argv[])
         expected_steplist[n++] = itu;
       }
     }
-  expected_steplist[n++] = ismear;
-  expected_steplist[n++] = 1;
-  expected_steplist[n++] = 4;
-  expected_steplist[n++] = iunsmear;
-  expected_steplist[n++] = 0;
-  expected_steplist[n++] = 2;
-  expected_steplist[n++] = 3;
-  expected_steplist[n++] = itu;
+    expected_steplist[n++] = ismear;
+    expected_steplist[n++] = 1;
+    expected_steplist[n++] = 4;
+    expected_steplist[n++] = iunsmear;
+    expected_steplist[n++] = 0;
+    expected_steplist[n++] = 2;
+    expected_steplist[n++] = 3;
+    expected_steplist[n++] = itu;
   }
 
-  expected_steplist[n-1] = itu+1;
+  expected_steplist[n - 1] = itu + 1;
 
   /* Begin tests */
 
@@ -195,29 +196,36 @@ int main(int argc, char *argv[])
     register_test(1, "Test operation list");
     print_test_header(1);
 
-    if (n != nop) { 
-      printf ("The expected and computed steplists have different number of operations\n");
-      print_int_array_comparison_tail(computed_steplist, expected_steplist, nop, n, 3);
+    if (n != nop) {
+      printf("The expected and computed steplists have different number of "
+             "operations\n");
+      print_int_array_comparison_tail(computed_steplist, expected_steplist, nop,
+                                      n, 3);
       fail_test(1);
 
       printf("First diff:\n");
       if (n < nop) {
-        step_diff = index_diff_array_int(computed_steplist, expected_steplist, n);
-        print_int_array_comparison_mid(computed_steplist, expected_steplist, n, step_diff, 3);
+        step_diff =
+            index_diff_array_int(computed_steplist, expected_steplist, n);
+        print_int_array_comparison_mid(computed_steplist, expected_steplist, n,
+                                       step_diff, 3);
       } else {
-        step_diff = index_diff_array_int(computed_steplist, expected_steplist, nop);
-        print_int_array_comparison_mid(computed_steplist, expected_steplist, nop, step_diff, 3);
+        step_diff =
+            index_diff_array_int(computed_steplist, expected_steplist, nop);
+        print_int_array_comparison_mid(computed_steplist, expected_steplist,
+                                       nop, step_diff, 3);
       }
-
 
     } else {
       step_diff = index_diff_array_int(computed_steplist, expected_steplist, n);
-      printf("Checking for discrepancy between computed and expected operation list...");
+      printf("Checking for discrepancy between computed and expected operation "
+             "list...");
 
       if (step_diff != n) {
         printf(" found\n");
         fail_test(1);
-        print_int_array_comparison_mid(computed_steplist, expected_steplist, n, step_diff, 3);
+        print_int_array_comparison_mid(computed_steplist, expected_steplist, n,
+                                       step_diff, 3);
       } else {
         printf(" none found\n");
       }
@@ -245,7 +253,8 @@ int main(int argc, char *argv[])
 
     for (i = 0; i < ismear; ++i) {
       diff = abs_diff_double(tau_total[i], tau);
-      printf("Force %2d:   abs|tau(%2d)  - tau| = %.1e (should be 0.0)\n", i, i, diff);
+      printf("Force %2d:   abs|tau(%2d)  - tau| = %.1e (should be 0.0)\n", i, i,
+             diff);
 
       if (diff > 1e-10)
         fail_test(2);

@@ -255,13 +255,23 @@ static void random_fields(spinor **mds)
 {
   int k, l;
   spin_t *s, *sm;
+#ifdef SITERANDOM
+  int ix;
+#endif
 
   for (k = 0; k < Ns; k++) {
     s = (spin_t *)(mds[k]);
     sm = s + VOLUME;
+#ifdef SITERANDOM
+    ix = 0;
+#endif
 
     for (; s < sm; s++) {
+#ifdef SITERANDOM
+      ranlxs_site((*s).r, 24, ix++);
+#else
       ranlxs((*s).r, 24);
+#endif
 
       for (l = 0; l < 24; l++)
         (*s).r[l] -= 0.5f;

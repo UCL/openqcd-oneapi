@@ -338,7 +338,7 @@ void read_action_parms(int iact)
 
     if ((ida == 0) && (smear_params.smear_gauge == 1)) {
       smear = 1;
-    } else if ((ida !=0) && (smear_params.smear_fermion == 1)) {
+    } else if ((ida != 0) && (smear_params.smear_fermion == 1)) {
       smear = 1;
     }
   }

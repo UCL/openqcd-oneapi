@@ -103,8 +103,8 @@ extern double square_dble(double);
 extern double sinc_dble(double);
 extern double smear_xi0_dble(double);
 extern double smear_xi1_dble(double);
-extern void mul_icomplex(complex_dble*);
-extern void mul_assign_scalar_complex(double, complex_dble*);
+extern void mul_icomplex(complex_dble *);
+extern void mul_assign_scalar_complex(double, complex_dble *);
 
 /* WSPACE_C */
 extern void alloc_wud(int n);

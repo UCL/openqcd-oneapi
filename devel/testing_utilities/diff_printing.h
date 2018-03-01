@@ -15,9 +15,10 @@ extern void print_int_array_comparison_tail(int l[], int r[], size_t Nl,
 extern void print_int_array_comparison_mid(int l[], int r[], size_t N,
                                            size_t pos, size_t num);
 
-extern void print_double_array_comparison_tail(double l[], double r[], size_t Nl,
-                                            size_t Nr, size_t num);
+extern void print_double_array_comparison_tail(double l[], double r[],
+                                               size_t Nl, size_t Nr,
+                                               size_t num);
 extern void print_double_array_comparison_mid(double l[], double r[], size_t N,
-                                           size_t pos, size_t num);
+                                              size_t pos, size_t num);
 
 #endif /* DIFF_PRINTING_H */

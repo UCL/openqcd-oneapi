@@ -96,6 +96,7 @@ int main(int argc, char *argv[])
                  "Syntax: time2 [-bc <type>]");
   }
 
+  set_ani_parms(1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
   set_lat_parms(5.5, 1.0, 0, NULL, 1.978);
   print_lat_parms();
 
@@ -111,8 +112,12 @@ int main(int argc, char *argv[])
   set_ani_parms(1, 1.2, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
   print_bc_parms(2);
 
-  start_ranlux(0, 12345);
   geometry();
+#ifndef SITERANDOM
+  start_ranlux(0, 12345);
+#else
+  start_ranlux_site(0, 12345);
+#endif
 
   set_sw_parms(-0.0123);
   mu = 0.0785;
@@ -121,7 +126,7 @@ int main(int argc, char *argv[])
   set_ud_phase();
   sw_term(NO_PTS);
 
-  nflds = (int)((4 * 1024 * 1024) / (VOLUME * sizeof(double))) + 1;
+  nflds = (int)((4) / (VOLUME * sizeof(double))) + 1;
   if ((nflds % 2) == 1)
     nflds += 1;
   alloc_wsd(nflds);
@@ -130,7 +135,7 @@ int main(int argc, char *argv[])
   for (i = 0; i < nflds; i++)
     random_sd(VOLUME, psd[i], 1.0);
 
-  nt = (int)(1.0e6 / (double)(nflds * VOLUME));
+  nt = (int)(1.0e2 / (double)(nflds * VOLUME));
   if (nt < 2)
     nt = 2;
   wdt = 0.0;
@@ -156,7 +161,7 @@ int main(int argc, char *argv[])
     printf("%4.3f micro sec (%d Mflops)\n\n", wdt, (int)(1920.0 / wdt));
   }
 
-  nt = (int)(1.0e6 / (double)(nflds * VOLUME));
+  nt = (int)(1.0e2 / (double)(nflds * VOLUME));
   if (nt < 2)
     nt = 2;
   wdt = 0.0;

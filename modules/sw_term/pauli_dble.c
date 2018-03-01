@@ -1530,6 +1530,175 @@ static void bck_house(void)
 
 #endif
 
+#ifdef AVX512
+
+static weyl_dble rs2;
+#include "avx512.h"
+#include "sse.h"
+
+void mul_pauli2_dble(double mu, pauli_dble *m, weyl_dble *s, weyl_dble *r)
+{
+  weyl_dble *s2 = s + 1;
+  double *u = m->u, *u2 = (m + 1)->u;
+
+  register __m512d r1, r2, r3;
+  register __m512d s512, u512;
+  register __m256d t256l, t256u;
+  register __m128d t128l, t128u;
+
+  t256l = _mm256_loadu2_m128d(&(*s2).c1.c1.re, &(*s).c1.c1.re);
+  s512 = _mm512_broadcast_f64x4(t256l);
+  _avx512_load_4_2_d(u512, u, u2, u + 10, u2 + 10);
+  r1 = _mm512_mul_pd(u512, s512);
+  _avx512_load_4_2_d(u512, u + 6, u2 + 6, u + 12, u2 + 12);
+  r2 = _mm512_mul_pd(u512, s512);
+  _avx512_load_4_2_d(u512, u + 8, u2 + 8, u + 14, u2 + 14);
+  r3 = _mm512_mul_pd(u512, s512);
+
+  s512 = _mm512_permute_pd(s512, 0b01010101);
+  _avx512_load_1d2u_d(u512, &mu, u + 11, u2 + 11);
+  u512 = _mm512_mul_pd(u512, s512);
+  r1 = _mm512_mask_add_pd(r1, 0b01010110, r1, u512);
+  r1 = _mm512_mask_sub_pd(r1, 0b10101001, r1, u512);
+  _avx512_load_4_2_d(u512, u + 7, u2 + 7, u + 13, u2 + 13);
+  u512 = _mm512_mul_pd(u512, s512);
+  r2 = _mm512_mask_add_pd(r2, 0b01010101, r2, u512);
+  r2 = _mm512_mask_sub_pd(r2, 0b10101010, r2, u512);
+  _avx512_load_4_2_d(u512, u + 9, u2 + 9, u + 15, u2 + 15);
+  u512 = _mm512_mul_pd(u512, s512);
+  r3 = _mm512_mask_add_pd(r3, 0b01010101, r3, u512);
+  r3 = _mm512_mask_sub_pd(r3, 0b10101010, r3, u512);
+
+  t256l = _mm256_loadu2_m128d(&(*s2).c1.c2.re, &(*s).c1.c2.re);
+  s512 = _mm512_broadcast_f64x4(t256l);
+  _avx512_load_4_2_d(u512, u + 6, u2 + 6, u + 18, u2 + 18);
+  r1 = _mm512_fmadd_pd(u512, s512, r1);
+  _avx512_load_4_2_d(u512, u + 1, u2 + 1, u + 20, u2 + 20);
+  r2 = _mm512_fmadd_pd(u512, s512, r2);
+  _avx512_load_4_2_d(u512, u + 16, u2 + 16, u + 22, u2 + 22);
+  r3 = _mm512_fmadd_pd(u512, s512, r3);
+
+  s512 = _mm512_permute_pd(s512, 0b01010101);
+  _avx512_load_4_2_d(u512, u + 7, u2 + 7, u + 19, u2 + 19);
+  u512 = _mm512_mul_pd(u512, s512);
+  r1 = _mm512_mask_add_pd(r1, 0b01011010, r1, u512);
+  r1 = _mm512_mask_sub_pd(r1, 0b10100101, r1, u512);
+  _avx512_load_1d2u_d(u512, &mu, u + 21, u2 + 21);
+  u512 = _mm512_mul_pd(u512, s512);
+  r2 = _mm512_mask_add_pd(r2, 0b01010110, r2, u512);
+  r2 = _mm512_mask_sub_pd(r2, 0b10101001, r2, u512);
+  _avx512_load_4_2_d(u512, u + 17, u2 + 17, u + 23, u2 + 23);
+  u512 = _mm512_mul_pd(u512, s512);
+  r3 = _mm512_mask_add_pd(r3, 0b01010101, r3, u512);
+  r3 = _mm512_mask_sub_pd(r3, 0b10101010, r3, u512);
+
+  t256l = _mm256_loadu2_m128d(&(*s2).c1.c3.re, &(*s).c1.c3.re);
+  s512 = _mm512_broadcast_f64x4(t256l);
+  _avx512_load_4_2_d(u512, u + 8, u2 + 8, u + 24, u2 + 24);
+  r1 = _mm512_fmadd_pd(u512, s512, r1);
+  _avx512_load_4_2_d(u512, u + 16, u2 + 16, u + 26, u2 + 26);
+  r2 = _mm512_fmadd_pd(u512, s512, r2);
+  _avx512_load_4_2_d(u512, u + 2, u2 + 2, u + 28, u2 + 28);
+  r3 = _mm512_fmadd_pd(u512, s512, r3);
+
+  s512 = _mm512_permute_pd(s512, 0b01010101);
+  _avx512_load_4_2_d(u512, u + 9, u2 + 9, u + 25, u2 + 25);
+  u512 = _mm512_mul_pd(u512, s512);
+  r1 = _mm512_mask_add_pd(r1, 0b01011010, r1, u512);
+  r1 = _mm512_mask_sub_pd(r1, 0b10100101, r1, u512);
+  _avx512_load_4_2_d(u512, u + 17, u2 + 17, u + 27, u2 + 27);
+  u512 = _mm512_mul_pd(u512, s512);
+  r2 = _mm512_mask_add_pd(r2, 0b01011010, r2, u512);
+  r2 = _mm512_mask_sub_pd(r2, 0b10100101, r2, u512);
+  _avx512_load_1d2u_d(u512, &mu, u + 29, u2 + 29);
+  u512 = _mm512_mul_pd(u512, s512);
+  r3 = _mm512_mask_add_pd(r3, 0b01010110, r3, u512);
+  r3 = _mm512_mask_sub_pd(r3, 0b10101001, r3, u512);
+
+  t256l = _mm256_loadu2_m128d(&(*s2).c2.c2.re, &(*s).c2.c2.re);
+  s512 = _mm512_broadcast_f64x4(t256l);
+  _avx512_load_4_2_d(u512, u + 12, u2 + 12, u + 30, u2 + 30);
+  r1 = _mm512_fmadd_pd(u512, s512, r1);
+  _avx512_load_4_2_d(u512, u + 20, u2 + 20, u + 4, u2 + 4);
+  r2 = _mm512_fmadd_pd(u512, s512, r2);
+  _avx512_load_4_2_d(u512, u + 26, u2 + 26, u + 34, u2 + 34);
+  r3 = _mm512_fmadd_pd(u512, s512, r3);
+
+  s512 = _mm512_permute_pd(s512, 0b01010101);
+  _avx512_load_4_2_d(u512, u + 13, u2 + 13, u + 31, u2 + 31);
+  u512 = _mm512_mul_pd(u512, s512);
+  r1 = _mm512_mask_add_pd(r1, 0b10101010, r1, u512);
+  r1 = _mm512_mask_sub_pd(r1, 0b01010101, r1, u512);
+  _avx512_load_2d1u_d(u512, u + 21, u2 + 21, &mu);
+  u512 = _mm512_mul_pd(u512, s512);
+  r2 = _mm512_mask_add_pd(r2, 0b01101010, r2, u512);
+  r2 = _mm512_mask_sub_pd(r2, 0b10010101, r2, u512);
+  _avx512_load_4_2_d(u512, u + 27, u2 + 27, u + 35, u2 + 35);
+  u512 = _mm512_mul_pd(u512, s512);
+  r3 = _mm512_mask_add_pd(r3, 0b01011010, r3, u512);
+  r3 = _mm512_mask_sub_pd(r3, 0b10100101, r3, u512);
+
+  t256l = _mm256_loadu2_m128d(&(*s2).c2.c1.re, &(*s).c2.c1.re);
+  s512 = _mm512_broadcast_f64x4(t256l);
+  _avx512_load_4_2_d(u512, u + 10, u2 + 10, u + 3, u2 + 3);
+  r1 = _mm512_fmadd_pd(u512, s512, r1);
+  _avx512_load_4_2_d(u512, u + 18, u2 + 18, u + 30, u2 + 30);
+  r2 = _mm512_fmadd_pd(u512, s512, r2);
+  _avx512_load_4_2_d(u512, u + 24, u2 + 24, u + 32, u2 + 32);
+  r3 = _mm512_fmadd_pd(u512, s512, r3);
+
+  s512 = _mm512_permute_pd(s512, 0b01010101);
+  _avx512_load_2d1u_d(u512, u + 11, u2 + 11, &mu);
+  u512 = _mm512_mul_pd(u512, s512);
+  r1 = _mm512_mask_add_pd(r1, 0b01101010, r1, u512);
+  r1 = _mm512_mask_sub_pd(r1, 0b10010101, r1, u512);
+  _avx512_load_4_2_d(u512, u + 19, u2 + 19, u + 31, u2 + 31);
+  u512 = _mm512_mul_pd(u512, s512);
+  r2 = _mm512_mask_add_pd(r2, 0b01011010, r2, u512);
+  r2 = _mm512_mask_sub_pd(r2, 0b10100101, r2, u512);
+  _avx512_load_4_2_d(u512, u + 25, u2 + 25, u + 33, u2 + 33);
+  u512 = _mm512_mul_pd(u512, s512);
+  r3 = _mm512_mask_add_pd(r3, 0b01011010, r3, u512);
+  r3 = _mm512_mask_sub_pd(r3, 0b10100101, r3, u512);
+
+  t256l = _mm256_loadu2_m128d(&(*s2).c2.c3.re, &(*s).c2.c3.re);
+  s512 = _mm512_broadcast_f64x4(t256l);
+  _avx512_load_4_2_d(u512, u + 14, u2 + 14, u + 32, u2 + 32);
+  r1 = _mm512_fmadd_pd(u512, s512, r1);
+  _avx512_load_4_2_d(u512, u + 22, u2 + 22, u + 34, u2 + 34);
+  r2 = _mm512_fmadd_pd(u512, s512, r2);
+  _avx512_load_4_2_d(u512, u + 28, u2 + 28, u + 5, u2 + 5);
+  r3 = _mm512_fmadd_pd(u512, s512, r3);
+
+  s512 = _mm512_permute_pd(s512, 0b01010101);
+  _avx512_load_4_2_d(u512, u + 15, u2 + 15, u + 33, u2 + 33);
+  u512 = _mm512_mul_pd(u512, s512);
+  r1 = _mm512_mask_add_pd(r1, 0b10101010, r1, u512);
+  r1 = _mm512_mask_sub_pd(r1, 0b01010101, r1, u512);
+  _avx512_load_4_2_d(u512, u + 23, u2 + 23, u + 35, u2 + 35);
+  u512 = _mm512_mul_pd(u512, s512);
+  r2 = _mm512_mask_add_pd(r2, 0b10101010, r2, u512);
+  r2 = _mm512_mask_sub_pd(r2, 0b01010101, r2, u512);
+  _avx512_load_2d1u_d(u512, u + 29, u2 + 29, &mu);
+  u512 = _mm512_mul_pd(u512, s512);
+  r3 = _mm512_mask_add_pd(r3, 0b01101010, r3, u512);
+  r3 = _mm512_mask_sub_pd(r3, 0b10010101, r3, u512);
+
+  _avx512_store_4_d(r1, r[0].c1.c1, r[1].c1.c1, r[0].c2.c1, r[1].c2.c1);
+  _avx512_store_4_d(r2, r[0].c1.c2, r[1].c1.c2, r[0].c2.c2, r[1].c2.c2);
+  _avx512_store_4_d(r3, r[0].c1.c3, r[1].c1.c3, r[0].c2.c3, r[1].c2.c3);
+}
+
+#else
+
+void mul_pauli2_dble(double mu, pauli_dble *m, weyl_dble *s, weyl_dble *r)
+{
+  mul_pauli_dble(mu, m, s, r);
+  mul_pauli_dble(-mu, m + 1, s + 1, r + 1);
+}
+
+#endif
+
 static double set_aa(double mu, pauli_dble *m)
 {
   int i, j;
@@ -1714,11 +1883,17 @@ void apply_sw_dble(int vol, double mu, pauli_dble *m, spinor_dble *s,
   pm = ps + vol;
 
   for (; ps < pm; ps++) {
+#ifdef AVX512
+    mul_pauli2_dble(mu, m, (*ps).w, (*pr).w);
+    m += 2;
+    pr += 1;
+#else
     mul_pauli_dble(mu, m, (*ps).w, (*pr).w);
     m += 1;
     mul_pauli_dble(-mu, m, (*ps).w + 1, (*pr).w + 1);
     m += 1;
     pr += 1;
+#endif
   }
 }
 

@@ -33,7 +33,11 @@
 static int init = 0;
 static double twopi;
 
+#ifdef SITERANDOM
+void gauss(float r[], int n, int ix)
+#else
 void gauss(float r[], int n)
+#endif
 {
   int k;
   float u[2];
@@ -45,7 +49,13 @@ void gauss(float r[], int n)
   }
 
   for (k = 0; k < n;) {
+#ifdef SITERANDOM
+    if (ix == -1)
+      ranlxs(u, 2);
+    ranlxs_site(u, 2, ix);
+#else
     ranlxs(u, 2);
+#endif
     x1 = (double)(u[0]);
     x2 = (double)(u[1]);
 
@@ -61,7 +71,11 @@ void gauss(float r[], int n)
   }
 }
 
+#ifdef SITERANDOM
+void gauss_dble(double rd[], int n, int ix)
+#else
 void gauss_dble(double rd[], int n)
+#endif
 {
   int k;
   double ud[2];
@@ -73,7 +87,13 @@ void gauss_dble(double rd[], int n)
   }
 
   for (k = 0; k < n;) {
+#ifdef SITERANDOM
+    if (ix == -1)
+      ranlxd(ud, 2);
+    ranlxd_site(ud, 2, ix);
+#else
     ranlxd(ud, 2);
+#endif
     x1 = ud[0];
     x2 = ud[1];
 

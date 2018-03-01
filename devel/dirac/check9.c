@@ -66,10 +66,10 @@ static void random_weyl(int vol, weyl *w)
   spin_t *ws, *wm;
 
   ws = (spin_t *)(w);
-  wm = ws + vol;
 
-  for (; ws < wm; ws++)
-    gauss((*ws).r, 12);
+  int ix;
+  for (ix = 0; ix < vol; ix++)
+    gauss(ws[ix].r, 12);
 }
 
 static void random_bnd(int ic)
@@ -142,6 +142,7 @@ int main(int argc, char *argv[])
                  "Syntax: check9 [-bc <type>]");
   }
 
+  set_ani_parms(1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
   set_lat_parms(5.5, 1.0, 0, NULL, 1.978);
   print_lat_parms();
 
@@ -158,8 +159,12 @@ int main(int argc, char *argv[])
   set_ani_parms(1, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
   print_bc_parms(2);
 
-  start_ranlux(0, 1234);
   geometry();
+#ifndef SITERANDOM
+  start_ranlux(0, 12345);
+#else
+  start_ranlux_site(0, 12345);
+#endif
   set_sap_parms(bs, 0, 1, 1);
   alloc_bgr(SAP_BLOCKS);
   alloc_ws(4);

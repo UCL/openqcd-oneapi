@@ -123,7 +123,298 @@ static const spinor_dble sd0 = {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
                                 {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}}};
 static spin_t rs ALIGNED32;
 
-#if (defined AVX)
+#if (defined AVX512)
+
+#include "avx512.h"
+#include "sse.h"
+
+static void doe_dble(const int *piup, const int *pidn, const su3_dble *u,
+                     const spinor_dble *pk)
+{
+  const spinor_dble *sp, *sm;
+  const su3_dble *up;
+
+  /* 512-bit wide stores for the spinor for each color */
+  __m512d a1, a2, a3;
+  __m512d b1, b2, b3;
+  __m512d w1, w2, w3;
+
+  /******************************* direction 0
+   * *********************************/
+
+  sp = pk + (*(piup++));
+  sm = pk + (*(pidn++));
+
+  {
+    register __m512d t1, t2, t3, t4, t5, t6;
+    _avx512_load_2_halfspinor_d(t1, t2, t3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
+    _avx512_load_2_halfspinor_d(t4, t5, t6, &(*sp).c3.c1.re, &(*sm).c3.c1.re);
+
+    a1 = _mm512_maskz_add_pd(0b00001111, t1, t4);
+    a1 = _mm512_mask_sub_pd(a1, 0b11110000, t1, t4);
+    a2 = _mm512_maskz_add_pd(0b00001111, t2, t5);
+    a2 = _mm512_mask_sub_pd(a2, 0b11110000, t2, t5);
+    a3 = _mm512_maskz_add_pd(0b00001111, t3, t6);
+    a3 = _mm512_mask_sub_pd(a3, 0b11110000, t3, t6);
+  }
+
+  sp = pk + (*(piup++));
+  _prefetch_spinor_dble(sp);
+  sm = pk + (*(pidn++));
+  _prefetch_spinor_dble(sm);
+
+  up = u;
+  u += 1;
+  avx512_su3_mul_quad_dble(*up, *u, b1, b2, b3, a1, a2, a3);
+
+  __m128d tg = _mm_load_sd(&gamma_f);
+  __m512d gamma_8 = _mm512_broadcastsd_pd(tg);
+  _avx512_to_weyl_1(w1, b1, gamma_8);
+  _avx512_to_weyl_1(w2, b2, gamma_8);
+  _avx512_to_weyl_1(w3, b3, gamma_8);
+
+  /******************************* direction 1
+   * *********************************/
+  {
+    register __m512d t1, t2, t3, t4, t5, t6;
+    _avx512_load_2_halfspinor_d(t1, t2, t3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
+    _avx512_load_2_halfspinor_d_reverse(t4, t5, t6, &(*sp).c3.c1.re,
+                                        &(*sm).c3.c1.re);
+
+    t4 = _mm512_permute_pd(t4, 0b01010101);
+    a1 = _mm512_maskz_add_pd(0b01011010, t1, t4);
+    a1 = _mm512_mask_sub_pd(a1, 0b10100101, t1, t4);
+    t5 = _mm512_permute_pd(t5, 0b01010101);
+    a2 = _mm512_maskz_add_pd(0b01011010, t2, t5);
+    a2 = _mm512_mask_sub_pd(a2, 0b10100101, t2, t5);
+    t6 = _mm512_permute_pd(t6, 0b01010101);
+    a3 = _mm512_maskz_add_pd(0b01011010, t3, t6);
+    a3 = _mm512_mask_sub_pd(a3, 0b10100101, t3, t6);
+  }
+
+  sp = pk + (*(piup++));
+  _prefetch_spinor_dble(sp);
+  sm = pk + (*(pidn++));
+  _prefetch_spinor_dble(sm);
+  up = ++u;
+  u += 1;
+
+  avx512_su3_mul_quad_dble(*up, *u, b1, b2, b3, a1, a2, a3);
+
+  _avx512_to_weyl_2(w1, b1);
+  _avx512_to_weyl_2(w2, b2);
+  _avx512_to_weyl_2(w3, b3);
+
+  /******************************* direction 2
+   * *********************************/
+
+  {
+    register __m512d t1, t2, t3, t4, t5, t6;
+    _avx512_load_2_halfspinor_d(t1, t2, t3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
+    _avx512_load_2_halfspinor_d_reverse(t4, t5, t6, &(*sp).c3.c1.re,
+                                        &(*sm).c3.c1.re);
+
+    a1 = _mm512_maskz_add_pd(0b11000011, t1, t4);
+    a1 = _mm512_mask_sub_pd(a1, 0b00111100, t1, t4);
+    a2 = _mm512_maskz_add_pd(0b11000011, t2, t5);
+    a2 = _mm512_mask_sub_pd(a2, 0b00111100, t2, t5);
+    a3 = _mm512_maskz_add_pd(0b11000011, t3, t6);
+    a3 = _mm512_mask_sub_pd(a3, 0b00111100, t3, t6);
+  }
+
+  sp = pk + (*(piup));
+  _prefetch_spinor_dble(sp);
+  sm = pk + (*(pidn));
+  _prefetch_spinor_dble(sm);
+  up = ++u;
+  u += 1;
+
+  avx512_su3_mul_quad_dble(*up, *u, b1, b2, b3, a1, a2, a3);
+
+  _avx512_to_weyl_3(w1, b1);
+  _avx512_to_weyl_3(w2, b2);
+  _avx512_to_weyl_3(w3, b3);
+
+  /******************************* direction 3
+   * *********************************/
+  {
+    register __m512d t1, t2, t3, t4, t5, t6;
+    _avx512_load_2_halfspinor_d(t1, t2, t3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
+    _avx512_load_2_halfspinor_d(t4, t5, t6, &(*sp).c3.c1.re, &(*sm).c3.c1.re);
+
+    t4 = _mm512_permute_pd(t4, 0b01010101);
+    a1 = _mm512_maskz_add_pd(0b10010110, t1, t4);
+    a1 = _mm512_mask_sub_pd(a1, 0b01101001, t1, t4);
+    t5 = _mm512_permute_pd(t5, 0b01010101);
+    a2 = _mm512_maskz_add_pd(0b10010110, t2, t5);
+    a2 = _mm512_mask_sub_pd(a2, 0b01101001, t2, t5);
+    t6 = _mm512_permute_pd(t6, 0b01010101);
+    a3 = _mm512_maskz_add_pd(0b10010110, t3, t6);
+    a3 = _mm512_mask_sub_pd(a3, 0b01101001, t3, t6);
+  }
+
+  up = ++u;
+  u += 1;
+  avx512_su3_mul_quad_dble(*up, *u, b1, b2, b3, a1, a2, a3);
+
+  _avx512_to_weyl_4(w1, b1);
+  _avx512_to_weyl_4(w2, b2);
+  _avx512_to_weyl_4(w3, b3);
+
+  const double dgcoe = one_over_gammaf * coe;
+  tg = _mm_load_sd(&dgcoe);
+  gamma_8 = _mm512_broadcastsd_pd(tg);
+  w1 = _mm512_mul_pd(gamma_8, w1);
+  w2 = _mm512_mul_pd(gamma_8, w2);
+  w3 = _mm512_mul_pd(gamma_8, w3);
+
+  /*_avx512_store_spinor( w1, w2, w3, &rs.s.c1.c1.re );*/
+  _avx512_store_2_halfspinor_d(w1, w2, w3, &rs.s.c1.c1.re, &rs.s.c3.c1.re);
+}
+
+static void deo_dble(const int *piup, const int *pidn, const su3_dble *u,
+                     spinor_dble *pl)
+{
+  const su3_dble *up;
+  spinor_dble *sp, *sm;
+
+  /* 512-bit wide stores for the spinor for each color */
+  __m512d a1, a2, a3;
+  __m512d b1, b2, b3;
+  __m512d w1, w2, w3;
+
+  /******************************* direction +0
+   * *********************************/
+
+  sp = pl + (*(piup++));
+  _prefetch_spinor_dble(sp);
+  sm = pl + (*(pidn++));
+  _prefetch_spinor_dble(sm);
+
+  _avx512_load_2_halfspinor_d(w1, w2, w3, &rs.s.c1.c1.re, &rs.s.c3.c1.re);
+
+  __m128d mulc = _mm_load_sd(&ceo);
+  __m512d mulc8 = _mm512_broadcastsd_pd(mulc);
+  w1 = _mm512_mul_pd(mulc8, w1);
+  w2 = _mm512_mul_pd(mulc8, w2);
+  w3 = _mm512_mul_pd(mulc8, w3);
+
+  _avx512_expand_weyl(a1, w1) _avx512_expand_weyl(a2, w2)
+      _avx512_expand_weyl(a3, w3)
+
+          up = u;
+  u += 1;
+  avx512_su3_mul_quad_dble(*u, *up, b1, b2, b3, a1, a2, a3);
+
+  _avx512_add_to_spinors(b1, (*sm).c1.c1, (*sm).c2.c1, (*sp).c1.c1,
+                         (*sp).c2.c1);
+  _avx512_add_to_spinors(b2, (*sm).c1.c2, (*sm).c2.c2, (*sp).c1.c2,
+                         (*sp).c2.c2);
+  _avx512_add_to_spinors(b3, (*sm).c1.c3, (*sm).c2.c3, (*sp).c1.c3,
+                         (*sp).c2.c3);
+
+  _avx512_add_to_spinors_2(b1, (*sm).c3.c1, (*sm).c4.c1, (*sp).c3.c1,
+                           (*sp).c4.c1);
+  _avx512_add_to_spinors_2(b2, (*sm).c3.c2, (*sm).c4.c2, (*sp).c3.c2,
+                           (*sp).c4.c2);
+  _avx512_add_to_spinors_2(b3, (*sm).c3.c3, (*sm).c4.c3, (*sp).c3.c3,
+                           (*sp).c4.c3);
+
+  /******************************* direction +1
+   * *********************************/
+  sp = pl + (*(piup++));
+  _prefetch_spinor_dble(sp);
+  sm = pl + (*(pidn++));
+  _prefetch_spinor_dble(sm);
+
+  mulc = _mm_load_sd(&one_over_gammaf);
+  mulc8 = _mm512_broadcastsd_pd(mulc);
+  w1 = _mm512_mul_pd(mulc8, w1);
+  w2 = _mm512_mul_pd(mulc8, w2);
+  w3 = _mm512_mul_pd(mulc8, w3);
+
+  _avx512_expand_weyl_2(a1, w1);
+  _avx512_expand_weyl_2(a2, w2);
+  _avx512_expand_weyl_2(a3, w3);
+
+  up = ++u;
+  u += 1;
+  avx512_su3_mul_quad_dble(*u, *up, b1, b2, b3, a1, a2, a3);
+
+  _avx512_add_to_spinors(b1, (*sm).c1.c1, (*sm).c2.c1, (*sp).c1.c1,
+                         (*sp).c2.c1);
+  _avx512_add_to_spinors(b2, (*sm).c1.c2, (*sm).c2.c2, (*sp).c1.c2,
+                         (*sp).c2.c2);
+  _avx512_add_to_spinors(b3, (*sm).c1.c3, (*sm).c2.c3, (*sp).c1.c3,
+                         (*sp).c2.c3);
+
+  _avx512_add_to_spinors_3(b1, (*sm).c3.c1, (*sm).c4.c1, (*sp).c3.c1,
+                           (*sp).c4.c1);
+  _avx512_add_to_spinors_3(b2, (*sm).c3.c2, (*sm).c4.c2, (*sp).c3.c2,
+                           (*sp).c4.c2);
+  _avx512_add_to_spinors_3(b3, (*sm).c3.c3, (*sm).c4.c3, (*sp).c3.c3,
+                           (*sp).c4.c3);
+
+  /******************************* direction +2
+   * *********************************/
+  sp = pl + (*(piup++));
+  _prefetch_spinor_dble(sp);
+  sm = pl + (*(pidn++));
+  _prefetch_spinor_dble(sm);
+
+  _avx512_expand_weyl_3(a1, w1);
+  _avx512_expand_weyl_3(a2, w2);
+  _avx512_expand_weyl_3(a3, w3);
+
+  up = ++u;
+  u += 1;
+  avx512_su3_mul_quad_dble(*u, *up, b1, b2, b3, a1, a2, a3);
+
+  _avx512_add_to_spinors(b1, (*sm).c1.c1, (*sm).c2.c1, (*sp).c1.c1,
+                         (*sp).c2.c1);
+  _avx512_add_to_spinors(b2, (*sm).c1.c2, (*sm).c2.c2, (*sp).c1.c2,
+                         (*sp).c2.c2);
+  _avx512_add_to_spinors(b3, (*sm).c1.c3, (*sm).c2.c3, (*sp).c1.c3,
+                         (*sp).c2.c3);
+
+  _avx512_add_to_spinors_4(b1, (*sm).c4.c1, (*sm).c3.c1, (*sp).c4.c1,
+                           (*sp).c3.c1);
+  _avx512_add_to_spinors_4(b2, (*sm).c4.c2, (*sm).c3.c2, (*sp).c4.c2,
+                           (*sp).c3.c2);
+  _avx512_add_to_spinors_4(b3, (*sm).c4.c3, (*sm).c3.c3, (*sp).c4.c3,
+                           (*sp).c3.c3);
+
+  /******************************* direction +3
+   * *********************************/
+  sp = pl + (*(piup++));
+  _prefetch_spinor_dble(sp);
+  sm = pl + (*(pidn++));
+  _prefetch_spinor_dble(sm);
+
+  _avx512_expand_weyl_4(a1, w1);
+  _avx512_expand_weyl_4(a2, w2);
+  _avx512_expand_weyl_4(a3, w3);
+
+  up = ++u;
+  u += 1;
+  avx512_su3_mul_quad_dble(*u, *up, b1, b2, b3, a1, a2, a3);
+
+  _avx512_add_to_spinors(b1, (*sm).c1.c1, (*sm).c2.c1, (*sp).c1.c1,
+                         (*sp).c2.c1);
+  _avx512_add_to_spinors(b2, (*sm).c1.c2, (*sm).c2.c2, (*sp).c1.c2,
+                         (*sp).c2.c2);
+  _avx512_add_to_spinors(b3, (*sm).c1.c3, (*sm).c2.c3, (*sp).c1.c3,
+                         (*sp).c2.c3);
+
+  _avx512_add_to_spinors_5(b1, (*sm).c3.c1, (*sm).c4.c1, (*sp).c3.c1,
+                           (*sp).c4.c1);
+  _avx512_add_to_spinors_5(b2, (*sm).c3.c2, (*sm).c4.c2, (*sp).c3.c2,
+                           (*sp).c4.c2);
+  _avx512_add_to_spinors_5(b3, (*sm).c3.c3, (*sm).c4.c3, (*sp).c3.c3,
+                           (*sp).c4.c3);
+}
+
+#elif (defined AVX)
 #include "avx.h"
 
 #define _load_cst(c)                                                           \
@@ -145,7 +436,7 @@ static spin_t rs ALIGNED32;
                        :                                                       \
                        : "xmm3", "xmm4", "xmm5")
 
-static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
+static void doe_dble(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
 {
   spinor_dble *sp, *sm;
 
@@ -327,7 +618,7 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _avx_zeroupper();
 }
 
-static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
+static void deo_dble(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
 {
   spinor_dble *sp, *sm;
 
@@ -518,22 +809,22 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
   __asm__ __volatile__("movddup %0, %%xmm15" : : "m"(c) : "xmm15")
 
 #define _mul_cst()                                                             \
-  __asm__ __volatile__("mulpd %%xmm15, %%xmm0 \n\t"                            \
-                       "mulpd %%xmm15, %%xmm1 \n\t"                            \
+  __asm__ __volatile__("mulpd %%xmm15, %%xmm0 nt"                              \
+                       "mulpd %%xmm15, %%xmm1 nt"                              \
                        "mulpd %%xmm15, %%xmm2"                                 \
                        :                                                       \
                        :                                                       \
                        : "xmm0", "xmm1", "xmm2")
 
 #define _mul_cst_up()                                                          \
-  __asm__ __volatile__("mulpd %%xmm15, %%xmm3 \n\t"                            \
-                       "mulpd %%xmm15, %%xmm4 \n\t"                            \
+  __asm__ __volatile__("mulpd %%xmm15, %%xmm3 nt"                              \
+                       "mulpd %%xmm15, %%xmm4 nt"                              \
                        "mulpd %%xmm15, %%xmm5"                                 \
                        :                                                       \
                        :                                                       \
                        : "xmm3", "xmm4", "xmm5")
 
-static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
+static void doe_dble(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
 {
   spinor_dble *sp, *sm;
 
@@ -874,7 +1165,7 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _sse_store_up_dble(rs.s.c4);
 }
 
-static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
+static void deo_dble(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
 {
   spinor_dble *sp, *sm;
 
@@ -1194,7 +1485,7 @@ static vector4double v11, v12, v13, v21, v22, v23;
 static vector4double *im1[3] = {&dim11, &dim12, &dim13};
 static vector4double *im2[3] = {&dim21, &dim22, &dim23};
 
-static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
+static void doe_dble(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
 {
   spinor_dble *sp, *sm;
   su3_vector_dble psi, chi;
@@ -1209,11 +1500,11 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _qpx_load_w1(psi1, sp);
   _qpx_load_w2(psi2, sp);
   sm = pk + (*(pidn++));
-  _qpx_prefetch_spinor_dp(sm);
+  _qpx_prefetch_spinor_dble(sm);
   _qpx_vec_add(psi1, psi1, psi2);
   _qpx_su3_mul(dim1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   dim21 = dim11;
   dim22 = dim12;
   dim23 = dim13;
@@ -1224,11 +1515,11 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _qpx_load_w1(psi1, sm);
   _qpx_load_w2(psi2, sm);
   sp = pk + (*(piup++));
-  _qpx_prefetch_spinor_dp(sp);
+  _qpx_prefetch_spinor_dble(sp);
   _qpx_vec_sub(psi1, psi1, psi2);
   _qpx_su3_inv_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_vec_add_assign(dim1, chi1);
   _qpx_vec_sub_assign(dim2, chi1);
 
@@ -1246,12 +1537,12 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _qpx_load_w1(psi1, sp);
   _qpx_load_w2(psi2, sp);
   sm = pk + (*(pidn++));
-  _qpx_prefetch_spinor_dp(sm);
+  _qpx_prefetch_spinor_dble(sm);
   _qpx_vec_x(chi1, psi2);
   _qpx_vec_i_add(psi1, psi1, chi1);
   _qpx_su3_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_vec_add_assign(dim1, chi1);
   _qpx_vec_x(chi2, chi1);
   _qpx_vec_i_sub(dim2, dim2, chi2);
@@ -1262,12 +1553,12 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _qpx_load_w1(psi1, sm);
   _qpx_load_w2(psi2, sm);
   sp = pk + (*(piup++));
-  _qpx_prefetch_spinor_dp(sp);
+  _qpx_prefetch_spinor_dble(sp);
   _qpx_vec_x(chi1, psi2);
   _qpx_vec_i_sub(psi1, psi1, chi1);
   _qpx_su3_inv_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_vec_add_assign(dim1, chi1);
   _qpx_vec_x(chi2, chi1);
   _qpx_vec_i_add(dim2, dim2, chi2);
@@ -1278,12 +1569,12 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _qpx_load_w1(psi1, sp);
   _qpx_load_w2(psi2, sp);
   sm = pk + (*(pidn++));
-  _qpx_prefetch_spinor_dp(sm);
+  _qpx_prefetch_spinor_dble(sm);
   _qpx_vec_x(chi1, psi2);
   _qpx_vec_add_n(psi1, psi1, chi1);
   _qpx_su3_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_vec_add_assign(dim1, chi1);
   _qpx_vec_x(chi2, chi1);
   _qpx_vec_sub_n(dim2, dim2, chi2);
@@ -1294,12 +1585,12 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _qpx_load_w1(psi1, sm);
   _qpx_load_w2(psi2, sm);
   sp = pk + (*(piup));
-  _qpx_prefetch_spinor_dp(sp);
+  _qpx_prefetch_spinor_dble(sp);
   _qpx_vec_x(chi1, psi2);
   _qpx_vec_sub_n(psi1, psi1, chi1);
   _qpx_su3_inv_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_vec_add_assign(dim1, chi1);
   _qpx_vec_x(chi2, chi1);
   _qpx_vec_add_n(dim2, dim2, chi2);
@@ -1310,11 +1601,11 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _qpx_load_w1(psi1, sp);
   _qpx_load_w2(psi2, sp);
   sm = pk + (*(pidn));
-  _qpx_prefetch_spinor_dp(sm);
+  _qpx_prefetch_spinor_dble(sm);
   _qpx_vec_i_add_n(psi1, psi1, psi2);
   _qpx_su3_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_vec_add(dim1, dim1, chi1);
   _qpx_vec_i_sub_n(dim2, dim2, chi1);
 
@@ -1345,7 +1636,7 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   dim23 = vec_mul(vmul, dim23);
 }
 
-static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
+static void deo_dble(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
 {
   spinor_dble *sp, *sm;
   su3_vector_dble psi, chi;
@@ -1366,10 +1657,10 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
   sp = pl + (*(piup++));
   _qpx_vec_sub(psi1, dim1, dim2);
   sm = pl + (*(pidn++));
-  _qpx_prefetch_spinor_dp(sm);
+  _qpx_prefetch_spinor_dble(sm);
   _qpx_su3_inv_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_load_w1(v1, sp);
   _qpx_load_w2(v2, sp);
   _qpx_vec_add(v1, v1, chi1);
@@ -1382,10 +1673,10 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
 
   _qpx_vec_add(psi1, dim1, dim2);
   sp = pl + (*(piup++));
-  _qpx_prefetch_spinor_dp(sp);
+  _qpx_prefetch_spinor_dble(sp);
   _qpx_su3_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_load_w1(v1, sm);
   _qpx_load_w2(v2, sm);
   _qpx_vec_add(v1, v1, chi1);
@@ -1407,10 +1698,10 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
   _qpx_vec_x(v1, dim2);
   _qpx_vec_i_sub(psi1, dim1, v1);
   sm = pl + (*(pidn++));
-  _qpx_prefetch_spinor_dp(sm);
+  _qpx_prefetch_spinor_dble(sm);
   _qpx_su3_inv_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_load_w1(v1, sp);
   _qpx_load_w2(v2, sp);
   _qpx_vec_add(v1, v1, chi1);
@@ -1425,10 +1716,10 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
   _qpx_vec_x(v1, dim2);
   _qpx_vec_i_add(psi1, dim1, v1);
   sp = pl + (*(piup++));
-  _qpx_prefetch_spinor_dp(sp);
+  _qpx_prefetch_spinor_dble(sp);
   _qpx_su3_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_load_w1(v1, sm);
   _qpx_load_w2(v2, sm);
   _qpx_vec_add(v1, v1, chi1);
@@ -1443,10 +1734,10 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
   _qpx_vec_x(v1, dim2);
   _qpx_vec_sub_n(psi1, dim1, v1);
   sm = pl + (*(pidn++));
-  _qpx_prefetch_spinor_dp(sm);
+  _qpx_prefetch_spinor_dble(sm);
   _qpx_su3_inv_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_load_w1(v1, sp);
   _qpx_load_w2(v2, sp);
   _qpx_vec_add(v1, v1, chi1);
@@ -1461,10 +1752,10 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
   _qpx_vec_x(v1, dim2);
   _qpx_vec_add_n(psi1, dim1, v1);
   sp = pl + (*(piup));
-  _qpx_prefetch_spinor_dp(sp);
+  _qpx_prefetch_spinor_dble(sp);
   _qpx_su3_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_load_w1(v1, sm);
   _qpx_load_w2(v2, sm);
   _qpx_vec_add(v1, v1, chi1);
@@ -1478,10 +1769,10 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
 
   _qpx_vec_i_sub_n(psi1, dim1, dim2);
   sm = pl + (*(pidn));
-  _qpx_prefetch_spinor_dp(sm);
+  _qpx_prefetch_spinor_dble(sm);
   _qpx_su3_inv_mul(chi1, *u, psi1);
   u += 1;
-  _qpx_prefetch_su3_dp(u);
+  _qpx_prefetch_su3_dble(u);
   _qpx_load_w1(v1, sp);
   _qpx_load_w2(v2, sp);
   _qpx_vec_add(v1, v1, chi1);
@@ -1512,7 +1803,7 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
   (r).c3.re *= (c);                                                            \
   (r).c3.im *= (c)
 
-static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
+static void doe_dble(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
 {
   spinor_dble *sp, *sm;
   su3_vector_dble psi, chi;
@@ -1658,7 +1949,7 @@ static void doe(int *piup, int *pidn, su3_dble *u, spinor_dble *pk)
   _vector_mul_assign(rs.s.c4, one_over_gammaf);
 }
 
-static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
+static void deo_dble(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
 {
   spinor_dble *sp, *sm;
   su3_vector_dble psi, chi;
@@ -1805,6 +2096,9 @@ static void deo(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
 
 void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
 {
+#ifdef dirac_counters
+  Dw_dble_counter++;
+#endif
   int bc, ix, t;
   int *piup, *pidn;
 
@@ -1855,10 +2149,9 @@ void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
       ix += 1;
 
       if ((t > 0) && ((t < (N0 - 1)) || (bc != 0))) {
-        doe(piup, pidn, u, s);
+        doe_dble(piup, pidn, u, s);
 
-        mul_pauli_dble(mu, m, (*so).w, (*ro).w);
-        mul_pauli_dble(-mu, m + 1, (*so).w + 1, (*ro).w + 1);
+        mul_pauli2_dble(mu, m, (*so).w, (*ro).w);
 
 #if (defined QPX)
         _qpx_load_w1(chid1, &((*ro).s));
@@ -1877,7 +2170,7 @@ void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
         rs = (*so);
 #endif
 
-        deo(piup, pidn, u, r);
+        deo_dble(piup, pidn, u, r);
       } else {
         (*so).s = sd0;
         (*ro).s = sd0;
@@ -1891,10 +2184,9 @@ void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
     }
   } else {
     for (; u < um; u += 8) {
-      doe(piup, pidn, u, s);
+      doe_dble(piup, pidn, u, s);
 
-      mul_pauli_dble(mu, m, (*so).w, (*ro).w);
-      mul_pauli_dble(-mu, m + 1, (*so).w + 1, (*ro).w + 1);
+      mul_pauli2_dble(mu, m, (*so).w, (*ro).w);
 
 #if (defined QPX)
       _qpx_load_w1(chid1, &((*ro).s));
@@ -1912,7 +2204,7 @@ void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
       _vector_add_assign((*ro).s.c4, rs.s.c4);
       rs = (*so);
 #endif
-      deo(piup, pidn, u, r);
+      deo_dble(piup, pidn, u, r);
 
       piup += 4;
       pidn += 4;
@@ -1927,6 +2219,9 @@ void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
 
 void Dwee_dble(double mu, spinor_dble *s, spinor_dble *r)
 {
+#ifdef dirac_counters
+  Dwee_dble_counter++;
+#endif
   int bc, ix, t;
   pauli_dble *m, *mm;
   spin_t *se, *re;
@@ -1945,8 +2240,7 @@ void Dwee_dble(double mu, spinor_dble *s, spinor_dble *r)
       ix += 1;
 
       if ((t > 0) && ((t < (N0 - 1)) || (bc != 0))) {
-        mul_pauli_dble(mu, m, (*se).w, (*re).w);
-        mul_pauli_dble(-mu, m + 1, (*se).w + 1, (*re).w + 1);
+        mul_pauli2_dble(mu, m, (*se).w, (*re).w);
       } else {
         (*se).s = sd0;
         (*re).s = sd0;
@@ -1957,8 +2251,7 @@ void Dwee_dble(double mu, spinor_dble *s, spinor_dble *r)
     }
   } else {
     for (; m < mm; m += 2) {
-      mul_pauli_dble(mu, m, (*se).w, (*re).w);
-      mul_pauli_dble(-mu, m + 1, (*se).w + 1, (*re).w + 1);
+      mul_pauli2_dble(mu, m, (*se).w, (*re).w);
 
       se += 1;
       re += 1;
@@ -1968,6 +2261,9 @@ void Dwee_dble(double mu, spinor_dble *s, spinor_dble *r)
 
 void Dwoo_dble(double mu, spinor_dble *s, spinor_dble *r)
 {
+#ifdef dirac_counters
+  Dwoo_dble_counter++;
+#endif
   int bc, ix, t;
   pauli_dble *m, *mm;
   spin_t *so, *ro;
@@ -1990,8 +2286,7 @@ void Dwoo_dble(double mu, spinor_dble *s, spinor_dble *r)
       ix += 1;
 
       if ((t > 0) && ((t < (N0 - 1)) || (bc != 0))) {
-        mul_pauli_dble(mu, m, (*so).w, (*ro).w);
-        mul_pauli_dble(-mu, m + 1, (*so).w + 1, (*ro).w + 1);
+        mul_pauli2_dble(mu, m, (*so).w, (*ro).w);
       } else {
         (*so).s = sd0;
         (*ro).s = sd0;
@@ -2002,8 +2297,7 @@ void Dwoo_dble(double mu, spinor_dble *s, spinor_dble *r)
     }
   } else {
     for (; m < mm; m += 2) {
-      mul_pauli_dble(mu, m, (*so).w, (*ro).w);
-      mul_pauli_dble(-mu, m + 1, (*so).w + 1, (*ro).w + 1);
+      mul_pauli2_dble(mu, m, (*so).w, (*ro).w);
 
       so += 1;
       ro += 1;
@@ -2013,6 +2307,9 @@ void Dwoo_dble(double mu, spinor_dble *s, spinor_dble *r)
 
 void Dwoe_dble(spinor_dble *s, spinor_dble *r)
 {
+#ifdef dirac_counters
+  Dwoe_dble_counter++;
+#endif
   int bc, ix, t;
   int *piup, *pidn;
   su3_dble *u, *um;
@@ -2045,7 +2342,7 @@ void Dwoe_dble(spinor_dble *s, spinor_dble *r)
       ix += 1;
 
       if ((t > 0) && ((t < (N0 - 1)) || (bc != 0))) {
-        doe(piup, pidn, u, s);
+        doe_dble(piup, pidn, u, s);
 #if (defined QPX)
         _qpx_store_w1(dim1, &((*ro).s));
         _qpx_store_w2(dim2, &((*ro).s));
@@ -2061,7 +2358,7 @@ void Dwoe_dble(spinor_dble *s, spinor_dble *r)
     }
   } else {
     for (; u < um; u += 8) {
-      doe(piup, pidn, u, s);
+      doe_dble(piup, pidn, u, s);
 #if (defined QPX)
       _qpx_store_w1(dim1, &((*ro).s));
       _qpx_store_w2(dim2, &((*ro).s));
@@ -2078,6 +2375,9 @@ void Dwoe_dble(spinor_dble *s, spinor_dble *r)
 
 void Dweo_dble(spinor_dble *s, spinor_dble *r)
 {
+#ifdef dirac_counters
+  Dweo_dble_counter++;
+#endif
   int bc, ix, t;
   int *piup, *pidn;
   su3_dble *u, *um;
@@ -2116,7 +2416,7 @@ void Dweo_dble(spinor_dble *s, spinor_dble *r)
 #else
         rs = (*so);
 #endif
-        deo(piup, pidn, u, r);
+        deo_dble(piup, pidn, u, r);
       } else
         (*so).s = sd0;
 
@@ -2132,7 +2432,7 @@ void Dweo_dble(spinor_dble *s, spinor_dble *r)
 #else
       rs = (*so);
 #endif
-      deo(piup, pidn, u, r);
+      deo_dble(piup, pidn, u, r);
 
       piup += 4;
       pidn += 4;
@@ -2145,6 +2445,9 @@ void Dweo_dble(spinor_dble *s, spinor_dble *r)
 
 void Dwhat_dble(double mu, spinor_dble *s, spinor_dble *r)
 {
+#ifdef dirac_counters
+  Dwhat_dble_counter++;
+#endif
   int bc, ix, t;
   int *piup, *pidn;
   su3_dble *u, *um;
@@ -2183,15 +2486,14 @@ void Dwhat_dble(double mu, spinor_dble *s, spinor_dble *r)
       ix += 1;
 
       if ((t > 0) && ((t < (N0 - 1)) || (bc != 0))) {
-        doe(piup, pidn, u, s);
+        doe_dble(piup, pidn, u, s);
 #if (defined QPX)
         mul_pauli_dble_qpx(m, im1, im1);
         mul_pauli_dble_qpx(m + 1, im2, im2);
 #else
-        mul_pauli_dble(0.0, m, rs.w, rs.w);
-        mul_pauli_dble(0.0, m + 1, rs.w + 1, rs.w + 1);
+        mul_pauli2_dble(0.0, m, rs.w, rs.w);
 #endif
-        deo(piup, pidn, u, r);
+        deo_dble(piup, pidn, u, r);
       }
 
       piup += 4;
@@ -2200,15 +2502,14 @@ void Dwhat_dble(double mu, spinor_dble *s, spinor_dble *r)
     }
   } else {
     for (; u < um; u += 8) {
-      doe(piup, pidn, u, s);
+      doe_dble(piup, pidn, u, s);
 #if (defined QPX)
       mul_pauli_dble_qpx(m, im1, im1);
       mul_pauli_dble_qpx(m + 1, im2, im2);
 #else
-      mul_pauli_dble(0.0, m, rs.w, rs.w);
-      mul_pauli_dble(0.0, m + 1, rs.w + 1, rs.w + 1);
+      mul_pauli2_dble(0.0, m, rs.w, rs.w);
 #endif
-      deo(piup, pidn, u, r);
+      deo_dble(piup, pidn, u, r);
 
       piup += 4;
       pidn += 4;
@@ -2221,6 +2522,9 @@ void Dwhat_dble(double mu, spinor_dble *s, spinor_dble *r)
 
 void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
 {
+#ifdef dirac_counters
+  Dw_blk_dble_counter++;
+#endif
   int nb, iswd, vol, volh, ibu, ibd;
   int *piup, *pidn, *ibp, *ibm;
 #if (defined QPX)
@@ -2296,10 +2600,9 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
 
     for (; u < um; u += 8) {
       if (((pidn[0] < vol) || (!ibd)) && ((piup[0] < vol) || (!ibu))) {
-        doe(piup, pidn, u, s);
+        doe_dble(piup, pidn, u, s);
 
-        mul_pauli_dble(mu, m, (*so).w, (*ro).w);
-        mul_pauli_dble(-mu, m + 1, (*so).w + 1, (*ro).w + 1);
+        mul_pauli2_dble(mu, m, (*so).w, (*ro).w);
 
 #if (defined QPX)
         _qpx_load_w1(chid1, &((*ro).s));
@@ -2317,7 +2620,7 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
         _vector_add_assign((*ro).s.c4, rs.s.c4);
         rs = (*so);
 #endif
-        deo(piup, pidn, u, r);
+        deo_dble(piup, pidn, u, r);
       } else {
         (*so).s = sd0;
         (*ro).s = sd0;
@@ -2337,10 +2640,9 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
       r[*ibp] = sd0;
   } else {
     for (; u < um; u += 8) {
-      doe(piup, pidn, u, s);
+      doe_dble(piup, pidn, u, s);
 
-      mul_pauli_dble(mu, m, (*so).w, (*ro).w);
-      mul_pauli_dble(-mu, m + 1, (*so).w + 1, (*ro).w + 1);
+      mul_pauli2_dble(mu, m, (*so).w, (*ro).w);
 
 #if (defined QPX)
       _qpx_load_w1(chid1, &((*ro).s));
@@ -2359,7 +2661,7 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
       rs = (*so);
 #endif
 
-      deo(piup, pidn, u, r);
+      deo_dble(piup, pidn, u, r);
 
       piup += 4;
       pidn += 4;
@@ -2372,6 +2674,9 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
 
 void Dwee_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
 {
+#ifdef dirac_counters
+  Dwee_blk_dble_counter++;
+#endif
   int nb, iswd, vol, ibu, ibd;
   int *piup, *pidn;
   pauli_dble *m, *mm;
@@ -2410,8 +2715,7 @@ void Dwee_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
 
     for (; m < mm; m += 2) {
       if (((pidn[0] < vol) || (!ibd)) && ((piup[0] < vol) || (!ibu))) {
-        mul_pauli_dble(mu, m, (*se).w, (*re).w);
-        mul_pauli_dble(-mu, m + 1, (*se).w + 1, (*re).w + 1);
+        mul_pauli2_dble(mu, m, (*se).w, (*re).w);
       } else {
         (*se).s = sd0;
         (*re).s = sd0;
@@ -2424,8 +2728,7 @@ void Dwee_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
     }
   } else {
     for (; m < mm; m += 2) {
-      mul_pauli_dble(mu, m, (*se).w, (*re).w);
-      mul_pauli_dble(-mu, m + 1, (*se).w + 1, (*re).w + 1);
+      mul_pauli2_dble(mu, m, (*se).w, (*re).w);
 
       se += 1;
       re += 1;
@@ -2435,6 +2738,9 @@ void Dwee_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
 
 void Dwoo_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
 {
+#ifdef dirac_counters
+  Dwoo_blk_dble_counter++;
+#endif
   int nb, iswd, vol, volh, ibu, ibd;
   int *piup, *pidn;
   pauli_dble *m, *mm;
@@ -2479,8 +2785,7 @@ void Dwoo_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
 
     for (; m < mm; m += 2) {
       if (((pidn[0] < vol) || (!ibd)) && ((piup[0] < vol) || (!ibu))) {
-        mul_pauli_dble(mu, m, (*so).w, (*ro).w);
-        mul_pauli_dble(-mu, m + 1, (*so).w + 1, (*ro).w + 1);
+        mul_pauli2_dble(mu, m, (*so).w, (*ro).w);
       } else {
         (*so).s = sd0;
         (*ro).s = sd0;
@@ -2493,8 +2798,7 @@ void Dwoo_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
     }
   } else {
     for (; m < mm; m += 2) {
-      mul_pauli_dble(mu, m, (*so).w, (*ro).w);
-      mul_pauli_dble(-mu, m + 1, (*so).w + 1, (*ro).w + 1);
+      mul_pauli2_dble(mu, m, (*so).w, (*ro).w);
 
       so += 1;
       ro += 1;
@@ -2504,6 +2808,9 @@ void Dwoo_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
 
 void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l)
 {
+#ifdef dirac_counters
+  Dwoe_blk_dble_counter++;
+#endif
   int nb, iswd, vol, volh, ibu, ibd;
   int *piup, *pidn, *ibp, *ibm;
   su3_dble *u, *um;
@@ -2560,7 +2867,7 @@ void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l)
 
     for (; u < um; u += 8) {
       if (((pidn[0] < vol) || (!ibd)) && ((piup[0] < vol) || (!ibu))) {
-        doe(piup, pidn, u, s);
+        doe_dble(piup, pidn, u, s);
 #if (defined QPX)
         _qpx_store_w1(dim1, &((*ro).s));
         _qpx_store_w2(dim2, &((*ro).s));
@@ -2576,7 +2883,7 @@ void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l)
     }
   } else {
     for (; u < um; u += 8) {
-      doe(piup, pidn, u, s);
+      doe_dble(piup, pidn, u, s);
 #if (defined QPX)
       _qpx_store_w1(dim1, &((*ro).s));
       _qpx_store_w2(dim2, &((*ro).s));
@@ -2592,6 +2899,9 @@ void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l)
 
 void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l)
 {
+#ifdef dirac_counters
+  Dweo_blk_dble_counter++;
+#endif
   int nb, iswd, vol, volh, ibu, ibd;
   int *piup, *pidn, *ibp, *ibm;
   su3_dble *u, *um;
@@ -2648,7 +2958,7 @@ void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l)
 #else
         rs = (*so);
 #endif
-        deo(piup, pidn, u, r);
+        deo_dble(piup, pidn, u, r);
       } else
         (*so).s = sd0;
 
@@ -2670,7 +2980,7 @@ void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l)
 #else
       rs = (*so);
 #endif
-      deo(piup, pidn, u, r);
+      deo_dble(piup, pidn, u, r);
 
       piup += 4;
       pidn += 4;
@@ -2681,6 +2991,9 @@ void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l)
 
 void Dwhat_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
 {
+#ifdef dirac_counters
+  Dwhat_blk_dble_counter++;
+#endif
   int nb, iswd, vol, volh, ibu, ibd;
   int *piup, *pidn, *ibp, *ibm;
   su3_dble *u, *um;
@@ -2745,15 +3058,14 @@ void Dwhat_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
 
     for (; u < um; u += 8) {
       if (((pidn[0] < vol) || (!ibd)) && ((piup[0] < vol) || (!ibu))) {
-        doe(piup, pidn, u, s);
+        doe_dble(piup, pidn, u, s);
 #if (defined QPX)
         mul_pauli_dble_qpx(m, im1, im1);
         mul_pauli_dble_qpx(m + 1, im2, im2);
 #else
-        mul_pauli_dble(0.0f, m, rs.w, rs.w);
-        mul_pauli_dble(0.0f, m + 1, rs.w + 1, rs.w + 1);
+        mul_pauli2_dble(0.0f, m, rs.w, rs.w);
 #endif
-        deo(piup, pidn, u, r);
+        deo_dble(piup, pidn, u, r);
       }
 
       piup += 4;
@@ -2768,15 +3080,14 @@ void Dwhat_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
       r[*ibp] = sd0;
   } else {
     for (; u < um; u += 8) {
-      doe(piup, pidn, u, s);
+      doe_dble(piup, pidn, u, s);
 #if (defined QPX)
       mul_pauli_dble_qpx(m, im1, im1);
       mul_pauli_dble_qpx(m + 1, im2, im2);
 #else
-      mul_pauli_dble(0.0f, m, rs.w, rs.w);
-      mul_pauli_dble(0.0f, m + 1, rs.w + 1, rs.w + 1);
+      mul_pauli2_dble(0.0f, m, rs.w, rs.w);
 #endif
-      deo(piup, pidn, u, r);
+      deo_dble(piup, pidn, u, r);
 
       piup += 4;
       pidn += 4;

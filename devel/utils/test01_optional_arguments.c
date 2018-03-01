@@ -64,7 +64,8 @@ int main(int argc, char *argv[])
       double_exp = -9.24;
       check = (abs_diff_double(opt_double, double_exp) < 1e-12);
 
-      printf("(%s)\tpar1_d == %.2f\n", check ? true_str : false_str, double_exp);
+      printf("(%s)\tpar1_d == %.2f\n", check ? true_str : false_str,
+             double_exp);
       fail_test_if(1, !check);
 
       int_exp = 175154;
@@ -76,7 +77,8 @@ int main(int argc, char *argv[])
       strcpy(string_exp, "Hello");
       check = (strcmp(string_exp, opt_string) == 0);
 
-      printf("(%s)\tpar3_s == \"%s\"\n", check ? true_str : false_str, string_exp);
+      printf("(%s)\tpar3_s == \"%s\"\n", check ? true_str : false_str,
+             string_exp);
       fail_test_if(1, !check);
 
       printf("\n-------------------------------------------\n\n");
@@ -98,7 +100,8 @@ int main(int argc, char *argv[])
       double_exp = 24.12;
       check = (abs_diff_double(opt_double, double_exp) < 1e-12);
 
-      printf("(%s)\topt1_d == %.2f\n", check ? true_str : false_str, double_exp);
+      printf("(%s)\topt1_d == %.2f\n", check ? true_str : false_str,
+             double_exp);
       fail_test_if(2, !check);
 
       int_exp = 114;
@@ -110,7 +113,8 @@ int main(int argc, char *argv[])
       strcpy(string_exp, "World");
       check = (strcmp(string_exp, opt_string) == 0);
 
-      printf("(%s)\topt3_s == \"%s\"\n", check ? true_str : false_str, string_exp);
+      printf("(%s)\topt3_s == \"%s\"\n", check ? true_str : false_str,
+             string_exp);
       fail_test_if(2, !check);
 
       printf("\n-------------------------------------------\n\n");
@@ -132,7 +136,8 @@ int main(int argc, char *argv[])
       double_exp = 55.21;
       check = (abs_diff_double(opt_double, double_exp) < 1e-12);
 
-      printf("(%s)\topt1_d == %.2f\n", check ? true_str : false_str, double_exp);
+      printf("(%s)\topt1_d == %.2f\n", check ? true_str : false_str,
+             double_exp);
       fail_test_if(3, !check);
 
       int_exp = -123;
@@ -144,7 +149,8 @@ int main(int argc, char *argv[])
       strcpy(string_exp, "Opt used");
       check = (strcmp(string_exp, opt_string) == 0);
 
-      printf("(%s)\topt3_s == \"%s\"\n", check ? true_str : false_str, string_exp);
+      printf("(%s)\topt3_s == \"%s\"\n", check ? true_str : false_str,
+             string_exp);
       fail_test_if(3, !check);
 
       printf("\n-------------------------------------------\n\n");
@@ -166,7 +172,8 @@ int main(int argc, char *argv[])
       double_exp = 5812.123;
       check = (abs_diff_double(opt_double, double_exp) < 1e-12);
 
-      printf("(%s)\tpar1_d == %.2f\n", check ? true_str : false_str, double_exp);
+      printf("(%s)\tpar1_d == %.2f\n", check ? true_str : false_str,
+             double_exp);
       fail_test_if(4, !check);
 
       int_exp = -61234;
@@ -178,7 +185,8 @@ int main(int argc, char *argv[])
       strcpy(string_exp, "Optional");
       check = (strcmp(string_exp, opt_string) == 0);
 
-      printf("(%s)\tpar3_s == \"%s\"\n", check ? true_str : false_str, string_exp);
+      printf("(%s)\tpar3_s == \"%s\"\n", check ? true_str : false_str,
+             string_exp);
       fail_test_if(4, !check);
 
       printf("\n-------------------------------------------\n\n");
@@ -204,7 +212,6 @@ int main(int argc, char *argv[])
       printf("\n-------------------------------------------\n\n");
     }
   }
-
 
   if (my_rank == 0)
     report_test_results();

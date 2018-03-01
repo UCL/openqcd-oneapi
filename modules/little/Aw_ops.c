@@ -453,17 +453,17 @@ void set_Aw(double mu)
           spinor_prod_gamma[nu](vol, sdo[k], sde[l], sp);
 
           if (ibn) {
-            z[k * Ns + l].re =  (-0.5) * (ani_factor) * (sp[0].re - sp[1].re);
-            z[k * Ns + l].im =  (-0.5) * (ani_factor) * (sp[0].im - sp[1].im);
+            z[k * Ns + l].re = (-0.5) * (ani_factor) * (sp[0].re - sp[1].re);
+            z[k * Ns + l].im = (-0.5) * (ani_factor) * (sp[0].im - sp[1].im);
 
-            w[l * Ns + k].re =  (-0.5) * (ani_factor) * (sp[0].re + sp[1].re);
-            w[l * Ns + k].im =  (0.5) *  (ani_factor) * (sp[0].im + sp[1].im);
+            w[l * Ns + k].re = (-0.5) * (ani_factor) * (sp[0].re + sp[1].re);
+            w[l * Ns + k].im = (0.5) * (ani_factor) * (sp[0].im + sp[1].im);
           } else {
             z[k * Ns + l].re += (-0.5) * (ani_factor) * (sp[0].re - sp[1].re);
             z[k * Ns + l].im += (-0.5) * (ani_factor) * (sp[0].im - sp[1].im);
 
             w[l * Ns + k].re += (-0.5) * (ani_factor) * (sp[0].re + sp[1].re);
-            w[l * Ns + k].im += (0.5) *  (ani_factor) * (sp[0].im + sp[1].im);
+            w[l * Ns + k].im += (0.5) * (ani_factor) * (sp[0].im + sp[1].im);
           }
         }
       }

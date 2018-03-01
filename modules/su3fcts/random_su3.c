@@ -44,14 +44,22 @@ static double rd[6];
 static su3_vector vs1, vs2, vs3;
 static su3_vector_dble vd1, vd2, vd3;
 
+#ifdef SITERANDOM
+static void random_su3_vector(su3_vector *v, int ix)
+#else
 static void random_su3_vector(su3_vector *v)
+#endif
 {
   float norm, fact;
 
   norm = 0.0f;
 
   while (norm <= 0.1f) {
+#ifdef SITERANDOM
+    gauss(rs, 6, ix);
+#else
     gauss(rs, 6);
+#endif
     norm = rs[0] * rs[0] + rs[1] * rs[1] + rs[2] * rs[2] + rs[3] * rs[3] +
            rs[4] * rs[4] + rs[5] * rs[5];
   }
@@ -66,15 +74,27 @@ static void random_su3_vector(su3_vector *v)
   (*v).c3.im = fact * rs[5];
 }
 
+#ifdef SITERANDOM
+void random_su3(su3 *u, int ix)
+#else
 void random_su3(su3 *u)
+#endif
 {
   float norm, fact;
 
+#ifdef SITERANDOM
+  random_su3_vector(&vs1, ix);
+#else
   random_su3_vector(&vs1);
+#endif
   norm = 0.0f;
 
   while (norm <= 0.1f) {
+#ifdef SITERANDOM
+    random_su3_vector(&vs2, ix);
+#else
     random_su3_vector(&vs2);
+#endif
     _vector_cross_prod(vs3, vs1, vs2);
     norm = _vector_prod_re(vs3, vs3);
   }
@@ -112,14 +132,22 @@ void random_su3(su3 *u)
   (*u).c33.im = vs3.c3.im;
 }
 
+#ifdef SITERANDOM
+static void random_su3_vector_dble(su3_vector_dble *v, int ix)
+#else
 static void random_su3_vector_dble(su3_vector_dble *v)
+#endif
 {
   double norm, fact;
 
   norm = 0.0;
 
   while (norm <= 0.1) {
+#ifdef SITERANDOM
+    gauss_dble(rd, 6, ix);
+#else
     gauss_dble(rd, 6);
+#endif
     norm = rd[0] * rd[0] + rd[1] * rd[1] + rd[2] * rd[2] + rd[3] * rd[3] +
            rd[4] * rd[4] + rd[5] * rd[5];
   }
@@ -134,15 +162,26 @@ static void random_su3_vector_dble(su3_vector_dble *v)
   (*v).c3.im = fact * rd[5];
 }
 
+#ifdef SITERANDOM
+void random_su3_dble(su3_dble *u, int ix)
+#else
 void random_su3_dble(su3_dble *u)
+#endif
 {
   double norm, fact;
-
+#ifdef SITERANDOM
+  random_su3_vector_dble(&vd1, ix);
+#else
   random_su3_vector_dble(&vd1);
+#endif
   norm = 0.0;
 
   while (norm <= 0.1) {
+#ifdef SITERANDOM
+    random_su3_vector_dble(&vd2, ix);
+#else
     random_su3_vector_dble(&vd2);
+#endif
     _vector_cross_prod(vd3, vd1, vd2);
     norm = _vector_prod_re(vd3, vd3);
   }

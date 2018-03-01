@@ -324,10 +324,7 @@ void mpc_gsum_d(double *src, double *dst, int num)
 
 /* Generic mathematical functions */
 
-double square_dble(double d)
-{
-  return d*d;
-}
+double square_dble(double d) { return d * d; }
 
 double sinc_dble(double d)
 {
@@ -335,16 +332,13 @@ double sinc_dble(double d)
 
   if (fabs(d) < 0.05) {
     dd = square_dble(d);
-    return 1. - dd/6*(1. - dd/20*(1.-dd/42));
+    return 1. - dd / 6 * (1. - dd / 20 * (1. - dd / 42));
   } else {
-    return sin(d)/d;
+    return sin(d) / d;
   }
 }
 
-double smear_xi0_dble(double d)
-{
-  return sinc_dble(d);
-}
+double smear_xi0_dble(double d) { return sinc_dble(d); }
 
 double smear_xi1_dble(double d)
 {
@@ -352,9 +346,9 @@ double smear_xi1_dble(double d)
   dd = square_dble(d);
 
   if (fabs(d) < 0.05) {
-    return -(1. - dd/10 *(1. - dd/28 * (1. - dd/54)))/3;
+    return -(1. - dd / 10 * (1. - dd / 28 * (1. - dd / 54))) / 3;
   } else {
-    return (cos(d) - sinc_dble(d))/dd;
+    return (cos(d) - sinc_dble(d)) / dd;
   }
 }
 

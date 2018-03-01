@@ -213,10 +213,7 @@ void copy_boundaries_forces(su3_alg_dble *force)
   }
 }
 
-void copy_bnd_frc(void)
-{
-  copy_boundaries_forces((*mdflds()).frc);
-}
+void copy_bnd_frc(void) { copy_boundaries_forces((*mdflds()).frc); }
 
 static void bck_send_f0(void)
 {
@@ -372,10 +369,6 @@ void add_boundaries_force(su3_alg_dble *force)
     bck_send_f0();
     add_f0(force);
   }
-
 }
 
-void add_bnd_frc(void)
-{
-  add_boundaries_force((*mdflds()).frc);
-}
+void add_bnd_frc(void) { add_boundaries_force((*mdflds()).frc); }

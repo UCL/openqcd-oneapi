@@ -146,9 +146,10 @@ static void allocate_su3_alg_send_recieve_buffers(void)
   }
 
   su3_alg_sbuf = amalloc(n * sizeof(*su3_alg_sbuf), ALIGN);
-  error(su3_alg_sbuf == NULL, 1,
-        "allocate_su3_alg_send_recieve_buffers [smeared_fields_communication.c]",
-        "Unable to allocate send buffer");
+  error(
+      su3_alg_sbuf == NULL, 1,
+      "allocate_su3_alg_send_recieve_buffers [smeared_fields_communication.c]",
+      "Unable to allocate send buffer");
 }
 
 static void pack_su3_alg_type_one(su3_alg_dble *algdb, int mu)
@@ -205,9 +206,11 @@ static void send_su3_alg_type_one(int mu)
 
     if (np == 0) {
       MPI_Send(su3_alg_sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
-      MPI_Recv(su3_alg_rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD, &stat);
+      MPI_Recv(su3_alg_rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD,
+               &stat);
     } else {
-      MPI_Recv(su3_alg_rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD, &stat);
+      MPI_Recv(su3_alg_rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD,
+               &stat);
       MPI_Send(su3_alg_sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
     }
 
@@ -230,11 +233,13 @@ static void send_su3_alg_type_two(int mu)
     nbf = 8 * nuk;
 
     if (np == 0) {
-        MPI_Send(su3_alg_sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
-        MPI_Recv(su3_alg_rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD, &stat);
+      MPI_Send(su3_alg_sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
+      MPI_Recv(su3_alg_rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD,
+               &stat);
     } else {
-        MPI_Recv(su3_alg_rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD, &stat);
-        MPI_Send(su3_alg_sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
+      MPI_Recv(su3_alg_rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD,
+               &stat);
+      MPI_Send(su3_alg_sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
     }
 
     su3_alg_rbuf += nuk;

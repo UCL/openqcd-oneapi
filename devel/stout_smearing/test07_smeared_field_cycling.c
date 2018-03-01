@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
   double theta[3] = {0.0, 0.0, 0.0};
   su3_dble **sfields;
   su3_dble *ud;
-  su3_dble* ud_adresses[7];
+  su3_dble *ud_adresses[7];
 
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
@@ -75,20 +75,20 @@ int main(int argc, char *argv[])
     print_test_header(1);
 
     printf("udfld()   {%p}, ud_adresses[5] {%p} (should be the same)\n",
-        (void *)ud, (void *)ud_adresses[5]);
+           (void *)ud, (void *)ud_adresses[5]);
 
     fail_test_if(1, ud != ud_adresses[5]);
 
     printf("sfield[0] {%p}, ud_adresses[6] {%p} (should be the same)\n",
-        (void *)sfields[0], (void *)ud_adresses[6]);
+           (void *)sfields[0], (void *)ud_adresses[6]);
 
     fail_test_if(1, sfields[0] != ud_adresses[6]);
 
     for (i = 0; i < 5; ++i) {
       printf("sfield[%d] {%p}, ud_adresses[%d] {%p} (should be the same)\n",
-          i+1, (void *)sfields[i+1], i, (void *)ud_adresses[i]);
+             i + 1, (void *)sfields[i + 1], i, (void *)ud_adresses[i]);
 
-      fail_test_if(1, sfields[i+1] != ud_adresses[i]);
+      fail_test_if(1, sfields[i + 1] != ud_adresses[i]);
     }
 
     printf("\n-------------------------------------------\n\n");
@@ -104,20 +104,20 @@ int main(int argc, char *argv[])
     print_test_header(2);
 
     printf("udfld()   {%p}, ud_adresses[6] {%p} (should be the same)\n",
-        (void *)ud, (void *)ud_adresses[6]);
+           (void *)ud, (void *)ud_adresses[6]);
 
     fail_test_if(2, ud != ud_adresses[6]);
 
     for (i = 0; i < 6; ++i) {
-      printf("sfield[%d] {%p}, ud_adresses[%d] {%p} (should be the same)\n",
-          i, (void *)sfields[i], i, (void *)ud_adresses[i]);
+      printf("sfield[%d] {%p}, ud_adresses[%d] {%p} (should be the same)\n", i,
+             (void *)sfields[i], i, (void *)ud_adresses[i]);
 
       fail_test_if(2, sfields[i] != ud_adresses[i]);
     }
 
     printf("\n-------------------------------------------\n\n");
   }
-  
+
   if (my_rank == 0)
     report_test_results();
 

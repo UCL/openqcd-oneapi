@@ -1329,24 +1329,6 @@ static void check_files(int *nl, int *icnfg)
   mpc_bcast_i(icnfg, 1);
 }
 
-static void init_rng(int icnfg)
-{
-  int ic;
-
-  if (append) {
-    if (cnfg[strlen(cnfg) - 1] != '*') {
-      if (norng)
-        start_ranlux(level, seed ^ (icnfg - 1));
-      else {
-        ic = import_ranlux(rng_file);
-        error_root(ic != (icnfg - 1), 1, "init_rng [qcd1.c]",
-                   "Configuration number mismatch (*.rng file)");
-      }
-    }
-  } else
-    start_ranlux(level, seed);
-}
-
 static void init_ud(void)
 {
   char *p;
@@ -1365,6 +1347,59 @@ static void init_ud(void)
   } else
     random_ud();
 }
+
+#ifndef SITERANDOM
+static void init_rng(int icnfg)
+{
+  int ic;
+
+  if (append) {
+    if (cnfg[strlen(cnfg) - 1] != '*') {
+      if (norng)
+        start_ranlux(level, seed ^ (icnfg - 1));
+      else {
+        ic = import_ranlux(rng_file);
+        error_root(ic != (icnfg - 1), 1, "init_rng [qcd1.c]",
+                   "Configuration number mismatch (*.rng file)");
+      }
+    }
+  } else
+    start_ranlux(level, seed);
+}
+#else
+static void init_rng(int icnfg) { start_ranlux_site(level, seed); }
+#endif
+
+#ifdef dirac_counters
+static void init_dirac_counters(void)
+{
+  Dw_dble_counter = 0;
+  Dwee_dble_counter = 0;
+  Dwoo_dble_counter = 0;
+  Dwoe_dble_counter = 0;
+  Dweo_dble_counter = 0;
+  Dwhat_dble_counter = 0;
+  Dw_blk_dble_counter = 0;
+  Dwee_blk_dble_counter = 0;
+  Dwoo_blk_dble_counter = 0;
+  Dwoe_blk_dble_counter = 0;
+  Dweo_blk_dble_counter = 0;
+  Dwhat_blk_dble_counter = 0;
+
+  Dw_counter = 0;
+  Dwee_counter = 0;
+  Dwoo_counter = 0;
+  Dwoe_counter = 0;
+  Dweo_counter = 0;
+  Dwhat_counter = 0;
+  Dw_blk_counter = 0;
+  Dwee_blk_counter = 0;
+  Dwoo_blk_counter = 0;
+  Dwoe_blk_counter = 0;
+  Dweo_blk_counter = 0;
+  Dwhat_blk_counter = 0;
+}
+#endif
 
 static void store_ud(su3_dble *usv)
 {
@@ -1819,6 +1854,10 @@ int main(int argc, char *argv[])
   wtms = 0.0;
   wtmsall = 0.0;
 
+#ifdef dirac_counters
+  init_dirac_counters();
+#endif
+
   for (n = 0; (iend == 0) && (n < ntr); n++) {
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
@@ -1877,6 +1916,58 @@ int main(int argc, char *argv[])
   }
 
   if (my_rank == 0) {
+#ifdef dirac_counters
+    if (Dw_counter > 0)
+      fprintf(flog, " Dw called %d times \n", Dw_counter);
+    if (Dwee_counter > 0)
+      fprintf(flog, " Dwee called %d times \n", Dwee_counter);
+    if (Dwoo_counter > 0)
+      fprintf(flog, " Dwoo called %d times \n", Dwoo_counter);
+    if (Dwoe_counter > 0)
+      fprintf(flog, " Dwoe called %d times \n", Dwoe_counter);
+    if (Dweo_counter > 0)
+      fprintf(flog, " Dweo called %d times \n", Dweo_counter);
+    if (Dwhat_counter > 0)
+      fprintf(flog, " Dwhat called %d times \n", Dwhat_counter);
+    if (Dw_blk_counter > 0)
+      fprintf(flog, " Dw_blk called %d times \n", Dw_blk_counter);
+    if (Dwee_blk_counter > 0)
+      fprintf(flog, " Dwee_blk called %d times \n", Dwee_blk_counter);
+    if (Dwoo_blk_counter > 0)
+      fprintf(flog, " Dwoo_blk called %d times \n", Dwoo_blk_counter);
+    if (Dwoe_blk_counter > 0)
+      fprintf(flog, " Dwoe_blk called %d times \n", Dwoe_blk_counter);
+    if (Dweo_blk_counter > 0)
+      fprintf(flog, " Dweo_blk called %d times \n", Dweo_blk_counter);
+    if (Dwhat_blk_counter > 0)
+      fprintf(flog, " Dwhat_blk called %d times \n", Dwhat_blk_counter);
+
+    if (Dw_dble_counter > 0)
+      fprintf(flog, " Dw_dble called %d times \n", Dw_dble_counter);
+    if (Dwee_dble_counter > 0)
+      fprintf(flog, " Dwee_dble called %d times \n", Dwee_dble_counter);
+    if (Dwoo_dble_counter > 0)
+      fprintf(flog, " Dwoo_dble called %d times \n", Dwoo_dble_counter);
+    if (Dwoe_dble_counter > 0)
+      fprintf(flog, " Dwoe_dble called %d times \n", Dwoe_dble_counter);
+    if (Dweo_dble_counter > 0)
+      fprintf(flog, " Dweo_dble called %d times \n", Dweo_dble_counter);
+    if (Dwhat_dble_counter > 0)
+      fprintf(flog, " Dwhat_dble called %d times \n", Dwhat_dble_counter);
+    if (Dw_blk_dble_counter > 0)
+      fprintf(flog, " Dw_blk_dble called %d times \n", Dw_blk_dble_counter);
+    if (Dwee_blk_dble_counter > 0)
+      fprintf(flog, " Dwee_blk_dble called %d times \n", Dwee_blk_dble_counter);
+    if (Dwoo_blk_dble_counter > 0)
+      fprintf(flog, " Dwoo_blk_dble called %d times \n", Dwoo_blk_dble_counter);
+    if (Dwoe_blk_dble_counter > 0)
+      fprintf(flog, " Dwoe_blk_dble called %d times \n", Dwoe_blk_dble_counter);
+    if (Dweo_blk_dble_counter > 0)
+      fprintf(flog, " Dweo_blk_dble called %d times \n", Dweo_blk_dble_counter);
+    if (Dwhat_blk_dble_counter > 0)
+      fprintf(flog, " Dwhat_blk_dble called %d times \n",
+              Dwhat_blk_dble_counter);
+#endif
     fprintf(flog, "Memory footprint at program end:\n");
     fprintf(flog, "   Current memory usage per proc: %8.3f MB\n",
             amem_use_mb());

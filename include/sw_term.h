@@ -30,6 +30,8 @@ extern void apply_sw(int vol, float mu, pauli *m, spinor *s, spinor *r);
 /* PAULI_DBLE_C */
 extern void mul_pauli_dble(double mu, pauli_dble *m, weyl_dble *s,
                            weyl_dble *r);
+extern void mul_pauli2_dble(double mu, pauli_dble *m, weyl_dble *s,
+                            weyl_dble *r);
 extern int inv_pauli_dble(double mu, pauli_dble *m, pauli_dble *im);
 extern complex_dble det_pauli_dble(double mu, pauli_dble *m);
 extern void apply_sw_dble(int vol, double mu, pauli_dble *m, spinor_dble *s,

@@ -362,13 +362,13 @@ void hmc_sanity_check(void)
 
     ie = (ani.has_ani == 1) && (bc_type() != 3);
     error_root(ie != 0, 1, "hmc_sanity_check [hmc.c]",
-        "Anisotropy not implemented for non-periodic boundaries");
+               "Anisotropy not implemented for non-periodic boundaries");
 
     smear = stout_smearing_parms();
 
     ie = (smear.num_smear != 0) && (bc_type() != 3);
     error_root(ie != 0, 1, "hmc_sanity_check [hmc.c]",
-        "Stout smearing not implemented for non-periodic boundaries");
+               "Stout smearing not implemented for non-periodic boundaries");
 
     for (k = 0; k < nact; k++) {
       ap = action_parms(iact[k]);
@@ -379,7 +379,8 @@ void hmc_sanity_check(void)
         ie = (smear.smear_fermion != ap.smear);
       }
 
-      error_root(ie != 0, 1, "hmc_sanity_check [hmc.c]",
+      error_root(
+          ie != 0, 1, "hmc_sanity_check [hmc.c]",
           "Inconsistent individual action smearing settings (internal error)");
     }
   }
