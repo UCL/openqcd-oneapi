@@ -2,3 +2,7 @@
 *.o
 *.log
 data/*
+
+build/*
+!build/Makefile
+!build/compile_settings.txt

@@ -15,4 +15,8 @@
 
 #define openQCD_RELEASE "openQCD-1.6"
 
+extern const char* build_date;
+extern const char* build_git_sha;
+extern const char* build_user_cflags;
+
 #endif
