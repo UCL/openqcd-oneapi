@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check5.c
-*
-* Copyright (C) 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of inv_pauli_dble()
-*
-*******************************************************************************/
+ *
+ * File check5.c
+ *
+ * Copyright (C) 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of inv_pauli_dble()
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

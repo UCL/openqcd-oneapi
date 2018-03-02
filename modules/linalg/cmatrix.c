@@ -1,51 +1,51 @@
 
 /*******************************************************************************
-*
-* File cmatrix.c
-*
-* Copyright (C) 2007, 2009, 2011, 2013,  Martin Luescher, Isabel Campos
-*               2016
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Complex matrix algebra (single-precision version).
-*
-* The externally accessible functions are
-*
-*   void cmat_vec(int n,complex *a,complex *v,complex *w)
-*     Computes w=a*v, where v and w are n-vectors and a an nxn matrix.
-*
-*   void cmat_vec_assign(int n,complex *a,complex *v,complex *w)
-*     Adds a*v to w, where v and w are n-vectors and a an nxn matrix.
-*
-*   void cmat_add(int n,complex *a,complex *b,complex *c)
-*     Computes the sum c=a+b of two nxn matrices a and b.
-*
-*   void cmat_sub(int n,complex *a,complex *b,complex *c)
-*     Computes the difference c=a-b of two nxn matrices a and b.
-*
-*   void cmat_mul(int n,complex *a,complex *b,complex *c)
-*     Computes the product c=a*b of two nxn matrices a and b.
-*
-*   void cmat_dag(int n,complex *a,complex *b)
-*     Assigns the hermitian conjugate of a to b.
-*
-* Notes:
-*
-* All of these programs can be called locally. Complex nxn matrices with
-* matrix elements A_{ij} are represented by linear arrays a of complex
-* numbers such that
-*
-*   A_{ij} = a[i*n+j]
-*
-* where i,j=0,1,..,n-1. It is assumed that the input and output arrays do
-* not overlap in memory (the results are otherwise unpredictable).
-*
-* If SSE or AVX instructions are to be used, and if n is even, it is taken
-* for granted that the arrays are aligned to a 16 byte boundary.
-*
-*******************************************************************************/
+ *
+ * File cmatrix.c
+ *
+ * Copyright (C) 2007, 2009, 2011, 2013,  Martin Luescher, Isabel Campos
+ *               2016
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Complex matrix algebra (single-precision version).
+ *
+ * The externally accessible functions are
+ *
+ *   void cmat_vec(int n,complex *a,complex *v,complex *w)
+ *     Computes w=a*v, where v and w are n-vectors and a an nxn matrix.
+ *
+ *   void cmat_vec_assign(int n,complex *a,complex *v,complex *w)
+ *     Adds a*v to w, where v and w are n-vectors and a an nxn matrix.
+ *
+ *   void cmat_add(int n,complex *a,complex *b,complex *c)
+ *     Computes the sum c=a+b of two nxn matrices a and b.
+ *
+ *   void cmat_sub(int n,complex *a,complex *b,complex *c)
+ *     Computes the difference c=a-b of two nxn matrices a and b.
+ *
+ *   void cmat_mul(int n,complex *a,complex *b,complex *c)
+ *     Computes the product c=a*b of two nxn matrices a and b.
+ *
+ *   void cmat_dag(int n,complex *a,complex *b)
+ *     Assigns the hermitian conjugate of a to b.
+ *
+ * Notes:
+ *
+ * All of these programs can be called locally. Complex nxn matrices with
+ * matrix elements A_{ij} are represented by linear arrays a of complex
+ * numbers such that
+ *
+ *   A_{ij} = a[i*n+j]
+ *
+ * where i,j=0,1,..,n-1. It is assumed that the input and output arrays do
+ * not overlap in memory (the results are otherwise unpredictable).
+ *
+ * If SSE or AVX instructions are to be used, and if n is even, it is taken
+ * for granted that the arrays are aligned to a 16 byte boundary.
+ *
+ *******************************************************************************/
 
 #define CMATRIX_C
 

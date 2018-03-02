@@ -1,71 +1,71 @@
 
 /*******************************************************************************
-*
-* File ltl_gcr.c
-*
-* Copyright (C) 2011-2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* GCR solver for the little Dirac equation Aw*psi=eta.
-*
-* The externally accessible functions are
-*
-*   double ltl_gcr(int nkv,int nmx,double res,double mu,
-*                  complex_dble *eta,complex_dble *psi,int *status)
-*     Obtains an approximate solution psi of the little Dirac equation for
-*     given source eta using the even-odd preconditioned GCR algorithm. See
-*     the notes for the explanation of the parameters of the program.
-*
-* Notes:
-*
-* The program is based on the flexible GCR algorithm for complex fields (see
-* linsolv/fgcr4vd.c). The improvement coefficients, the quark mass in the SW
-* term and the parameters of the deflation subspace are assumed to be set by
-* set_lat_parms(), set_bc_parms(), set_sw_parms() and set_dfl_parms(). It is
-* also taken for granted that the deflation subspace has been initialized by
-* calling dfl_subspace().
-*
-* The parameters passed through the argument list are:
-*
-*   nkv     Maximal number of Krylov vectors generated before the GCR
-*           algorithm is restarted.
-*
-*   nmx     Maximal total number of Krylov vectors that may be generated.
-*
-*   res     Desired maximal relative residue |eta-Aw*psi|/|eta| of the
-*           calculated solution.
-*
-*   mu      Value of the twisted mass in the Dirac equation.
-*
-*   eta     Source field. eta is unchanged on exit if psi does not
-*           coincide with eta (which is permissible).
-*
-*   psi     Calculated approximate solution of the little Dirac equation.
-*
-*   status  If the program is able to solve the little equation to the
-*           desired accuracy, status reports the total number of Krylov
-*           vectors that were required for the solution. Negative values
-*           indicate that the program failed (-1: the algorithm did not
-*           converge, -2: the inversion of the diagonal elements of the
-*           little Dirac operator was not safe).
-*
-* When status>=-1, the program returns the norm of the residue of the
-* calculated approximate solution of the even-odd preconditioned, globally
-* deflated little Dirac equation. No action is performed if status=-2
-* and the program returns 1.0.
-*
-* The even-odd preconditioned little Dirac operator is updated if it is
-* not up-to-date. Evidently the solver is a global program that must be
-* called on all processes simultaneously. The required workspaces are
-*
-*  complex             2*nkv+1
-*  complex_dble        3
-*
-* (see utils/wspace.c).
-*
-*******************************************************************************/
+ *
+ * File ltl_gcr.c
+ *
+ * Copyright (C) 2011-2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * GCR solver for the little Dirac equation Aw*psi=eta.
+ *
+ * The externally accessible functions are
+ *
+ *   double ltl_gcr(int nkv,int nmx,double res,double mu,
+ *                  complex_dble *eta,complex_dble *psi,int *status)
+ *     Obtains an approximate solution psi of the little Dirac equation for
+ *     given source eta using the even-odd preconditioned GCR algorithm. See
+ *     the notes for the explanation of the parameters of the program.
+ *
+ * Notes:
+ *
+ * The program is based on the flexible GCR algorithm for complex fields (see
+ * linsolv/fgcr4vd.c). The improvement coefficients, the quark mass in the SW
+ * term and the parameters of the deflation subspace are assumed to be set by
+ * set_lat_parms(), set_bc_parms(), set_sw_parms() and set_dfl_parms(). It is
+ * also taken for granted that the deflation subspace has been initialized by
+ * calling dfl_subspace().
+ *
+ * The parameters passed through the argument list are:
+ *
+ *   nkv     Maximal number of Krylov vectors generated before the GCR
+ *           algorithm is restarted.
+ *
+ *   nmx     Maximal total number of Krylov vectors that may be generated.
+ *
+ *   res     Desired maximal relative residue |eta-Aw*psi|/|eta| of the
+ *           calculated solution.
+ *
+ *   mu      Value of the twisted mass in the Dirac equation.
+ *
+ *   eta     Source field. eta is unchanged on exit if psi does not
+ *           coincide with eta (which is permissible).
+ *
+ *   psi     Calculated approximate solution of the little Dirac equation.
+ *
+ *   status  If the program is able to solve the little equation to the
+ *           desired accuracy, status reports the total number of Krylov
+ *           vectors that were required for the solution. Negative values
+ *           indicate that the program failed (-1: the algorithm did not
+ *           converge, -2: the inversion of the diagonal elements of the
+ *           little Dirac operator was not safe).
+ *
+ * When status>=-1, the program returns the norm of the residue of the
+ * calculated approximate solution of the even-odd preconditioned, globally
+ * deflated little Dirac equation. No action is performed if status=-2
+ * and the program returns 1.0.
+ *
+ * The even-odd preconditioned little Dirac operator is updated if it is
+ * not up-to-date. Evidently the solver is a global program that must be
+ * called on all processes simultaneously. The required workspaces are
+ *
+ *  complex             2*nkv+1
+ *  complex_dble        3
+ *
+ * (see utils/wspace.c).
+ *
+ *******************************************************************************/
 
 #define LTL_GCR_C
 

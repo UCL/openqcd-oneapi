@@ -1,53 +1,53 @@
 
 /*******************************************************************************
-*
-* File ym_action.c
-*
-* Copyright (C) 2010-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of the Yang-Mills action using the symmetric field tensor.
-*
-* The externally accessible functions are
-*
-*   double ym_action(void)
-*     Returns the Yang-Mills action S (w/o prefactor 1/g0^2) of the
-*     double-precision gauge field, using a symmetric expression for
-*     the gauge-field tensor.
-*
-*   double ym_action_slices(double *asl)
-*     Computes the sum asl[t] of the Yang-Mills action density (w/o
-*     prefactor 1/g0^2) of the double-precision gauge field at time
-*     t=0,1,...,N0-1 (where N0=NPROC0*L0). The program returns the
-*     total action.
-*
-* Notes:
-*
-* The Yang-Mills action density s(x) is defined by
-*
-*  s(x)=(1/4)*sum_{mu,nu} [F_{mu,nu}^a(x)]^2
-*
-* where
-*
-*  F_{mu,nu}^a(x)=-2*tr{F_{mu,nu}(x)*T^a}, a=1,..,8,
-*
-* are the SU(3) components of the symmetric field tensor returned by the
-* program ftensor() [ftensor.c]. At the boundaries of the lattice (if any),
-* the action density is set to zero. The total action S is the sum of s(x)
-* over all points x with time component in the range
-*
-*  0<x0<NPROC0*L0-1        (open bc),
-*
-*  0<x0<NPROC0*L0          (SF and open-SF bc),
-*
-*  0<=x0<NPROC0*L0         (periodic bc).
-*
-* The programs in this module perform global operations and must be called
-* simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File ym_action.c
+ *
+ * Copyright (C) 2010-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of the Yang-Mills action using the symmetric field tensor.
+ *
+ * The externally accessible functions are
+ *
+ *   double ym_action(void)
+ *     Returns the Yang-Mills action S (w/o prefactor 1/g0^2) of the
+ *     double-precision gauge field, using a symmetric expression for
+ *     the gauge-field tensor.
+ *
+ *   double ym_action_slices(double *asl)
+ *     Computes the sum asl[t] of the Yang-Mills action density (w/o
+ *     prefactor 1/g0^2) of the double-precision gauge field at time
+ *     t=0,1,...,N0-1 (where N0=NPROC0*L0). The program returns the
+ *     total action.
+ *
+ * Notes:
+ *
+ * The Yang-Mills action density s(x) is defined by
+ *
+ *  s(x)=(1/4)*sum_{mu,nu} [F_{mu,nu}^a(x)]^2
+ *
+ * where
+ *
+ *  F_{mu,nu}^a(x)=-2*tr{F_{mu,nu}(x)*T^a}, a=1,..,8,
+ *
+ * are the SU(3) components of the symmetric field tensor returned by the
+ * program ftensor() [ftensor.c]. At the boundaries of the lattice (if any),
+ * the action density is set to zero. The total action S is the sum of s(x)
+ * over all points x with time component in the range
+ *
+ *  0<x0<NPROC0*L0-1        (open bc),
+ *
+ *  0<x0<NPROC0*L0          (SF and open-SF bc),
+ *
+ *  0<=x0<NPROC0*L0         (periodic bc).
+ *
+ * The programs in this module perform global operations and must be called
+ * simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define YM_ACTION_C
 

@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File su3fcts.h
-*
-* Copyright (C) 2010, 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File su3fcts.h
+ *
+ * Copyright (C) 2010, 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef SU3FCTS_H
 #define SU3FCTS_H

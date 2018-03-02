@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check7.c
-*
-* Copyright (C) 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Comparison of Dw_blk(),..,Dwhat_blk() with Dw().
-*
-*******************************************************************************/
+ *
+ * File check7.c
+ *
+ * Copyright (C) 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Comparison of Dw_blk(),..,Dwhat_blk() with Dw().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

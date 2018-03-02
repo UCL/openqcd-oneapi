@@ -1,64 +1,64 @@
 
 /*******************************************************************************
-*
-* File hmc_parms.c
-*
-* Copyright (C) 2009, 2010, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Basic HMC parameters
-*
-* The externally accessible functions are
-*
-*   hmc_parms_t set_hmc_parms(int nact,int *iact,int npf,int nmu,
-*                             double *mu,int nlv,double tau)
-*     Sets some basic parameters of the HMC algorithm. The parameters are
-*
-*       nact        Number of terms in the total action
-*
-*       iact        Indices iact[i] of the action terms (i=0,..,nact-1)
-*
-*       npf         Number of pseudo-fermion fields on which the action
-*                   depends
-*
-*       nmu         Number of twisted mass parameters on which the
-*                   pseudo-fermion actions and forces depend
-*
-*       mu          Twisted masses mu[i] (i=0,..,nmu-1)
-*
-*       nlv         Number of levels of the molecular-dynamics integrator
-*
-*       tau         Molecular-dynamics trajectory length
-*
-*     The total action must include the gauge action, but pseudo-fermion
-*     actions are optional and the momentum action is treated separately.
-*     The program returns a structure that contains the parameters listed
-*     above.
-*
-*   hmc_parms_t hmc_parms(void)
-*     Returns a structure containing the current values of the parameters
-*     listed above.
-*
-*   void print_hmc_parms(void)
-*     Prints the HMC parameters to stdout on MPI process 0.
-*
-*   void write_hmc_parms(FILE *fdat)
-*     Writes the HMC parameters to the file fdat on MPI process 0.
-*
-*   void check_hmc_parms(FILE *fdat)
-*     Compares the HMC parameters with the values stored on the file fdat
-*     on MPI process 0, assuming the latter were written to the file by
-*     the program write_hmc_parms().
-*
-* Notes:
-*
-* To ensure the consistency of the data base, the parameters must be set
-* simultaneously on all processes. The type hmc_parms_t is defined in the
-* in the file flags.h.
-*
-*******************************************************************************/
+ *
+ * File hmc_parms.c
+ *
+ * Copyright (C) 2009, 2010, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Basic HMC parameters
+ *
+ * The externally accessible functions are
+ *
+ *   hmc_parms_t set_hmc_parms(int nact,int *iact,int npf,int nmu,
+ *                             double *mu,int nlv,double tau)
+ *     Sets some basic parameters of the HMC algorithm. The parameters are
+ *
+ *       nact        Number of terms in the total action
+ *
+ *       iact        Indices iact[i] of the action terms (i=0,..,nact-1)
+ *
+ *       npf         Number of pseudo-fermion fields on which the action
+ *                   depends
+ *
+ *       nmu         Number of twisted mass parameters on which the
+ *                   pseudo-fermion actions and forces depend
+ *
+ *       mu          Twisted masses mu[i] (i=0,..,nmu-1)
+ *
+ *       nlv         Number of levels of the molecular-dynamics integrator
+ *
+ *       tau         Molecular-dynamics trajectory length
+ *
+ *     The total action must include the gauge action, but pseudo-fermion
+ *     actions are optional and the momentum action is treated separately.
+ *     The program returns a structure that contains the parameters listed
+ *     above.
+ *
+ *   hmc_parms_t hmc_parms(void)
+ *     Returns a structure containing the current values of the parameters
+ *     listed above.
+ *
+ *   void print_hmc_parms(void)
+ *     Prints the HMC parameters to stdout on MPI process 0.
+ *
+ *   void write_hmc_parms(FILE *fdat)
+ *     Writes the HMC parameters to the file fdat on MPI process 0.
+ *
+ *   void check_hmc_parms(FILE *fdat)
+ *     Compares the HMC parameters with the values stored on the file fdat
+ *     on MPI process 0, assuming the latter were written to the file by
+ *     the program write_hmc_parms().
+ *
+ * Notes:
+ *
+ * To ensure the consistency of the data base, the parameters must be set
+ * simultaneously on all processes. The type hmc_parms_t is defined in the
+ * in the file flags.h.
+ *
+ *******************************************************************************/
 
 #define HMC_PARMS_C
 

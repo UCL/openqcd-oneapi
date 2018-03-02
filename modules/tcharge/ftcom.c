@@ -1,41 +1,41 @@
 
 /*******************************************************************************
-*
-* File ftcom.c
-*
-* Copyright (C) 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Communication of the field tensor components residing at the boundaries
-* of the local lattices.
-*
-* The externally accessible functions are
-*
-*   void copy_bnd_ft(int n,u3_alg_dble *ft)
-*     Fetches the boundary values the field ft from the neighbouring MPI
-*     processes (see the notes). The boundary values at time NPROC0*L0
-*     are fetched from the field at time 0 only in the case of periodic
-*     boundary conditions.
-*
-*   void add_bnd_ft(int n,u3_alg_dble *ft)
-*     Adds the boundary values of the field ft to the field on the
-*     neighbouring MPI processes. The boundary values at time NPROC0*L0
-*     are added to the field at time 0 only in the case of periodic
-*     boundary conditions.
-*
-* Notes:
-*
-* Both communication programs assume that the field ft has the same size as
-* the n-th component of the symmetric field tensor F_{mu nu}, where n=0,..,5
-* labels the (mu,nu)-planes (0,1),(0,2),(0,3),(2,3),(3,1),(1,2). For further
-* explanations, see the files lattice/README.ftidx and tcharge/ftensor.c.
-*
-* The programs in this module perform global communications and must be
-* called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File ftcom.c
+ *
+ * Copyright (C) 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Communication of the field tensor components residing at the boundaries
+ * of the local lattices.
+ *
+ * The externally accessible functions are
+ *
+ *   void copy_bnd_ft(int n,u3_alg_dble *ft)
+ *     Fetches the boundary values the field ft from the neighbouring MPI
+ *     processes (see the notes). The boundary values at time NPROC0*L0
+ *     are fetched from the field at time 0 only in the case of periodic
+ *     boundary conditions.
+ *
+ *   void add_bnd_ft(int n,u3_alg_dble *ft)
+ *     Adds the boundary values of the field ft to the field on the
+ *     neighbouring MPI processes. The boundary values at time NPROC0*L0
+ *     are added to the field at time 0 only in the case of periodic
+ *     boundary conditions.
+ *
+ * Notes:
+ *
+ * Both communication programs assume that the field ft has the same size as
+ * the n-th component of the symmetric field tensor F_{mu nu}, where n=0,..,5
+ * labels the (mu,nu)-planes (0,1),(0,2),(0,3),(2,3),(3,1),(1,2). For further
+ * explanations, see the files lattice/README.ftidx and tcharge/ftensor.c.
+ *
+ * The programs in this module perform global communications and must be
+ * called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define FTCOM_C
 

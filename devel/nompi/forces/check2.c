@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2005, 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of prod2xv
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2005, 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of prod2xv
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,65 +1,65 @@
 
 /*******************************************************************************
-*
-* File salg.c
-*
-* Copyright (C) 2005, 2007, 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Generic linear algebra routines for single-precision spinor fields.
-*
-* The externally accessible functions are
-*
-*   complex spinor_prod(int vol,int icom,spinor *s,spinor *r)
-*     Computes the scalar product of the fields s and r.
-*
-*   float spinor_prod_re(int vol,int icom,spinor *s,spinor *r)
-*     Computes the real part of the scalar product of the fields
-*     s and r.
-*
-*   float norm_square(int vol,int icom,spinor *s)
-*     Computes the square of the norm of the field s.
-*
-*   void mulc_spinor_add(int vol,spinor *s,spinor *r,complex z)
-*     Replaces the field s by s+z*r.
-*
-*   void mulr_spinor_add(int vol,spinor *s,spinor *r,float c)
-*     Replaces the field s by s+c*r.
-*
-*   void project(int vol,int icom,spinor *s,spinor *r)
-*     Replaces the field s by s-(r,s)*r.
-*
-*   void scale(int vol,float c,spinor *s)
-*     Replaces the field s by c*s.
-*
-*   float normalize(int vol,int icom,spinor *s)
-*     Replaces the field s by s/||s|| and returns the norm ||s||.
-*
-*   void rotate(int vol,int n,spinor **ppk,complex *v)
-*     Replaces the fields pk[] by sum_j pj*v[n*j+k] where 0<=k,j<n
-*     and pk=ppk[k].
-*
-*   void mulg5(int vol,spinor *s)
-*     Multiplies the field s with gamma_5.
-*
-*   void mulmg5(int vol,spinor *s)
-*     Multiplies the field s with -gamma_5.
-*
-* Notes:
-*
-* All these programs act on arrays of spinor fields whose base address
-* is passed through the arguments. The length of the arrays is specified
-* by the parameter vol. Scalar products are globally summed if the
-* parameter icom is equal to 1. In this case, the calculated values are
-* guaranteed to be exactly the same on all processes.
-*
-* The programs perform no communications except in the case of the scalar
-* products if these are globally summed. If SSE (AVX) instructions are used,
-* the spinor fields must be aligned to a 16 (32) byte boundary.
-*
-*******************************************************************************/
+ *
+ * File salg.c
+ *
+ * Copyright (C) 2005, 2007, 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Generic linear algebra routines for single-precision spinor fields.
+ *
+ * The externally accessible functions are
+ *
+ *   complex spinor_prod(int vol,int icom,spinor *s,spinor *r)
+ *     Computes the scalar product of the fields s and r.
+ *
+ *   float spinor_prod_re(int vol,int icom,spinor *s,spinor *r)
+ *     Computes the real part of the scalar product of the fields
+ *     s and r.
+ *
+ *   float norm_square(int vol,int icom,spinor *s)
+ *     Computes the square of the norm of the field s.
+ *
+ *   void mulc_spinor_add(int vol,spinor *s,spinor *r,complex z)
+ *     Replaces the field s by s+z*r.
+ *
+ *   void mulr_spinor_add(int vol,spinor *s,spinor *r,float c)
+ *     Replaces the field s by s+c*r.
+ *
+ *   void project(int vol,int icom,spinor *s,spinor *r)
+ *     Replaces the field s by s-(r,s)*r.
+ *
+ *   void scale(int vol,float c,spinor *s)
+ *     Replaces the field s by c*s.
+ *
+ *   float normalize(int vol,int icom,spinor *s)
+ *     Replaces the field s by s/||s|| and returns the norm ||s||.
+ *
+ *   void rotate(int vol,int n,spinor **ppk,complex *v)
+ *     Replaces the fields pk[] by sum_j pj*v[n*j+k] where 0<=k,j<n
+ *     and pk=ppk[k].
+ *
+ *   void mulg5(int vol,spinor *s)
+ *     Multiplies the field s with gamma_5.
+ *
+ *   void mulmg5(int vol,spinor *s)
+ *     Multiplies the field s with -gamma_5.
+ *
+ * Notes:
+ *
+ * All these programs act on arrays of spinor fields whose base address
+ * is passed through the arguments. The length of the arrays is specified
+ * by the parameter vol. Scalar products are globally summed if the
+ * parameter icom is equal to 1. In this case, the calculated values are
+ * guaranteed to be exactly the same on all processes.
+ *
+ * The programs perform no communications except in the case of the scalar
+ * products if these are globally summed. If SSE (AVX) instructions are used,
+ * the spinor fields must be aligned to a 16 (32) byte boundary.
+ *
+ *******************************************************************************/
 
 #define SALG_C
 

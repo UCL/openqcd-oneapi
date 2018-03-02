@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File vflds.h
-*
-* Copyright (C) 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File vflds.h
+ *
+ * Copyright (C) 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef VFLDS_H
 #define VFLDS_H

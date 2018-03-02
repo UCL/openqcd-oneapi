@@ -1,78 +1,78 @@
 
 /*******************************************************************************
-*
-* File dfl_geometry.c
-*
-* Copyright (C) 2007, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Geometry of the DFL_BLOCKS block grid.
-*
-* The externally accessible functions are
-*
-*   dfl_grid_t dfl_geometry(void)
-*     Returns a structure containing the index arrays that describe the
-*     geometry of the DFL_BLOCKS block grid (see the notes).
-*
-* Notes:
-*
-* The blocks in the DFL_BLOCKS grid form a hypercubic lattice whose geometry
-* is described by a structure of type dfl_grid_t. The elements of this
-* structure are:
-*
-*  nb              Number of blocks in the local lattice.
-*
-*  nbb             Number of exterior boundary blocks of the local
-*                  block lattice.
-*
-*  inn[ix][ifc]    Index of the nearest neighbour block in direction ifc
-*                  of the block with index ix (ix=0,..,nb-1, ifc=0,..,7).
-*                  The ordering of the directions ifc is -0,+0,..,-3,+3.
-*
-*  idx[ix]         Position of the block with index ix in the array of
-*                  blocks returned by blk_list(). Note that ix=idx[ib]
-*                  if ib=idx[ix].
-*
-*  ipp[ix]         Index of the nearest neighbour (partner block) in the
-*                  local lattice of the block on the exterior boundary
-*                  with index nb+ix (ix=0,..,nbb-1).
-*
-*  map[ix]         Index of the partner block on the opposite face of the
-*                  local lattice of the block on the exterior boundary
-*                  with index nb+ix (ix=0,..,nbb-1).
-*
-*  nbbe[ifc]       Number of even (odd) blocks on the exterior boundary
-*  nbbo[ifc]       in direction ifc.
-*
-*  obbe[ifc]       Offset of the index of the first even (odd) block on
-*  obbo[ifc]       the exterior boundary in direction ifc. The offsets
-*                  are given relative to the first block on the boundary.
-*
-* The blocks in the local lattice are ordered according to their Cartesian
-* coordinates (n0,n1,n2,n3) in the total block lattice. First come all even
-* blocks (those with (n0+n1+n2+n3)=0 mod 2) and then the odd ones. Within
-* each of these two groups of blocks, the ordering is lexicographic, i.e.
-* the block with coordinates n comes before the block with coordinates m if
-*
-*   (n0<m0) or ((n0=m0)&&(n1<m1)) or ...
-*
-* This ordering coincides with the one of the blocks in the array returned
-* by blk_list(DFL_BLOCKS,&nb,&isw) if isw=0, while if isw=1 the even and odd
-* blocks are swapped. The blocks on the exterior boundaries of the local
-* block lattice are ordered in the same way.
-*
-* The grid geometry and the calculated index arrays are independent of the
-* chosen boundary conditions for the global fields.
-*
-* The program dfl_geometry() obtains the block size from the parameter data
-* base (see flags/dfl_parms.c), but the DFL_BLOCKS block grid does not need
-* to be allocated when the program is called for the first time. Since some
-* communication may be involved, the program must be called on MPI processes
-* simultaneously.
-*
-*******************************************************************************/
+ *
+ * File dfl_geometry.c
+ *
+ * Copyright (C) 2007, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Geometry of the DFL_BLOCKS block grid.
+ *
+ * The externally accessible functions are
+ *
+ *   dfl_grid_t dfl_geometry(void)
+ *     Returns a structure containing the index arrays that describe the
+ *     geometry of the DFL_BLOCKS block grid (see the notes).
+ *
+ * Notes:
+ *
+ * The blocks in the DFL_BLOCKS grid form a hypercubic lattice whose geometry
+ * is described by a structure of type dfl_grid_t. The elements of this
+ * structure are:
+ *
+ *  nb              Number of blocks in the local lattice.
+ *
+ *  nbb             Number of exterior boundary blocks of the local
+ *                  block lattice.
+ *
+ *  inn[ix][ifc]    Index of the nearest neighbour block in direction ifc
+ *                  of the block with index ix (ix=0,..,nb-1, ifc=0,..,7).
+ *                  The ordering of the directions ifc is -0,+0,..,-3,+3.
+ *
+ *  idx[ix]         Position of the block with index ix in the array of
+ *                  blocks returned by blk_list(). Note that ix=idx[ib]
+ *                  if ib=idx[ix].
+ *
+ *  ipp[ix]         Index of the nearest neighbour (partner block) in the
+ *                  local lattice of the block on the exterior boundary
+ *                  with index nb+ix (ix=0,..,nbb-1).
+ *
+ *  map[ix]         Index of the partner block on the opposite face of the
+ *                  local lattice of the block on the exterior boundary
+ *                  with index nb+ix (ix=0,..,nbb-1).
+ *
+ *  nbbe[ifc]       Number of even (odd) blocks on the exterior boundary
+ *  nbbo[ifc]       in direction ifc.
+ *
+ *  obbe[ifc]       Offset of the index of the first even (odd) block on
+ *  obbo[ifc]       the exterior boundary in direction ifc. The offsets
+ *                  are given relative to the first block on the boundary.
+ *
+ * The blocks in the local lattice are ordered according to their Cartesian
+ * coordinates (n0,n1,n2,n3) in the total block lattice. First come all even
+ * blocks (those with (n0+n1+n2+n3)=0 mod 2) and then the odd ones. Within
+ * each of these two groups of blocks, the ordering is lexicographic, i.e.
+ * the block with coordinates n comes before the block with coordinates m if
+ *
+ *   (n0<m0) or ((n0=m0)&&(n1<m1)) or ...
+ *
+ * This ordering coincides with the one of the blocks in the array returned
+ * by blk_list(DFL_BLOCKS,&nb,&isw) if isw=0, while if isw=1 the even and odd
+ * blocks are swapped. The blocks on the exterior boundaries of the local
+ * block lattice are ordered in the same way.
+ *
+ * The grid geometry and the calculated index arrays are independent of the
+ * chosen boundary conditions for the global fields.
+ *
+ * The program dfl_geometry() obtains the block size from the parameter data
+ * base (see flags/dfl_parms.c), but the DFL_BLOCKS block grid does not need
+ * to be allocated when the program is called for the first time. Since some
+ * communication may be involved, the program must be called on MPI processes
+ * simultaneously.
+ *
+ *******************************************************************************/
 
 #define DFL_GEOMETRY_C
 

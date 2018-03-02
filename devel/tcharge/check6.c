@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check6.c
-*
-* Copyright (C) 2010, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the program ym_action_slices().
-*
-*******************************************************************************/
+ *
+ * File check6.c
+ *
+ * Copyright (C) 2010, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the program ym_action_slices().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2005, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Consistency checks on the global index arrays cpr,...,map
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2005, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Consistency checks on the global index arrays cpr,...,map
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

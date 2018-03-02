@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check10.c
-*
-* Copyright (C) 2012, 2013, 2016 Martin Luescher, Stefan Schaefer
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of force4() and action4().
-*
-*******************************************************************************/
+ *
+ * File check10.c
+ *
+ * Copyright (C) 2012, 2013, 2016 Martin Luescher, Stefan Schaefer
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of force4() and action4().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

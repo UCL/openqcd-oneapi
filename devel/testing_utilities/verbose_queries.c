@@ -109,8 +109,7 @@ char const *bool_to_char_colour(int bool_like, int expected)
   return text_buffer;
 }
 
-void test_flag_verbose(int test_id, query_t qflag, int expected,
-                       int is_verbose)
+void test_flag_verbose(int test_id, query_t qflag, int expected, int is_verbose)
 {
   int query_result = query_flags(qflag);
 

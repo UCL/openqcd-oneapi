@@ -1,17 +1,17 @@
 
 /*******************************************************************************
-*
-* File su3.h
-*
-* Copyright (C) 2005, 2009, 2011, 2013 Martin Luescher, Filippo Palombi
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Type definitions and macros for SU(3) matrices, SU(3) vectors and Dirac
-* spinors
-*
-*******************************************************************************/
+ *
+ * File su3.h
+ *
+ * Copyright (C) 2005, 2009, 2011, 2013 Martin Luescher, Filippo Palombi
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Type definitions and macros for SU(3) matrices, SU(3) vectors and Dirac
+ * spinors
+ *
+ *******************************************************************************/
 
 #ifndef SU3_H
 #define SU3_H
@@ -111,19 +111,19 @@ typedef struct
 } u3_alg_dble;
 
 /*******************************************************************************
-*
-* The following macros are the same for single and double precision types
-*
-* Depending on the macro, arguments are variables of type su3_vector and su3
-* (or su3_vector_dble and su3_dble)
-*
-*******************************************************************************/
+ *
+ * The following macros are the same for single and double precision types
+ *
+ * Depending on the macro, arguments are variables of type su3_vector and su3
+ * (or su3_vector_dble and su3_dble)
+ *
+ *******************************************************************************/
 
 /*
-* r.c1=c*s.c1 (c real)
-* r.c2=c*s.c2
-* r.c3=c*s.c3
-*/
+ * r.c1=c*s.c1 (c real)
+ * r.c2=c*s.c2
+ * r.c3=c*s.c3
+ */
 
 #define _vector_mul(r, c, s)                                                   \
   (r).c1.re = (c) * (s).c1.re;                                                 \
@@ -134,10 +134,10 @@ typedef struct
   (r).c3.im = (c) * (s).c3.im
 
 /*
-* r.c1=i*c*s.c1 (c real)
-* r.c2=i*c*s.c2
-* r.c3=i*c*s.c3
-*/
+ * r.c1=i*c*s.c1 (c real)
+ * r.c2=i*c*s.c2
+ * r.c3=i*c*s.c3
+ */
 
 #define _vector_imul(r, c, s)                                                  \
   (r).c1.re = -(c) * (s).c1.im;                                                \
@@ -148,10 +148,10 @@ typedef struct
   (r).c3.im = (c) * (s).c3.re
 
 /*
-* r.c1=c*s.c1 (c complex)
-* r.c2=c*s.c2
-* r.c3=c*s.c3
-*/
+ * r.c1=c*s.c1 (c complex)
+ * r.c2=c*s.c2
+ * r.c3=c*s.c3
+ */
 
 #define _vector_mulc(r, c, s)                                                  \
   (r).c1.re = (c).re * (s).c1.re - (c).im * (s).c1.im;                         \
@@ -162,10 +162,10 @@ typedef struct
   (r).c3.im = (c).re * (s).c3.im + (c).im * (s).c3.re
 
 /*
-* r.c1=s1.c1+s2.c1
-* r.c2=s1.c2+s2.c2
-* r.c3=s1.c3+s2.c3
-*/
+ * r.c1=s1.c1+s2.c1
+ * r.c2=s1.c2+s2.c2
+ * r.c3=s1.c3+s2.c3
+ */
 
 #define _vector_add(r, s1, s2)                                                 \
   (r).c1.re = (s1).c1.re + (s2).c1.re;                                         \
@@ -176,10 +176,10 @@ typedef struct
   (r).c3.im = (s1).c3.im + (s2).c3.im
 
 /*
-* r.c1=s1.c1-s2.c1
-* r.c2=s1.c2-s2.c2
-* r.c3=s1.c3-s2.c3
-*/
+ * r.c1=s1.c1-s2.c1
+ * r.c2=s1.c2-s2.c2
+ * r.c3=s1.c3-s2.c3
+ */
 
 #define _vector_sub(r, s1, s2)                                                 \
   (r).c1.re = (s1).c1.re - (s2).c1.re;                                         \
@@ -190,10 +190,10 @@ typedef struct
   (r).c3.im = (s1).c3.im - (s2).c3.im
 
 /*
-* r.c1=s1.c1+i*s2.c1
-* r.c2=s1.c2+i*s2.c2
-* r.c3=s1.c3+i*s2.c3
-*/
+ * r.c1=s1.c1+i*s2.c1
+ * r.c2=s1.c2+i*s2.c2
+ * r.c3=s1.c3+i*s2.c3
+ */
 
 #define _vector_i_add(r, s1, s2)                                               \
   (r).c1.re = (s1).c1.re - (s2).c1.im;                                         \
@@ -204,10 +204,10 @@ typedef struct
   (r).c3.im = (s1).c3.im + (s2).c3.re
 
 /*
-* r.c1=s1.c1+i*s2.c1
-* r.c2=s1.c2+i*s2.c2
-* r.c3=s1.c3+i*s2.c3
-*/
+ * r.c1=s1.c1+i*s2.c1
+ * r.c2=s1.c2+i*s2.c2
+ * r.c3=s1.c3+i*s2.c3
+ */
 
 #define _vector_i_sub(r, s1, s2)                                               \
   (r).c1.re = (s1).c1.re + (s2).c1.im;                                         \
@@ -218,10 +218,10 @@ typedef struct
   (r).c3.im = (s1).c3.im - (s2).c3.re
 
 /*
-* r.c1+=s.c1
-* r.c2+=s.c2
-* r.c3+=s.c3
-*/
+ * r.c1+=s.c1
+ * r.c2+=s.c2
+ * r.c3+=s.c3
+ */
 
 #define _vector_add_assign(r, s)                                               \
   (r).c1.re += (s).c1.re;                                                      \
@@ -232,10 +232,10 @@ typedef struct
   (r).c3.im += (s).c3.im
 
 /*
-* r.c1-=s.c1
-* r.c2-=s.c2
-* r.c3-=s.c3
-*/
+ * r.c1-=s.c1
+ * r.c2-=s.c2
+ * r.c3-=s.c3
+ */
 
 #define _vector_sub_assign(r, s)                                               \
   (r).c1.re -= (s).c1.re;                                                      \
@@ -246,10 +246,10 @@ typedef struct
   (r).c3.im -= (s).c3.im
 
 /*
-* r.c1+=i*s.c1
-* r.c2+=i*s.c2
-* r.c3+=i*s.c3
-*/
+ * r.c1+=i*s.c1
+ * r.c2+=i*s.c2
+ * r.c3+=i*s.c3
+ */
 
 #define _vector_i_add_assign(r, s)                                             \
   (r).c1.re -= (s).c1.im;                                                      \
@@ -260,10 +260,10 @@ typedef struct
   (r).c3.im += (s).c3.re
 
 /*
-* r.c1-=i*s.c1
-* r.c2-=i*s.c2
-* r.c3-=i*s.c3
-*/
+ * r.c1-=i*s.c1
+ * r.c2-=i*s.c2
+ * r.c3-=i*s.c3
+ */
 
 #define _vector_i_sub_assign(r, s)                                             \
   (r).c1.re += (s).c1.im;                                                      \
@@ -274,26 +274,26 @@ typedef struct
   (r).c3.im -= (s).c3.re
 
 /*
-* Real part of the scalar product (r,s)
-*/
+ * Real part of the scalar product (r,s)
+ */
 
 #define _vector_prod_re(r, s)                                                  \
   (r).c1.re *(s).c1.re + (r).c1.im *(s).c1.im + (r).c2.re *(s).c2.re +         \
       (r).c2.im *(s).c2.im + (r).c3.re *(s).c3.re + (r).c3.im *(s).c3.im
 
 /*
-* Imaginary part of the scalar product (r,s)
-*/
+ * Imaginary part of the scalar product (r,s)
+ */
 
 #define _vector_prod_im(r, s)                                                  \
   (r).c1.re *(s).c1.im - (r).c1.im *(s).c1.re + (r).c2.re *(s).c2.im -         \
       (r).c2.im *(s).c2.re + (r).c3.re *(s).c3.im - (r).c3.im *(s).c3.re
 
 /*
-* r.c1+=c*s.c1 (c real)
-* r.c2+=c*s.c2
-* r.c3+=c*s.c3
-*/
+ * r.c1+=c*s.c1 (c real)
+ * r.c2+=c*s.c2
+ * r.c3+=c*s.c3
+ */
 
 #define _vector_mulr_assign(r, c, s)                                           \
   (r).c1.re += (c) * (s).c1.re;                                                \
@@ -304,10 +304,10 @@ typedef struct
   (r).c3.im += (c) * (s).c3.im
 
 /*
-* r.c1+=i*c*s.c1 (c real)
-* r.c2+=i*c*s.c2
-* r.c3+=i*c*s.c3
-*/
+ * r.c1+=i*c*s.c1 (c real)
+ * r.c2+=i*c*s.c2
+ * r.c3+=i*c*s.c3
+ */
 
 #define _vector_mulir_assign(r, c, s)                                          \
   (r).c1.re -= (c) * (s).c1.im;                                                \
@@ -318,10 +318,10 @@ typedef struct
   (r).c3.im += (c) * (s).c3.re
 
 /*
-* r.c1+=z*s.c1 (z of type complex)
-* r.c2+=z*s.c2
-* r.c3+=z*s.c3
-*/
+ * r.c1+=z*s.c1 (z of type complex)
+ * r.c2+=z*s.c2
+ * r.c3+=z*s.c3
+ */
 
 #define _vector_mulc_assign(r, z, s)                                           \
   (r).c1.re += ((z).re * (s).c1.re - (z).im * (s).c1.im);                      \
@@ -332,10 +332,10 @@ typedef struct
   (r).c3.im += ((z).re * (s).c3.im + (z).im * (s).c3.re)
 
 /*
-* r.c1-=z*s.c1 (z of type complex)
-* r.c2-=z*s.c2
-* r.c3-=z*s.c3
-*/
+ * r.c1-=z*s.c1 (z of type complex)
+ * r.c2-=z*s.c2
+ * r.c3-=z*s.c3
+ */
 
 #define _vector_project(r, z, s)                                               \
   (r).c1.re -= ((z).re * (s).c1.re - (z).im * (s).c1.im);                      \
@@ -346,10 +346,10 @@ typedef struct
   (r).c3.im -= ((z).re * (s).c3.im + (z).im * (s).c3.re)
 
 /*
-* r.c1=c*r.c1+s.c1 (c real)
-* r.c2=c*r.c2+s.c2
-* r.c3=c*r.c3+s.c3
-*/
+ * r.c1=c*r.c1+s.c1 (c real)
+ * r.c2=c*r.c2+s.c2
+ * r.c3=c*r.c3+s.c3
+ */
 
 #define _vector_mulr_add(r, c, s)                                              \
   (r).c1.re = (c) * (r).c1.re + (s).c1.re;                                     \
@@ -360,10 +360,10 @@ typedef struct
   (r).c3.im = (c) * (r).c3.im + (s).c3.im
 
 /*
-* r.c1=cr*r.c1+cs*s.c1 (cr,cs real)
-* r.c2=cr*r.c2+cs*s.c2
-* r.c3=cr*r.c3+cs*s.c3
-*/
+ * r.c1=cr*r.c1+cs*s.c1 (cr,cs real)
+ * r.c2=cr*r.c2+cs*s.c2
+ * r.c3=cr*r.c3+cs*s.c3
+ */
 
 #define _vector_combine(r, s, cr, cs)                                          \
   (r).c1.re = (cr) * (r).c1.re + (cs) * (s).c1.re;                             \
@@ -374,10 +374,10 @@ typedef struct
   (r).c3.im = (cr) * (r).c3.im + (cs) * (s).c3.im
 
 /*
-* v.c1=(w.c2*z.c3-w.c3*z.c2)^*
-* v.c2=(w.c3*z.c1-w.c1*z.c3)^*
-* v.c3=(w.c1*z.c2-w.c2*z.c1)^*
-*/
+ * v.c1=(w.c2*z.c3-w.c3*z.c2)^*
+ * v.c2=(w.c3*z.c1-w.c1*z.c3)^*
+ * v.c3=(w.c1*z.c2-w.c2*z.c1)^*
+ */
 
 #define _vector_cross_prod(v, w, z)                                            \
   (v).c1.re = (w).c2.re * (z).c3.re - (w).c2.im * (z).c3.im -                  \
@@ -394,12 +394,12 @@ typedef struct
               (w).c1.re * (z).c2.im - (w).c1.im * (z).c2.re
 
 /*
-* SU(3) matrix u times SU(3) vector s
-*
-* r.c1=(u*s).c1
-* r.c2=(u*s).c2
-* r.c3=(u*s).c3
-*/
+ * SU(3) matrix u times SU(3) vector s
+ *
+ * r.c1=(u*s).c1
+ * r.c2=(u*s).c2
+ * r.c3=(u*s).c3
+ */
 
 #define _su3_multiply(r, u, s)                                                 \
   (r).c1.re = (u).c11.re * (s).c1.re - (u).c11.im * (s).c1.im +                \
@@ -422,12 +422,12 @@ typedef struct
               (u).c33.re * (s).c3.im + (u).c33.im * (s).c3.re
 
 /*
-* SU(3) matrix u^dagger times SU(3) vector s
-*
-* r.c1=(u^dagger*s).c1
-* r.c2=(u^dagger*s).c2
-* r.c3=(u^dagger*s).c3
-*/
+ * SU(3) matrix u^dagger times SU(3) vector s
+ *
+ * r.c1=(u^dagger*s).c1
+ * r.c2=(u^dagger*s).c2
+ * r.c3=(u^dagger*s).c3
+ */
 
 #define _su3_inverse_multiply(r, u, s)                                         \
   (r).c1.re = (u).c11.re * (s).c1.re + (u).c11.im * (s).c1.im +                \
@@ -450,16 +450,16 @@ typedef struct
               (u).c33.re * (s).c3.im - (u).c33.im * (s).c3.re
 
 /*******************************************************************************
-*
-* Macros for SU(3) matrices
-*
-* Arguments are variables of type su3
-*
-*******************************************************************************/
+ *
+ * Macros for SU(3) matrices
+ *
+ * Arguments are variables of type su3
+ *
+ *******************************************************************************/
 
 /*
-* u=v^dagger
-*/
+ * u=v^dagger
+ */
 
 #define _su3_dagger(u, v)                                                      \
   (u).c11.re = (v).c11.re;                                                     \
@@ -482,8 +482,8 @@ typedef struct
   (u).c33.im = -(v).c33.im
 
 /*
-* u=v*w
-*/
+ * u=v*w
+ */
 
 #define _su3_times_su3(u, v, w)                                                \
   (u).c11.re = (v).c11.re * (w).c11.re - (v).c11.im * (w).c11.im +             \
@@ -542,14 +542,14 @@ typedef struct
                (v).c33.re * (w).c33.im + (v).c33.im * (w).c33.re
 
 /*******************************************************************************
-*
-* Macros for variables of type su3_alg
-*
-*******************************************************************************/
+ *
+ * Macros for variables of type su3_alg
+ *
+ *******************************************************************************/
 
 /*
-* r+=s
-*/
+ * r+=s
+ */
 
 #define _su3_alg_add_assign(r, s)                                              \
   (r).c1 += (s).c1;                                                            \
@@ -562,8 +562,8 @@ typedef struct
   (r).c8 += (s).c8
 
 /*
-* r-=s
-*/
+ * r-=s
+ */
 
 #define _su3_alg_sub_assign(r, s)                                              \
   (r).c1 -= (s).c1;                                                            \
@@ -576,8 +576,8 @@ typedef struct
   (r).c8 -= (s).c8
 
 /*
-* s*=c, c real
-*/
+ * s*=c, c real
+ */
 
 #define _su3_alg_mul_assign(s, c)                                              \
   (s).c1 *= (c);                                                               \
@@ -590,8 +590,8 @@ typedef struct
   (s).c8 *= (c)
 
 /*
-* r+=c*s, c real
-*/
+ * r+=c*s, c real
+ */
 
 #define _su3_alg_mul_add_assign(r, c, s)                                       \
   (r).c1 += (c) * (s).c1;                                                      \
@@ -604,8 +604,8 @@ typedef struct
   (r).c8 += (c) * (s).c8
 
 /*
-* r-=c*s, c real
-*/
+ * r-=c*s, c real
+ */
 
 #define _su3_alg_mul_sub_assign(r, c, s)                                       \
   (r).c1 -= (c) * (s).c1;                                                      \
@@ -618,14 +618,14 @@ typedef struct
   (r).c8 -= (c) * (s).c8
 
 /*******************************************************************************
-*
-* Macros for variables of type u3_alg
-*
-*******************************************************************************/
+ *
+ * Macros for variables of type u3_alg
+ *
+ *******************************************************************************/
 
 /*
-* r=c*(u+v)
-*/
+ * r=c*(u+v)
+ */
 
 #define _u3_alg_mul_add(r, c, u, v)                                            \
   (r).c1 = (c) * ((u).c1 + (v).c1);                                            \
@@ -639,8 +639,8 @@ typedef struct
   (r).c9 = (c) * ((u).c9 + (v).c9)
 
 /*
-* r=c*(u-v)
-*/
+ * r=c*(u-v)
+ */
 
 #define _u3_alg_mul_sub(r, c, u, v)                                            \
   (r).c1 = (c) * ((u).c1 - (v).c1);                                            \

@@ -1,34 +1,34 @@
 
 /*******************************************************************************
-*
-* File ranlux_site.c
-*
-* Based on ranlux.c
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*   void start_ranlux(int level,int seed)
-*     Initializes the random number generators ranlxs and ranlxd on all
-*     sites in different ways. The luxury level should be 0 (recommended)
-*     or 1 (exceptional) and the seed can be any positive integer less than
-*     or equal to INT_MAX - n_global_sites. An error occurs if the seed is
-*     not in this range.
-*
-*   void ranlxs_site(float r[], int n, int x)
-*     Computes the next n single-precision random numbers and for site x
-*     assigns them to the elements r[0],...,r[n-1] of the array r[]
-*     NOTE: This funcion overwrites the state of the standard generator.
-*           You should not use both ranlxs() and ranlxs_site() in the same run.
-*
-*   void ranlxd_site(float r[], int n, int x)
-*     Computes the next n double-precision random numbers and for site x
-*     assigns them to the elements r[0],...,r[n-1] of the array r[]
-*     NOTE: This funcion overwrites the state of the standard generator.
-*           You should not use both ranlxd() and ranlxd_site() in the same run.
-*
-*
-*******************************************************************************/
+ *
+ * File ranlux_site.c
+ *
+ * Based on ranlux.c
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *   void start_ranlux(int level,int seed)
+ *     Initializes the random number generators ranlxs and ranlxd on all
+ *     sites in different ways. The luxury level should be 0 (recommended)
+ *     or 1 (exceptional) and the seed can be any positive integer less than
+ *     or equal to INT_MAX - n_global_sites. An error occurs if the seed is
+ *     not in this range.
+ *
+ *   void ranlxs_site(float r[], int n, int x)
+ *     Computes the next n single-precision random numbers and for site x
+ *     assigns them to the elements r[0],...,r[n-1] of the array r[]
+ *     NOTE: This funcion overwrites the state of the standard generator.
+ *           You should not use both ranlxs() and ranlxs_site() in the same run.
+ *
+ *   void ranlxd_site(float r[], int n, int x)
+ *     Computes the next n double-precision random numbers and for site x
+ *     assigns them to the elements r[0],...,r[n-1] of the array r[]
+ *     NOTE: This funcion overwrites the state of the standard generator.
+ *           You should not use both ranlxd() and ranlxd_site() in the same run.
+ *
+ *
+ *******************************************************************************/
 
 #define RANLUX_C
 

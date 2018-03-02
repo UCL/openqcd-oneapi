@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check3.c
-*
-* Copyright (C) 2005, 2008, 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Hermiticity of Dw() and comparison with Dwee(),..,Dwhat().
-*
-*******************************************************************************/
+ *
+ * File check3.c
+ *
+ * Copyright (C) 2005, 2008, 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Hermiticity of Dw() and comparison with Dwee(),..,Dwhat().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

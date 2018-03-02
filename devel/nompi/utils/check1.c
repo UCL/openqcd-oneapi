@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2007, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Test of the endianness and byte swapping programs
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2007, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Test of the endianness and byte swapping programs
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

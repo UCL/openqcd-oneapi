@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File time1.c
-*
-* Copyright (C) 2005, 2008-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Timing of plaq_frc(), sw_frc() and hop_frc().
-*
-*******************************************************************************/
+ *
+ * File time1.c
+ *
+ * Copyright (C) 2005, 2008-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of plaq_frc(), sw_frc() and hop_frc().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

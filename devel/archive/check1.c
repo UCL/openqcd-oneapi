@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2005, 2007, 2010-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Writing and reading gauge configurations.
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2005, 2007, 2010-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Writing and reading gauge configurations.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

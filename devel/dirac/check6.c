@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check6.c
-*
-* Copyright (C) 2005, 2008, 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Hermiticity of Dw_dble() and comparison with Dwee_dble(),..,Dwhat_dble().
-*
-*******************************************************************************/
+ *
+ * File check6.c
+ *
+ * Copyright (C) 2005, 2008, 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Hermiticity of Dw_dble() and comparison with Dwee_dble(),..,Dwhat_dble().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

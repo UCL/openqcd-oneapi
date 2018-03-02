@@ -1,55 +1,55 @@
 
 /*******************************************************************************
-*
-* File blk_grid.c
-*
-* Copyright (C) 2005, 2007, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Block grid allocation.
-*
-* The externally accessible functions are
-*
-*   void alloc_bgr(blk_grid_t grid)
-*     Allocates the specified block grid. The block array and the block
-*     fields are put in the static memory of this module and are properly
-*     initialized.
-*
-*   block_t *blk_list(blk_grid_t grid,int *nb,int *isw)
-*     Returns the pointer to the block array of the specified grid. The
-*     number of blocks on the local lattice is assigned to nb and isw is
-*     set to 0 or 1 depending on whether the first block is black or white
-*     (by definition it is black on the first process). If the block grid
-*     is not allocated, the program returns NULL and sets nb and isw to 0.
-*
-* Notes:
-*
-* The block sizes bs[4] and other parameters of the specified block grid
-* are obtained from the parameter data base. These and the lattice sizes
-* must be such that the lattice can be covered by non-overlapping blocks.
-* Moreover, the number of blocks in each direction must be even and the
-* local lattices must contain an even number of blocks. This ensures that
-* the block grid can be chessboard-coloured and that the number of blocks
-* in the local lattice is the same for both colours.
-*
-* On all processes, the blocks at a given position in the array of blocks
-* returned by blk_list() have the same position in the local lattice. The
-* blocks are ordered such that the first half of them have the same colour.
-* For a given colour, the blocks are ordered according to their index
-*
-*   n[3]+nbl[3]*n[2]+nbl[2]*nbl[3]*n[1]+nbl[1]*nbl[2]*nbl[3]*n[0],
-*
-* where n[mu]=bo[mu]/bs[mu] are the Cartesian coordinates of the block in
-* the block grid and nbl[mu] denotes the numbers of blocks in direction mu.
-* All blocks have allocated boundaries and the protection flag set.
-*
-* The program alloc_bgr() involves communications and must be called on all
-* processes simultaneously with the same parameters. A given block grid can
-* be allocated only once.
-*
-*******************************************************************************/
+ *
+ * File blk_grid.c
+ *
+ * Copyright (C) 2005, 2007, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Block grid allocation.
+ *
+ * The externally accessible functions are
+ *
+ *   void alloc_bgr(blk_grid_t grid)
+ *     Allocates the specified block grid. The block array and the block
+ *     fields are put in the static memory of this module and are properly
+ *     initialized.
+ *
+ *   block_t *blk_list(blk_grid_t grid,int *nb,int *isw)
+ *     Returns the pointer to the block array of the specified grid. The
+ *     number of blocks on the local lattice is assigned to nb and isw is
+ *     set to 0 or 1 depending on whether the first block is black or white
+ *     (by definition it is black on the first process). If the block grid
+ *     is not allocated, the program returns NULL and sets nb and isw to 0.
+ *
+ * Notes:
+ *
+ * The block sizes bs[4] and other parameters of the specified block grid
+ * are obtained from the parameter data base. These and the lattice sizes
+ * must be such that the lattice can be covered by non-overlapping blocks.
+ * Moreover, the number of blocks in each direction must be even and the
+ * local lattices must contain an even number of blocks. This ensures that
+ * the block grid can be chessboard-coloured and that the number of blocks
+ * in the local lattice is the same for both colours.
+ *
+ * On all processes, the blocks at a given position in the array of blocks
+ * returned by blk_list() have the same position in the local lattice. The
+ * blocks are ordered such that the first half of them have the same colour.
+ * For a given colour, the blocks are ordered according to their index
+ *
+ *   n[3]+nbl[3]*n[2]+nbl[2]*nbl[3]*n[1]+nbl[1]*nbl[2]*nbl[3]*n[0],
+ *
+ * where n[mu]=bo[mu]/bs[mu] are the Cartesian coordinates of the block in
+ * the block grid and nbl[mu] denotes the numbers of blocks in direction mu.
+ * All blocks have allocated boundaries and the protection flag set.
+ *
+ * The program alloc_bgr() involves communications and must be called on all
+ * processes simultaneously with the same parameters. A given block grid can
+ * be allocated only once.
+ *
+ *******************************************************************************/
 
 #define BLK_GRID_C
 

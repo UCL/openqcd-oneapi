@@ -1,63 +1,63 @@
 
 /*******************************************************************************
-*
-* File Pbnd.c
-*
-* Copyright (C) 2005, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Generic programs for the projector theta to the exterior boundary of a
-* block of lattice points (version for single-precision fields)
-*
-* The following are arrays of functions indexed by the face number
-* ifc=0,..,7
-*
-*   void (*assign_s2w[8])(int *imb,int vol,spinor *s,weyl *r)
-*     Applies the projector theta[ifc] to the spinor s[imb[ix]],
-*     ix=0,..,vol-1, and assigns the result to the weyl spinor r[ix].
-*
-*   void (*add_assign_w2s[8])(int *imb,int vol,weyl *s,spinor *r)
-*     Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor
-*     psi satisfying theta[ifc]*psi=psi and adds psi to r[imb[ix]].
-*
-*   void (*sub_assign_w2s[8])(int *imb,int vol,weyl *s,spinor *r)
-*     Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor
-*     psi satisfying theta[ifc]*psi=psi and subtracts psi from r[imb[ix]].
-*
-*   void (*mulg5_sub_assign_w2s[8])(int *imb,int vol,weyl *s,spinor *r)
-*     Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor
-*     psi satisfying theta[ifc]*psi=psi and subtracts gamma5*psi from
-*     r[imb[ix]].
-*
-* Notes:
-*
-* The projector theta was introduced in section 3.3 of
-*
-*   Lattice QCD and the Schwarz alternating procedure, JHEP 0305 (2003) 052
-*
-* Block faces in the -0,+0,..,-3,+3 directions are labelled by an index
-* ifc=0,..,7 and the projector on a given face is then given by
-*
-*   theta[ifc] = (1/2)*(1+gamma_mu) if ifc=2*mu,
-*
-*              = (1/2)*(1-gamma_mu) if ifc=2*mu+1
-*
-* Dirac fields on the face that satisfy theta[ifc]*psi=psi are completely
-* characterized by their first two Dirac components. In this way they are
-* mapped to Weyl fields on the face in an invertible manner.
-*
-* The size and position of the faces is only implicitly defined through
-* the parameter vol and the array *imb of the indices of the points on
-* the face.
-*
-* None of these programs involves communications. They are general purpose
-* routines that know nothing about the underiying geometry. In particular,
-* they can be called locally. If SSE instructions are used, the fields must
-* be aligned to a 16 byte boundary.
-*
-*******************************************************************************/
+ *
+ * File Pbnd.c
+ *
+ * Copyright (C) 2005, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Generic programs for the projector theta to the exterior boundary of a
+ * block of lattice points (version for single-precision fields)
+ *
+ * The following are arrays of functions indexed by the face number
+ * ifc=0,..,7
+ *
+ *   void (*assign_s2w[8])(int *imb,int vol,spinor *s,weyl *r)
+ *     Applies the projector theta[ifc] to the spinor s[imb[ix]],
+ *     ix=0,..,vol-1, and assigns the result to the weyl spinor r[ix].
+ *
+ *   void (*add_assign_w2s[8])(int *imb,int vol,weyl *s,spinor *r)
+ *     Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor
+ *     psi satisfying theta[ifc]*psi=psi and adds psi to r[imb[ix]].
+ *
+ *   void (*sub_assign_w2s[8])(int *imb,int vol,weyl *s,spinor *r)
+ *     Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor
+ *     psi satisfying theta[ifc]*psi=psi and subtracts psi from r[imb[ix]].
+ *
+ *   void (*mulg5_sub_assign_w2s[8])(int *imb,int vol,weyl *s,spinor *r)
+ *     Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor
+ *     psi satisfying theta[ifc]*psi=psi and subtracts gamma5*psi from
+ *     r[imb[ix]].
+ *
+ * Notes:
+ *
+ * The projector theta was introduced in section 3.3 of
+ *
+ *   Lattice QCD and the Schwarz alternating procedure, JHEP 0305 (2003) 052
+ *
+ * Block faces in the -0,+0,..,-3,+3 directions are labelled by an index
+ * ifc=0,..,7 and the projector on a given face is then given by
+ *
+ *   theta[ifc] = (1/2)*(1+gamma_mu) if ifc=2*mu,
+ *
+ *              = (1/2)*(1-gamma_mu) if ifc=2*mu+1
+ *
+ * Dirac fields on the face that satisfy theta[ifc]*psi=psi are completely
+ * characterized by their first two Dirac components. In this way they are
+ * mapped to Weyl fields on the face in an invertible manner.
+ *
+ * The size and position of the faces is only implicitly defined through
+ * the parameter vol and the array *imb of the indices of the points on
+ * the face.
+ *
+ * None of these programs involves communications. They are general purpose
+ * routines that know nothing about the underiying geometry. In particular,
+ * they can be called locally. If SSE instructions are used, the fields must
+ * be aligned to a 16 byte boundary.
+ *
+ *******************************************************************************/
 
 #define PBND_C
 

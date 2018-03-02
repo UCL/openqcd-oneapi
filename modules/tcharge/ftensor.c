@@ -1,55 +1,55 @@
 
 /*******************************************************************************
-*
-* File ftensor.c
-*
-* Copyright (C) 2010-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of the symmetric field tensor.
-*
-* The externally accessible function is
-*
-*   u3_alg_dble **ftensor(void)
-*     Computes the symmetric field tensor of the global double-precision
-*     gauge field and returns the pointers ft[0],..,ft[5] to the field
-*     components with the Lorentz indices (0,1),(0,2),(0,3),(2,3),(3,1),
-*     (1,2). The arrays are automatically allocated if needed. Along the
-*     boundaries of the lattice (if any), the program sets the field to
-*     zero.
-*
-* Notes:
-*
-* At all points x in the interior of the lattice, the (mu,nu)-component of
-* the field tensor is defined by
-*
-*  F_{mu,nu}(x) = (1/8)*[Q_{mu,nu}(x)-Q_{nu,mu}(x)]
-*
-* where
-*
-*  Q_{mu,nu}(x) = U(x,mu)*U(x+mu,nu)*U(x+nu,mu)^dag*U(x,nu)^dag + (3 more)
-*
-* denotes the sum of the four plaquette loops at x in the (mu,nu)-plane (the
-* same as in the case of the SW term). Elsewhere the elements of the field
-* arrays are set to zero. The interior points are those at global time x0
-* in the range
-*
-*  0<x0<NPROC0*L0-1        (open bc),
-*
-*  0<x0<NPROC0*L0          (SF and open-SF bc),
-*
-*  0<=x0<NPROC0*L0         (periodic bc).
-*
-* Note that the field tensor calculated here is in the Lie algebra of U(3)
-* not SU(3). The type u3_alg_dble is explained in the notes in the module
-* su3fcts/su3prod.c.
-*
-* The program in this module performs global operations and must be called
-* simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File ftensor.c
+ *
+ * Copyright (C) 2010-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of the symmetric field tensor.
+ *
+ * The externally accessible function is
+ *
+ *   u3_alg_dble **ftensor(void)
+ *     Computes the symmetric field tensor of the global double-precision
+ *     gauge field and returns the pointers ft[0],..,ft[5] to the field
+ *     components with the Lorentz indices (0,1),(0,2),(0,3),(2,3),(3,1),
+ *     (1,2). The arrays are automatically allocated if needed. Along the
+ *     boundaries of the lattice (if any), the program sets the field to
+ *     zero.
+ *
+ * Notes:
+ *
+ * At all points x in the interior of the lattice, the (mu,nu)-component of
+ * the field tensor is defined by
+ *
+ *  F_{mu,nu}(x) = (1/8)*[Q_{mu,nu}(x)-Q_{nu,mu}(x)]
+ *
+ * where
+ *
+ *  Q_{mu,nu}(x) = U(x,mu)*U(x+mu,nu)*U(x+nu,mu)^dag*U(x,nu)^dag + (3 more)
+ *
+ * denotes the sum of the four plaquette loops at x in the (mu,nu)-plane (the
+ * same as in the case of the SW term). Elsewhere the elements of the field
+ * arrays are set to zero. The interior points are those at global time x0
+ * in the range
+ *
+ *  0<x0<NPROC0*L0-1        (open bc),
+ *
+ *  0<x0<NPROC0*L0          (SF and open-SF bc),
+ *
+ *  0<=x0<NPROC0*L0         (periodic bc).
+ *
+ * Note that the field tensor calculated here is in the Lie algebra of U(3)
+ * not SU(3). The type u3_alg_dble is explained in the notes in the module
+ * su3fcts/su3prod.c.
+ *
+ * The program in this module performs global operations and must be called
+ * simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define FTENSOR_C
 

@@ -1,45 +1,45 @@
 
 /*******************************************************************************
-*
-* File vflds.c
-*
-* Copyright (C) 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Allocation and initialization of the global vector fields related to
-* the deflation subspace.
-*
-* The externally accessible functions are
-*
-*   complex **vflds(void)
-*     Returns the base address of the global single-precision vector fields
-*     (see the notes). The fields are allocated and initialized to zero if
-*     they are not already allocated.
-*
-*   complex_dble **vdflds(void)
-*     Returns the base address of the global double-precision vector fields
-*     (see the notes). The fields are allocated and initialized to zero if
-*     they are not already allocated.
-*
-* Notes:
-*
-* The vector fields made available through the programs in this module
-* are arrays complex numbers. Eventually they contain the global modes
-* used to deflate the little Dirac operator that represents the action
-* of the Wilson-Dirac operator in the deflation subspace.
-*
-* Each vector field has Ns*nb elements, where Ns is the number of local
-* deflation modes and nb the number blocks in the DFL_BLOCKS grid. The
-* elements of the fields are interpreted as the components of a spinor
-* field along the deflation subspace.
-*
-* The programs vflds() and vdflds() return arrays of 2*Ns and Ns global
-* vector fields, respectively. They may involve global communications and
-* must therefore be called simultaneously on all processes.
-*
-*******************************************************************************/
+ *
+ * File vflds.c
+ *
+ * Copyright (C) 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Allocation and initialization of the global vector fields related to
+ * the deflation subspace.
+ *
+ * The externally accessible functions are
+ *
+ *   complex **vflds(void)
+ *     Returns the base address of the global single-precision vector fields
+ *     (see the notes). The fields are allocated and initialized to zero if
+ *     they are not already allocated.
+ *
+ *   complex_dble **vdflds(void)
+ *     Returns the base address of the global double-precision vector fields
+ *     (see the notes). The fields are allocated and initialized to zero if
+ *     they are not already allocated.
+ *
+ * Notes:
+ *
+ * The vector fields made available through the programs in this module
+ * are arrays complex numbers. Eventually they contain the global modes
+ * used to deflate the little Dirac operator that represents the action
+ * of the Wilson-Dirac operator in the deflation subspace.
+ *
+ * Each vector field has Ns*nb elements, where Ns is the number of local
+ * deflation modes and nb the number blocks in the DFL_BLOCKS grid. The
+ * elements of the fields are interpreted as the components of a spinor
+ * field along the deflation subspace.
+ *
+ * The programs vflds() and vdflds() return arrays of 2*Ns and Ns global
+ * vector fields, respectively. They may involve global communications and
+ * must therefore be called simultaneously on all processes.
+ *
+ *******************************************************************************/
 
 #define VFLDS_C
 

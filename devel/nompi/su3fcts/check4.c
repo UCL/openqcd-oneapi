@@ -1,17 +1,17 @@
 
 /*******************************************************************************
-*
-* File check4.c
-*
-* Copyright (C) 2009, 2011, 2016 Filippo Palombi, Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Comparison of chexp_drv2() with chexp_drv0() and chexp_drv1() and
-* invariance of the calculated coefficients under rotations of X
-*
-*******************************************************************************/
+ *
+ * File check4.c
+ *
+ * Copyright (C) 2009, 2011, 2016 Filippo Palombi, Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Comparison of chexp_drv2() with chexp_drv0() and chexp_drv1() and
+ * invariance of the calculated coefficients under rotations of X
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,31 +1,31 @@
 
 /*******************************************************************************
-*
-* File pchi_square.c
-*
-* Copyright (C) 2005, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Chi-square probability distribution
-*
-* The externally accessible function is
-*
-*   double pchi_square(double chi_square,int nu)
-*     For chi_square>=0 and nu=1,2,...,1000 the program returns an
-*     approximation for P(chi_square|nu) which deviates from the exact
-*     distribution by less than 10^(-8) [10^(-9) if nu=1]
-*
-* Notes:
-*
-* See the notes
-*
-*   M. Luescher: Statistical tests
-*
-* for a detailed description.
-*
-*******************************************************************************/
+ *
+ * File pchi_square.c
+ *
+ * Copyright (C) 2005, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Chi-square probability distribution
+ *
+ * The externally accessible function is
+ *
+ *   double pchi_square(double chi_square,int nu)
+ *     For chi_square>=0 and nu=1,2,...,1000 the program returns an
+ *     approximation for P(chi_square|nu) which deviates from the exact
+ *     distribution by less than 10^(-8) [10^(-9) if nu=1]
+ *
+ * Notes:
+ *
+ * See the notes
+ *
+ *   M. Luescher: Statistical tests
+ *
+ * for a detailed description.
+ *
+ *******************************************************************************/
 
 #define PCHI_SQUARE_C
 

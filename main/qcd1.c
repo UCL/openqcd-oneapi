@@ -1,21 +1,21 @@
 
 /*******************************************************************************
-*
-* File qcd1.c
-*
-* Copyright (C) 2011-2013, 2016 Martin Luescher, Isabel Campos
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* HMC simulation program for QCD with Wilson quarks.
-*
-* Syntax: qcd1 -i <filename> [-noloc] [-noexp] [-rmold] [-noms]
-*                            [-c <filename> [-a [-norng]]]
-*
-* For usage instructions see the file README.qcd1.
-*
-*******************************************************************************/
+ *
+ * File qcd1.c
+ *
+ * Copyright (C) 2011-2013, 2016 Martin Luescher, Isabel Campos
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * HMC simulation program for QCD with Wilson quarks.
+ *
+ * Syntax: qcd1 -i <filename> [-noloc] [-noexp] [-rmold] [-noms]
+ *                            [-c <filename> [-a [-norng]]]
+ *
+ * For usage instructions see the file README.qcd1.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

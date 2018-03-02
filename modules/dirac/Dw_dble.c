@@ -1,94 +1,94 @@
 
 /*******************************************************************************
-*
-* File Dw_dble.c
-*
-* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Application of the O(a)-improved Wilson-Dirac operator D (double-
-* precision programs).
-*
-* The externally accessible functions are
-*
-*   void Dw_dble(double mu,spinor_dble *s,spinor_dble *r)
-*     Depending on whether the twisted-mass flag is set or not, this
-*     program applies D+i*mu*gamma_5*1e or D+i*mu*gamma_5 to the field
-*     s and assigns the result to the field r.
-*
-*   void Dwee_dble(double mu,spinor_dble *s,spinor_dble *r)
-*     Applies D_ee+i*mu*gamma_5 to the field s on the even points of the
-*     lattice and assigns the result to the field r.
-*
-*   void Dwoo_dble(double mu,spinor_dble *s,spinor_dble *r)
-*     Depending on whether the twisted-mass flag is set or not, this
-*     program applies D_oo or D_oo+i*mu*gamma_5 to the field s on the
-*     odd points of the lattice and assigns the result to the field r.
-*
-*   void Dwoe_dble(spinor_dble *s,spinor_dble *r)
-*     Applies D_oe to the field s and assigns the result to the field r.
-*
-*   void Dweo_dble(spinor_dble *s,spinor_dble *r)
-*     Applies D_eo to the field s and *subtracts* the result from the
-*     field r.
-*
-*   void Dwhat_dble(double mu,spinor_dble *s,spinor_dble *r)
-*     Applies Dhat+i*mu*gamma_5 to the field s and assigns the result to
-*     the field r.
-*
-* The following programs operate on the fields in the n'th block b of the
-* specified block grid:
-*
-*   void Dw_blk_dble(blk_grid_t grid,int n,double mu,int k,int l)
-*     Depending on whether the twisted-mass flag is set or not, this
-*     program applies D+i*mu*gamma_5*1e or D+i*mu*gamma_5 to the field
-*     b.sd[k] and assigns the result to the field b.sd[l].
-*
-*   void Dwee_blk_dble(blk_grid_t grid,int n,double mu,int k,int l)
-*     Applies D_ee+i*mu*gamma_5 to the field b.sd[k] on the even points and
-*     assigns the result to the field b.sd[l].
-*
-*   void Dwoo_blk_dble(blk_grid_t grid,int n,double mu,int k,int l)
-*     Depending on whether the twisted-mass flag is set or not, this
-*     program applies D_oo or D_oo+i*mu*gamma_5 to the field b.sd[k] on
-*     the odd points and assigns the result to the field b.sd[l].
-*
-*   void Dwoe_blk_dble(blk_grid_t grid,int n,int k,int l)
-*     Applies D_oe to the field b.sd[k] and assigns the result to the field
-*     b.sd[l].
-*
-*   void Dweo_blk_dble(blk_grid_t grid,int n,int k,int l)
-*     Applies D_eo to the field b.sd[k] and *subtracts* the result from the
-*     field b.sd[l].
-*
-*   void Dwhat_blk_dble(blk_grid_t grid,int n,double mu,int k,int l)
-*     Applies Dhat+i*mu*gamma_5 to the field b.sd[k] and assigns the result
-*     to the field b.sd[l].
-*
-* Notes:
-*
-* The notation and normalization conventions are specified in the notes
-* "Implementation of the lattice Dirac operator" (file doc/dirac.pdf).
-*
-* In all these programs, it is assumed that the SW term is in the proper
-* condition and that the global spinor fields have NSPIN elements. The
-* programs check whether the twisted-mass flag (see flags/lat_parms.c) is
-* set and turn off the twisted-mass term on the odd lattice sites if it is.
-* The input and output fields may not coincide in the case of the programs
-* Dw_dble(), Dwhat_dble(), Dw_blk_dble() and Dwhat_blk_dble().
-*
-* When the input and output fields are different, the input field is not
-* changed except possibly at the points at global time 0 and NPROC0*L0-1,
-* where both fields are set to zero if so required by the chosen boundary
-* conditions. Depending on the operator considered, the fields are zeroed
-* only on the even or odd points at these times.
-*
-* The programs Dw_dble(),..,Dwhat_dble() perform global operations and must
-* be called simultaneously on all processes.
-*
-*******************************************************************************/
+ *
+ * File Dw_dble.c
+ *
+ * Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Application of the O(a)-improved Wilson-Dirac operator D (double-
+ * precision programs).
+ *
+ * The externally accessible functions are
+ *
+ *   void Dw_dble(double mu,spinor_dble *s,spinor_dble *r)
+ *     Depending on whether the twisted-mass flag is set or not, this
+ *     program applies D+i*mu*gamma_5*1e or D+i*mu*gamma_5 to the field
+ *     s and assigns the result to the field r.
+ *
+ *   void Dwee_dble(double mu,spinor_dble *s,spinor_dble *r)
+ *     Applies D_ee+i*mu*gamma_5 to the field s on the even points of the
+ *     lattice and assigns the result to the field r.
+ *
+ *   void Dwoo_dble(double mu,spinor_dble *s,spinor_dble *r)
+ *     Depending on whether the twisted-mass flag is set or not, this
+ *     program applies D_oo or D_oo+i*mu*gamma_5 to the field s on the
+ *     odd points of the lattice and assigns the result to the field r.
+ *
+ *   void Dwoe_dble(spinor_dble *s,spinor_dble *r)
+ *     Applies D_oe to the field s and assigns the result to the field r.
+ *
+ *   void Dweo_dble(spinor_dble *s,spinor_dble *r)
+ *     Applies D_eo to the field s and *subtracts* the result from the
+ *     field r.
+ *
+ *   void Dwhat_dble(double mu,spinor_dble *s,spinor_dble *r)
+ *     Applies Dhat+i*mu*gamma_5 to the field s and assigns the result to
+ *     the field r.
+ *
+ * The following programs operate on the fields in the n'th block b of the
+ * specified block grid:
+ *
+ *   void Dw_blk_dble(blk_grid_t grid,int n,double mu,int k,int l)
+ *     Depending on whether the twisted-mass flag is set or not, this
+ *     program applies D+i*mu*gamma_5*1e or D+i*mu*gamma_5 to the field
+ *     b.sd[k] and assigns the result to the field b.sd[l].
+ *
+ *   void Dwee_blk_dble(blk_grid_t grid,int n,double mu,int k,int l)
+ *     Applies D_ee+i*mu*gamma_5 to the field b.sd[k] on the even points and
+ *     assigns the result to the field b.sd[l].
+ *
+ *   void Dwoo_blk_dble(blk_grid_t grid,int n,double mu,int k,int l)
+ *     Depending on whether the twisted-mass flag is set or not, this
+ *     program applies D_oo or D_oo+i*mu*gamma_5 to the field b.sd[k] on
+ *     the odd points and assigns the result to the field b.sd[l].
+ *
+ *   void Dwoe_blk_dble(blk_grid_t grid,int n,int k,int l)
+ *     Applies D_oe to the field b.sd[k] and assigns the result to the field
+ *     b.sd[l].
+ *
+ *   void Dweo_blk_dble(blk_grid_t grid,int n,int k,int l)
+ *     Applies D_eo to the field b.sd[k] and *subtracts* the result from the
+ *     field b.sd[l].
+ *
+ *   void Dwhat_blk_dble(blk_grid_t grid,int n,double mu,int k,int l)
+ *     Applies Dhat+i*mu*gamma_5 to the field b.sd[k] and assigns the result
+ *     to the field b.sd[l].
+ *
+ * Notes:
+ *
+ * The notation and normalization conventions are specified in the notes
+ * "Implementation of the lattice Dirac operator" (file doc/dirac.pdf).
+ *
+ * In all these programs, it is assumed that the SW term is in the proper
+ * condition and that the global spinor fields have NSPIN elements. The
+ * programs check whether the twisted-mass flag (see flags/lat_parms.c) is
+ * set and turn off the twisted-mass term on the odd lattice sites if it is.
+ * The input and output fields may not coincide in the case of the programs
+ * Dw_dble(), Dwhat_dble(), Dw_blk_dble() and Dwhat_blk_dble().
+ *
+ * When the input and output fields are different, the input field is not
+ * changed except possibly at the points at global time 0 and NPROC0*L0-1,
+ * where both fields are set to zero if so required by the chosen boundary
+ * conditions. Depending on the operator considered, the fields are zeroed
+ * only on the even or odd points at these times.
+ *
+ * The programs Dw_dble(),..,Dwhat_dble() perform global operations and must
+ * be called simultaneously on all processes.
+ *
+ *******************************************************************************/
 
 #define DW_DBLE_C
 

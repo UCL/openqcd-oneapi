@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File time3.c
-*
-* Copyright (C) 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Timing of Dw_blk() and Dwhat_blk().
-*
-*******************************************************************************/
+ *
+ * File time3.c
+ *
+ * Copyright (C) 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of Dw_blk() and Dwhat_blk().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2012-2014, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Gauge action of constant Abelian background fields.
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2012-2014, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Gauge action of constant Abelian background fields.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

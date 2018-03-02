@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check6.c
-*
-* Copyright (C) 2005, 2009, 2010, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Accuracy of inv_pauli_dble()
-*
-*******************************************************************************/
+ *
+ * File check6.c
+ *
+ * Copyright (C) 2005, 2009, 2010, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Accuracy of inv_pauli_dble()
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

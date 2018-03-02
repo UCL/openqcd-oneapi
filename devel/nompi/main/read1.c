@@ -1,23 +1,23 @@
 
 /*******************************************************************************
-*
-* File read1.c
-*
-* Copyright (C) 2010-2014 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Reads and evaluates data from the *.dat files created by the programs qcd1
-* and ym1. The file to be read has to be specified on the command line.
-*
-* This program writes the history of the MD energy deficit dH, the acceptance
-* flag iac and the average plaquette to the file <run name>.run1.dat in the
-* plots directory. In addition, some information about the distribution of dH
-* and the integrated autocorrelation time of the plaquette are printed to
-* stdout.
-*
-*******************************************************************************/
+ *
+ * File read1.c
+ *
+ * Copyright (C) 2010-2014 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Reads and evaluates data from the *.dat files created by the programs qcd1
+ * and ym1. The file to be read has to be specified on the command line.
+ *
+ * This program writes the history of the MD energy deficit dH, the acceptance
+ * flag iac and the average plaquette to the file <run name>.run1.dat in the
+ * plots directory. In addition, some information about the distribution of dH
+ * and the integrated autocorrelation time of the plaquette are printed to
+ * stdout.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check11.c
-*
-* Copyright (C) 2012, 2013, 2016 Martin Luescher, Stefan Schaefer
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of force5() and action5().
-*
-*******************************************************************************/
+ *
+ * File check11.c
+ *
+ * Copyright (C) 2012, 2013, 2016 Martin Luescher, Stefan Schaefer
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of force5() and action5().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

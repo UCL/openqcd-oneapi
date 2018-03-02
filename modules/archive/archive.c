@@ -1,87 +1,87 @@
 
 /*******************************************************************************
-*
-* File archive.c
-*
-* Copyright (C) 2005, 2007, 2009-2014 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Programs to read and write gauge-field configurations.
-*
-* The externally accessible functions are
-*
-*   void write_cnfg(char *out)
-*     Writes the lattice sizes, the process grid sizes, the coordinates
-*     of the calling process, the state of the random number generators,
-*     the local plaquette sum and the local double-precision gauge field
-*     to the file "out".
-*
-*   void read_cnfg(char *in)
-*     Reads the local double-precision gauge field from the file "in",
-*     assuming it was written to the file by the program write_cnfg().
-*     The program then resets the random number generator and checks
-*     that the restored field is compatible with the chosen boundary
-*     conditions.
-*
-*   void export_cnfg(char *out)
-*     Writes the lattice sizes and the global double-precision gauge
-*     field to the file "out" from process 0 in the universal format
-*     specified below (see the notes).
-*
-*   void import_cnfg(char *in)
-*     Reads the global double-precision gauge field from the file "in"
-*     on process 0, assuming the field was written to the file in the
-*     universal format. The field is periodically extended if needed
-*     and the program then checks that the configuration is compatible
-*     with the chosen boundary conditions (see the notes).
-*
-* Notes:
-*
-* The program export_cnfg() first writes the lattice sizes and the average
-* of the plaquette Re(tr{U(p)}) to the output file. Then follow the 8 link
-* variables in the directions +0,-0,...,+3,-3 at the first odd point, the
-* second odd point, and so on. The order of the point (x0,x1,x2,x3) with
-* Cartesian coordinates in the range 0<=x0<N0,...,0<=x3<N3 is determined by
-* the index
-*
-*   ix=x3+N3*x2+N2*N3*x1+N1*N2*N3*x0,
-*
-* where N0,N1,N2,N3 are the global lattice sizes (N0=NPROC0*L0, etc.). The
-* average plaquette is calculated by summing the plaquette values over all
-* plaquettes in the lattice, including the space-like ones at time N0 if
-* SF or open-SF boundary conditions are chosen, and dividing the sum by
-* 6*N0*N1*N2*N3.
-*
-* Independently of the machine, the export function writes the data to the
-* output file in little-endian byte order. Integers and double-precision
-* numbers on the output file occupy 4 and 8 bytes, respectively, the latter
-* being formatted according to the IEEE-754 standard. The import function
-* assumes the data on the input file to be little endian and converts them
-* to big-endian order if the machine is big endian. Exported configurations
-* can thus be safely exchanged between different machines.
-*
-* If the current lattice sizes N0,..,N3 are larger than the lattice sizes
-* n0,..,n3 read from the configuration file, and if N0,..,N3 are integer
-* multiples of n0,..,n3, the program import_cnfg() periodically extends the
-* imported field. An extension in the time direction is only possible with
-* periodic boundary conditions. Note that the boundary values of the link
-* variables (rather than the angles characterizing them) must match in the
-* case of SF and open-SF boundary conditions (see doc/gauge_action.pdf).
-*
-* Compatibility of a configuration with the chosen boundary conditions is
-* established by calling check_bc() [lattice/bcnds.c], with a tolerance on
-* the boundary link variables of 64.0*DBL_EPSILON, and by checking that the
-* average plaquette coincides with the value read from the configuration
-* file. On exit both read_cnfg() and import_cnfg() set the boundary values
-* of the field (if any) to the ones stored in the parameter data base so
-* as to guarantee that they are bit-identical to the latter.
-*
-* All programs in this module may involve global communications and must be
-* called simultaneously on all processes.
-*
-*******************************************************************************/
+ *
+ * File archive.c
+ *
+ * Copyright (C) 2005, 2007, 2009-2014 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Programs to read and write gauge-field configurations.
+ *
+ * The externally accessible functions are
+ *
+ *   void write_cnfg(char *out)
+ *     Writes the lattice sizes, the process grid sizes, the coordinates
+ *     of the calling process, the state of the random number generators,
+ *     the local plaquette sum and the local double-precision gauge field
+ *     to the file "out".
+ *
+ *   void read_cnfg(char *in)
+ *     Reads the local double-precision gauge field from the file "in",
+ *     assuming it was written to the file by the program write_cnfg().
+ *     The program then resets the random number generator and checks
+ *     that the restored field is compatible with the chosen boundary
+ *     conditions.
+ *
+ *   void export_cnfg(char *out)
+ *     Writes the lattice sizes and the global double-precision gauge
+ *     field to the file "out" from process 0 in the universal format
+ *     specified below (see the notes).
+ *
+ *   void import_cnfg(char *in)
+ *     Reads the global double-precision gauge field from the file "in"
+ *     on process 0, assuming the field was written to the file in the
+ *     universal format. The field is periodically extended if needed
+ *     and the program then checks that the configuration is compatible
+ *     with the chosen boundary conditions (see the notes).
+ *
+ * Notes:
+ *
+ * The program export_cnfg() first writes the lattice sizes and the average
+ * of the plaquette Re(tr{U(p)}) to the output file. Then follow the 8 link
+ * variables in the directions +0,-0,...,+3,-3 at the first odd point, the
+ * second odd point, and so on. The order of the point (x0,x1,x2,x3) with
+ * Cartesian coordinates in the range 0<=x0<N0,...,0<=x3<N3 is determined by
+ * the index
+ *
+ *   ix=x3+N3*x2+N2*N3*x1+N1*N2*N3*x0,
+ *
+ * where N0,N1,N2,N3 are the global lattice sizes (N0=NPROC0*L0, etc.). The
+ * average plaquette is calculated by summing the plaquette values over all
+ * plaquettes in the lattice, including the space-like ones at time N0 if
+ * SF or open-SF boundary conditions are chosen, and dividing the sum by
+ * 6*N0*N1*N2*N3.
+ *
+ * Independently of the machine, the export function writes the data to the
+ * output file in little-endian byte order. Integers and double-precision
+ * numbers on the output file occupy 4 and 8 bytes, respectively, the latter
+ * being formatted according to the IEEE-754 standard. The import function
+ * assumes the data on the input file to be little endian and converts them
+ * to big-endian order if the machine is big endian. Exported configurations
+ * can thus be safely exchanged between different machines.
+ *
+ * If the current lattice sizes N0,..,N3 are larger than the lattice sizes
+ * n0,..,n3 read from the configuration file, and if N0,..,N3 are integer
+ * multiples of n0,..,n3, the program import_cnfg() periodically extends the
+ * imported field. An extension in the time direction is only possible with
+ * periodic boundary conditions. Note that the boundary values of the link
+ * variables (rather than the angles characterizing them) must match in the
+ * case of SF and open-SF boundary conditions (see doc/gauge_action.pdf).
+ *
+ * Compatibility of a configuration with the chosen boundary conditions is
+ * established by calling check_bc() [lattice/bcnds.c], with a tolerance on
+ * the boundary link variables of 64.0*DBL_EPSILON, and by checking that the
+ * average plaquette coincides with the value read from the configuration
+ * file. On exit both read_cnfg() and import_cnfg() set the boundary values
+ * of the field (if any) to the ones stored in the parameter data base so
+ * as to guarantee that they are bit-identical to the latter.
+ *
+ * All programs in this module may involve global communications and must be
+ * called simultaneously on all processes.
+ *
+ *******************************************************************************/
 
 #define ARCHIVE_C
 

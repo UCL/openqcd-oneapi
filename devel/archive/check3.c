@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check3.c
-*
-* Copyright (C) 2005, 2007, 2008, 2010-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Importing a configuration previously exported by check2.
-*
-*******************************************************************************/
+ *
+ * File check3.c
+ *
+ * Copyright (C) 2005, 2007, 2008, 2010-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Importing a configuration previously exported by check2.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

@@ -1,66 +1,66 @@
 
 /*******************************************************************************
-*
-* File hmc.c
-*
-* Copyright (C) 2005, 2007, 2009-2013,    Martin Luescher, Filippo Palombi,
-*               2016                      Stefan Schaefer, Isabel Campos
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* HMC simulation algorithm.
-*
-* The externally accessible functions are
-*
-*   void hmc_sanity_check(void)
-*     Performs various checks on the chosen parameters for the HMC
-*     algorithm and terminates with an error message if an inconsistency
-*     is discovered.
-*
-*   void hmc_wsize(int *nwud,int *nws,int *nwsd,int *nwv,int *nwvd)
-*     Determines the minimal sizes of the workspaces required for the
-*     HMC algorithm based on the information in the parameter data base.
-*     On exit the program returns the numbers of double-precision gauge
-*     (nwud), spinor (nwsd) and complex vector (nwvd) fields as well as
-*     the numbers of single-precision spinor (nws) and complex vector
-*     (nwv) fields that must be allocated.
-*
-*   int run_hmc(double *act0,double *act1)
-*     Generates a random momentum field, integrates the MD equations and
-*     applies the HMC acceptance step to the fields at the end of the MD
-*     trajectory (see the notes).
-*      The arrays act0 and act1 must have at least nact+1 elements, where
-*     nact is the number of actions that take part in the HMC algorithm
-*     (see flags/hmc_parms.c). On exit act0 and act1 contain the part of
-*     the actions computed on the local lattice at the beginning and the
-*     end of the MD evolution (see the notes).
-*      The program returns 1 or 0 depending on whether the field generated
-*     by the molecular-dynamics evolution was accepted or not. If it was
-*     not accepted, the gauge field is restored to its initial value.
-*
-* Notes:
-*
-* The molecular-dynamics equations are integrated using the integrator
-* specified by the list of elementary operations returned by mdsteps()
-* (see update/mdsteps.c and update/mdint.c). The elements of the action
-* arrays act0 and act1 are
-*
-*  actx[0]        Action of the momentum field,
-*  actx[1]        Gauge field action,
-*  actx[2+n]      Pseudo-fermion action number n,
-*
-* where the pseudo-fermion actions are counted from 0 in steps of 1, as
-* they appear in the action array hmc.iact returned by hmc_parms().
-*
-* The boundary conditions are imposed as specified in the parameter data
-* base (see flags/lat_parms.c). Accepted new gauge field configurations
-* are renormalized to SU(3) on all active links.
-*
-* The programs in this module perform global communications and must be
-* called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File hmc.c
+ *
+ * Copyright (C) 2005, 2007, 2009-2013,    Martin Luescher, Filippo Palombi,
+ *               2016                      Stefan Schaefer, Isabel Campos
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * HMC simulation algorithm.
+ *
+ * The externally accessible functions are
+ *
+ *   void hmc_sanity_check(void)
+ *     Performs various checks on the chosen parameters for the HMC
+ *     algorithm and terminates with an error message if an inconsistency
+ *     is discovered.
+ *
+ *   void hmc_wsize(int *nwud,int *nws,int *nwsd,int *nwv,int *nwvd)
+ *     Determines the minimal sizes of the workspaces required for the
+ *     HMC algorithm based on the information in the parameter data base.
+ *     On exit the program returns the numbers of double-precision gauge
+ *     (nwud), spinor (nwsd) and complex vector (nwvd) fields as well as
+ *     the numbers of single-precision spinor (nws) and complex vector
+ *     (nwv) fields that must be allocated.
+ *
+ *   int run_hmc(double *act0,double *act1)
+ *     Generates a random momentum field, integrates the MD equations and
+ *     applies the HMC acceptance step to the fields at the end of the MD
+ *     trajectory (see the notes).
+ *      The arrays act0 and act1 must have at least nact+1 elements, where
+ *     nact is the number of actions that take part in the HMC algorithm
+ *     (see flags/hmc_parms.c). On exit act0 and act1 contain the part of
+ *     the actions computed on the local lattice at the beginning and the
+ *     end of the MD evolution (see the notes).
+ *      The program returns 1 or 0 depending on whether the field generated
+ *     by the molecular-dynamics evolution was accepted or not. If it was
+ *     not accepted, the gauge field is restored to its initial value.
+ *
+ * Notes:
+ *
+ * The molecular-dynamics equations are integrated using the integrator
+ * specified by the list of elementary operations returned by mdsteps()
+ * (see update/mdsteps.c and update/mdint.c). The elements of the action
+ * arrays act0 and act1 are
+ *
+ *  actx[0]        Action of the momentum field,
+ *  actx[1]        Gauge field action,
+ *  actx[2+n]      Pseudo-fermion action number n,
+ *
+ * where the pseudo-fermion actions are counted from 0 in steps of 1, as
+ * they appear in the action array hmc.iact returned by hmc_parms().
+ *
+ * The boundary conditions are imposed as specified in the parameter data
+ * base (see flags/lat_parms.c). Accepted new gauge field configurations
+ * are renormalized to SU(3) on all active links.
+ *
+ * The programs in this module perform global communications and must be
+ * called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define HMC_C
 
@@ -555,8 +555,9 @@ static void start_hmc(double *act0, su3_dble *uold)
 
     dfl_modes2(status);
     error_root((status[1] < 0) || ((status[1] == 0) && (status[0] < 0)), 1,
-               "start_hmc [hmc.c]", "Deflation subspace generation "
-                                    "failed (status = %d;%d)",
+               "start_hmc [hmc.c]",
+               "Deflation subspace generation "
+               "failed (status = %d;%d)",
                status[0], status[1]);
 
     if (status[1] == 0)

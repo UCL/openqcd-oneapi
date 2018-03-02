@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check3.c
-*
-* Copyright (C) 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the solver for the little Dirac equation.
-*
-*******************************************************************************/
+ *
+ * File check3.c
+ *
+ * Copyright (C) 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the solver for the little Dirac equation.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

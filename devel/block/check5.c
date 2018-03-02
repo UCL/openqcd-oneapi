@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check5.c
-*
-* Copyright (C) 2005, 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of assign_s2sblk(),...,assign_sdblk2sd().
-*
-*******************************************************************************/
+ *
+ * File check5.c
+ *
+ * Copyright (C) 2005, 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of assign_s2sblk(),...,assign_sdblk2sd().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

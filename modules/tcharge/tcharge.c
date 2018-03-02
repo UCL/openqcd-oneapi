@@ -1,54 +1,54 @@
 
 /*******************************************************************************
-*
-* File tcharge.c
-*
-* Copyright (C) 2010-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of the topological charge using the symmetric field tensor.
-*
-* The externally accessible functions are
-*
-*   double tcharge(void)
-*     Returns the "field-theoretic" topological charge Q of the global
-*     double-precision gauge field, using a symmetric expression for the
-*     gauge-field tensor.
-*
-*   double tcharge_slices(double *qsl)
-*     Computes the sum qsl[x0] of the "field-theoretic" topological charge
-*     density of the double-precision gauge field at time x0=0,1,...,N0-1
-*     (where N0=NPROC0*L0). The program returns the total charge.
-*
-* Notes:
-*
-* The topological charge density q(x) is defined by
-*
-*  q(x)=(8*Pi^2)^(-1)*{F_{01}^a(x)*F_{23}^a(x)+
-*                      F_{02}^a(x)*F_{31}^a(x)+
-*                      F_{03}^a(x)*F_{12}^a(x)},
-*
-* where
-*
-*  F_{mu,nu}^a(x)=-2*tr{F_{mu,nu}(x)*T^a}, a=1,..,8,
-*
-* are the SU(3) components of the symmetric field tensor returned by the
-* program ftensor() [ftensor.c]. At the boundaries of the lattice (if any),
-* the charge density is set to zero. The total charge Q is the sum of q(x)
-* over all points x with time component in the range
-*
-*  0<x0<NPROC0*L0-1        (open bc),
-*
-*  0<x0<NPROC0*L0          (SF and open-SF bc),
-*
-*  0<=x0<NPROC0*L0         (periodic bc).
-*
-* The programs in this module perform global communications and must be
-* called simultaneously on all processes.
-*
-*******************************************************************************/
+ *
+ * File tcharge.c
+ *
+ * Copyright (C) 2010-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of the topological charge using the symmetric field tensor.
+ *
+ * The externally accessible functions are
+ *
+ *   double tcharge(void)
+ *     Returns the "field-theoretic" topological charge Q of the global
+ *     double-precision gauge field, using a symmetric expression for the
+ *     gauge-field tensor.
+ *
+ *   double tcharge_slices(double *qsl)
+ *     Computes the sum qsl[x0] of the "field-theoretic" topological charge
+ *     density of the double-precision gauge field at time x0=0,1,...,N0-1
+ *     (where N0=NPROC0*L0). The program returns the total charge.
+ *
+ * Notes:
+ *
+ * The topological charge density q(x) is defined by
+ *
+ *  q(x)=(8*Pi^2)^(-1)*{F_{01}^a(x)*F_{23}^a(x)+
+ *                      F_{02}^a(x)*F_{31}^a(x)+
+ *                      F_{03}^a(x)*F_{12}^a(x)},
+ *
+ * where
+ *
+ *  F_{mu,nu}^a(x)=-2*tr{F_{mu,nu}(x)*T^a}, a=1,..,8,
+ *
+ * are the SU(3) components of the symmetric field tensor returned by the
+ * program ftensor() [ftensor.c]. At the boundaries of the lattice (if any),
+ * the charge density is set to zero. The total charge Q is the sum of q(x)
+ * over all points x with time component in the range
+ *
+ *  0<x0<NPROC0*L0-1        (open bc),
+ *
+ *  0<x0<NPROC0*L0          (SF and open-SF bc),
+ *
+ *  0<=x0<NPROC0*L0         (periodic bc).
+ *
+ * The programs in this module perform global communications and must be
+ * called simultaneously on all processes.
+ *
+ *******************************************************************************/
 
 #define TCHARGE_C
 

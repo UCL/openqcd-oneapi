@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File time3.c
-*
-* Copyright (C) 2005, 2009, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Timing of inv_pauli_dble() and det_pauli_dble()
-*
-*******************************************************************************/
+ *
+ * File time3.c
+ *
+ * Copyright (C) 2005, 2009, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of inv_pauli_dble() and det_pauli_dble()
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

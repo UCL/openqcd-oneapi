@@ -1,42 +1,42 @@
 
 /*******************************************************************************
-*
-* File ranlxd.c
-*
-* Copyright (C) 2005, 2008, 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Random number generator "ranlxd" version 3.0. See the notes
-*
-*   "User's guide for ranlxs and ranlxd v3.0" (May 2001)
-*
-*   "Algorithms used in ranlux v3.0" (May 2001)
-*
-* for a detailed description.
-*
-* The externally accessible functions are
-*
-*   void ranlxd(double r[],int n)
-*     Computes the next n double-precision random numbers and
-*     assigns them to the elements r[0],...,r[n-1] of the array r[]
-*
-*   void rlxd_init(int level,int seed)
-*     Initialization of the generator
-*
-*   int rlxd_size(void)
-*     Returns the number of integers required to save the state of
-*     the generator
-*
-*   void rlxd_get(int state[])
-*     Extracts the current state of the generator and stores the
-*     information in the array state[N] where N>=rlxd_size()
-*
-*   void rlxd_reset(int state[])
-*     Resets the generator to the state defined by the array state[N]
-*
-*******************************************************************************/
+ *
+ * File ranlxd.c
+ *
+ * Copyright (C) 2005, 2008, 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Random number generator "ranlxd" version 3.0. See the notes
+ *
+ *   "User's guide for ranlxs and ranlxd v3.0" (May 2001)
+ *
+ *   "Algorithms used in ranlux v3.0" (May 2001)
+ *
+ * for a detailed description.
+ *
+ * The externally accessible functions are
+ *
+ *   void ranlxd(double r[],int n)
+ *     Computes the next n double-precision random numbers and
+ *     assigns them to the elements r[0],...,r[n-1] of the array r[]
+ *
+ *   void rlxd_init(int level,int seed)
+ *     Initialization of the generator
+ *
+ *   int rlxd_size(void)
+ *     Returns the number of integers required to save the state of
+ *     the generator
+ *
+ *   void rlxd_get(int state[])
+ *     Extracts the current state of the generator and stores the
+ *     information in the array state[N] where N>=rlxd_size()
+ *
+ *   void rlxd_reset(int state[])
+ *     Resets the generator to the state defined by the array state[N]
+ *
+ *******************************************************************************/
 
 #define RANLXD_C
 

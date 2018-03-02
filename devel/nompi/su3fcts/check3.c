@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check3.c
-*
-* Copyright (C) 2009, 2011 Filippo Palombi, Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of chexp_drv0() and ch2mat() using the spectral representation of X
-*
-*******************************************************************************/
+ *
+ * File check3.c
+ *
+ * Copyright (C) 2009, 2011 Filippo Palombi, Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of chexp_drv0() and ch2mat() using the spectral representation of X
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

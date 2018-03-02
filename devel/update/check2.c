@@ -1,17 +1,17 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2005, 2007, 2009-2013, Martin Luescher, Filippo Palombi
-*               2016                   Stefan Schaefer
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Reversibility of the MD evolution.
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2005, 2007, 2009-2013, Martin Luescher, Filippo Palombi
+ *               2016                   Stefan Schaefer
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Reversibility of the MD evolution.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

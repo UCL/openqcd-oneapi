@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check4.c
-*
-* Copyright (C) 2010, 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the gauge and translation invariance of the Yang-Mills action.
-*
-*******************************************************************************/
+ *
+ * File check4.c
+ *
+ * Copyright (C) 2010, 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the gauge and translation invariance of the Yang-Mills action.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

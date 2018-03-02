@@ -1,68 +1,68 @@
 
 /*******************************************************************************
-*
-* File vinit.c
-*
-* Copyright (C) 2007, 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Generic initialization and assignment programs for complex single- and
-* double-precision fields
-*
-* The externally accessible functions are
-*
-*   void set_v2zero(int n,complex *v)
-*     Sets the single-precision field v to zero.
-*
-*   void set_vd2zero(int n,complex_dble *vd)
-*     Sets the double-precision field vd to zero.
-*
-*   void random_v(int n,complex *v,float sigma)
-*     Initializes the components of the single-precision field v to
-*     (complex) random values z with distribution proportional to
-*     exp{-|z|^2/sigma^2}.
-*
-*   void random_vd(int n,complex_dble *vd,double sigma)
-*     Initializes the components of the double-precision field vd to
-*     (complex) random values z with distribution proportional to
-*     exp{-|z|^2/sigma^2}.
-*
-*   void assign_v2v(int n,complex *v,complex *w)
-*     Assigns the single-precision field v to the single-precision
-*     field w.
-*
-*   void assign_v2vd(int n,complex *v,complex_dble *wd)
-*     Assigns the single-precision field v to the double-precision
-*     field wd.
-*
-*   void assign_vd2v(int n,complex_dble *vd,complex *w)
-*     Assigns the double-precision field vd to the single-precision
-*     field w.
-*
-*   void assign_vd2vd(int n,complex_dble *vd,complex_dble *wd)
-*     Assigns the double-precision field vd to the double-precision
-*     field wd.
-*
-*   void add_v2vd(int n,complex *v,complex_dble *wd)
-*     Adds the single-precision field v to the double-precision field
-*     wd.
-*
-*   void diff_vd2v(int n,complex_dble *vd,complex_dble *wd,complex *w)
-*     Assigns the difference vd-wd of the double-precision fields vd
-*     and wd to the single-precision field w.
-*
-* Notes:
-*
-* All these programs operate on arrays of complex fields, whose base
-* addresses are passed through the arguments. The length of the arrays
-* is specified by the parameter n.
-*
-* Since no communications are performed, all programs in this file can be
-* called locally.
-*
-*******************************************************************************/
+ *
+ * File vinit.c
+ *
+ * Copyright (C) 2007, 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Generic initialization and assignment programs for complex single- and
+ * double-precision fields
+ *
+ * The externally accessible functions are
+ *
+ *   void set_v2zero(int n,complex *v)
+ *     Sets the single-precision field v to zero.
+ *
+ *   void set_vd2zero(int n,complex_dble *vd)
+ *     Sets the double-precision field vd to zero.
+ *
+ *   void random_v(int n,complex *v,float sigma)
+ *     Initializes the components of the single-precision field v to
+ *     (complex) random values z with distribution proportional to
+ *     exp{-|z|^2/sigma^2}.
+ *
+ *   void random_vd(int n,complex_dble *vd,double sigma)
+ *     Initializes the components of the double-precision field vd to
+ *     (complex) random values z with distribution proportional to
+ *     exp{-|z|^2/sigma^2}.
+ *
+ *   void assign_v2v(int n,complex *v,complex *w)
+ *     Assigns the single-precision field v to the single-precision
+ *     field w.
+ *
+ *   void assign_v2vd(int n,complex *v,complex_dble *wd)
+ *     Assigns the single-precision field v to the double-precision
+ *     field wd.
+ *
+ *   void assign_vd2v(int n,complex_dble *vd,complex *w)
+ *     Assigns the double-precision field vd to the single-precision
+ *     field w.
+ *
+ *   void assign_vd2vd(int n,complex_dble *vd,complex_dble *wd)
+ *     Assigns the double-precision field vd to the double-precision
+ *     field wd.
+ *
+ *   void add_v2vd(int n,complex *v,complex_dble *wd)
+ *     Adds the single-precision field v to the double-precision field
+ *     wd.
+ *
+ *   void diff_vd2v(int n,complex_dble *vd,complex_dble *wd,complex *w)
+ *     Assigns the difference vd-wd of the double-precision fields vd
+ *     and wd to the single-precision field w.
+ *
+ * Notes:
+ *
+ * All these programs operate on arrays of complex fields, whose base
+ * addresses are passed through the arguments. The length of the arrays
+ * is specified by the parameter n.
+ *
+ * Since no communications are performed, all programs in this file can be
+ * called locally.
+ *
+ *******************************************************************************/
 
 #define VINIT_C
 

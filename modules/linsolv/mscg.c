@@ -1,77 +1,77 @@
 
 /*******************************************************************************
-*
-* File mscg.c
-*
-* Copyright (C) 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Generic multi-shift CG solver program for the lattice Dirac equation
-*
-* The externally accessible function is
-*
-*   void mscg(int vol,int icom,int nmu,double *mu,
-*             void (*Dop_dble)(double mu,spinor_dble *s,spinor_dble *r),
-*             spinor_dble **wsd,int nmx,double *res,
-*             spinor_dble *eta,spinor_dble **psi,int *status)
-*     Solution of the Dirac equation (D^dag*D+mu^2)*psi=eta for a given
-*     source eta and one or more values of mu using the multi-shift CG
-*     algorithm. See the notes for the explanation of the parameters of
-*     the program.
-*
-* Notes:
-*
-* The algorithm implemented in this module is described in the notes
-* "Multi-shift conjugate gradient algorithm" (file doc/mscg.pdf).
-*
-* The program Dop_dble() for the Dirac operator is assumed to have the
-* following properties:
-*
-*   void Dop_dble(double mu,spinor_dble *s,spinor_dble *r)
-*     Application of an operator Op or its hermitian conjugate Op^dag
-*     to the double-precision Dirac field s and assignment of the result
-*     to r (where r is different from s). The operator must be such that
-*     the identity Op^dag*Op=D^dag*D+mu^2 holds. Op and Op^dag are applied
-*     alternatingly, i.e. the first call of the program applies Op, the
-*     next call Op^dag, then Op again and so on. In all cases, the source
-*     field s remains unchanged.
-*
-* The other parameters of the program mscg() are:
-*
-*   vol     Number of spinors in the Dirac fields.
-*
-*   icom    Indicates whether the equation to be solved is a local
-*           equation (icom=0) or a global one (icom=1). Scalar products
-*           are summed over all MPI processes if icom=1, while no
-*           communications are performed if icom=0.
-*
-*   nmu     Number of shifts mu.
-*
-*   mu      Array of the shifts mu (nmu elements).
-*
-*   nmx     Maximal number of CG iterations that may be applied.
-*
-*   res     Array of the desired maximal relative residues of the
-*           calculated solutions (nmu elements).
-*
-*   wsd     Array of at least 3+nmu (5 if nmu=1) double-precision spinor
-*           fields (used as work space).
-*
-*   eta     Source field (unchanged on exit).
-*
-*   psi     Array of the calculated approximate solutions of the Dirac
-*           equations (D^dag*D+mu^2)*psi=eta (nmu elements).
-*
-*   status  On exit, this parameter reports the number of CG iterations
-*           that were required, or a negative value if the program failed.
-*
-* The spinor fields must have at least vol elements and must be such that
-* the program Dop_dble() acts correctly on them. Some debugging output is
-* printed to stdout on process 0 if the macro MSCG_DBG is defined.
-*
-*******************************************************************************/
+ *
+ * File mscg.c
+ *
+ * Copyright (C) 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Generic multi-shift CG solver program for the lattice Dirac equation
+ *
+ * The externally accessible function is
+ *
+ *   void mscg(int vol,int icom,int nmu,double *mu,
+ *             void (*Dop_dble)(double mu,spinor_dble *s,spinor_dble *r),
+ *             spinor_dble **wsd,int nmx,double *res,
+ *             spinor_dble *eta,spinor_dble **psi,int *status)
+ *     Solution of the Dirac equation (D^dag*D+mu^2)*psi=eta for a given
+ *     source eta and one or more values of mu using the multi-shift CG
+ *     algorithm. See the notes for the explanation of the parameters of
+ *     the program.
+ *
+ * Notes:
+ *
+ * The algorithm implemented in this module is described in the notes
+ * "Multi-shift conjugate gradient algorithm" (file doc/mscg.pdf).
+ *
+ * The program Dop_dble() for the Dirac operator is assumed to have the
+ * following properties:
+ *
+ *   void Dop_dble(double mu,spinor_dble *s,spinor_dble *r)
+ *     Application of an operator Op or its hermitian conjugate Op^dag
+ *     to the double-precision Dirac field s and assignment of the result
+ *     to r (where r is different from s). The operator must be such that
+ *     the identity Op^dag*Op=D^dag*D+mu^2 holds. Op and Op^dag are applied
+ *     alternatingly, i.e. the first call of the program applies Op, the
+ *     next call Op^dag, then Op again and so on. In all cases, the source
+ *     field s remains unchanged.
+ *
+ * The other parameters of the program mscg() are:
+ *
+ *   vol     Number of spinors in the Dirac fields.
+ *
+ *   icom    Indicates whether the equation to be solved is a local
+ *           equation (icom=0) or a global one (icom=1). Scalar products
+ *           are summed over all MPI processes if icom=1, while no
+ *           communications are performed if icom=0.
+ *
+ *   nmu     Number of shifts mu.
+ *
+ *   mu      Array of the shifts mu (nmu elements).
+ *
+ *   nmx     Maximal number of CG iterations that may be applied.
+ *
+ *   res     Array of the desired maximal relative residues of the
+ *           calculated solutions (nmu elements).
+ *
+ *   wsd     Array of at least 3+nmu (5 if nmu=1) double-precision spinor
+ *           fields (used as work space).
+ *
+ *   eta     Source field (unchanged on exit).
+ *
+ *   psi     Array of the calculated approximate solutions of the Dirac
+ *           equations (D^dag*D+mu^2)*psi=eta (nmu elements).
+ *
+ *   status  On exit, this parameter reports the number of CG iterations
+ *           that were required, or a negative value if the program failed.
+ *
+ * The spinor fields must have at least vol elements and must be such that
+ * the program Dop_dble() acts correctly on them. Some debugging output is
+ * printed to stdout on process 0 if the macro MSCG_DBG is defined.
+ *
+ *******************************************************************************/
 
 #define MSCG_C
 

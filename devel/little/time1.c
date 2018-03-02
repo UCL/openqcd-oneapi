@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File time1.c
-*
-* Copyright (C) 2007, 2008, 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Timing of Awhat().
-*
-*******************************************************************************/
+ *
+ * File time1.c
+ *
+ * Copyright (C) 2007, 2008, 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of Awhat().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

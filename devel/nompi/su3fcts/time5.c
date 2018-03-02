@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File time5.c
-*
-* Copyright (C) 2009, 2011, 2013, 2016 Filippo Palombi, Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Timing of chexp_drv*(), ch2mat() and expXsu3()
-*
-*******************************************************************************/
+ *
+ * File time5.c
+ *
+ * Copyright (C) 2009, 2011, 2013, 2016 Filippo Palombi, Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of chexp_drv*(), ch2mat() and expXsu3()
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

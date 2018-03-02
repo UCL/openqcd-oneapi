@@ -1,17 +1,17 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2005, 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Checks on the allocation and initialization of the gauge, Dirac and Weyl
-* fields on the known block grids.
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2005, 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Checks on the allocation and initialization of the gauge, Dirac and Weyl
+ * fields on the known block grids.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

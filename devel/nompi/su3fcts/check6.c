@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check6.c
-*
-* Copyright (C) 2009, 2011, 2016 Filippo Palombi, Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Verifies that exp(X) is in SU(3) and that exp(X)*exp(-X)=1
-*
-*******************************************************************************/
+ *
+ * File check6.c
+ *
+ * Copyright (C) 2009, 2011, 2016 Filippo Palombi, Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Verifies that exp(X) is in SU(3) and that exp(X)*exp(-X)=1
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

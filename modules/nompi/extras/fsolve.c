@@ -1,66 +1,66 @@
 
 /*******************************************************************************
-*
-* File fsolve.c
-*
-* Copyright (C) 2008, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* General purpose equation solver and function minimizers
-*
-* The externally accessible functions are
-*
-*   double inverse_fct(double y,double x1,double x2,double (*f)(double x),
-*                      double omega1,double omega2)
-*     Finds a solution x of the equation f(x)=y in the interval [x1,x2]
-*     to an absolute precision omega1 or a relative precision omega2
-*     (whichever is reached first). The points x1,x2 must be such that
-*     f(x1) and f(x2) have different sign
-*
-*   double minimize_fct(double x0,double x1,double x2,double (*f)(double x),
-*                       double omega1,double omega2)
-*     Finds a local minimum x of f(x) in the interval [x0,x2] to an
-*     absolute precision omega1 or a relative precision omega2 (whichever
-*     is reached first). The point x1 is taken as an initial guess of the
-*     position of the minimum (x0<x1<x2)
-*
-*   void powell(int n,double *x0,double *x1,double *x2,
-*               double (*f)(int n,double *x),int imx,
-*               double omega1,double omega2,double *xmin,int *status)
-*     Finds a local minimum xmin of a given function f that depends on
-*     on a vector x[0],..,x[n-1] of n variables. The minimum is searched
-*     for in the hypercube x0[j]<x[j]<x2[j], j=0,..,n-1, starting from
-*     x=x1 (which must be in the hypercube). At most imx iterations of
-*     Powell's direction set method are applied to find the minimum.
-*      The program terminates if the coordinates of the position xmin
-*     changed by less than omega1 or less than omega2*xmin in the last
-*     iteration. On output status reports the total number of iterations
-*     that were required or a negative number if the program failed (-1
-*     if the algorithm did not converge, -2 if the minimum could not be
-*     bracketed)
-*
-* Notes:
-*
-* The program inverse_fct() uses a slightly modified secant method, while
-* minimize_fct() proceeds according to a golden-ratio bisection method.
-*
-* The meaningful levels of precision depend on the function f() and the
-* machine precision. In particular, rounding becomes important in the
-* minimization routine at a precision roughly equal to the square root
-* of the machine precision.
-*
-* Powell's method is described in Chapter 10 of
-*
-*   W.H. Press, S.A. Teukolsky, W.T. Vetterling and B.P. Flannery,
-*   Numerical Recipes in FORTRAN, 2nd Edition
-*   (Cambridge University Press, Cambridge, 1992)
-*
-* The variant recommended in this book is implemented here with some small
-* modifications
-*
-*******************************************************************************/
+ *
+ * File fsolve.c
+ *
+ * Copyright (C) 2008, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * General purpose equation solver and function minimizers
+ *
+ * The externally accessible functions are
+ *
+ *   double inverse_fct(double y,double x1,double x2,double (*f)(double x),
+ *                      double omega1,double omega2)
+ *     Finds a solution x of the equation f(x)=y in the interval [x1,x2]
+ *     to an absolute precision omega1 or a relative precision omega2
+ *     (whichever is reached first). The points x1,x2 must be such that
+ *     f(x1) and f(x2) have different sign
+ *
+ *   double minimize_fct(double x0,double x1,double x2,double (*f)(double x),
+ *                       double omega1,double omega2)
+ *     Finds a local minimum x of f(x) in the interval [x0,x2] to an
+ *     absolute precision omega1 or a relative precision omega2 (whichever
+ *     is reached first). The point x1 is taken as an initial guess of the
+ *     position of the minimum (x0<x1<x2)
+ *
+ *   void powell(int n,double *x0,double *x1,double *x2,
+ *               double (*f)(int n,double *x),int imx,
+ *               double omega1,double omega2,double *xmin,int *status)
+ *     Finds a local minimum xmin of a given function f that depends on
+ *     on a vector x[0],..,x[n-1] of n variables. The minimum is searched
+ *     for in the hypercube x0[j]<x[j]<x2[j], j=0,..,n-1, starting from
+ *     x=x1 (which must be in the hypercube). At most imx iterations of
+ *     Powell's direction set method are applied to find the minimum.
+ *      The program terminates if the coordinates of the position xmin
+ *     changed by less than omega1 or less than omega2*xmin in the last
+ *     iteration. On output status reports the total number of iterations
+ *     that were required or a negative number if the program failed (-1
+ *     if the algorithm did not converge, -2 if the minimum could not be
+ *     bracketed)
+ *
+ * Notes:
+ *
+ * The program inverse_fct() uses a slightly modified secant method, while
+ * minimize_fct() proceeds according to a golden-ratio bisection method.
+ *
+ * The meaningful levels of precision depend on the function f() and the
+ * machine precision. In particular, rounding becomes important in the
+ * minimization routine at a precision roughly equal to the square root
+ * of the machine precision.
+ *
+ * Powell's method is described in Chapter 10 of
+ *
+ *   W.H. Press, S.A. Teukolsky, W.T. Vetterling and B.P. Flannery,
+ *   Numerical Recipes in FORTRAN, 2nd Edition
+ *   (Cambridge University Press, Cambridge, 1992)
+ *
+ * The variant recommended in this book is implemented here with some small
+ * modifications
+ *
+ *******************************************************************************/
 
 #define FSOLVE_C
 

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check5.c
-*
-* Copyright (C) 2010, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Yang-Mills action of constant abelian background fields.
-*
-*******************************************************************************/
+ *
+ * File check5.c
+ *
+ * Copyright (C) 2010, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Yang-Mills action of constant abelian background fields.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

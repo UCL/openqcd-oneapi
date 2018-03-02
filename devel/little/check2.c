@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the program b2b_flds().
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the program b2b_flds().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

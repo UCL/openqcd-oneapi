@@ -1,33 +1,33 @@
 
 /*******************************************************************************
-*
-* File su3ren.c
-*
-* Copyright (C) 2005, 2009, 2010, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Renormalization of SU(3) matrices
-*
-* The externally accessible function are
-*
-*   void project_to_su3(su3 *u)
-*     Projects an approximate single-precision SU(3) matrix back to SU(3).
-*     No action is performed if the matrix is degenerate
-*
-*   void project_to_su3_dble(su3_dble *u)
-*     Projects an approximate double-precision SU(3) matrix back to SU(3).
-*     No action is performed if the matrix is degenerate
-*
-* Notes:
-*
-* The programs in this module do not perform any communications and can be
-* called locally. A matrix is considered to be degenerate if the first
-* column vector or the cross-product of the first and the second vector is
-* exactly equal to zero.
-*
-*******************************************************************************/
+ *
+ * File su3ren.c
+ *
+ * Copyright (C) 2005, 2009, 2010, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Renormalization of SU(3) matrices
+ *
+ * The externally accessible function are
+ *
+ *   void project_to_su3(su3 *u)
+ *     Projects an approximate single-precision SU(3) matrix back to SU(3).
+ *     No action is performed if the matrix is degenerate
+ *
+ *   void project_to_su3_dble(su3_dble *u)
+ *     Projects an approximate double-precision SU(3) matrix back to SU(3).
+ *     No action is performed if the matrix is degenerate
+ *
+ * Notes:
+ *
+ * The programs in this module do not perform any communications and can be
+ * called locally. A matrix is considered to be degenerate if the first
+ * column vector or the cross-product of the first and the second vector is
+ * exactly equal to zero.
+ *
+ *******************************************************************************/
 
 #define SU3REN_C
 

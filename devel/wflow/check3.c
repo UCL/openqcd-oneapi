@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check3.c
-*
-* Copyright (C) 2009-2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Convergence of the numerical integration of the Wilson flow.
-*
-*******************************************************************************/
+ *
+ * File check3.c
+ *
+ * Copyright (C) 2009-2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Convergence of the numerical integration of the Wilson flow.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

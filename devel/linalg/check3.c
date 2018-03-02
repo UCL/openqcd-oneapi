@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check3.c
-*
-* Copyright (C) 2005, 2011, 2012, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Checks on the programs in the module salg_dble.c
-*
-*******************************************************************************/
+ *
+ * File check3.c
+ *
+ * Copyright (C) 2005, 2011, 2012, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Checks on the programs in the module salg_dble.c
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

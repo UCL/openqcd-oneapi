@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check6.c
-*
-* Copyright (C) 2005, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Statistical test of random_su3_dble
-*
-*******************************************************************************/
+ *
+ * File check6.c
+ *
+ * Copyright (C) 2005, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Statistical test of random_su3_dble
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

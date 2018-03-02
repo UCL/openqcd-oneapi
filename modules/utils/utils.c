@@ -1,85 +1,85 @@
 
 /*******************************************************************************
-*
-* File utils.c
-*
-* Copyright (C) 2005, 2008, 2011, 2016 Martin Luescher, 2013 Hubert Simma
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Collection of basic utility programs
-*
-* The externally accessible functions are
-*
-*   int safe_mod(int x,int y)
-*     Returns x mod y, where y is assumed positive and x can have any
-*     sign. The return value is in the interval [0,y)
-*
-*   void *amalloc(size_t size,int p)
-*     Allocates an aligned memory area of "size" bytes, with a starting
-*     address (the return value) that is an integer multiple of 2^p. A
-*     NULL pointer is returned if the allocation was not successful
-*
-*   void afree(void *addr)
-*     Frees the aligned memory area at address "addr" that was previously
-*     allocated using amalloc. If the memory space at this address was
-*     already freed using afree, or if the address does not match an
-*     address previously returned by amalloc, the program does not do
-*     anything
-*
-*   double amem_use_mb()
-*     Returns the current size in MByte of the total memory area which
-*     has been allocated through amalloc (but not yet freed by afree)
-*
-*   double amem_max_mb()
-*     Returns the maximum size in MByte of the total memory area which
-*     has been allocated through amalloc at any moment since the start
-*     of the program execution and until the current call to amem_max_mb()
-*
-*   int mpi_permanent_tag(void)
-*     Returns a new send tag that is guaranteed to be unique and which
-*     is therefore suitable for use in permanent communication requests.
-*     The available number of tags of this kind is 16384
-*
-*   int mpi_tag(void)
-*     Returns a new send tag for use in non-permanent communications.
-*     Note that the counter for these tags wraps around after 16384
-*     tags have been delivered
-*
-*   void message(char *format,...)
-*     Prints a message from process 0 to stdout. The usage and argument
-*     list is the same as in the case of the printf function
-*
-*   void mpc_gsum_d(double *src, double *dst, int num)
-*     Compute global sum of num double precision values from src and
-*     store results in dst
-*
-*   void mpc_bcast_c(char *buf, int num)
-*     Broadcast num char values from buf of rank 0
-*
-*   void mpc_bcast_d(double *buf, int num)
-*     Broadcast num double values from buf of rank 0
-*
-*   void mpc_bcast_i(int *buf, int num)
-*     Broadcast num int values from buf of rank 0
-*
-*   void mpc_print_info()
-*     Print info how mpc functions are implemented
-*
-* Notes:
-*
-* If an error is detected in a locally operating program, it is not possible
-* to stop the global program immediately in a decent manner. Such errors
-* should first be recorded by the error_loc() function, and the main program
-* may later be aborted by calling error_chk() outside the program where the
-* error was detected.
-*
-* An important point to note is that the programs error() and error_chk()
-* require a global communication. They must therefore be called on all
-* processes simultaneously.
-*
-*******************************************************************************/
+ *
+ * File utils.c
+ *
+ * Copyright (C) 2005, 2008, 2011, 2016 Martin Luescher, 2013 Hubert Simma
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Collection of basic utility programs
+ *
+ * The externally accessible functions are
+ *
+ *   int safe_mod(int x,int y)
+ *     Returns x mod y, where y is assumed positive and x can have any
+ *     sign. The return value is in the interval [0,y)
+ *
+ *   void *amalloc(size_t size,int p)
+ *     Allocates an aligned memory area of "size" bytes, with a starting
+ *     address (the return value) that is an integer multiple of 2^p. A
+ *     NULL pointer is returned if the allocation was not successful
+ *
+ *   void afree(void *addr)
+ *     Frees the aligned memory area at address "addr" that was previously
+ *     allocated using amalloc. If the memory space at this address was
+ *     already freed using afree, or if the address does not match an
+ *     address previously returned by amalloc, the program does not do
+ *     anything
+ *
+ *   double amem_use_mb()
+ *     Returns the current size in MByte of the total memory area which
+ *     has been allocated through amalloc (but not yet freed by afree)
+ *
+ *   double amem_max_mb()
+ *     Returns the maximum size in MByte of the total memory area which
+ *     has been allocated through amalloc at any moment since the start
+ *     of the program execution and until the current call to amem_max_mb()
+ *
+ *   int mpi_permanent_tag(void)
+ *     Returns a new send tag that is guaranteed to be unique and which
+ *     is therefore suitable for use in permanent communication requests.
+ *     The available number of tags of this kind is 16384
+ *
+ *   int mpi_tag(void)
+ *     Returns a new send tag for use in non-permanent communications.
+ *     Note that the counter for these tags wraps around after 16384
+ *     tags have been delivered
+ *
+ *   void message(char *format,...)
+ *     Prints a message from process 0 to stdout. The usage and argument
+ *     list is the same as in the case of the printf function
+ *
+ *   void mpc_gsum_d(double *src, double *dst, int num)
+ *     Compute global sum of num double precision values from src and
+ *     store results in dst
+ *
+ *   void mpc_bcast_c(char *buf, int num)
+ *     Broadcast num char values from buf of rank 0
+ *
+ *   void mpc_bcast_d(double *buf, int num)
+ *     Broadcast num double values from buf of rank 0
+ *
+ *   void mpc_bcast_i(int *buf, int num)
+ *     Broadcast num int values from buf of rank 0
+ *
+ *   void mpc_print_info()
+ *     Print info how mpc functions are implemented
+ *
+ * Notes:
+ *
+ * If an error is detected in a locally operating program, it is not possible
+ * to stop the global program immediately in a decent manner. Such errors
+ * should first be recorded by the error_loc() function, and the main program
+ * may later be aborted by calling error_chk() outside the program where the
+ * error was detected.
+ *
+ * An important point to note is that the programs error() and error_chk()
+ * require a global communication. They must therefore be called on all
+ * processes simultaneously.
+ *
+ *******************************************************************************/
 
 #define UTILS_C
 

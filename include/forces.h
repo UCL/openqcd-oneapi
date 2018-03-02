@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File forces.h
-*
-* Copyright (C) 2011, 2012 Martin Luescher, Stefan Schaefer
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File forces.h
+ *
+ * Copyright (C) 2011, 2012 Martin Luescher, Stefan Schaefer
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef FORCES_H
 #define FORCES_H

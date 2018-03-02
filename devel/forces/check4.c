@@ -1,17 +1,17 @@
 
 /*******************************************************************************
-*
-* File check4.c
-*
-* Copyright (C) 2005, 2008-2013, 2016 Martin Luescher, Filippo Palombi,
-*                                     Stefan Schaefer
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of sw_frc() and hop_frc().
-*
-*******************************************************************************/
+ *
+ * File check4.c
+ *
+ * Copyright (C) 2005, 2008-2013, 2016 Martin Luescher, Filippo Palombi,
+ *                                     Stefan Schaefer
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of sw_frc() and hop_frc().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

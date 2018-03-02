@@ -1,32 +1,32 @@
 
 /*******************************************************************************
-*
-* File shift.c
-*
-* Copyright (C) 2006, 2009, 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Translation of the global double-precision gauge field.
-*
-* The externally accessible function is
-*
-*   int shift_ud(int *s)
-*     Replaces the double-precision gauge field U(x,mu) by U(x-s,mu), where
-*     s[4] is any given shift vector. The program returns the number of
-*     elementary steps (translations by 1 lattice unit) that were performed.
-*
-* Notes:
-*
-* Shifts in the time direction are only permitted in the case of periodic
-* boundary conditions. The required communication buffers are allocated
-* automatically.
-*
-* The program shift_ud() acts globally and must be called simultaneously on
-* all MPI processes with the same translation vector.
-*
-*******************************************************************************/
+ *
+ * File shift.c
+ *
+ * Copyright (C) 2006, 2009, 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Translation of the global double-precision gauge field.
+ *
+ * The externally accessible function is
+ *
+ *   int shift_ud(int *s)
+ *     Replaces the double-precision gauge field U(x,mu) by U(x-s,mu), where
+ *     s[4] is any given shift vector. The program returns the number of
+ *     elementary steps (translations by 1 lattice unit) that were performed.
+ *
+ * Notes:
+ *
+ * Shifts in the time direction are only permitted in the case of periodic
+ * boundary conditions. The required communication buffers are allocated
+ * automatically.
+ *
+ * The program shift_ud() acts globally and must be called simultaneously on
+ * all MPI processes with the same translation vector.
+ *
+ *******************************************************************************/
 
 #define SHIFT_C
 

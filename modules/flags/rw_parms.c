@@ -1,137 +1,137 @@
 
 /*******************************************************************************
-*
-* File rw_parms.c
-*
-* Copyright (C) 2012-2014 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Reweighting factor parameter data base.
-*
-* The externally accessible functions are
-*
-*   rw_parms_t set_rw_parms(int irw,rwfact_t rwfact,int im0,int nsrc,
-*                           int irp,int nfct,double *mu,int *np,int *isp)
-*     Sets the parameters in the reweighting factor parameter set number
-*     irw and returns a structure containing them (see the notes).
-*
-*   rw_parms_t rw_parms(int irw)
-*     Returns a structure containing the reweighting factor parameter set
-*     number irw (see the notes).
-*
-*   void read_rw_parms(int irw)
-*     On process 0, this program scans stdin for a line starting with the
-*     string "[Reweighting factor <int>]" (after any number of blanks), where
-*     <int> is the integer value passed through the argument. An error occurs
-*     if no such line or more than one is found. The lines
-*
-*       rwfact   <rwfact_t>
-*       im0      <int>
-*       nsrc     <int>
-*       irp      <int>
-*       mu       <double> [<double>]
-*       np       <int> [<int>]
-*       isp      <int> [<int>]
-*
-*     are then read using read_line() [utils/mutils.c] and the data are
-*     added to the data base by calling set_rw_parms(irw,...). Depending
-*     on the value of "rwfact", some lines are not read and can be omitted
-*     in the input file. The number of items on the lines with tag "mu",
-*     "np" and "isp" depends on the reweighting factor too (see the notes).
-*
-*   void print_rw_parms(void)
-*     Prints the defined reweighting factor parameter sets to stdout on
-*     MPI process 0.
-*
-*   void write_rw_parms(FILE *fdat)
-*     Writes the defined reweighting factor parameter sets to the file fdat
-*     on MPI process 0.
-*
-*   void check_rw_parms(FILE *fdat)
-*     Compares the defined reweighting factor parameter sets with those
-*     on the file fdat on MPI process 0, assuming the latter were written
-*     to the file by the program write_rw_parms().
-*
-* Notes:
-*
-* The elements of a structure of type rw_parms_t are:
-*
-*   rwfact  Reweighting factor program used. This parameter is an enum
-*           type with one of the following values:
-*
-*            RWTM1       (program rwtm1() [update/rwtm.c]),
-*
-*            RWTM1_EO    (program rwtm1eo() [update/rwtmeo.c]),
-*
-*            RWTM2       (program rwtm2() [update/rwtm.c]),
-*
-*            RWTM2_EO    (program rwtm2eo() [update/rwtmeo.c]),
-*
-*            RWRAT       (program rwrat() [update/rwrat.c]).
-*
-*   im0     Index of the bare sea quark mass in the parameter data base
-*           (see flags/lat_parms.c).
-*
-*   nsrc    Number N of random source fields to be used for the stochastic
-*           estimation of the reweighting factor. If the latter is split
-*           into a product factors, N random fields are used for each of
-*           them.
-*
-*   irp     Rational function parameter set index. Only relevant if
-*           rwfact=RWRAT.
-*
-*   nfct    If rwfact=RWTM*: Number of Hasenbusch factors into which the
-*           reweighting factor is decomposed;
-*           If rwfact=RWRAT: Number of rational factors into which the
-*           rational function is decomposed.
-*
-*   mu      Array of twisted masses that define the Hasenbusch factors
-*           (nfct elements; 0<mu[0]<mu[1]<..<mu[nfct-1]). Only relevant
-*           if rwfact=RWTM* and otherwise set to NULL.
-*
-*   np      Array of the numbers of poles of the rational factors into
-*           which the rational function is decomposed. Only relevant if
-*           rwfact=RWRAT and otherwise set to NULL.
-*
-*   isp     Array of solver parameter set indices describing the solvers
-*           for the Dirac equation to be used. The array must have nfct
-*           elements that correspond to the factors of the reweighting
-*           factor if rwfact=RWTM* or, if rwfact=RWRAT, to the rational
-*           functions into which the rational function is decomposed.
-*
-* Valid examples of parameter sections that can be read by read_rw_parms()
-* are
-*
-*   [Reweighting factor 1]
-*    rwfact   RWTM1           # Or RWTM1_EO, RWTM2, RWTM2_EO
-*    im0      0
-*    nsrc     12
-*    mu       0.001 0.003     # Implies a decomposition in 2 factors
-*    isp      3               # Solver no 3 will be used for all factors
-*
-*   [Reweighting factor 4]
-*    rwfact   RWRAT
-*    im0      1
-*    nsrc     4
-*    irp      0
-*    np       6 2 2           # Implies a decomposition in 3 rational parts
-*    isp      3 5 6           # For each part, a separate solver is used
-*
-* The number of solver parameter sets specified on the line with tag "isp"
-* need not match the number of factors or rational parts specified on the
-* lines with tag "mu" or "np". If fewer are given, the list is padded with
-* the last entry on the line. Superfluos entries are ignored.
-*
-* Up to 32 reweighting parameter sets, labeled by an index irw=0,1,..,31,
-* can be specified. Once a set is defined, it cannot be changed by calling
-* set_rw_parms() again. All parameters must be globally the same.
-*
-* Except for rw_parms(), the programs in this module perform global operations
-* and must be called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File rw_parms.c
+ *
+ * Copyright (C) 2012-2014 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Reweighting factor parameter data base.
+ *
+ * The externally accessible functions are
+ *
+ *   rw_parms_t set_rw_parms(int irw,rwfact_t rwfact,int im0,int nsrc,
+ *                           int irp,int nfct,double *mu,int *np,int *isp)
+ *     Sets the parameters in the reweighting factor parameter set number
+ *     irw and returns a structure containing them (see the notes).
+ *
+ *   rw_parms_t rw_parms(int irw)
+ *     Returns a structure containing the reweighting factor parameter set
+ *     number irw (see the notes).
+ *
+ *   void read_rw_parms(int irw)
+ *     On process 0, this program scans stdin for a line starting with the
+ *     string "[Reweighting factor <int>]" (after any number of blanks), where
+ *     <int> is the integer value passed through the argument. An error occurs
+ *     if no such line or more than one is found. The lines
+ *
+ *       rwfact   <rwfact_t>
+ *       im0      <int>
+ *       nsrc     <int>
+ *       irp      <int>
+ *       mu       <double> [<double>]
+ *       np       <int> [<int>]
+ *       isp      <int> [<int>]
+ *
+ *     are then read using read_line() [utils/mutils.c] and the data are
+ *     added to the data base by calling set_rw_parms(irw,...). Depending
+ *     on the value of "rwfact", some lines are not read and can be omitted
+ *     in the input file. The number of items on the lines with tag "mu",
+ *     "np" and "isp" depends on the reweighting factor too (see the notes).
+ *
+ *   void print_rw_parms(void)
+ *     Prints the defined reweighting factor parameter sets to stdout on
+ *     MPI process 0.
+ *
+ *   void write_rw_parms(FILE *fdat)
+ *     Writes the defined reweighting factor parameter sets to the file fdat
+ *     on MPI process 0.
+ *
+ *   void check_rw_parms(FILE *fdat)
+ *     Compares the defined reweighting factor parameter sets with those
+ *     on the file fdat on MPI process 0, assuming the latter were written
+ *     to the file by the program write_rw_parms().
+ *
+ * Notes:
+ *
+ * The elements of a structure of type rw_parms_t are:
+ *
+ *   rwfact  Reweighting factor program used. This parameter is an enum
+ *           type with one of the following values:
+ *
+ *            RWTM1       (program rwtm1() [update/rwtm.c]),
+ *
+ *            RWTM1_EO    (program rwtm1eo() [update/rwtmeo.c]),
+ *
+ *            RWTM2       (program rwtm2() [update/rwtm.c]),
+ *
+ *            RWTM2_EO    (program rwtm2eo() [update/rwtmeo.c]),
+ *
+ *            RWRAT       (program rwrat() [update/rwrat.c]).
+ *
+ *   im0     Index of the bare sea quark mass in the parameter data base
+ *           (see flags/lat_parms.c).
+ *
+ *   nsrc    Number N of random source fields to be used for the stochastic
+ *           estimation of the reweighting factor. If the latter is split
+ *           into a product factors, N random fields are used for each of
+ *           them.
+ *
+ *   irp     Rational function parameter set index. Only relevant if
+ *           rwfact=RWRAT.
+ *
+ *   nfct    If rwfact=RWTM*: Number of Hasenbusch factors into which the
+ *           reweighting factor is decomposed;
+ *           If rwfact=RWRAT: Number of rational factors into which the
+ *           rational function is decomposed.
+ *
+ *   mu      Array of twisted masses that define the Hasenbusch factors
+ *           (nfct elements; 0<mu[0]<mu[1]<..<mu[nfct-1]). Only relevant
+ *           if rwfact=RWTM* and otherwise set to NULL.
+ *
+ *   np      Array of the numbers of poles of the rational factors into
+ *           which the rational function is decomposed. Only relevant if
+ *           rwfact=RWRAT and otherwise set to NULL.
+ *
+ *   isp     Array of solver parameter set indices describing the solvers
+ *           for the Dirac equation to be used. The array must have nfct
+ *           elements that correspond to the factors of the reweighting
+ *           factor if rwfact=RWTM* or, if rwfact=RWRAT, to the rational
+ *           functions into which the rational function is decomposed.
+ *
+ * Valid examples of parameter sections that can be read by read_rw_parms()
+ * are
+ *
+ *   [Reweighting factor 1]
+ *    rwfact   RWTM1           # Or RWTM1_EO, RWTM2, RWTM2_EO
+ *    im0      0
+ *    nsrc     12
+ *    mu       0.001 0.003     # Implies a decomposition in 2 factors
+ *    isp      3               # Solver no 3 will be used for all factors
+ *
+ *   [Reweighting factor 4]
+ *    rwfact   RWRAT
+ *    im0      1
+ *    nsrc     4
+ *    irp      0
+ *    np       6 2 2           # Implies a decomposition in 3 rational parts
+ *    isp      3 5 6           # For each part, a separate solver is used
+ *
+ * The number of solver parameter sets specified on the line with tag "isp"
+ * need not match the number of factors or rational parts specified on the
+ * lines with tag "mu" or "np". If fewer are given, the list is padded with
+ * the last entry on the line. Superfluos entries are ignored.
+ *
+ * Up to 32 reweighting parameter sets, labeled by an index irw=0,1,..,31,
+ * can be specified. Once a set is defined, it cannot be changed by calling
+ * set_rw_parms() again. All parameters must be globally the same.
+ *
+ * Except for rw_parms(), the programs in this module perform global operations
+ * and must be called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define RW_PARMS_C
 

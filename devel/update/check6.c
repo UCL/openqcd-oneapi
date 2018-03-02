@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check6.c
-*
-* Copyright (C) 2012-2014, 2016 Stefan Schaefer, Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Comparison of rwtm*eo() with action4().
-*
-*******************************************************************************/
+ *
+ * File check6.c
+ *
+ * Copyright (C) 2012-2014, 2016 Stefan Schaefer, Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Comparison of rwtm*eo() with action4().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

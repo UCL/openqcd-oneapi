@@ -1,77 +1,77 @@
 
 /*******************************************************************************
-*
-* File salg_dble.c
-*
-* Copyright (C) 2005, 2007, 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Generic linear algebra routines for double-precision Dirac fields.
-*
-* The externally accessible functions are
-*
-*   complex_dble spinor_prod_dble(int vol,int icom,spinor_dble *s,
-*                                 spinor_dble *r)
-*     Computes the scalar product of the fields s and r.
-*
-*   double spinor_prod_re_dble(int vol,int icom,spinor_dble *s,
-*                              spinor_dble *r)
-*     Computes the real part of the scalar product of the fields
-*     s and r.
-*
-*   complex_dble spinor_prod5_dble(int vol,int icom,spinor_dble *s,
-*                                  spinor_dble *r)
-*     Computes the scalar product of the fields s and gamma_5*r.
-*
-*   double norm_square_dble(int vol,int icom,spinor_dble *s)
-*     Computes the square of the norm of the field s.
-*
-*   void mulc_spinor_add_dble(int vol,spinor_dble *s,spinor_dble *r,
-*                             complex_dble z)
-*     Replaces the field s by s+z*r.
-*
-*   void mulr_spinor_add_dble(int vol,spinor_dble *s,spinor_dble *r,
-*                             double c)
-*     Replaces the field s by s+c*r.
-*
-*   void combine_spinor_dble(int vol,spinor_dble *s,spinor_dble *r,
-*                            double cs,double cr)
-*     Replaces the field s by cs*s+cr*r.
-*
-*   void project_dble(int vol,int icom,spinor_dble *s,spinor_dble *r)
-*     Replaces the field s by s-(r,s)*r.
-*
-*   void scale_dble(int vol,double c,spinor_dble *s)
-*     Replaces the field s by c*s.
-*
-*   double normalize_dble(int vol,int icom,spinor_dble *s)
-*     Replaces the field s by s/||s|| and returns the norm ||s||.
-*
-*   void rotate_dble(int vol,int n,spinor_dble **ppk,complex_dble *v)
-*     Replaces the fields pk by sum_j pj*v[n*j+k] where 0<=k,j<n and
-*     pk=ppk[k].
-*
-*   void mulg5_dble(int vol,spinor_dble *s)
-*     Multiplies the field s with gamma_5.
-*
-*   void mulmg5_dble(int vol,spinor_dble *s)
-*     Multiplies the field s with -gamma_5.
-*
-* Notes:
-*
-* All these programs act on arrays of spinor fields whose base address
-* is passed through the arguments. The length of the arrays is specified
-* by the parameter vol. Scalar products are globally summed if the
-* parameter icom is equal to 1. In this case, the calculated values are
-* guaranteed to be exactly the same on all processes.
-*
-* The programs perform no communications except in the case of the scalar
-* products if these are globally summed. If SSE (AVX) instructions are used,
-* the spinor fields must be aligned to a 16 (32) byte boundary.
-*
-*******************************************************************************/
+ *
+ * File salg_dble.c
+ *
+ * Copyright (C) 2005, 2007, 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Generic linear algebra routines for double-precision Dirac fields.
+ *
+ * The externally accessible functions are
+ *
+ *   complex_dble spinor_prod_dble(int vol,int icom,spinor_dble *s,
+ *                                 spinor_dble *r)
+ *     Computes the scalar product of the fields s and r.
+ *
+ *   double spinor_prod_re_dble(int vol,int icom,spinor_dble *s,
+ *                              spinor_dble *r)
+ *     Computes the real part of the scalar product of the fields
+ *     s and r.
+ *
+ *   complex_dble spinor_prod5_dble(int vol,int icom,spinor_dble *s,
+ *                                  spinor_dble *r)
+ *     Computes the scalar product of the fields s and gamma_5*r.
+ *
+ *   double norm_square_dble(int vol,int icom,spinor_dble *s)
+ *     Computes the square of the norm of the field s.
+ *
+ *   void mulc_spinor_add_dble(int vol,spinor_dble *s,spinor_dble *r,
+ *                             complex_dble z)
+ *     Replaces the field s by s+z*r.
+ *
+ *   void mulr_spinor_add_dble(int vol,spinor_dble *s,spinor_dble *r,
+ *                             double c)
+ *     Replaces the field s by s+c*r.
+ *
+ *   void combine_spinor_dble(int vol,spinor_dble *s,spinor_dble *r,
+ *                            double cs,double cr)
+ *     Replaces the field s by cs*s+cr*r.
+ *
+ *   void project_dble(int vol,int icom,spinor_dble *s,spinor_dble *r)
+ *     Replaces the field s by s-(r,s)*r.
+ *
+ *   void scale_dble(int vol,double c,spinor_dble *s)
+ *     Replaces the field s by c*s.
+ *
+ *   double normalize_dble(int vol,int icom,spinor_dble *s)
+ *     Replaces the field s by s/||s|| and returns the norm ||s||.
+ *
+ *   void rotate_dble(int vol,int n,spinor_dble **ppk,complex_dble *v)
+ *     Replaces the fields pk by sum_j pj*v[n*j+k] where 0<=k,j<n and
+ *     pk=ppk[k].
+ *
+ *   void mulg5_dble(int vol,spinor_dble *s)
+ *     Multiplies the field s with gamma_5.
+ *
+ *   void mulmg5_dble(int vol,spinor_dble *s)
+ *     Multiplies the field s with -gamma_5.
+ *
+ * Notes:
+ *
+ * All these programs act on arrays of spinor fields whose base address
+ * is passed through the arguments. The length of the arrays is specified
+ * by the parameter vol. Scalar products are globally summed if the
+ * parameter icom is equal to 1. In this case, the calculated values are
+ * guaranteed to be exactly the same on all processes.
+ *
+ * The programs perform no communications except in the case of the scalar
+ * products if these are globally summed. If SSE (AVX) instructions are used,
+ * the spinor fields must be aligned to a 16 (32) byte boundary.
+ *
+ *******************************************************************************/
 
 #define SALG_DBLE_C
 

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File global.h
-*
-* Copyright (C) 2009, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Global parameters and arrays
-*
-*******************************************************************************/
+ *
+ * File global.h
+ *
+ * Copyright (C) 2009, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Global parameters and arrays
+ *
+ *******************************************************************************/
 
 #ifndef GLOBAL_H
 #define GLOBAL_H

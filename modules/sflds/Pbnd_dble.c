@@ -1,49 +1,49 @@
 
 /*******************************************************************************
-*
-* File Pbnd_dble.c
-*
-* Copyright (C) 2005, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Generic programs for the projector theta to the exterior boundary of a
-* block of lattice points (version for double-precision fields)
-*
-* The following are arrays of functions indexed by the face number
-* ifc=0,..,7
-*
-*   void (*assign_sd2wd[8])(int *imb,int vol,spinor_dble *sd,weyl_dble *rd)
-*     Applies the projector theta[ifc] to the spinor sd[imb[ix]],
-*     ix=0,..,vol-1, and assigns the result to the weyl spinor rd[ix]
-*
-*   void (*add_assign_wd2sd[8])(int *imb,int vol,weyl_dble *sd,spinor_dble *rd)
-*     Expands the Weyl spinor sd[ix], ix=0,..,vol-1, to a Dirac spinor
-*     psi satisfying theta[ifc]*psi=psi and adds psi to rd[imb[ix]]
-*
-*   void (*sub_assign_wd2sd[8])(int *imb,int vol,weyl_dble *sd,spinor_dble *rd)
-*     Expands the Weyl spinor sd[ix], ix=0,..,vol-1, to a Dirac spinor
-*     psi satisfying theta[ifc]*psi=psi and subtracts psi from rd[imb[ix]]
-*
-*   void (*mulg5_sub_assign_wd2sd[8])(int *imb,int vol,weyl_dble *sd,
-*                                     spinor_dble *rd)
-*     Expands the Weyl spinor sd[ix], ix=0,..,vol-1, to a Dirac spinor
-*     psi satisfying theta[ifc]*psi=psi and subtracts gamma5*psi from
-*     rd[imb[ix]]
-*
-* Notes:
-*
-* The projector theta is described in the module sflds/Pbnd.c. The size and
-* position of the faces is only implicitly defined through the parameter vol
-* and the array *imb of the indices of the points on the face.
-*
-* None of these programs involves communications. They are general purpose
-* routines that know nothing about the underlying geometry. In particular,
-* they can be called locally. If SSE instructions are used, the fields must
-* be aligned to a 16 byte boundary.
-*
-*******************************************************************************/
+ *
+ * File Pbnd_dble.c
+ *
+ * Copyright (C) 2005, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Generic programs for the projector theta to the exterior boundary of a
+ * block of lattice points (version for double-precision fields)
+ *
+ * The following are arrays of functions indexed by the face number
+ * ifc=0,..,7
+ *
+ *   void (*assign_sd2wd[8])(int *imb,int vol,spinor_dble *sd,weyl_dble *rd)
+ *     Applies the projector theta[ifc] to the spinor sd[imb[ix]],
+ *     ix=0,..,vol-1, and assigns the result to the weyl spinor rd[ix]
+ *
+ *   void (*add_assign_wd2sd[8])(int *imb,int vol,weyl_dble *sd,spinor_dble *rd)
+ *     Expands the Weyl spinor sd[ix], ix=0,..,vol-1, to a Dirac spinor
+ *     psi satisfying theta[ifc]*psi=psi and adds psi to rd[imb[ix]]
+ *
+ *   void (*sub_assign_wd2sd[8])(int *imb,int vol,weyl_dble *sd,spinor_dble *rd)
+ *     Expands the Weyl spinor sd[ix], ix=0,..,vol-1, to a Dirac spinor
+ *     psi satisfying theta[ifc]*psi=psi and subtracts psi from rd[imb[ix]]
+ *
+ *   void (*mulg5_sub_assign_wd2sd[8])(int *imb,int vol,weyl_dble *sd,
+ *                                     spinor_dble *rd)
+ *     Expands the Weyl spinor sd[ix], ix=0,..,vol-1, to a Dirac spinor
+ *     psi satisfying theta[ifc]*psi=psi and subtracts gamma5*psi from
+ *     rd[imb[ix]]
+ *
+ * Notes:
+ *
+ * The projector theta is described in the module sflds/Pbnd.c. The size and
+ * position of the faces is only implicitly defined through the parameter vol
+ * and the array *imb of the indices of the points on the face.
+ *
+ * None of these programs involves communications. They are general purpose
+ * routines that know nothing about the underlying geometry. In particular,
+ * they can be called locally. If SSE instructions are used, the fields must
+ * be aligned to a 16 byte boundary.
+ *
+ *******************************************************************************/
 
 #define PBND_DBLE_C
 

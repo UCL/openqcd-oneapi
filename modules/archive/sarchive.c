@@ -1,64 +1,64 @@
 
 /*******************************************************************************
-*
-* File sarchive.c
-*
-* Copyright (C) 2007, 2008, 2011, 2013, 2014 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Programs to read and write global double-precision spinor fields.
-*
-* The externally accessible functions are
-*
-*   void write_sfld(char *out,spinor_dble *sd)
-*     Writes the lattice sizes, the process grid sizes, the coordinates
-*     of the calling process, the square of the norm of the spinor field
-*     sd and the local part of the latter to the file "out".
-*
-*   void read_sfld(char *in,spinor_dble *sd)
-*     Reads the local part of the spinor field sd from the file "in",
-*     assuming the field was written to the file by write_sfld().
-*
-*   void export_sfld(char *out,spinor_dble *sd)
-*     Writes the lattice sizes and the spinor field sd to the file "out"
-*     from process 0 in the universal format specified below (see the
-*     notes).
-*
-*   void import_sfld(char *in,spinor_dble *sd)
-*     Reads the spinor field sd from the file "in" on process 0, assuming
-*     the field was written to the file in the universal format (see the
-*     notes).
-*
-* Notes:
-*
-* The spinor fields are assumed to be global quark fields as described in
-* main/README.global. Only their physical components (i.e. the spinors on
-* the local lattices) are written and read.
-*
-* The program export_sfld() first writes the global lattice sizes and the
-* square-norm of the spinor field. Then follow the spinors at the first
-* lattice point, the second point, and so on, in the order given by the
-* index
-*
-*   ix=x3+N3*x2+N2*N3*x1+N1*N2*N3*x0,
-*
-* where N0,N1,N2,N3 are the (global) lattice sizes and (x0,x1,x2,x3) the
-* Cartesian coordinates of the points (0<=x0<N0,...,0<=x3<N3).
-*
-* Independently of the machine, the export function writes the data to the
-* output file in little-endian byte order. Integers and double-precision
-* numbers on the output file occupy 4 and 8 bytes, respectively, the latter
-* being formatted according to the IEEE-754 standard. The import function
-* assumes the data on the input file to be little endian and converts them
-* to big-endian order if the machine is big endian. Exported fields can
-* thus be safely exchanged between different machines.
-*
-* All programs in this module involve communications and must be called
-* simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File sarchive.c
+ *
+ * Copyright (C) 2007, 2008, 2011, 2013, 2014 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Programs to read and write global double-precision spinor fields.
+ *
+ * The externally accessible functions are
+ *
+ *   void write_sfld(char *out,spinor_dble *sd)
+ *     Writes the lattice sizes, the process grid sizes, the coordinates
+ *     of the calling process, the square of the norm of the spinor field
+ *     sd and the local part of the latter to the file "out".
+ *
+ *   void read_sfld(char *in,spinor_dble *sd)
+ *     Reads the local part of the spinor field sd from the file "in",
+ *     assuming the field was written to the file by write_sfld().
+ *
+ *   void export_sfld(char *out,spinor_dble *sd)
+ *     Writes the lattice sizes and the spinor field sd to the file "out"
+ *     from process 0 in the universal format specified below (see the
+ *     notes).
+ *
+ *   void import_sfld(char *in,spinor_dble *sd)
+ *     Reads the spinor field sd from the file "in" on process 0, assuming
+ *     the field was written to the file in the universal format (see the
+ *     notes).
+ *
+ * Notes:
+ *
+ * The spinor fields are assumed to be global quark fields as described in
+ * main/README.global. Only their physical components (i.e. the spinors on
+ * the local lattices) are written and read.
+ *
+ * The program export_sfld() first writes the global lattice sizes and the
+ * square-norm of the spinor field. Then follow the spinors at the first
+ * lattice point, the second point, and so on, in the order given by the
+ * index
+ *
+ *   ix=x3+N3*x2+N2*N3*x1+N1*N2*N3*x0,
+ *
+ * where N0,N1,N2,N3 are the (global) lattice sizes and (x0,x1,x2,x3) the
+ * Cartesian coordinates of the points (0<=x0<N0,...,0<=x3<N3).
+ *
+ * Independently of the machine, the export function writes the data to the
+ * output file in little-endian byte order. Integers and double-precision
+ * numbers on the output file occupy 4 and 8 bytes, respectively, the latter
+ * being formatted according to the IEEE-754 standard. The import function
+ * assumes the data on the input file to be little endian and converts them
+ * to big-endian order if the machine is big endian. Exported fields can
+ * thus be safely exchanged between different machines.
+ *
+ * All programs in this module involve communications and must be called
+ * simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define SARCHIVE_C
 

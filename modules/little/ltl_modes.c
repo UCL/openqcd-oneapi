@@ -1,39 +1,39 @@
 
 /*******************************************************************************
-*
-* File ltl_modes.c
-*
-* Copyright (C) 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of the little modes.
-*
-* The externally accessible functions are
-*
-*   int set_ltl_modes(void)
-*     Computes the little modes, the associated little-little Dirac
-*     operator and its inverse. The program returns 0 if the inversion
-*     was safe and 1 if not.
-*
-*   complex_dble *ltl_matrix(void)
-*     Returns the pointer to an Ns x Ns matrix that represents the
-*     *inverse* of the double-precision little-little Dirac operator.
-*
-* Notes:
-*
-* For a description of the little Dirac operator and the associated data
-* structures see README.Aw. As usual, Ns denotes the number of deflation
-* modes in each block of the DFL_BLOCKS grid.
-*
-* The inversion of a double-precision complex matrix is considered to be
-* safe if and only if its Frobenius condition number is less than 10^6.
-*
-* All programs in this module may involve global communications and must
-* be called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File ltl_modes.c
+ *
+ * Copyright (C) 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of the little modes.
+ *
+ * The externally accessible functions are
+ *
+ *   int set_ltl_modes(void)
+ *     Computes the little modes, the associated little-little Dirac
+ *     operator and its inverse. The program returns 0 if the inversion
+ *     was safe and 1 if not.
+ *
+ *   complex_dble *ltl_matrix(void)
+ *     Returns the pointer to an Ns x Ns matrix that represents the
+ *     *inverse* of the double-precision little-little Dirac operator.
+ *
+ * Notes:
+ *
+ * For a description of the little Dirac operator and the associated data
+ * structures see README.Aw. As usual, Ns denotes the number of deflation
+ * modes in each block of the DFL_BLOCKS grid.
+ *
+ * The inversion of a double-precision complex matrix is considered to be
+ * safe if and only if its Frobenius condition number is less than 10^6.
+ *
+ * All programs in this module may involve global communications and must
+ * be called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define LTL_MODES_C
 

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2008, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of the Jacobi elliptic functions sn,cn,dn
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2008, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of the Jacobi elliptic functions sn,cn,dn
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File grid_queries.h
-*
-* Copyright (C) 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Block grid queries
-*
-*******************************************************************************/
+ *
+ * File grid_queries.h
+ *
+ * Copyright (C) 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Block grid queries
+ *
+ *******************************************************************************/
 
 #define GRID_QUERIES_H
 

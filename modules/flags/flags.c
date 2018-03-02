@@ -1,60 +1,60 @@
 
 /*******************************************************************************
-*
-* File flags.c
-*
-* Copyright (C) 2009, 2011, 2012, 2016 Martin Luescher, Isabel Campos
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Flags data base input and query programs
-*
-* The externally accessible functions are
-*
-*   void set_flags(event_t event)
-*     Reports an event to the data base, where some of the global field
-*     arrays are changed.
-*
-*   void set_grid_flags(blk_grid_t grid,event_t event)
-*     Reports an event to the data base, where some of the field arrays
-*     on the specified block grid are changed.
-*
-*   int query_flags(query_t query)
-*     Queries the data base on the status of the global field arrays.
-*     The program returns 1 or 0 depending on whether the answer to the
-*     specified query is "yes" or "no". If the query is unknown to the
-*     the data base, the program returns -1.
-*
-*   int query_grid_flags(blk_grid_t grid,query_t query)
-*     Queries the data base on the status of the field arrays on the
-*     specified block grid. The program returns 1 or 0 depending on
-*     whether the answer to the specified query is "yes" or "no". If
-*     the query is unknown to the data base, the program returns -1.
-*
-*   void print_flags(void)
-*     Prints the current values of all flags describing the state of
-*     the global field arrays to stdout on process 0.
-*
-*   void print_grid_flags(blk_grid_t grid)
-*     Prints the current values of all flags describing the state of
-*     the field arrays on the specified block grid to stdout on
-*     process 0.
-*
-* Notes:
-*
-* The programs set_flags() and set_grid_flags() perform global operations
-* and must be called on all processes simultaneously. As a consequence,
-* the contents of the data base is the same everywhere. All other programs
-* in this module can be called locally.
-*
-* The possible events and queries are defined in the header file flags.h.
-* The associated actions are defined in the *.h files in the include/flags
-* directory (application programs do not need to include these).
-*
-* For further explanations, see the file README.flags in this directory.
-*
-*******************************************************************************/
+ *
+ * File flags.c
+ *
+ * Copyright (C) 2009, 2011, 2012, 2016 Martin Luescher, Isabel Campos
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Flags data base input and query programs
+ *
+ * The externally accessible functions are
+ *
+ *   void set_flags(event_t event)
+ *     Reports an event to the data base, where some of the global field
+ *     arrays are changed.
+ *
+ *   void set_grid_flags(blk_grid_t grid,event_t event)
+ *     Reports an event to the data base, where some of the field arrays
+ *     on the specified block grid are changed.
+ *
+ *   int query_flags(query_t query)
+ *     Queries the data base on the status of the global field arrays.
+ *     The program returns 1 or 0 depending on whether the answer to the
+ *     specified query is "yes" or "no". If the query is unknown to the
+ *     the data base, the program returns -1.
+ *
+ *   int query_grid_flags(blk_grid_t grid,query_t query)
+ *     Queries the data base on the status of the field arrays on the
+ *     specified block grid. The program returns 1 or 0 depending on
+ *     whether the answer to the specified query is "yes" or "no". If
+ *     the query is unknown to the data base, the program returns -1.
+ *
+ *   void print_flags(void)
+ *     Prints the current values of all flags describing the state of
+ *     the global field arrays to stdout on process 0.
+ *
+ *   void print_grid_flags(blk_grid_t grid)
+ *     Prints the current values of all flags describing the state of
+ *     the field arrays on the specified block grid to stdout on
+ *     process 0.
+ *
+ * Notes:
+ *
+ * The programs set_flags() and set_grid_flags() perform global operations
+ * and must be called on all processes simultaneously. As a consequence,
+ * the contents of the data base is the same everywhere. All other programs
+ * in this module can be called locally.
+ *
+ * The possible events and queries are defined in the header file flags.h.
+ * The associated actions are defined in the *.h files in the include/flags
+ * directory (application programs do not need to include these).
+ *
+ * For further explanations, see the file README.flags in this directory.
+ *
+ *******************************************************************************/
 
 #define FLAGS_C
 

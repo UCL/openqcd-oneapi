@@ -1,62 +1,62 @@
 
 /*******************************************************************************
-*
-* File geometry.c
-*
-* Copyright (C) 2005, 2008, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Programs related to the lattice and block geometry.
-*
-* The externally accessible functions are
-*
-*   int ipr_global(int *n)
-*     This program returns the rank of the MPI process with Cartesian
-*     coordinates n[0],..,n[3] in the process grid.
-*
-*   void ipt_global(int *x,int *ip,int *ix)
-*     Given the Cartesian coordinates x[0],..,x[3] of a point on the full
-*     lattice, this program finds the local lattice containing x. On exit
-*     the rank of the associated MPI process is assigned to ip and the
-*     local index of the point to ix.
-*
-*   int global_time(int ix)
-*     Returns the (global) time coordinate of the lattice point with local
-*     index ix.
-*
-*   void geometry(void)
-*     Computes the global arrays cpr,npr describing the MPI process grid
-*     and the index arrays ipt,iup,idn and map that characterize the lattice
-*     geometry (see main/global.h).
-*
-*   void blk_geometry(block_t *b)
-*     Computes the index arrays b.ipt,b.iup and b.idn that describe the
-*     geometry of the block b.
-*
-*   void blk_imbed(block_t *b)
-*     Computes the index arrays b.imb and b.ibp that describe the
-*     embedding of the block b in the full lattice.
-*
-*   void bnd_geometry(block_t *b)
-*     Computes the index arrays bb.ipp and bb.map that describe the
-*     geometry of the exterior boundaries bb of the block b.
-*
-*   void bnd_imbed(block_t *b)
-*     Computes the index arrays bb.imb that describe the embedding
-*     of the exterior boundaries bb of the block b in the full lattice.
-*
-* Notes:
-*
-* See main/README.global for a description of the lattice geometry and
-* block/README.block for explanations of the block structure.
-*
-* The programs geometry() and blk_geometry() may involve communications and
-* must be called simultaneously on all processes. All other programs can be
-* called locally.
-*
-*******************************************************************************/
+ *
+ * File geometry.c
+ *
+ * Copyright (C) 2005, 2008, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Programs related to the lattice and block geometry.
+ *
+ * The externally accessible functions are
+ *
+ *   int ipr_global(int *n)
+ *     This program returns the rank of the MPI process with Cartesian
+ *     coordinates n[0],..,n[3] in the process grid.
+ *
+ *   void ipt_global(int *x,int *ip,int *ix)
+ *     Given the Cartesian coordinates x[0],..,x[3] of a point on the full
+ *     lattice, this program finds the local lattice containing x. On exit
+ *     the rank of the associated MPI process is assigned to ip and the
+ *     local index of the point to ix.
+ *
+ *   int global_time(int ix)
+ *     Returns the (global) time coordinate of the lattice point with local
+ *     index ix.
+ *
+ *   void geometry(void)
+ *     Computes the global arrays cpr,npr describing the MPI process grid
+ *     and the index arrays ipt,iup,idn and map that characterize the lattice
+ *     geometry (see main/global.h).
+ *
+ *   void blk_geometry(block_t *b)
+ *     Computes the index arrays b.ipt,b.iup and b.idn that describe the
+ *     geometry of the block b.
+ *
+ *   void blk_imbed(block_t *b)
+ *     Computes the index arrays b.imb and b.ibp that describe the
+ *     embedding of the block b in the full lattice.
+ *
+ *   void bnd_geometry(block_t *b)
+ *     Computes the index arrays bb.ipp and bb.map that describe the
+ *     geometry of the exterior boundaries bb of the block b.
+ *
+ *   void bnd_imbed(block_t *b)
+ *     Computes the index arrays bb.imb that describe the embedding
+ *     of the exterior boundaries bb of the block b in the full lattice.
+ *
+ * Notes:
+ *
+ * See main/README.global for a description of the lattice geometry and
+ * block/README.block for explanations of the block structure.
+ *
+ * The programs geometry() and blk_geometry() may involve communications and
+ * must be called simultaneously on all processes. All other programs can be
+ * called locally.
+ *
+ *******************************************************************************/
 
 #define GEOMETRY_C
 

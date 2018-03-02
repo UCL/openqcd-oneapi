@@ -1,135 +1,135 @@
 
 /*******************************************************************************
-*
-* File force_parms.c
-*
-* Copyright (C) 2011, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Force parameter data base
-*
-* The externally accessible functions are
-*
-*   force_parms_t set_force_parms(int ifr,force_t force,int ipf,int im0,
-*                                 int *irat,int *imu,int *isp,int *ncr)
-*     Sets the parameters in the force parameter set number ifr and returns
-*     a structure containing them (see the notes).
-*
-*   force_parms_t force_parms(int ifr)
-*     Returns a structure containing the force parameter set number ifr
-*     (see the notes).
-*
-*   void read_force_parms(int ifr)
-*     On process 0, this program scans stdin for a line starting with the
-*     string "[Force <int>]" (after any number of blanks), where <int> is
-*     the integer value passed by the argument. An error occurs if no such
-*     line or more than one is found. The lines
-*
-*       force   <force_t>
-*       ipf     <int>
-*       im0     <int>
-*       irat    <int> <int> <int>
-*       imu     <int> [<int>]
-*       isp     <int> [<int>]
-*       ncr     <int> [<int>]
-*
-*     are then read using read_line() [utils/mutils.c]. Depending on the
-*     value of "force", some lines are not read and can be omitted in the
-*     input file. The number of integer items on the lines with tag "imu"
-*     and "isp" and "ncr" depends on the force too. The data are then added
-*     to the data base by calling set_force_parms(ifr,...).
-*
-*   void read_force_parms2(int ifr)
-*     Same as read_force_parms() except that only the lines
-*
-*       force   <force_t>
-*       isp     <int> [<int>]
-*       ncr     <int> [<int>]
-*
-*     are read from stdin. All other force parameters are inferred from
-*     the parameters of the action no ifr so that the force is the one
-*     deriving from that action. An error occurs if the parameters of the
-*     action no ifr have not previously been added to the data base or
-*     if the force and action types do not match.
-*
-*   void print_force_parms(void)
-*     Prints the parameters of the defined forces to stdout on MPI
-*     process 0.
-*
-*   void print_force_parms2(void)
-*     Prints the parameters of the defined forces to stdout on MPI
-*     process 0 in a short format corresponding to read_force_parms2().
-*
-*   void write_force_parms(FILE *fdat)
-*     Writes the parameters of the defined forces to the file fdat on
-*     MPI process 0.
-*
-*   void check_force_parms(FILE *fdat)
-*     Compares the parameters of the defined forces with those stored
-*     on the file fdat on MPI process 0, assuming the latter were written
-*     to the file by the program write_force_parms().
-*
-* Notes:
-*
-* For a description of the supported forces and their parameters see
-* forces/README.forces.
-*
-* The elements of a structure of type force_parms_t are
-*
-*   force   Force program used. This parameter is an enum type with
-*           one of the following values:
-*
-*            FRG             (program force0() [forces/force0.c]),
-*
-*            FRF_TM1         (program force1() [forces/force1.c]),
-*
-*            FRF_TM1_EO      (program force4() [forces/force4.c]),
-*
-*            FRF_TM1_EO_SDET (program force4() [forces/force4.c]),
-*
-*            FRF_TM2         (program force2() [forces/force2.c]),
-*
-*            FRF_TM2_EO      (program force5() [forces/force5.c]),
-*
-*            FRF_RAT         (program force3() [forces/force3.c]),
-*
-*            FRF_RAT_SDET    (program force3() [forces/force3.c]),
-*
-*   ipf     Pseudo-fermion field index (see mdflds/mdflds.c),
-*
-*   im0     Index of the bare sea quark mass in parameter data base
-*           (see flags/lat_parms.c),
-*
-*   irat    Indices specifying a rational function (see ratfcts/ratfcts.c),
-*
-*   imu     Twisted mass indices (see flags/hmc_parms.c),
-*
-*   isp     Solver parameter set indices (see flags/solver_parms.c),
-*
-*   ncr     Chronological solver stack sizes (see update/chrono.c),
-*
-*   icr     Chronological solver stack indices (set internally).
-*
-* Depending on the force, some parameters are not used and are set to zero
-* by set_force_parms() independently of the values of the arguments. In
-* particular, for a given force, only the required number of integers are
-* read from the arrays imu, isp and ncr passed to the program.
-*
-* The number of twisted mass indices is 1 and 2 in the case of the forces
-* FRF_TM1* and FRF_TM2*, respectively. These forces require a chronological
-* solver stack size to be specified and 1 solver parameter set to be used
-* for the solution of the Dirac equation with twisted mass index imu[0].
-*
-* Up to 32 force parameter sets, labeled by an index ifr=0,1,..,31, can
-* be specified. Once a set is specified, it cannot be changed by calling
-* set_force_parms() again. Force parameters must be globally the same.
-*
-* Except for force_parms(), the programs in this module perform global
-* operations and must be called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File force_parms.c
+ *
+ * Copyright (C) 2011, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Force parameter data base
+ *
+ * The externally accessible functions are
+ *
+ *   force_parms_t set_force_parms(int ifr,force_t force,int ipf,int im0,
+ *                                 int *irat,int *imu,int *isp,int *ncr)
+ *     Sets the parameters in the force parameter set number ifr and returns
+ *     a structure containing them (see the notes).
+ *
+ *   force_parms_t force_parms(int ifr)
+ *     Returns a structure containing the force parameter set number ifr
+ *     (see the notes).
+ *
+ *   void read_force_parms(int ifr)
+ *     On process 0, this program scans stdin for a line starting with the
+ *     string "[Force <int>]" (after any number of blanks), where <int> is
+ *     the integer value passed by the argument. An error occurs if no such
+ *     line or more than one is found. The lines
+ *
+ *       force   <force_t>
+ *       ipf     <int>
+ *       im0     <int>
+ *       irat    <int> <int> <int>
+ *       imu     <int> [<int>]
+ *       isp     <int> [<int>]
+ *       ncr     <int> [<int>]
+ *
+ *     are then read using read_line() [utils/mutils.c]. Depending on the
+ *     value of "force", some lines are not read and can be omitted in the
+ *     input file. The number of integer items on the lines with tag "imu"
+ *     and "isp" and "ncr" depends on the force too. The data are then added
+ *     to the data base by calling set_force_parms(ifr,...).
+ *
+ *   void read_force_parms2(int ifr)
+ *     Same as read_force_parms() except that only the lines
+ *
+ *       force   <force_t>
+ *       isp     <int> [<int>]
+ *       ncr     <int> [<int>]
+ *
+ *     are read from stdin. All other force parameters are inferred from
+ *     the parameters of the action no ifr so that the force is the one
+ *     deriving from that action. An error occurs if the parameters of the
+ *     action no ifr have not previously been added to the data base or
+ *     if the force and action types do not match.
+ *
+ *   void print_force_parms(void)
+ *     Prints the parameters of the defined forces to stdout on MPI
+ *     process 0.
+ *
+ *   void print_force_parms2(void)
+ *     Prints the parameters of the defined forces to stdout on MPI
+ *     process 0 in a short format corresponding to read_force_parms2().
+ *
+ *   void write_force_parms(FILE *fdat)
+ *     Writes the parameters of the defined forces to the file fdat on
+ *     MPI process 0.
+ *
+ *   void check_force_parms(FILE *fdat)
+ *     Compares the parameters of the defined forces with those stored
+ *     on the file fdat on MPI process 0, assuming the latter were written
+ *     to the file by the program write_force_parms().
+ *
+ * Notes:
+ *
+ * For a description of the supported forces and their parameters see
+ * forces/README.forces.
+ *
+ * The elements of a structure of type force_parms_t are
+ *
+ *   force   Force program used. This parameter is an enum type with
+ *           one of the following values:
+ *
+ *            FRG             (program force0() [forces/force0.c]),
+ *
+ *            FRF_TM1         (program force1() [forces/force1.c]),
+ *
+ *            FRF_TM1_EO      (program force4() [forces/force4.c]),
+ *
+ *            FRF_TM1_EO_SDET (program force4() [forces/force4.c]),
+ *
+ *            FRF_TM2         (program force2() [forces/force2.c]),
+ *
+ *            FRF_TM2_EO      (program force5() [forces/force5.c]),
+ *
+ *            FRF_RAT         (program force3() [forces/force3.c]),
+ *
+ *            FRF_RAT_SDET    (program force3() [forces/force3.c]),
+ *
+ *   ipf     Pseudo-fermion field index (see mdflds/mdflds.c),
+ *
+ *   im0     Index of the bare sea quark mass in parameter data base
+ *           (see flags/lat_parms.c),
+ *
+ *   irat    Indices specifying a rational function (see ratfcts/ratfcts.c),
+ *
+ *   imu     Twisted mass indices (see flags/hmc_parms.c),
+ *
+ *   isp     Solver parameter set indices (see flags/solver_parms.c),
+ *
+ *   ncr     Chronological solver stack sizes (see update/chrono.c),
+ *
+ *   icr     Chronological solver stack indices (set internally).
+ *
+ * Depending on the force, some parameters are not used and are set to zero
+ * by set_force_parms() independently of the values of the arguments. In
+ * particular, for a given force, only the required number of integers are
+ * read from the arrays imu, isp and ncr passed to the program.
+ *
+ * The number of twisted mass indices is 1 and 2 in the case of the forces
+ * FRF_TM1* and FRF_TM2*, respectively. These forces require a chronological
+ * solver stack size to be specified and 1 solver parameter set to be used
+ * for the solution of the Dirac equation with twisted mass index imu[0].
+ *
+ * Up to 32 force parameter sets, labeled by an index ifr=0,1,..,31, can
+ * be specified. Once a set is specified, it cannot be changed by calling
+ * set_force_parms() again. Force parameters must be globally the same.
+ *
+ * Except for force_parms(), the programs in this module perform global
+ * operations and must be called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define FORCE_PARMS_C
 

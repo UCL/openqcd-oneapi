@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File flags/events.h
-*
-* Copyright (C) 2009, 2010, 2012, 2016 Martin Luescher, Isabel Campos
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Full-lattice events
-*
-*******************************************************************************/
+ *
+ * File flags/events.h
+ *
+ * Copyright (C) 2009, 2010, 2012, 2016 Martin Luescher, Isabel Campos
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Full-lattice events
+ *
+ *******************************************************************************/
 
 #define EVENTS_H
 
@@ -21,8 +21,9 @@ static void (*event_fcts[(int)(EVENTS) + 1])(void) = {NULL};
 static void LatUpdatedU(void)
 {
   error(check_bit_state(lat.u.state, SMEARED_STATE_BIT) != 0, 1,
-        "LatUpdatedU [events.h]", "Trying to update a single precision gauge "
-                                  "field that is not in its smeared state");
+        "LatUpdatedU [events.h]",
+        "Trying to update a single precision gauge "
+        "field that is not in its smeared state");
 
   lat.u.tag = next_tag();
 }
@@ -30,8 +31,9 @@ static void LatUpdatedU(void)
 static void LatUpdatedUd(void)
 {
   error(check_bit_state(lat.ud.state, SMEARED_STATE_BIT) != 0, 1,
-        "LatUpdatedUd [events.h]", "Trying to update a double precision gauge "
-                                   "field that is not in its smeared state");
+        "LatUpdatedUd [events.h]",
+        "Trying to update a double precision gauge "
+        "field that is not in its smeared state");
 
   lat.ud.tag = next_tag();
 }

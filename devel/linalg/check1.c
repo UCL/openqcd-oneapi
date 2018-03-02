@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2005, 2009, 2010, 2011 Martin Luescher, Filippo Palombi
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Checks of the programs in the module liealg
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2005, 2009, 2010, 2011 Martin Luescher, Filippo Palombi
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Checks of the programs in the module liealg
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

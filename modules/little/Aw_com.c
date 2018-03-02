@@ -1,45 +1,45 @@
 
 /*******************************************************************************
-*
-* File Aw_com.c
-*
-* Copyright (C) 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Communication functions needed for the computation of the little Dirac
-* operator.
-*
-*   b2b_flds_t *b2b_flds(int n,int mu)
-*     Extracts the spinor fields on the interior boundaries of the n'th
-*     block of the DFL_BLOCKS grid and its neighbouring block in direction
-*     mu. The spinors on the odd sites are multiplied by the link variables
-*     in direction mu and -mu respectively. If the two blocks touch the
-*     boundary of the local lattice, the fields extracted from the even
-*     sites are copied to the neighbouring process. The program returns a
-*     structure containing the extracted field arrays (see README.Aw_com
-*     for detailed explanations).
-*
-*   void cpAoe_ext_bnd(void)
-*     Copies the hopping terms Aoe and Aeo of the double-precision little
-*     Dirac operator on the odd exterior boundary points of the local block
-*     lattice to the neighbouring MPI processes and *adds* them to the hop-
-*     ping terms on the matching blocks on the target lattices.
-*
-*   void cpAee_int_bnd(void)
-*     Copies the even-even terms Aee of the double-precision little Dirac
-*     operator on the (even) interior boundary points of the local block
-*     lattice to the neighbouring MPI processes.
-*
-* Notes:
-*
-* The program b2b_flds() writes the extracted spinor fields to internally
-* allocated field arrays. These are reused when the program is called
-* the next time. The data in the field arrays returned by b2b_flds() are
-* therefore preserved only up to the next call of the program.
-*
-*******************************************************************************/
+ *
+ * File Aw_com.c
+ *
+ * Copyright (C) 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Communication functions needed for the computation of the little Dirac
+ * operator.
+ *
+ *   b2b_flds_t *b2b_flds(int n,int mu)
+ *     Extracts the spinor fields on the interior boundaries of the n'th
+ *     block of the DFL_BLOCKS grid and its neighbouring block in direction
+ *     mu. The spinors on the odd sites are multiplied by the link variables
+ *     in direction mu and -mu respectively. If the two blocks touch the
+ *     boundary of the local lattice, the fields extracted from the even
+ *     sites are copied to the neighbouring process. The program returns a
+ *     structure containing the extracted field arrays (see README.Aw_com
+ *     for detailed explanations).
+ *
+ *   void cpAoe_ext_bnd(void)
+ *     Copies the hopping terms Aoe and Aeo of the double-precision little
+ *     Dirac operator on the odd exterior boundary points of the local block
+ *     lattice to the neighbouring MPI processes and *adds* them to the hop-
+ *     ping terms on the matching blocks on the target lattices.
+ *
+ *   void cpAee_int_bnd(void)
+ *     Copies the even-even terms Aee of the double-precision little Dirac
+ *     operator on the (even) interior boundary points of the local block
+ *     lattice to the neighbouring MPI processes.
+ *
+ * Notes:
+ *
+ * The program b2b_flds() writes the extracted spinor fields to internally
+ * allocated field arrays. These are reused when the program is called
+ * the next time. The data in the field arrays returned by b2b_flds() are
+ * therefore preserved only up to the next call of the program.
+ *
+ *******************************************************************************/
 
 #define AW_COM_C
 

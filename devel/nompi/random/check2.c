@@ -1,18 +1,18 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2005, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Writes the state of ranlxs to a file together with the next 147 random
-* numbers. Then reads the data back in and checks the correct reinitialization
-* of the generator
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2005, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Writes the state of ranlxs to a file together with the next 147 random
+ * numbers. Then reads the data back in and checks the correct reinitialization
+ * of the generator
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stddef.h>

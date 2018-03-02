@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2010, 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the programs set_bc() and check_bc().
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2010, 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the programs set_bc() and check_bc().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

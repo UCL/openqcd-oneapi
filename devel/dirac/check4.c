@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check4.c
-*
-* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Gauge covariance of Dw_dble().
-*
-*******************************************************************************/
+ *
+ * File check4.c
+ *
+ * Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Gauge covariance of Dw_dble().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

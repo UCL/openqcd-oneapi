@@ -1,61 +1,61 @@
 
 /*******************************************************************************
-*
-* File frcfcts.c
-*
-* Copyright (C) 2005, 2011, 2012, 2016 Martin Luescher, Stefan Schaefer
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Generic functions used for the force calculation.
-*
-* The externally accessible functions are
-*
-*   void det2xt(pauli_dble *m,u3_alg_dble *X)
-*     Computes the matrices X[0],..,X[5] associated to the SW term on a
-*     given lattice point (see the notes). The program expects that m[0]
-*     and m[1] contain the hermitian part of the inverse of the SW term
-*     at the chosen point.
-*
-*   void prod2xt(spinor_dble *r,spinor_dble *s,u3_alg_dble *X)
-*     Computes the matrices X[0],..,X[5] associated to a pair of spinors
-*     r and s at a given lattice point (see the notes).
-*
-* The following is an array of functions indexed by the direction mu=0,..,3:
-*
-*   void (*prod2xv[])(spinor_dble *rx,spinor_dble *ry,
-*                      spinor_dble *sx,spinor_dble *sy,su3_dble *u)
-*     Computes the complex 3x3 matrix
-*
-*       u=tr{gamma_5*(1-gamma_mu)*[(sy x rx^dag)+(ry x sx^dag)]}
-*
-*     where ..x.. denotes the tensor product in spinor space and the trace
-*     is taken over the Dirac indices.
-*
-* Notes:
-*
-* As discussed in the notes
-*
-*  M. Luescher: "Molecular-dynamics quark forces" (January 2012)
-*
-* the programs in this module serve to compute the spin part of the quark
-* forces. The data type u3_alg_dble is described at the top of the module
-* su3fcts/su3prod.c.
-*
-* The matrices computed by the program det2xt() are
-*
-*  X[n]=i*tr{sigma_{mu,nu}*diag(m[0],m[1])}
-*
-* where (mu,nu)=(0,1),(0,2),(0,3),(2,3),(3,1),(1,2) for n=0,..,5. Similarly,
-* the program prod2xt() computes
-*
-*  X[n]=i*tr{(gamma_5*sigma_{mu,nu}*s) x (r^dag)+(s<->r)}
-*
-* where ..x.. denotes the tensor product in spinor space. In both cases,
-* the trace is taken over the Dirac indices only.
-*
-*******************************************************************************/
+ *
+ * File frcfcts.c
+ *
+ * Copyright (C) 2005, 2011, 2012, 2016 Martin Luescher, Stefan Schaefer
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Generic functions used for the force calculation.
+ *
+ * The externally accessible functions are
+ *
+ *   void det2xt(pauli_dble *m,u3_alg_dble *X)
+ *     Computes the matrices X[0],..,X[5] associated to the SW term on a
+ *     given lattice point (see the notes). The program expects that m[0]
+ *     and m[1] contain the hermitian part of the inverse of the SW term
+ *     at the chosen point.
+ *
+ *   void prod2xt(spinor_dble *r,spinor_dble *s,u3_alg_dble *X)
+ *     Computes the matrices X[0],..,X[5] associated to a pair of spinors
+ *     r and s at a given lattice point (see the notes).
+ *
+ * The following is an array of functions indexed by the direction mu=0,..,3:
+ *
+ *   void (*prod2xv[])(spinor_dble *rx,spinor_dble *ry,
+ *                      spinor_dble *sx,spinor_dble *sy,su3_dble *u)
+ *     Computes the complex 3x3 matrix
+ *
+ *       u=tr{gamma_5*(1-gamma_mu)*[(sy x rx^dag)+(ry x sx^dag)]}
+ *
+ *     where ..x.. denotes the tensor product in spinor space and the trace
+ *     is taken over the Dirac indices.
+ *
+ * Notes:
+ *
+ * As discussed in the notes
+ *
+ *  M. Luescher: "Molecular-dynamics quark forces" (January 2012)
+ *
+ * the programs in this module serve to compute the spin part of the quark
+ * forces. The data type u3_alg_dble is described at the top of the module
+ * su3fcts/su3prod.c.
+ *
+ * The matrices computed by the program det2xt() are
+ *
+ *  X[n]=i*tr{sigma_{mu,nu}*diag(m[0],m[1])}
+ *
+ * where (mu,nu)=(0,1),(0,2),(0,3),(2,3),(3,1),(1,2) for n=0,..,5. Similarly,
+ * the program prod2xt() computes
+ *
+ *  X[n]=i*tr{(gamma_5*sigma_{mu,nu}*s) x (r^dag)+(s<->r)}
+ *
+ * where ..x.. denotes the tensor product in spinor space. In both cases,
+ * the trace is taken over the Dirac indices only.
+ *
+ *******************************************************************************/
 
 #define FRCFCTS_C
 

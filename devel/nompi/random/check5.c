@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check5.c
-*
-* Copyright (C) 2005 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Statistical test of random_su3
-*
-*******************************************************************************/
+ *
+ * File check5.c
+ *
+ * Copyright (C) 2005 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Statistical test of random_su3
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,48 +1,48 @@
 
 /*******************************************************************************
-*
-* File sap.c
-*
-* Copyright (C) 2005, 2011, 2012, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Multiplicative alternating Schwarz procedure for the solution of the
-* Wilson-Dirac equation
-*
-* The externally accessible functions are
-*
-*   void sap(float mu,int isolv,int nmr,spinor *psi,spinor *rho)
-*     Application of one cycle of the multiplicative Schwarz procedure to
-*     the approximate solution psi of the Wilson-Dirac equation, assuming
-*     the associated residue is stored in the field rho (see the notes). The
-*     block Dirac equation is solved using nmr iterations of the ordinary
-*     (isolv=0) or the even-odd preconditioned (isolv=1) minimal residual
-*     algorithm. On exit, the new approximate solution and its residue are
-*     returned in the fields psi and rho.
-*
-* Notes:
-*
-* Depending on whether the twisted-mass flag is set or not, the program
-* solves the equation
-*
-*   (Dw+i*mu*gamma_5*1e)*psi=eta  or  (Dw+i*mu*gamma_5)*psi=eta,
-*
-* the residues of the calculated solution being
-*
-*   rho=eta-(Dw+i*mu*gamma5*1e)*psi or rho=eta-(Dw+i*mu*gamma5)*psi
-*
-* respectively. The twisted-mass flag is retrieved from the parameter data
-* base (see flags/lat_parms.c).
-*
-* The program acts on the SAP_BLOCKS block grid. It is taken for granted
-* that the grid is allocated and that the single-precision gauge and SW
-* field on the grid are in the proper condition when sap() is called. In
-* particular, the SW term must not be inverted if isolv=0, but should be
-* inverted on the odd sites if isolv=1.
-*
-*******************************************************************************/
+ *
+ * File sap.c
+ *
+ * Copyright (C) 2005, 2011, 2012, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Multiplicative alternating Schwarz procedure for the solution of the
+ * Wilson-Dirac equation
+ *
+ * The externally accessible functions are
+ *
+ *   void sap(float mu,int isolv,int nmr,spinor *psi,spinor *rho)
+ *     Application of one cycle of the multiplicative Schwarz procedure to
+ *     the approximate solution psi of the Wilson-Dirac equation, assuming
+ *     the associated residue is stored in the field rho (see the notes). The
+ *     block Dirac equation is solved using nmr iterations of the ordinary
+ *     (isolv=0) or the even-odd preconditioned (isolv=1) minimal residual
+ *     algorithm. On exit, the new approximate solution and its residue are
+ *     returned in the fields psi and rho.
+ *
+ * Notes:
+ *
+ * Depending on whether the twisted-mass flag is set or not, the program
+ * solves the equation
+ *
+ *   (Dw+i*mu*gamma_5*1e)*psi=eta  or  (Dw+i*mu*gamma_5)*psi=eta,
+ *
+ * the residues of the calculated solution being
+ *
+ *   rho=eta-(Dw+i*mu*gamma5*1e)*psi or rho=eta-(Dw+i*mu*gamma5)*psi
+ *
+ * respectively. The twisted-mass flag is retrieved from the parameter data
+ * base (see flags/lat_parms.c).
+ *
+ * The program acts on the SAP_BLOCKS block grid. It is taken for granted
+ * that the grid is allocated and that the single-precision gauge and SW
+ * field on the grid are in the proper condition when sap() is called. In
+ * particular, the SW term must not be inverted if isolv=0, but should be
+ * inverted on the odd sites if isolv=1.
+ *
+ *******************************************************************************/
 
 #define SAP_C
 

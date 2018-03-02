@@ -1,19 +1,19 @@
 #ifndef QPX_H
 #define QPX_H
 /*******************************************************************************
-*
-* File qpx.h
-*
-* Copyright (C) 2013 Dalibor Djukanovic
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Type definitions and macros for fast manipulation  of
-* SU(3) matrices, SU(3) vectors and Dirac spinors exploiting the Quad FPU
-* unit of BlueGene/Q
-*
-*******************************************************************************/
+ *
+ * File qpx.h
+ *
+ * Copyright (C) 2013 Dalibor Djukanovic
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Type definitions and macros for fast manipulation  of
+ * SU(3) matrices, SU(3) vectors and Dirac spinors exploiting the Quad FPU
+ * unit of BlueGene/Q
+ *
+ *******************************************************************************/
 
 #ifdef PDToolkit
 /* Needed for parsing with TAU */

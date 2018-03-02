@@ -1,15 +1,15 @@
 
 /*******************************************************************************
-*
-* File avx512.h
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Macros for operating on SU(3) vectors and matrices using Intel intrinsic
-* operations for AVX512 compatible processors
-*
-*******************************************************************************/
+ *
+ * File avx512.h
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Macros for operating on SU(3) vectors and matrices using Intel intrinsic
+ * operations for AVX512 compatible processors
+ *
+ *******************************************************************************/
 
 #ifndef AVX512_H
 #define AVX512_H

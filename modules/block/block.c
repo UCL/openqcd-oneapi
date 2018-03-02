@@ -1,91 +1,91 @@
 
 /*******************************************************************************
-*
-* File block.c
-*
-* Copyright (C) 2005, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Basic allocation programs for blocks of lattice points.
-*
-* The externally accessible functions are
-*
-*   void alloc_blk(block_t *b,int *bo,int *bs,
-*                  int iu,int iud,int ns,int nsd)
-*     Sets the offset and side-lengths of the block b to bo[4] and bs[4],
-*     respectively, and allocates the block fields depending on the values
-*     of the other parameters. The single-precision gauge and SW fields are
-*     allocated if iu=1, the double-precision gauge and SW fields if iud=1,
-*     while ns and nsd are the numbers of single- and double-precision Dirac
-*     fields that are allocated. All elements of the block are properly
-*     initialized and the share flag b.shf is set to 0x0 (see the notes).
-*
-*   void alloc_bnd(block_t *b,int iu,int iud,int nw,int nwd)
-*     Allocates the boundary structures b.bb in the block b and the fields
-*     in there depending on the parameters iu,iud,nw and nwd. The single-
-*     and double-precision gauge fields are allocated if iu=1 and iud=1,
-*     respectively, while nw and nwd are the numbers of single- and double-
-*     precision Weyl fields that are allocated. All elements of the block
-*     are then properly initialized (see the notes).
-*
-*   void clone_blk(block_t *b,int shf,int *bo,block_t *c)
-*     Sets the offset of the block c to bo[4] and its side lengths to
-*     b.bs[4]. The fields in c are then allocated depending on the bits
-*     b1,b2,..,b8 (counting from the lowest) of the share flag shf. The
-*     relevant bits are:
-*
-*       b2=1: b.ipt,b.iup and b.idn are shared,
-*       b3=1: b.u, b.bb.u and b.sw are shared,
-*       b4=1: b.ud, b.bb.ud and b.swd are shared,
-*       b5=1: b.s is shared,
-*       b6=1: b.sd is shared.
-*       b7=1: b.bb.w is shared,
-*       b8=1: b.bb.wd is shared.
-*
-*     All fields that are not shared and are allocated on b are allocated
-*     on c as well, while the pointers to the shared fields are set to those
-*     of b. An error occurs if a field is shared according to the share flag
-*     b.shf on b but not according to shf. Moreover, the offset differences
-*     bo[mu]-b.bo[mu] must be integer multiples of b.bs[mu] for all mu. The
-*     share flag c.shf is set to shf.
-*
-*   void free_blk(block_t *b)
-*     Frees the arrays in the block b and in the boundaries b.bb that were
-*     previously allocated by alloc_blk(), alloc_bnd() or clone_blk(). The
-*     boundary structures are then freed too (if they were allocated) and
-*     all entries in the block structure are set to 0 (or NULL).
-*
-*   int ipt_blk(block_t *b,int *x)
-*     Returns the index of the lattice point in the block b with Cartesian
-*     coordinates x[4] relative to the base point of b.
-*
-* Notes:
-*
-* The entries of the block and boundary structures are explained in the file
-* README.block in this directory.
-*
-* It is currently not possible to allocate blocks that are not fully
-* contained in the local lattice. Moreover, the block sizes must be even
-* and not smaller than 4. The exterior boundaries of a block may, however,
-* overlap with the lattices on the neighbouring processes. In all cases,
-* the scalar elements of the structures and the geometry and field arrays
-* are properly initialized (gauge and SW fields are set to 1, Dirac spinor
-* and Weyl fields to 0).
-*
-* Block allocation is a global operation, i.e. alloc_blk(), alloc_bnd(),
-* clone_blk() and free_blk() must be called on all processes simultaneously.
-* The program ipt_blk() can be called locally.
-*
-* alloc_blk() and clone_blk() register the blocks as being allocated. In this
-* way it is possible to exclude any misuses of the programs such as freeing
-* an unallocated block (which could have unpredictable side-effects). An
-* already allocated block is first freed and then reallocated by alloc_blk().
-* Blocks b and their boundary structures b.bb cannot be freed or reallocated
-* if the lowest bit of the share flag b.shf is equal to 1.
-*
-*******************************************************************************/
+ *
+ * File block.c
+ *
+ * Copyright (C) 2005, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Basic allocation programs for blocks of lattice points.
+ *
+ * The externally accessible functions are
+ *
+ *   void alloc_blk(block_t *b,int *bo,int *bs,
+ *                  int iu,int iud,int ns,int nsd)
+ *     Sets the offset and side-lengths of the block b to bo[4] and bs[4],
+ *     respectively, and allocates the block fields depending on the values
+ *     of the other parameters. The single-precision gauge and SW fields are
+ *     allocated if iu=1, the double-precision gauge and SW fields if iud=1,
+ *     while ns and nsd are the numbers of single- and double-precision Dirac
+ *     fields that are allocated. All elements of the block are properly
+ *     initialized and the share flag b.shf is set to 0x0 (see the notes).
+ *
+ *   void alloc_bnd(block_t *b,int iu,int iud,int nw,int nwd)
+ *     Allocates the boundary structures b.bb in the block b and the fields
+ *     in there depending on the parameters iu,iud,nw and nwd. The single-
+ *     and double-precision gauge fields are allocated if iu=1 and iud=1,
+ *     respectively, while nw and nwd are the numbers of single- and double-
+ *     precision Weyl fields that are allocated. All elements of the block
+ *     are then properly initialized (see the notes).
+ *
+ *   void clone_blk(block_t *b,int shf,int *bo,block_t *c)
+ *     Sets the offset of the block c to bo[4] and its side lengths to
+ *     b.bs[4]. The fields in c are then allocated depending on the bits
+ *     b1,b2,..,b8 (counting from the lowest) of the share flag shf. The
+ *     relevant bits are:
+ *
+ *       b2=1: b.ipt,b.iup and b.idn are shared,
+ *       b3=1: b.u, b.bb.u and b.sw are shared,
+ *       b4=1: b.ud, b.bb.ud and b.swd are shared,
+ *       b5=1: b.s is shared,
+ *       b6=1: b.sd is shared.
+ *       b7=1: b.bb.w is shared,
+ *       b8=1: b.bb.wd is shared.
+ *
+ *     All fields that are not shared and are allocated on b are allocated
+ *     on c as well, while the pointers to the shared fields are set to those
+ *     of b. An error occurs if a field is shared according to the share flag
+ *     b.shf on b but not according to shf. Moreover, the offset differences
+ *     bo[mu]-b.bo[mu] must be integer multiples of b.bs[mu] for all mu. The
+ *     share flag c.shf is set to shf.
+ *
+ *   void free_blk(block_t *b)
+ *     Frees the arrays in the block b and in the boundaries b.bb that were
+ *     previously allocated by alloc_blk(), alloc_bnd() or clone_blk(). The
+ *     boundary structures are then freed too (if they were allocated) and
+ *     all entries in the block structure are set to 0 (or NULL).
+ *
+ *   int ipt_blk(block_t *b,int *x)
+ *     Returns the index of the lattice point in the block b with Cartesian
+ *     coordinates x[4] relative to the base point of b.
+ *
+ * Notes:
+ *
+ * The entries of the block and boundary structures are explained in the file
+ * README.block in this directory.
+ *
+ * It is currently not possible to allocate blocks that are not fully
+ * contained in the local lattice. Moreover, the block sizes must be even
+ * and not smaller than 4. The exterior boundaries of a block may, however,
+ * overlap with the lattices on the neighbouring processes. In all cases,
+ * the scalar elements of the structures and the geometry and field arrays
+ * are properly initialized (gauge and SW fields are set to 1, Dirac spinor
+ * and Weyl fields to 0).
+ *
+ * Block allocation is a global operation, i.e. alloc_blk(), alloc_bnd(),
+ * clone_blk() and free_blk() must be called on all processes simultaneously.
+ * The program ipt_blk() can be called locally.
+ *
+ * alloc_blk() and clone_blk() register the blocks as being allocated. In this
+ * way it is possible to exclude any misuses of the programs such as freeing
+ * an unallocated block (which could have unpredictable side-effects). An
+ * already allocated block is first freed and then reallocated by alloc_blk().
+ * Blocks b and their boundary structures b.bb cannot be freed or reallocated
+ * if the lowest bit of the share flag b.shf is equal to 1.
+ *
+ *******************************************************************************/
 
 #define BLOCK_C
 

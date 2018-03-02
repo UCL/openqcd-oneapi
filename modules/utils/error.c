@@ -1,55 +1,55 @@
 
 /*******************************************************************************
-*
-* File error.c
-*
-* Copyright (C) 2015 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Error handling functions.
-*
-*   void set_error_file(char *path,int loc_flag)
-*     Sets the path of the file to which error messages are written. If
-*     loc_flag!=0, the number of the local MPI process is appended to the
-*     file name when the error_loc() function writes a message. Otherwise
-*     the same file is used for all error messages.
-*
-*   void error(int test,int no,char *name,char *format,...)
-*     Checks whether "test"=0 on all processes and, if not, aborts the
-*     program gracefully with error number "no" after printing the "name"
-*     of the calling program and an error message to the error file from
-*     process 0. The message is formed using the "format" string and any
-*     additional arguments, exactly as in a printf() statement.
-*
-*   void error_root(int test,int no,char *name,char *format,...)
-*     Same as the error() function except that "test" is examined on
-*     process 0 only.
-*
-*   void error_loc(int test,int no,char *name,char *message)
-*     Checks whether "test"=0 on the local process and, if not, aborts the
-*     program gracefully with error number "no" after printing the "name"
-*     of the calling program and an error message to the local error file.
-*     The message is formed using the "format" string and any additional
-*     arguments, exactly as in a printf() statement.
-*
-* The program error() performs global communications and must be called on
-* all MPI processes simultaneously. All other programs may be locally called.
-*
-* When the error file is not or not yet set, all error messages are written
-* to stdout. The error file name need not be the same on all MPI processes
-* and it may be reset at any given time. The error file used by the error()
-* function is the one specified on the root process.
-*
-* It is permissible to direct the error messages to a file that is used for
-* other purposes as well, as long as the file is not open for reading when
-* an error occurs (it may, however, be open in "w" or "a" mode).
-*
-* If an error is detected, the programs in this module abort the MPI program
-* by calling MPI_Abort().
-*
-*******************************************************************************/
+ *
+ * File error.c
+ *
+ * Copyright (C) 2015 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Error handling functions.
+ *
+ *   void set_error_file(char *path,int loc_flag)
+ *     Sets the path of the file to which error messages are written. If
+ *     loc_flag!=0, the number of the local MPI process is appended to the
+ *     file name when the error_loc() function writes a message. Otherwise
+ *     the same file is used for all error messages.
+ *
+ *   void error(int test,int no,char *name,char *format,...)
+ *     Checks whether "test"=0 on all processes and, if not, aborts the
+ *     program gracefully with error number "no" after printing the "name"
+ *     of the calling program and an error message to the error file from
+ *     process 0. The message is formed using the "format" string and any
+ *     additional arguments, exactly as in a printf() statement.
+ *
+ *   void error_root(int test,int no,char *name,char *format,...)
+ *     Same as the error() function except that "test" is examined on
+ *     process 0 only.
+ *
+ *   void error_loc(int test,int no,char *name,char *message)
+ *     Checks whether "test"=0 on the local process and, if not, aborts the
+ *     program gracefully with error number "no" after printing the "name"
+ *     of the calling program and an error message to the local error file.
+ *     The message is formed using the "format" string and any additional
+ *     arguments, exactly as in a printf() statement.
+ *
+ * The program error() performs global communications and must be called on
+ * all MPI processes simultaneously. All other programs may be locally called.
+ *
+ * When the error file is not or not yet set, all error messages are written
+ * to stdout. The error file name need not be the same on all MPI processes
+ * and it may be reset at any given time. The error file used by the error()
+ * function is the one specified on the root process.
+ *
+ * It is permissible to direct the error messages to a file that is used for
+ * other purposes as well, as long as the file is not open for reading when
+ * an error occurs (it may, however, be open in "w" or "a" mode).
+ *
+ * If an error is detected, the programs in this module abort the MPI program
+ * by calling MPI_Abort().
+ *
+ *******************************************************************************/
 
 #define ERROR_C
 

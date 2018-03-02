@@ -1,50 +1,50 @@
 
 /*******************************************************************************
-*
-* File map_sw2blk.c
-*
-* Copyright (C) 2005, 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Copying of the SW fields to the blocks in a block grid
-*
-* The externally accessible functions are
-*
-*   int assign_swd2swbgr(blk_grid_t grid,ptset_t set)
-*     Assigns the global double-precision SW field to the corresponding
-*     single-precision fields in the specified grid. On the given point
-*     set, the copied Pauli matrices are inverted before assignment and
-*     the program returns 0 or 1 depending on whether the inversions were
-*     safe or not.
-*
-*   int assign_swd2swdblk(blk_grid_t grid,int n,ptset_t set)
-*     Assigns the global double-precision SW field to the corresponding
-*     double-precision field on the n'th block of the specified grid. On
-*     the given point set, the copied Pauli matrices are inverted before
-*     assignment and the program returns 0 or 1 depending on whether the
-*     inversions were safe or not.
-*
-* Notes:
-*
-* The possible point sets are defined in utils.h. Independently of the
-* specified set, the source field is left unchanged, i.e. the inversions
-* are performed "on the fly" (no inversions are performed if set=NO_PTS).
-* Pauli matrix inversions are considered unsafe if the Frobenius condition
-* number of the matrix exceeds 100 (see pauli_dble.c).
-*
-* In the case of assign_swd2swbgr(), the single-precision SW field on the
-* block grid must not be shared. The program assign_swd2swdblk() instead
-* requires that the double-precision SW field on the blocks is shared (an
-* error occurs if these conditions are violated).
-*
-* Both programs in this module may involve communications and must be called
-* on all processes simultaneously. The return value is globally the same in
-* the case of assign_swd2swbgr(), but may depend on the rank of the process
-* in the case of assign_swd2swdblk().
-*
-*******************************************************************************/
+ *
+ * File map_sw2blk.c
+ *
+ * Copyright (C) 2005, 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Copying of the SW fields to the blocks in a block grid
+ *
+ * The externally accessible functions are
+ *
+ *   int assign_swd2swbgr(blk_grid_t grid,ptset_t set)
+ *     Assigns the global double-precision SW field to the corresponding
+ *     single-precision fields in the specified grid. On the given point
+ *     set, the copied Pauli matrices are inverted before assignment and
+ *     the program returns 0 or 1 depending on whether the inversions were
+ *     safe or not.
+ *
+ *   int assign_swd2swdblk(blk_grid_t grid,int n,ptset_t set)
+ *     Assigns the global double-precision SW field to the corresponding
+ *     double-precision field on the n'th block of the specified grid. On
+ *     the given point set, the copied Pauli matrices are inverted before
+ *     assignment and the program returns 0 or 1 depending on whether the
+ *     inversions were safe or not.
+ *
+ * Notes:
+ *
+ * The possible point sets are defined in utils.h. Independently of the
+ * specified set, the source field is left unchanged, i.e. the inversions
+ * are performed "on the fly" (no inversions are performed if set=NO_PTS).
+ * Pauli matrix inversions are considered unsafe if the Frobenius condition
+ * number of the matrix exceeds 100 (see pauli_dble.c).
+ *
+ * In the case of assign_swd2swbgr(), the single-precision SW field on the
+ * block grid must not be shared. The program assign_swd2swdblk() instead
+ * requires that the double-precision SW field on the blocks is shared (an
+ * error occurs if these conditions are violated).
+ *
+ * Both programs in this module may involve communications and must be called
+ * on all processes simultaneously. The return value is globally the same in
+ * the case of assign_swd2swbgr(), but may depend on the rank of the process
+ * in the case of assign_swd2swdblk().
+ *
+ *******************************************************************************/
 
 #define MAP_SW2BLK_C
 

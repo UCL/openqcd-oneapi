@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check5.c
-*
-* Copyright (C) 2007, 2008, 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Exporting and importing spinor fields.
-*
-*******************************************************************************/
+ *
+ * File check5.c
+ *
+ * Copyright (C) 2007, 2008, 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Exporting and importing spinor fields.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

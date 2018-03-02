@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check7.c
-*
-* Copyright (C) 2009, 2011, 2016 Martin Luescher, Filippo Palombi
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of expXsu3() using the spectral representation of X
-*
-*******************************************************************************/
+ *
+ * File check7.c
+ *
+ * Copyright (C) 2009, 2011, 2016 Martin Luescher, Filippo Palombi
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of expXsu3() using the spectral representation of X
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

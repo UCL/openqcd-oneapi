@@ -1,17 +1,17 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2005, 2008, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Copying of files. After running this program, one can verify that all
-* bytes have been copied correctly using the diff utility.
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2005, 2008, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Copying of files. After running this program, one can verify that all
+ * bytes have been copied correctly using the diff utility.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

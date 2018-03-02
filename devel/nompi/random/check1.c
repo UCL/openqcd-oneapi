@@ -1,17 +1,17 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2005 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* This program checks that ranlxs and ranlxd implement the basic algorithm
-* correctly
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2005 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * This program checks that ranlxs and ranlxd implement the basic algorithm
+ * correctly
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -39,10 +39,10 @@ int main(void)
   rlxd_init(1, 32767);
 
   /*******************************************************************************
-  *
-  * Check that the correct sequences of random numbers are obtained
-  *
-  *******************************************************************************/
+   *
+   * Check that the correct sequences of random numbers are obtained
+   *
+   *******************************************************************************/
 
   for (k = 0; k < 20; k++) {
     ranlxs(xs, NXS);
@@ -223,10 +223,10 @@ int main(void)
   }
 
   /*******************************************************************************
-  *
-  * Check of the I/O routines
-  *
-  *******************************************************************************/
+   *
+   * Check of the I/O routines
+   *
+   *******************************************************************************/
 
   rlxs_get(state1);
   rlxd_get(state2);
@@ -269,10 +269,10 @@ int main(void)
   }
 
   /*******************************************************************************
-  *
-  * Success messages
-  *
-  *******************************************************************************/
+   *
+   * Success messages
+   *
+   *******************************************************************************/
 
   if ((test1 == 0) && (test2 == 0)) {
     printf("\n");

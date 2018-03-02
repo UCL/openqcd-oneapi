@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File time2.c
-*
-* Copyright (C) 2007, 2009, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Timing of cmat_vec_dble, cmat_mul_dble and cmat_inv_dble
-*
-*******************************************************************************/
+ *
+ * File time2.c
+ *
+ * Copyright (C) 2007, 2009, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of cmat_vec_dble, cmat_mul_dble and cmat_inv_dble
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

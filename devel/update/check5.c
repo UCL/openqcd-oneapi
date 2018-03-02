@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check5.c
-*
-* Copyright (C) 2012-2014, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Comparison of rwtm*() with action1().
-*
-*******************************************************************************/
+ *
+ * File check5.c
+ *
+ * Copyright (C) 2012-2014, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Comparison of rwtm*() with action1().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

@@ -1,20 +1,20 @@
 
 /*******************************************************************************
-*
-* File ms2.c
-*
-* Copyright (C) 2012, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of the spectral range of the hermitian Dirac operator.
-*
-* Syntax: ms2 -i <input file> [-noexp]
-*
-* For usage instructions see the file README.ms2.
-*
-*******************************************************************************/
+ *
+ * File ms2.c
+ *
+ * Copyright (C) 2012, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of the spectral range of the hermitian Dirac operator.
+ *
+ * Syntax: ms2 -i <input file> [-noexp]
+ *
+ * For usage instructions see the file README.ms2.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -482,8 +482,9 @@ static double power1(int *status)
 
       error_root((stat[0] < 0) || (stat[1] < 0) || (stat[3] < 0) ||
                      (stat[4] < 0),
-                 1, "power1 [ms2.c]", "DFL_SAP_GCR solver failed "
-                                      "(status = %d,%d,%d;%d,%d,%d)",
+                 1, "power1 [ms2.c]",
+                 "DFL_SAP_GCR solver failed "
+                 "(status = %d,%d,%d;%d,%d,%d)",
                  stat[0], stat[1], stat[2], stat[3], stat[4], stat[5]);
 
       for (l = 0; l < 2; l++) {

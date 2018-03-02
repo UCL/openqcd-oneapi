@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File grid_events.h
-*
-* Copyright (C) 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Block grid events
-*
-*******************************************************************************/
+ *
+ * File grid_events.h
+ *
+ * Copyright (C) 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Block grid events
+ *
+ *******************************************************************************/
 
 #define GRID_EVENTS_H
 

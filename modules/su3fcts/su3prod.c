@@ -1,74 +1,74 @@
 
 /*******************************************************************************
-*
-* File su3prod.c
-*
-* Copyright (C) 2005, 2009-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Products of double-precision 3x3 matrices.
-*
-* The externally accessible functions are
-*
-*   void su3xsu3(su3_dble *u,su3_dble *v,su3_dble *w)
-*     Computes w=u*v assuming that w is different from u.
-*
-*   void su3dagxsu3(su3_dble *u,su3_dble *v,su3_dble *w)
-*     Computes w=u^dag*v assuming that w is different from u.
-*
-*   void su3xsu3dag(su3_dble *u,su3_dble *v,su3_dble *w)
-*     Computes w=u*v^dag assuming that w is different from u and v.
-*
-*   void su3dagxsu3dag(su3_dble *u,su3_dble *v,su3_dble *w)
-*     Computes w=u^dag*v^dag assuming that w is different from u and v.
-*
-*   void su3xu3alg(su3_dble *u,u3_alg_dble *X,su3_dble *v)
-*     Computes v=u*X assuming that v is different from u.
-*
-*   void su3dagxu3alg(su3_dble *u,u3_alg_dble *X,su3_dble *v)
-*     Computes v=u^dag*X assuming that v is different from u.
-*
-*   void u3algxsu3(u3_alg_dble *X,su3_dble *u,su3_dble *v)
-*     Computes v=X*u assuming that v is different from u.
-*
-*   void u3algxsu3dag(u3_alg_dble *X,su3_dble *u,su3_dble *v)
-*     Computes v=X*u^dag assuming that v is different from u.
-*
-*   double prod2su3alg(su3_dble *u,su3_dble *v,su3_alg_dble *X)
-*     Computes the product w=u*v and assigns its traceless antihermitian
-*     part (1/2)*[w-w^dag-(1/3)*tr{w-w^dag}] to X. The program returns
-*     the real part of tr{w}.
-*
-*   void prod2u3alg(su3_dble *u,su3_dble *v,u3_alg_dble *X)
-*     Computes the product w=u*v and assigns w-w^dag to X.
-*
-*   void rotate_su3alg(su3_dble *u,su3_alg_dble *X)
-*     Replaces X by u*X*u^dag. The matrix u must be unitary but its
-*     determinant may be different from 1.
-*
-* Notes:
-*
-* Unless stated otherwise, the matrices of type su3_dble are not assumed to
-* be unitary or unimodular. They are just treated as general 3x3 complex
-* matrices and the operations are applied to them as described.
-*
-* The elements X of the Lie algebra of U(3) are antihermitian 3x3 matrices
-* that are represented by structures X with real entries X.c1,...,X.c9
-* through
-*
-*  X_11=i*X.c1, X_22=i*X.c2, X_33=i*X.c3,
-*
-*  X_12=X.c4+i*X.c5, X_13=X.c6+i*X.c7, X_23=X.c8+i*X.c9
-*
-* The type su3_alg_dble [which represents elements of the Lie algebra of SU(3)]
-* is described in the file linalg/liealg.c.
-*
-* If SSE2 or AVX instructions are used, all su3_dble and su3_alg_dble matrices
-* are assumed to be aligned to 16 byte boundaries.
-*
-*******************************************************************************/
+ *
+ * File su3prod.c
+ *
+ * Copyright (C) 2005, 2009-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Products of double-precision 3x3 matrices.
+ *
+ * The externally accessible functions are
+ *
+ *   void su3xsu3(su3_dble *u,su3_dble *v,su3_dble *w)
+ *     Computes w=u*v assuming that w is different from u.
+ *
+ *   void su3dagxsu3(su3_dble *u,su3_dble *v,su3_dble *w)
+ *     Computes w=u^dag*v assuming that w is different from u.
+ *
+ *   void su3xsu3dag(su3_dble *u,su3_dble *v,su3_dble *w)
+ *     Computes w=u*v^dag assuming that w is different from u and v.
+ *
+ *   void su3dagxsu3dag(su3_dble *u,su3_dble *v,su3_dble *w)
+ *     Computes w=u^dag*v^dag assuming that w is different from u and v.
+ *
+ *   void su3xu3alg(su3_dble *u,u3_alg_dble *X,su3_dble *v)
+ *     Computes v=u*X assuming that v is different from u.
+ *
+ *   void su3dagxu3alg(su3_dble *u,u3_alg_dble *X,su3_dble *v)
+ *     Computes v=u^dag*X assuming that v is different from u.
+ *
+ *   void u3algxsu3(u3_alg_dble *X,su3_dble *u,su3_dble *v)
+ *     Computes v=X*u assuming that v is different from u.
+ *
+ *   void u3algxsu3dag(u3_alg_dble *X,su3_dble *u,su3_dble *v)
+ *     Computes v=X*u^dag assuming that v is different from u.
+ *
+ *   double prod2su3alg(su3_dble *u,su3_dble *v,su3_alg_dble *X)
+ *     Computes the product w=u*v and assigns its traceless antihermitian
+ *     part (1/2)*[w-w^dag-(1/3)*tr{w-w^dag}] to X. The program returns
+ *     the real part of tr{w}.
+ *
+ *   void prod2u3alg(su3_dble *u,su3_dble *v,u3_alg_dble *X)
+ *     Computes the product w=u*v and assigns w-w^dag to X.
+ *
+ *   void rotate_su3alg(su3_dble *u,su3_alg_dble *X)
+ *     Replaces X by u*X*u^dag. The matrix u must be unitary but its
+ *     determinant may be different from 1.
+ *
+ * Notes:
+ *
+ * Unless stated otherwise, the matrices of type su3_dble are not assumed to
+ * be unitary or unimodular. They are just treated as general 3x3 complex
+ * matrices and the operations are applied to them as described.
+ *
+ * The elements X of the Lie algebra of U(3) are antihermitian 3x3 matrices
+ * that are represented by structures X with real entries X.c1,...,X.c9
+ * through
+ *
+ *  X_11=i*X.c1, X_22=i*X.c2, X_33=i*X.c3,
+ *
+ *  X_12=X.c4+i*X.c5, X_13=X.c6+i*X.c7, X_23=X.c8+i*X.c9
+ *
+ * The type su3_alg_dble [which represents elements of the Lie algebra of SU(3)]
+ * is described in the file linalg/liealg.c.
+ *
+ * If SSE2 or AVX instructions are used, all su3_dble and su3_alg_dble matrices
+ * are assumed to be aligned to 16 byte boundaries.
+ *
+ *******************************************************************************/
 
 #define SU3PROD_C
 
@@ -92,7 +92,10 @@ static void su3xsu3vec_pair(su3_dble const *u)
   _avx_su3_multiply_pair_dble(*u);
 }
 
-static void su3dagxsu3vec(su3_dble const *u) { _avx_su3_inverse_multiply_dble(*u); }
+static void su3dagxsu3vec(su3_dble const *u)
+{
+  _avx_su3_inverse_multiply_dble(*u);
+}
 
 static void su3dagxsu3vec_pair(su3_dble const *u)
 {

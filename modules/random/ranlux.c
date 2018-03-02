@@ -1,65 +1,65 @@
 
 /*******************************************************************************
-*
-* File ranlux.c
-*
-* Copyright (C) 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Initialization of the ranlux generators
-*
-* The externally accessible functions are
-*
-*   void start_ranlux(int level,int seed)
-*     Initializes the random number generators ranlxs and ranlxd on all
-*     processes in different ways. The luxury level should be 0 (recommended)
-*     or 1 (exceptional) and the seed can be any positive integer less than
-*     or equal to INT_MAX/NPROC. An error occurs if the seed is not in this
-*     range.
-*
-*   void export_ranlux(int tag,char *out)
-*     Writes the tag, the lattice sizes, the process grid and the state of
-*     the random number generators ranlxs and ranlxd to the file "out" from
-*     process 0. The state of the generators is retrieved from all processes
-*     and written to the file in the order specified in the notes.
-*
-*   int import_ranlux(char *in)
-*     Reads the state of the random number generators ranlxs and ranlxd from
-*     the file "in". The file is read from process 0 only and the data on
-*     the file are expected in the form written by export_ranlux(). An error
-*     occurs if the lattice sizes and process grid read from the file do not
-*     coincide with the actual values of these parameters. The program then
-*     resets the generators on all processes to the state read from the file.
-*     The value returned is the tag read from the file.
-*
-* Notes:
-*
-* The program start_ranlux() guarantees that all generators are initialized
-* with different seed values. Moreover, the initialization is guaranteed to
-* be pairwise different from the previous one when start_ranlux() is called
-* a second time with another value of "seed".
-*
-* The functions in this module assign a lexicographic index
-*
-*  id=n3+NPROC3*n2+NPROC2*NPROC3*n1+NPROC1*NPROC2*NPROC3*n0
-*
-* to the MPI process with Cartesian grid coordinates (n0,n1,n2,n3). On a
-* given process, the initialization of the generators depends only on the
-* index and the parameters "level" and "seed".
-*
-* The function export_ranlux() writes the state of the generators to the
-* specified file in the order of increasing index. Independently of the
-* machine, the data are written in little-endian byte order, using a 4 byte
-* integer type. The import function assumes the data on the input file to
-* be of this kind and converts them to big-endian byte order if the machine
-* is big endian.
-*
-* The programs in this module act globally and must be called simultaneously
-* on all processes.
-*
-*******************************************************************************/
+ *
+ * File ranlux.c
+ *
+ * Copyright (C) 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Initialization of the ranlux generators
+ *
+ * The externally accessible functions are
+ *
+ *   void start_ranlux(int level,int seed)
+ *     Initializes the random number generators ranlxs and ranlxd on all
+ *     processes in different ways. The luxury level should be 0 (recommended)
+ *     or 1 (exceptional) and the seed can be any positive integer less than
+ *     or equal to INT_MAX/NPROC. An error occurs if the seed is not in this
+ *     range.
+ *
+ *   void export_ranlux(int tag,char *out)
+ *     Writes the tag, the lattice sizes, the process grid and the state of
+ *     the random number generators ranlxs and ranlxd to the file "out" from
+ *     process 0. The state of the generators is retrieved from all processes
+ *     and written to the file in the order specified in the notes.
+ *
+ *   int import_ranlux(char *in)
+ *     Reads the state of the random number generators ranlxs and ranlxd from
+ *     the file "in". The file is read from process 0 only and the data on
+ *     the file are expected in the form written by export_ranlux(). An error
+ *     occurs if the lattice sizes and process grid read from the file do not
+ *     coincide with the actual values of these parameters. The program then
+ *     resets the generators on all processes to the state read from the file.
+ *     The value returned is the tag read from the file.
+ *
+ * Notes:
+ *
+ * The program start_ranlux() guarantees that all generators are initialized
+ * with different seed values. Moreover, the initialization is guaranteed to
+ * be pairwise different from the previous one when start_ranlux() is called
+ * a second time with another value of "seed".
+ *
+ * The functions in this module assign a lexicographic index
+ *
+ *  id=n3+NPROC3*n2+NPROC2*NPROC3*n1+NPROC1*NPROC2*NPROC3*n0
+ *
+ * to the MPI process with Cartesian grid coordinates (n0,n1,n2,n3). On a
+ * given process, the initialization of the generators depends only on the
+ * index and the parameters "level" and "seed".
+ *
+ * The function export_ranlux() writes the state of the generators to the
+ * specified file in the order of increasing index. Independently of the
+ * machine, the data are written in little-endian byte order, using a 4 byte
+ * integer type. The import function assumes the data on the input file to
+ * be of this kind and converts them to big-endian byte order if the machine
+ * is big endian.
+ *
+ * The programs in this module act globally and must be called simultaneously
+ * on all processes.
+ *
+ *******************************************************************************/
 
 #define RANLUX_C
 

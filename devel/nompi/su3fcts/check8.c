@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check8.c
-*
-* Copyright (C) 2009, 2010, 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the programs cm3x3_zero(),...,cm3x3_lc2()
-*
-*******************************************************************************/
+ *
+ * File check8.c
+ *
+ * Copyright (C) 2009, 2010, 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the programs cm3x3_zero(),...,cm3x3_lc2()
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>
