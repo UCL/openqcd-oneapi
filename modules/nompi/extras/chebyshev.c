@@ -1,51 +1,51 @@
 
 /*******************************************************************************
-*
-* File chebyshev.c
-*
-* Copyright (C) 2005, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Chebyshev approximation and integration
-*
-* The externally accessible functions are
-*
-*   int cheby_fit(double a,double b,double (*f)(double x),
-*                                   int nmax,double eps,double c[])
-*     Computes the coefficients c[0],...,c[n], with n<=nmax being the
-*     value returned by the program and eps the desired absolute precision
-*     of the approximation
-*
-*   double cheby_val(double a,double b,int n,double c[],double x)
-*     Computes the value of the Chebyshev approximation at x, assuming
-*     the coefficients c_k are stored in the array c[0],...,c[n]
-*
-*   double cheby_int(double a,double b,double (*f)(double x),
-*                                      int nmax,double eps)
-*     Computes the definite integral of f(x) in the range a<=x<=b to an
-*     absolute precision eps, using Chebyshev polynomials of degree n<=nmax
-*
-* Notes:
-*
-* For the numerical approximation and integration of a given function f(x),
-* using the Chebyshev polynomials
-*
-*   T_k(z)=cos(k*theta),  z=cos(theta),  -1<=z<=1,
-*
-* the function is assumed to be defined in the range a<=x<=b and to be
-* available as a function program. The approximation is then of the form
-*
-*   f(x)=sum{c_k*T_k(z),k=0..n}+r(x),   z=(a+b-2*x)/(a-b)
-*
-*   |r(x)|<eps for all x
-*
-* A detailed description is given in the notes
-*
-*   M. Luescher: Chebyshev approximation and integration
-*
-*******************************************************************************/
+ *
+ * File chebyshev.c
+ *
+ * Copyright (C) 2005, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Chebyshev approximation and integration
+ *
+ * The externally accessible functions are
+ *
+ *   int cheby_fit(double a,double b,double (*f)(double x),
+ *                                   int nmax,double eps,double c[])
+ *     Computes the coefficients c[0],...,c[n], with n<=nmax being the
+ *     value returned by the program and eps the desired absolute precision
+ *     of the approximation
+ *
+ *   double cheby_val(double a,double b,int n,double c[],double x)
+ *     Computes the value of the Chebyshev approximation at x, assuming
+ *     the coefficients c_k are stored in the array c[0],...,c[n]
+ *
+ *   double cheby_int(double a,double b,double (*f)(double x),
+ *                                      int nmax,double eps)
+ *     Computes the definite integral of f(x) in the range a<=x<=b to an
+ *     absolute precision eps, using Chebyshev polynomials of degree n<=nmax
+ *
+ * Notes:
+ *
+ * For the numerical approximation and integration of a given function f(x),
+ * using the Chebyshev polynomials
+ *
+ *   T_k(z)=cos(k*theta),  z=cos(theta),  -1<=z<=1,
+ *
+ * the function is assumed to be defined in the range a<=x<=b and to be
+ * available as a function program. The approximation is then of the form
+ *
+ *   f(x)=sum{c_k*T_k(z),k=0..n}+r(x),   z=(a+b-2*x)/(a-b)
+ *
+ *   |r(x)|<eps for all x
+ *
+ * A detailed description is given in the notes
+ *
+ *   M. Luescher: Chebyshev approximation and integration
+ *
+ *******************************************************************************/
 
 #define CHEBYSHEV_C
 

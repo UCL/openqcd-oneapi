@@ -1,20 +1,20 @@
 
 /*******************************************************************************
-*
-* File ms3.c
-*
-* Copyright (C) 2012, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of Wilson-flow observables.
-*
-* Syntax: ms3 -i <input file> [-noexp] [-a]
-*
-* For usage instructions see the file README.ms3.
-*
-*******************************************************************************/
+ *
+ * File ms3.c
+ *
+ * Copyright (C) 2012, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of Wilson-flow observables.
+ *
+ * Syntax: ms3 -i <input file> [-noexp] [-a]
+ *
+ * For usage instructions see the file README.ms3.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

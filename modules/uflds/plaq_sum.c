@@ -1,50 +1,50 @@
 
 /*******************************************************************************
-*
-* File plaq_sum.c
-*
-* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Calculation of plaquette sums.
-*
-* The externally accessible functions are
-*
-*   double plaq_sum_dble(int icom)
-*     Returns the sum of Re[tr{U(p)}] over all unoriented plaquettes p,
-*     where U(p) is the product of the double-precision link variables
-*     around p. If icom=1 the global sum of the local sums is returned
-*     and otherwise just the local sum.
-*
-*   double plaq_wsum_dble(int icom)
-*     Same as plaq_sum_dble(), but giving weight 1/2 to the contribution
-*     of the space-like plaquettes at the boundaries of the lattice if
-*     boundary conditions of type 0,1 or 2 are chosen.
-*
-*   double plaq_action_slices(double *asl)
-*     Computes the time-slice sums asl[x0] of the tree-level O(a)-improved
-*     plaquette action density of the double-precision gauge field. The
-*     factor 1/g0^2 is omitted and the time x0 runs from 0 to NPROC0*L0-1.
-*     The program returns the total action.
-*
-* Notes:
-*
-* The Wilson plaquette action density is defined so that it converges to the
-* Yang-Mills action in the classical continuum limit with a rate proportional
-* to a^2. In particular, at the boundaries of the lattice (if there are any),
-* the space-like plaquettes are given the weight 1/2 and the contribution of
-* a plaquette p in the bulk is 2*Re[tr{1-U(p)}].
-*
-* The time-slice sum asl[x0] computed by plaq_action_slices() includes the
-* full contribution to the action of the space-like plaquettes at time x0 and
-* 1/2 of the contribution of the time-like plaquettes at time x0 and x0-1.
-*
-* The programs in this module perform global communications and must be
-* called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File plaq_sum.c
+ *
+ * Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Calculation of plaquette sums.
+ *
+ * The externally accessible functions are
+ *
+ *   double plaq_sum_dble(int icom)
+ *     Returns the sum of Re[tr{U(p)}] over all unoriented plaquettes p,
+ *     where U(p) is the product of the double-precision link variables
+ *     around p. If icom=1 the global sum of the local sums is returned
+ *     and otherwise just the local sum.
+ *
+ *   double plaq_wsum_dble(int icom)
+ *     Same as plaq_sum_dble(), but giving weight 1/2 to the contribution
+ *     of the space-like plaquettes at the boundaries of the lattice if
+ *     boundary conditions of type 0,1 or 2 are chosen.
+ *
+ *   double plaq_action_slices(double *asl)
+ *     Computes the time-slice sums asl[x0] of the tree-level O(a)-improved
+ *     plaquette action density of the double-precision gauge field. The
+ *     factor 1/g0^2 is omitted and the time x0 runs from 0 to NPROC0*L0-1.
+ *     The program returns the total action.
+ *
+ * Notes:
+ *
+ * The Wilson plaquette action density is defined so that it converges to the
+ * Yang-Mills action in the classical continuum limit with a rate proportional
+ * to a^2. In particular, at the boundaries of the lattice (if there are any),
+ * the space-like plaquettes are given the weight 1/2 and the contribution of
+ * a plaquette p in the bulk is 2*Re[tr{1-U(p)}].
+ *
+ * The time-slice sum asl[x0] computed by plaq_action_slices() includes the
+ * full contribution to the action of the space-like plaquettes at time x0 and
+ * 1/2 of the contribution of the time-like plaquettes at time x0 and x0-1.
+ *
+ * The programs in this module perform global communications and must be
+ * called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define PLAQ_SUM_C
 

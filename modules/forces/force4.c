@@ -1,105 +1,105 @@
 
 /*******************************************************************************
-*
-* File force4.c
-*
-* Copyright (C) 2012, 2013 Martin Luescher, Stefan Schaefer
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Twisted mass pseudo-fermion action and force with even-odd preconditioning.
-*
-* The externally accessible functions are
-*
-*   double setpf4(double mu,int ipf,int isw,int icom)
-*     Generates a pseudo-fermion field phi with probability proportional
-*     to exp(-Spf) and returns the action Spf+Sdet if isw=1 or Spf if
-*     isw!=1 (see the notes).
-*
-*   void force4(double mu,int ipf,int isw,int isp,int icr,double c,
-*               int *status)
-*     Computes the force deriving from the action Spf+Sdet if isw=1 or
-*     Spf if isw!=1 (see the notes). The calculated force is multiplied
-*     by c and added to the molecular-dynamics force field.
-*
-*   double action4(double mu,int ipf,int isw,int isp,int icom,
-*                  int *status)
-*     Returns the action Spf+Sdet if isw=1 or Spf if isw!=1 (see the
-*     notes).
-*
-* Notes:
-*
-* The pseudo-fermion action Spf is given by
-*
-*   Spf=(phi,(Dwhat^dag*Dwhat+mu^2)^(-1)*phi),
-*
-* where Dwhat denotes the even-odd preconditioned (improved) Wilson-Dirac
-* operator and phi the pseudo-fermion field. The latter vanishes on the
-* odd lattice sites.
-*
-* The inclusion of the "small quark determinant" amounts to adding the
-* action
-*
-*   Sdet=-2*ln{det(1e+Doo)}+constant
-*
-* to the molecular-dynamics Hamilton function, where 1e is the projector
-* to the quark fields that vanish on the odd lattice sites and Doo the
-* odd-odd component of the Dirac operator (the constant is adjusted so
-* as to reduce the significance losses when the action differences are
-* computed at the end of the molecular-dynamics trajectories).
-*
-* The common parameters of the programs in this module are:
-*
-*   mu            Twisted mass parameter in Spf.
-*
-*   ipf           Index of the pseudo-fermion field phi in the
-*                 structure returned by mdflds() [mdflds.c].
-*
-*   isp           Index of the solver parameter set that describes
-*                 the solver to be used for the solution of the
-*                 Dirac equation.
-*
-*   icom          The action returned by the programs setpf4() and
-*                 action4() is summed over all MPI processes if icom=1.
-*                 Otherwise the local part of the action is returned.
-*
-*   status        Status values returned by the solver used for the
-*                 solution of the Dirac equation.
-*
-* The supported solvers are CGNE, SAP_GCR and DFL_SAP_GCR. Depending
-* on the program and the solver, the number of status variables varies
-* and is given by:
-*
-*                  CGNE         SAP_GCR       DFL_SAP_GCR
-*   force4()         1             2               6
-*   action4()        1             1               3
-*
-* Note that, in force4(), the GCR solvers solve the Dirac equations twice.
-* In these cases, the program writes the status values one after the other
-* to the array. The bare quark mass m0 is the one last set by sw_parms()
-* [flags/lat_parms.c] and it is taken for granted that the parameters of
-* the solver have been set by set_solver_parms() [flags/solver_parms.c].
-*
-* The program force4() attempts to propagate the solutions of the Dirac
-* equation along the molecular-dynamics trajectories, using the field
-* stack number icr (no fields are propagated if icr=0). If this feature
-* is used, the program setup_chrono() [update/chrono.c] must be called
-* before force4() is called for the first time.
-*
-* The required workspaces of double-precision spinor fields are
-*
-*                  CGNE         SAP_GCR       DFL_SAP_GCR
-*   setpf4()         1             1               1
-*   force4()     2+(icr>0)     2+2*(icr>0)     2+2*(icr>0)
-*   action4()        1             1               1
-*
-* (these figures do not include the workspace required by the solvers).
-*
-* The programs in this module perform global communications and must be
-* called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File force4.c
+ *
+ * Copyright (C) 2012, 2013 Martin Luescher, Stefan Schaefer
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Twisted mass pseudo-fermion action and force with even-odd preconditioning.
+ *
+ * The externally accessible functions are
+ *
+ *   double setpf4(double mu,int ipf,int isw,int icom)
+ *     Generates a pseudo-fermion field phi with probability proportional
+ *     to exp(-Spf) and returns the action Spf+Sdet if isw=1 or Spf if
+ *     isw!=1 (see the notes).
+ *
+ *   void force4(double mu,int ipf,int isw,int isp,int icr,double c,
+ *               int *status)
+ *     Computes the force deriving from the action Spf+Sdet if isw=1 or
+ *     Spf if isw!=1 (see the notes). The calculated force is multiplied
+ *     by c and added to the molecular-dynamics force field.
+ *
+ *   double action4(double mu,int ipf,int isw,int isp,int icom,
+ *                  int *status)
+ *     Returns the action Spf+Sdet if isw=1 or Spf if isw!=1 (see the
+ *     notes).
+ *
+ * Notes:
+ *
+ * The pseudo-fermion action Spf is given by
+ *
+ *   Spf=(phi,(Dwhat^dag*Dwhat+mu^2)^(-1)*phi),
+ *
+ * where Dwhat denotes the even-odd preconditioned (improved) Wilson-Dirac
+ * operator and phi the pseudo-fermion field. The latter vanishes on the
+ * odd lattice sites.
+ *
+ * The inclusion of the "small quark determinant" amounts to adding the
+ * action
+ *
+ *   Sdet=-2*ln{det(1e+Doo)}+constant
+ *
+ * to the molecular-dynamics Hamilton function, where 1e is the projector
+ * to the quark fields that vanish on the odd lattice sites and Doo the
+ * odd-odd component of the Dirac operator (the constant is adjusted so
+ * as to reduce the significance losses when the action differences are
+ * computed at the end of the molecular-dynamics trajectories).
+ *
+ * The common parameters of the programs in this module are:
+ *
+ *   mu            Twisted mass parameter in Spf.
+ *
+ *   ipf           Index of the pseudo-fermion field phi in the
+ *                 structure returned by mdflds() [mdflds.c].
+ *
+ *   isp           Index of the solver parameter set that describes
+ *                 the solver to be used for the solution of the
+ *                 Dirac equation.
+ *
+ *   icom          The action returned by the programs setpf4() and
+ *                 action4() is summed over all MPI processes if icom=1.
+ *                 Otherwise the local part of the action is returned.
+ *
+ *   status        Status values returned by the solver used for the
+ *                 solution of the Dirac equation.
+ *
+ * The supported solvers are CGNE, SAP_GCR and DFL_SAP_GCR. Depending
+ * on the program and the solver, the number of status variables varies
+ * and is given by:
+ *
+ *                  CGNE         SAP_GCR       DFL_SAP_GCR
+ *   force4()         1             2               6
+ *   action4()        1             1               3
+ *
+ * Note that, in force4(), the GCR solvers solve the Dirac equations twice.
+ * In these cases, the program writes the status values one after the other
+ * to the array. The bare quark mass m0 is the one last set by sw_parms()
+ * [flags/lat_parms.c] and it is taken for granted that the parameters of
+ * the solver have been set by set_solver_parms() [flags/solver_parms.c].
+ *
+ * The program force4() attempts to propagate the solutions of the Dirac
+ * equation along the molecular-dynamics trajectories, using the field
+ * stack number icr (no fields are propagated if icr=0). If this feature
+ * is used, the program setup_chrono() [update/chrono.c] must be called
+ * before force4() is called for the first time.
+ *
+ * The required workspaces of double-precision spinor fields are
+ *
+ *                  CGNE         SAP_GCR       DFL_SAP_GCR
+ *   setpf4()         1             1               1
+ *   force4()     2+(icr>0)     2+2*(icr>0)     2+2*(icr>0)
+ *   action4()        1             1               1
+ *
+ * (these figures do not include the workspace required by the solvers).
+ *
+ * The programs in this module perform global communications and must be
+ * called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define FORCE4_C
 

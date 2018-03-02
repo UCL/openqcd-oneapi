@@ -1,53 +1,53 @@
 
 /*******************************************************************************
-*
-* File zolotarev.c
-*
-* Copyright (C) 2008, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of the Zolotarev rational approximation to 1/sqrt(y)
-*
-* The externally accessible function is
-*
-*   void zolotarev(int n,double eps,double *A,double *ar,double *delta)
-*     Computes the amplitude A, the coefficients ar[r-1]=a_r, r=1,..,2n,
-*     and the error delta of the Zolotarev optimal rational approximation
-*     of degree [n,n] to the function f(y)=1/sqrt(y).
-*
-* Notes:
-*
-* The optimal rational approximation R(y) of degree [n,n] to 1/sqrt(y)
-* in the range eps<=y<=1 is given by
-*
-*   R(y)=A*P(y)/Q(y),
-*
-*   P(y)=(y+a_1)*(y+a_3)*..*(y+a_{2n-1}),
-*
-*   Q(y)=(y+a_2)*(y+a_4)*..*(y+a_{2n}),
-*
-*   a_r={cn(r*v,k)/sn(r*v,k)}^2,   v=K/(2n+1),   k=sqrt(1-eps),
-*
-* where sn(u,k), cn(u,k) and K=K(k) denote the Jacobi elliptic functions
-* and the complete elliptic integral respectively. The formulae for the
-* the amplitude A and the relative error delta,
-*
-*   A={2/[1+sqrt(1-d^2)]}*[c_1*c_3*..*c_{2n-1}]/[c_2*c_4*..*c_{2n}],
-*
-*   delta=d^2/[1+sqrt(1-d^2)]^2,
-*
-* involve the coefficients
-*
-*   c_r={sn(r*v,k)}^2,   r=1,..,2n,
-*
-*   d=k^{2n+1}*{c_1*c_3*..*c_{2n-1}}^2.
-*
-* See N.I. Achiezer: "Theory of Approximation" (Dover Publications, New York,
-* 1992) for the proof of these formulae.
-*
-*******************************************************************************/
+ *
+ * File zolotarev.c
+ *
+ * Copyright (C) 2008, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of the Zolotarev rational approximation to 1/sqrt(y)
+ *
+ * The externally accessible function is
+ *
+ *   void zolotarev(int n,double eps,double *A,double *ar,double *delta)
+ *     Computes the amplitude A, the coefficients ar[r-1]=a_r, r=1,..,2n,
+ *     and the error delta of the Zolotarev optimal rational approximation
+ *     of degree [n,n] to the function f(y)=1/sqrt(y).
+ *
+ * Notes:
+ *
+ * The optimal rational approximation R(y) of degree [n,n] to 1/sqrt(y)
+ * in the range eps<=y<=1 is given by
+ *
+ *   R(y)=A*P(y)/Q(y),
+ *
+ *   P(y)=(y+a_1)*(y+a_3)*..*(y+a_{2n-1}),
+ *
+ *   Q(y)=(y+a_2)*(y+a_4)*..*(y+a_{2n}),
+ *
+ *   a_r={cn(r*v,k)/sn(r*v,k)}^2,   v=K/(2n+1),   k=sqrt(1-eps),
+ *
+ * where sn(u,k), cn(u,k) and K=K(k) denote the Jacobi elliptic functions
+ * and the complete elliptic integral respectively. The formulae for the
+ * the amplitude A and the relative error delta,
+ *
+ *   A={2/[1+sqrt(1-d^2)]}*[c_1*c_3*..*c_{2n-1}]/[c_2*c_4*..*c_{2n}],
+ *
+ *   delta=d^2/[1+sqrt(1-d^2)]^2,
+ *
+ * involve the coefficients
+ *
+ *   c_r={sn(r*v,k)}^2,   r=1,..,2n,
+ *
+ *   d=k^{2n+1}*{c_1*c_3*..*c_{2n-1}}^2.
+ *
+ * See N.I. Achiezer: "Theory of Approximation" (Dover Publications, New York,
+ * 1992) for the proof of these formulae.
+ *
+ *******************************************************************************/
 
 #define ZOLOTAREV_C
 

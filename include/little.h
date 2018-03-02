@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File little.h
-*
-* Copyright (C) 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File little.h
+ *
+ * Copyright (C) 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef LITTLE_H
 #define LITTLE_H

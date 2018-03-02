@@ -1,17 +1,17 @@
 
 /*******************************************************************************
-*
-* File check4.c
-*
-* Copyright (C) 2005, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Kolmogorov-Smirnov test of the random distribution produced by
-* gauss and gauss_dble
-*
-*******************************************************************************/
+ *
+ * File check4.c
+ *
+ * Copyright (C) 2005, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Kolmogorov-Smirnov test of the random distribution produced by
+ * gauss and gauss_dble
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

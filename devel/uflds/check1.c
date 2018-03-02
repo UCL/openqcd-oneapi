@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2009, 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Initialization of the link variables.
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2009, 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Initialization of the link variables.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

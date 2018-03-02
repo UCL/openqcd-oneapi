@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File time1.c
-*
-* Copyright (C) 2005, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Timing of mul_pauli() and mul_pauli2()
-*
-*******************************************************************************/
+ *
+ * File time1.c
+ *
+ * Copyright (C) 2005, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of mul_pauli() and mul_pauli2()
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

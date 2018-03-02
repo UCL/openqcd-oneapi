@@ -1,13 +1,13 @@
 /*******************************************************************************
-*
-* File wflow.h
-*
-* Copyright (C) 2009, 2010, 2011, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File wflow.h
+ *
+ * Copyright (C) 2009, 2010, 2011, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef WFLOW_H
 #define WFLOW_H

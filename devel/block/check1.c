@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2005, 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Consistency checks on the geometry arrays in the known block grids.
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2005, 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Consistency checks on the geometry arrays in the known block grids.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

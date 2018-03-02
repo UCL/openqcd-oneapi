@@ -1,51 +1,51 @@
 
 /*******************************************************************************
-*
-* File bstap.c
-*
-* Copyright (C) 2012, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Allocation and computation of the boundary staple field.
-*
-* The externally accessible functions are
-*
-*   su3_dble *bstap(void)
-*     Returns the base address of the boundary staple field. If it is
-*     not already allocated, the field is allocated and initialized to
-*     unity.
-*
-*   void set_bstap(void)
-*     Computes the boundary staples and copies them to the neighbouring
-*     MPI processes (see doc/gauge_actions.pdf).
-*
-* Notes:
-*
-* The boundary staple field has size 3*BNDRY and is logically divided into
-* face segments. For the face with index ifc, the associated segment is
-* at offset ofs[ifc] from the base address, where
-*
-*   ofs[0]=0
-*   ofs[1]=ofs[0]+3*FACE0
-*   ofs[2]=ofs[1]+3*FACE0
-*   ofs[3]=ofs[2]+3*FACE1
-*   ofs[4]=ofs[3]+3*FACE1
-*   ofs[5]=ofs[4]+3*FACE2
-*   ofs[6]=ofs[5]+3*FACE2
-*   ofs[7]=ofs[6]+3*FACE3
-*
-* The ordering of the staples along the faces coincides with the ordering
-* of the lattice points at the boundary (see main/README.global and also
-* lattice/README.uidx for some further details). With open or SF boundary
-* conditions, the program set_bstap() sets the time-like boundary staples
-* at the boundaries of the lattice to zero.
-*
-* All these programs act globally and must be called on all MPI processes
-* simultaneously.
-*
-*******************************************************************************/
+ *
+ * File bstap.c
+ *
+ * Copyright (C) 2012, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Allocation and computation of the boundary staple field.
+ *
+ * The externally accessible functions are
+ *
+ *   su3_dble *bstap(void)
+ *     Returns the base address of the boundary staple field. If it is
+ *     not already allocated, the field is allocated and initialized to
+ *     unity.
+ *
+ *   void set_bstap(void)
+ *     Computes the boundary staples and copies them to the neighbouring
+ *     MPI processes (see doc/gauge_actions.pdf).
+ *
+ * Notes:
+ *
+ * The boundary staple field has size 3*BNDRY and is logically divided into
+ * face segments. For the face with index ifc, the associated segment is
+ * at offset ofs[ifc] from the base address, where
+ *
+ *   ofs[0]=0
+ *   ofs[1]=ofs[0]+3*FACE0
+ *   ofs[2]=ofs[1]+3*FACE0
+ *   ofs[3]=ofs[2]+3*FACE1
+ *   ofs[4]=ofs[3]+3*FACE1
+ *   ofs[5]=ofs[4]+3*FACE2
+ *   ofs[6]=ofs[5]+3*FACE2
+ *   ofs[7]=ofs[6]+3*FACE3
+ *
+ * The ordering of the staples along the faces coincides with the ordering
+ * of the lattice points at the boundary (see main/README.global and also
+ * lattice/README.uidx for some further details). With open or SF boundary
+ * conditions, the program set_bstap() sets the time-like boundary staples
+ * at the boundaries of the lattice to zero.
+ *
+ * All these programs act globally and must be called on all MPI processes
+ * simultaneously.
+ *
+ *******************************************************************************/
 
 #define BSTAP_C
 

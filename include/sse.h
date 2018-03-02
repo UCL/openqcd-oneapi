@@ -1,19 +1,19 @@
 
 /*******************************************************************************
-*
-* File sse.h
-*
-* Copyright (C) 2005, 2008, 2009, 2011,  Martin Luescher, Filippo Palombi
-*               2016
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Macros for Dirac spinors, SU(3) vectors and SU(3) matrices using inline
-* assembly SSE3 instructions. The machine is assumed to comply with the
-* x86-64 instruction set.
-*
-*******************************************************************************/
+ *
+ * File sse.h
+ *
+ * Copyright (C) 2005, 2008, 2009, 2011,  Martin Luescher, Filippo Palombi
+ *               2016
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Macros for Dirac spinors, SU(3) vectors and SU(3) matrices using inline
+ * assembly SSE3 instructions. The machine is assumed to comply with the
+ * x86-64 instruction set.
+ *
+ *******************************************************************************/
 
 #ifndef SSE_H
 #define SSE_H
@@ -49,10 +49,10 @@ static sse_float _sse_sgn
     __attribute__((unused)) = {-1.0f, -1.0f, -1.0f, -1.0f};
 
 /*******************************************************************************
-*
-* Prefetch macros
-*
-*******************************************************************************/
+ *
+ * Prefetch macros
+ *
+ *******************************************************************************/
 
 #if (defined P4)
 
@@ -260,31 +260,31 @@ static sse_float _sse_sgn
 #endif
 
 /*******************************************************************************
-*
-* Macros for su3_vector data
-*
-* Most of these macros operate on pairs of su3 vectors that are stored
-* in the low and high words of xmm0,xmm1,xmm2 or xmm3,xmm4,xmm5. For example,
-*
-* xmm0 -> sl.c1.re,sl.c1.im,sh.c1.re,sh.c1.im
-* xmm1 -> sl.c2.re,sl.c2.im,sh.c2.re,sh.c2.im
-* xmm2 -> sl.c3.re,sl.c3.im,sh.c3.re,sh.c3.im
-*
-* (where sl and sh are of type su3_vector). This can also be interpreted as
-* an sse_vector s that is stored in these registers according to
-*
-* xmm0 -> s.c1.c1,s.c1.c2,s.c1.c3,s.c1.c4
-* xmm1 -> s.c2.c1,s.c2.c2,s.c2.c3,s.c2.c4
-* xmm2 -> s.c3.c1,s.c3.c2,s.c3.c3,s.c3.c4
-*
-* The load and store macros can be used to move data in either format
-* from and to the xmm registers
-*
-*******************************************************************************/
+ *
+ * Macros for su3_vector data
+ *
+ * Most of these macros operate on pairs of su3 vectors that are stored
+ * in the low and high words of xmm0,xmm1,xmm2 or xmm3,xmm4,xmm5. For example,
+ *
+ * xmm0 -> sl.c1.re,sl.c1.im,sh.c1.re,sh.c1.im
+ * xmm1 -> sl.c2.re,sl.c2.im,sh.c2.re,sh.c2.im
+ * xmm2 -> sl.c3.re,sl.c3.im,sh.c3.re,sh.c3.im
+ *
+ * (where sl and sh are of type su3_vector). This can also be interpreted as
+ * an sse_vector s that is stored in these registers according to
+ *
+ * xmm0 -> s.c1.c1,s.c1.c2,s.c1.c3,s.c1.c4
+ * xmm1 -> s.c2.c1,s.c2.c2,s.c2.c3,s.c2.c4
+ * xmm2 -> s.c3.c1,s.c3.c2,s.c3.c3,s.c3.c4
+ *
+ * The load and store macros can be used to move data in either format
+ * from and to the xmm registers
+ *
+ *******************************************************************************/
 
 /*
-* Loads two su3 vectors sl and sh to the low and high words of xmm0,xmm1,xmm2
-*/
+ * Loads two su3 vectors sl and sh to the low and high words of xmm0,xmm1,xmm2
+ */
 
 #define _sse_pair_load(sl, sh)                                                 \
   __asm__ __volatile__("movsd %0, %%xmm0 \n\t"                                 \
@@ -299,8 +299,8 @@ static sse_float _sse_sgn
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Loads two su3 vectors sl and sh to the low and high words of xmm3,xmm4,xmm5
-*/
+ * Loads two su3 vectors sl and sh to the low and high words of xmm3,xmm4,xmm5
+ */
 
 #define _sse_pair_load_up(sl, sh)                                              \
   __asm__ __volatile__("movsd %0, %%xmm3 \n\t"                                 \
@@ -315,8 +315,8 @@ static sse_float _sse_sgn
                        : "xmm3", "xmm4", "xmm5")
 
 /*
-* Stores the low and high words of xmm0,xmm1,xmm2 to the su3 vectors rl and rh
-*/
+ * Stores the low and high words of xmm0,xmm1,xmm2 to the su3 vectors rl and rh
+ */
 
 #define _sse_pair_store(rl, rh)                                                \
   __asm__ __volatile__("movlps %%xmm0, %0 \n\t"                                \
@@ -329,8 +329,8 @@ static sse_float _sse_sgn
                          "=m"((rh).c1), "=m"((rh).c2), "=m"((rh).c3))
 
 /*
-* Stores the low and high words of xmm3,xmm4,xmm5 to the su3 vectors rl and rh
-*/
+ * Stores the low and high words of xmm3,xmm4,xmm5 to the su3 vectors rl and rh
+ */
 
 #define _sse_pair_store_up(rl, rh)                                             \
   __asm__ __volatile__("movlps %%xmm3, %0 \n\t"                                \
@@ -343,8 +343,8 @@ static sse_float _sse_sgn
                          "=m"((rh).c1), "=m"((rh).c2), "=m"((rh).c3))
 
 /*
-* Loads the components of a Weyl spinor s to xmm0,xmm1,xmm2
-*/
+ * Loads the components of a Weyl spinor s to xmm0,xmm1,xmm2
+ */
 
 #define _sse_weyl_load(s)                                                      \
   __asm__ __volatile__("movaps %0, %%xmm0 \n\t"                                \
@@ -356,8 +356,8 @@ static sse_float _sse_sgn
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Loads the components of a Weyl spinor s to xmm3,xmm4,xmm5
-*/
+ * Loads the components of a Weyl spinor s to xmm3,xmm4,xmm5
+ */
 
 #define _sse_weyl_load_up(s)                                                   \
   __asm__ __volatile__("movaps %0, %%xmm3 \n\t"                                \
@@ -369,8 +369,8 @@ static sse_float _sse_sgn
                        : "xmm3", "xmm4", "xmm5")
 
 /*
-* Stores xmm0,xmm1,xmm2 to the components of a Weyl spinor s
-*/
+ * Stores xmm0,xmm1,xmm2 to the components of a Weyl spinor s
+ */
 
 #define _sse_weyl_store(s)                                                     \
   __asm__ __volatile__("movaps %%xmm0, %0 \n\t"                                \
@@ -380,8 +380,8 @@ static sse_float _sse_sgn
                          "=m"((s).c2.c1), "=m"((s).c2.c2), "=m"((s).c2.c3))
 
 /*
-* Stores xmm3,xmm4,xmm5 to the components of a Weyl spinor s
-*/
+ * Stores xmm3,xmm4,xmm5 to the components of a Weyl spinor s
+ */
 
 #define _sse_weyl_store_up(s)                                                  \
   __asm__ __volatile__("movaps %%xmm3, %0 \n\t"                                \
@@ -391,8 +391,8 @@ static sse_float _sse_sgn
                          "=m"((s).c2.c1), "=m"((s).c2.c2), "=m"((s).c2.c3))
 
 /*
-* Adds xmm3,xmm4,xmm5 to xmm0,xmm1,xmm2
-*/
+ * Adds xmm3,xmm4,xmm5 to xmm0,xmm1,xmm2
+ */
 
 #define _sse_vector_add()                                                      \
   __asm__ __volatile__("addps %%xmm3, %%xmm0 \n\t"                             \
@@ -403,8 +403,8 @@ static sse_float _sse_sgn
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Subtracts xmm3,xmm4,xmm5 from xmm0,xmm1,xmm2
-*/
+ * Subtracts xmm3,xmm4,xmm5 from xmm0,xmm1,xmm2
+ */
 
 #define _sse_vector_sub()                                                      \
   __asm__ __volatile__("subps %%xmm3, %%xmm0 \n\t"                             \
@@ -415,9 +415,9 @@ static sse_float _sse_sgn
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Multiplies the high words xmm3,xmm4,xmm5 with -1 and adds these registers
-* to xmm0,xmm1,xmm2
-*/
+ * Multiplies the high words xmm3,xmm4,xmm5 with -1 and adds these registers
+ * to xmm0,xmm1,xmm2
+ */
 
 #define _sse_vector_addsub()                                                   \
   __asm__ __volatile__("mulps %0, %%xmm3 \n\t"                                 \
@@ -431,9 +431,9 @@ static sse_float _sse_sgn
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Multiplies the low words xmm3,xmm4,xmm5 with -1 and adds these registers
-* to xmm0,xmm1,xmm2
-*/
+ * Multiplies the low words xmm3,xmm4,xmm5 with -1 and adds these registers
+ * to xmm0,xmm1,xmm2
+ */
 
 #define _sse_vector_subadd()                                                   \
   __asm__ __volatile__("mulps %0, %%xmm3 \n\t"                                 \
@@ -447,8 +447,8 @@ static sse_float _sse_sgn
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Multiplies xmm3,xmm4,xmm5 with i and adds them to xmm0,xmm1,xmm2
-*/
+ * Multiplies xmm3,xmm4,xmm5 with i and adds them to xmm0,xmm1,xmm2
+ */
 
 #define _sse_vector_i_add()                                                    \
   __asm__ __volatile__("shufps $0xb1, %%xmm3, %%xmm3 \n\t"                     \
@@ -462,8 +462,8 @@ static sse_float _sse_sgn
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Multiplies xmm3,xmm4,xmm5 with i and subtracts them from xmm0,xmm1,xmm2
-*/
+ * Multiplies xmm3,xmm4,xmm5 with i and subtracts them from xmm0,xmm1,xmm2
+ */
 
 #define _sse_vector_i_sub()                                                    \
   __asm__ __volatile__("shufps $0xb1, %%xmm3, %%xmm3 \n\t"                     \
@@ -480,9 +480,9 @@ static sse_float _sse_sgn
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Exchanges the high and low words of xmm3,xmm4,xmm5, multiplies them with i
-* and adds the result to xmm0,xmm1,xmm2
-*/
+ * Exchanges the high and low words of xmm3,xmm4,xmm5, multiplies them with i
+ * and adds the result to xmm0,xmm1,xmm2
+ */
 
 #define _sse_vector_xch_i_add()                                                \
   __asm__ __volatile__("shufps $0x1b, %%xmm3, %%xmm3 \n\t"                     \
@@ -496,9 +496,9 @@ static sse_float _sse_sgn
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Exchanges the high and low words of xmm3,xmm4,xmm5, multiplies them with i
-* and subtracts the result from xmm0,xmm1,xmm2
-*/
+ * Exchanges the high and low words of xmm3,xmm4,xmm5, multiplies them with i
+ * and subtracts the result from xmm0,xmm1,xmm2
+ */
 
 #define _sse_vector_xch_i_sub()                                                \
   __asm__ __volatile__("shufps $0x1b, %%xmm3, %%xmm3 \n\t"                     \
@@ -515,9 +515,9 @@ static sse_float _sse_sgn
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Multiplies the low and high words of xmm3,xmm4,xmm5 with i and -i
-* respectively and adds these registers to xmm0,xmm1,xmm2
-*/
+ * Multiplies the low and high words of xmm3,xmm4,xmm5 with i and -i
+ * respectively and adds these registers to xmm0,xmm1,xmm2
+ */
 
 #define _sse_vector_i_addsub()                                                 \
   __asm__ __volatile__("shufps $0xb1, %%xmm3, %%xmm3 \n\t"                     \
@@ -534,9 +534,9 @@ static sse_float _sse_sgn
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Multiplies the low and high words of xmm3,xmm4,xmm5 with -i and i
-* respectively and adds these registers to xmm0,xmm1,xmm2
-*/
+ * Multiplies the low and high words of xmm3,xmm4,xmm5 with -i and i
+ * respectively and adds these registers to xmm0,xmm1,xmm2
+ */
 
 #define _sse_vector_i_subadd()                                                 \
   __asm__ __volatile__("shufps $0xb1, %%xmm3, %%xmm3 \n\t"                     \
@@ -553,8 +553,8 @@ static sse_float _sse_sgn
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Exchanges the high and low words in xmm3,xmm4,xmm5
-*/
+ * Exchanges the high and low words in xmm3,xmm4,xmm5
+ */
 
 #define _sse_vector_xch()                                                      \
   __asm__ __volatile__("shufps $0x4e, %%xmm3, %%xmm3 \n\t"                     \
@@ -565,18 +565,18 @@ static sse_float _sse_sgn
                        : "xmm3", "xmm4", "xmm5")
 
 /******************************************************************************
-*
-*  Action of su3 matrices on su3 vectors
-*
-******************************************************************************/
+ *
+ *  Action of su3 matrices on su3 vectors
+ *
+ ******************************************************************************/
 
 /*
-* Multiplies a pair sl,sh of su3 vectors with an su3 matrix u,
-* assuming sl and sh are in the low and high words of xmm0,xmm1,xmm2
-*
-* On output the result is in xmm3,xmm4,xmm5 and the registers
-* xmm0,xmm1,xmm2 are changed
-*/
+ * Multiplies a pair sl,sh of su3 vectors with an su3 matrix u,
+ * assuming sl and sh are in the low and high words of xmm0,xmm1,xmm2
+ *
+ * On output the result is in xmm3,xmm4,xmm5 and the registers
+ * xmm0,xmm1,xmm2 are changed
+ */
 
 #define _sse_su3_multiply(u)                                                   \
   __asm__ __volatile__("movss %0, %%xmm3 \n\t"                                 \
@@ -678,12 +678,12 @@ static sse_float _sse_sgn
                          "xmm9", "xmm10", "xmm11")
 
 /*
-* Multiplies a pair sl,sh of su3 vectors with an su3 matrix u^dagger,
-* assuming sl and sh are in the low and high words of xmm0,xmm1,xmm2
-*
-* On output the result is in xmm3,xmm4,xmm5 and the registers
-* xmm0,xmm1,xmm2 are changed
-*/
+ * Multiplies a pair sl,sh of su3 vectors with an su3 matrix u^dagger,
+ * assuming sl and sh are in the low and high words of xmm0,xmm1,xmm2
+ *
+ * On output the result is in xmm3,xmm4,xmm5 and the registers
+ * xmm0,xmm1,xmm2 are changed
+ */
 
 #define _sse_su3_inverse_multiply(u)                                           \
   __asm__ __volatile__("movss %0, %%xmm6 \n\t"                                 \
@@ -787,14 +787,14 @@ static sse_float _sse_sgn
                          "xmm9", "xmm10", "xmm11")
 
 /******************************************************************************
-*
-*  Macros for Dirac spinors
-*
-******************************************************************************/
+ *
+ *  Macros for Dirac spinors
+ *
+ ******************************************************************************/
 
 /*
-*  Loads the spinor s to the registers xmm0,..,xmm5 in linear order
-*/
+ *  Loads the spinor s to the registers xmm0,..,xmm5 in linear order
+ */
 
 #define _sse_spinor_load(s)                                                    \
   __asm__ __volatile__("movaps %0, %%xmm0 \n\t"                                \
@@ -813,8 +813,8 @@ static sse_float _sse_sgn
                        : "xmm3", "xmm4", "xmm5")
 
 /*
-*  Loads the spinor s to the registers xmm6,..,xmm11 in linear order
-*/
+ *  Loads the spinor s to the registers xmm6,..,xmm11 in linear order
+ */
 
 #define _sse_spinor_load_up(s)                                                 \
   __asm__ __volatile__("movaps %0, %%xmm6 \n\t"                                \
@@ -833,8 +833,8 @@ static sse_float _sse_sgn
                        : "xmm9", "xmm10", "xmm11")
 
 /*
-*  Stores the registers xmm0,..,xmm5 to the spinor s in linear order
-*/
+ *  Stores the registers xmm0,..,xmm5 to the spinor s in linear order
+ */
 
 #define _sse_spinor_store(s)                                                   \
   __asm__ __volatile__("movaps %%xmm0, %0 \n\t"                                \
@@ -849,8 +849,8 @@ static sse_float _sse_sgn
                          "=m"((s).c4.c1), "=m"((s).c4.c2), "=m"((s).c4.c3))
 
 /*
-*  Stores the registers xmm6,..,xmm11 to the spinor s in linear order
-*/
+ *  Stores the registers xmm6,..,xmm11 to the spinor s in linear order
+ */
 
 #define _sse_spinor_store_up(s)                                                \
   __asm__ __volatile__("movaps %%xmm6, %0 \n\t"                                \
@@ -865,8 +865,8 @@ static sse_float _sse_sgn
                          "=m"((s).c4.c1), "=m"((s).c4.c2), "=m"((s).c4.c3))
 
 /*
-*  Loads (z.re,z.re,z.re,z.re) to xmm6 and (-z.im,z.im,-z.im,z.im) to xmm7
-*/
+ *  Loads (z.re,z.re,z.re,z.re) to xmm6 and (-z.im,z.im,-z.im,z.im) to xmm7
+ */
 
 #define _sse_load_cmplx(z)                                                     \
   __asm__ __volatile__("movss %0, %%xmm6 \n\t"                                 \
@@ -879,9 +879,9 @@ static sse_float _sse_sgn
                        : "xmm6", "xmm7")
 
 /*
-*  Multiplies the spinor s by the complex number z and assigns the result to
-*  xmm0,..,xmm5, assuming z was loaded to xmm6,xmm7 using _sse_load_cmplx(z)
-*/
+ *  Multiplies the spinor s by the complex number z and assigns the result to
+ *  xmm0,..,xmm5, assuming z was loaded to xmm6,xmm7 using _sse_load_cmplx(z)
+ */
 
 #define _sse_mulc_spinor(s)                                                    \
   __asm__ __volatile__("movaps %0, %%xmm0 \n\t"                                \
@@ -936,9 +936,9 @@ static sse_float _sse_sgn
                        : "xmm3", "xmm4", "xmm5", "xmm11", "xmm12", "xmm13")
 
 /*
-*  Multiplies the spinor s by the complex number z and adds the result to
-*  xmm0,..,xmm5, assuming z was loaded to xmm6,xmm7 using _sse_load_cmplx(z)
-*/
+ *  Multiplies the spinor s by the complex number z and adds the result to
+ *  xmm0,..,xmm5, assuming z was loaded to xmm6,xmm7 using _sse_load_cmplx(z)
+ */
 
 #define _sse_mulc_spinor_add(s)                                                \
   __asm__ __volatile__("movaps %0, %%xmm8 \n\t"                                \
@@ -1001,8 +1001,8 @@ static sse_float _sse_sgn
                          "xmm11", "xmm12", "xmm13")
 
 /*
-*  Loads (c,c,c,c) to xmm6 and xmm7
-*/
+ *  Loads (c,c,c,c) to xmm6 and xmm7
+ */
 
 #define _sse_load_real(c)                                                      \
   __asm__ __volatile__("movss %0, %%xmm6 \n\t"                                 \
@@ -1014,9 +1014,9 @@ static sse_float _sse_sgn
                        : "xmm6", "xmm7")
 
 /*
-*  Multiplies the spinor s by the real number c and assigns the result to
-*  xmm0,..,xmm5, assuming c was loaded to xmm6,xmm7 using _sse_load_real(c)
-*/
+ *  Multiplies the spinor s by the real number c and assigns the result to
+ *  xmm0,..,xmm5, assuming c was loaded to xmm6,xmm7 using _sse_load_real(c)
+ */
 
 #define _sse_mulr_spinor(s)                                                    \
   __asm__ __volatile__("movaps %0, %%xmm0 \n\t"                                \
@@ -1047,9 +1047,9 @@ static sse_float _sse_sgn
                        : "xmm3", "xmm4", "xmm5")
 
 /*
-*  Multiplies the spinor s by the real number c and adds the result to
-*  xmm0,..,xmm5, assuming c was loaded to xmm6,xmm7 using _sse_load_real(c)
-*/
+ *  Multiplies the spinor s by the real number c and adds the result to
+ *  xmm0,..,xmm5, assuming c was loaded to xmm6,xmm7 using _sse_load_real(c)
+ */
 
 #define _sse_mulr_spinor_add(s)                                                \
   __asm__ __volatile__("movaps %0, %%xmm8 \n\t"                                \

@@ -1,52 +1,52 @@
 
 /*******************************************************************************
-*
-* File valg_dble.c
-*
-* Copyright (C) 2007, 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Generic linear algebra routines for double-precision complex fields
-*
-* The externally accessible functions are
-*
-*   complex_dble vprod_dble(int n,int icom,complex_dble *v,complex_dble *w)
-*     Computes the scalar product of the n-vectors v and w.
-*
-*   double vnorm_square_dble(int n,int icom,complex_dble *v)
-*     Computes the square of the norm of the n-vector v.
-*
-*   void mulc_vadd_dble(int n,complex_dble *v,complex_dble *w,complex_dble z)
-*     Replaces the n-vector v by v+z*w.
-*
-*   void vproject_dble(int n,int icom,complex_dble *v,complex_dble *w)
-*     Replaces the n-vector v by v-(w,v)*w.
-*
-*   void vscale_dble(int n,double r,complex_dble *v)
-*     Replaces the n-vector v by r*v.
-*
-*   double vnormalize_dble(int n,int icom,complex_dble *v)
-*     Normalizes the n-vector v to unity and returns the norm of the
-*     input vector.
-*
-*   void vrotate_dble(int n,int nv,complex_dble **pv,complex_dble *a)
-*     Replaces the n-vectors vk=pv[k], k=0,..,nv-1, by the linear
-*     combinations sum_{j=0}^{nv-1} vj*a[n*j+k].
-*
-* Notes:
-*
-* All these programs operate on complex n-vectors whose base addresses are
-* passed through the arguments. The length n of the arrays is specified by
-* the parameter n. Scalar products are globally summed if the parameter
-* icom is equal to 1. In this case the calculated values are guaranteed to
-* be exactly the same on all processes.
-*
-* The programs perform no communications except in the case of the scalar
-* products if these are globally summed.
-*
-*******************************************************************************/
+ *
+ * File valg_dble.c
+ *
+ * Copyright (C) 2007, 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Generic linear algebra routines for double-precision complex fields
+ *
+ * The externally accessible functions are
+ *
+ *   complex_dble vprod_dble(int n,int icom,complex_dble *v,complex_dble *w)
+ *     Computes the scalar product of the n-vectors v and w.
+ *
+ *   double vnorm_square_dble(int n,int icom,complex_dble *v)
+ *     Computes the square of the norm of the n-vector v.
+ *
+ *   void mulc_vadd_dble(int n,complex_dble *v,complex_dble *w,complex_dble z)
+ *     Replaces the n-vector v by v+z*w.
+ *
+ *   void vproject_dble(int n,int icom,complex_dble *v,complex_dble *w)
+ *     Replaces the n-vector v by v-(w,v)*w.
+ *
+ *   void vscale_dble(int n,double r,complex_dble *v)
+ *     Replaces the n-vector v by r*v.
+ *
+ *   double vnormalize_dble(int n,int icom,complex_dble *v)
+ *     Normalizes the n-vector v to unity and returns the norm of the
+ *     input vector.
+ *
+ *   void vrotate_dble(int n,int nv,complex_dble **pv,complex_dble *a)
+ *     Replaces the n-vectors vk=pv[k], k=0,..,nv-1, by the linear
+ *     combinations sum_{j=0}^{nv-1} vj*a[n*j+k].
+ *
+ * Notes:
+ *
+ * All these programs operate on complex n-vectors whose base addresses are
+ * passed through the arguments. The length n of the arrays is specified by
+ * the parameter n. Scalar products are globally summed if the parameter
+ * icom is equal to 1. In this case the calculated values are guaranteed to
+ * be exactly the same on all processes.
+ *
+ * The programs perform no communications except in the case of the scalar
+ * products if these are globally summed.
+ *
+ *******************************************************************************/
 
 #define VALG_DBLE_C
 

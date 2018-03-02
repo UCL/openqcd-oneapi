@@ -1,100 +1,100 @@
 
 /*******************************************************************************
-*
-* File mdint_parms.c
-*
-* Copyright (C) 2011, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Molecular-dynamics integrator data base
-*
-* The externally accessible functions are
-*
-*   mdint_parms_t set_mdint_parms(int ilv,integrator_t integrator,double lambda,
-*                                 int nstep,int nfr,int *ifr)
-*     Sets the parameters of the molecular-dynamics integrator at level
-*     ilv and returns a structure containing them (see the notes).
-*
-*   mdint_parms_t mdint_parms(int ilv)
-*     Returns a structure containing the parameters of the integrator at
-*     level ilv (see the notes).
-*
-*   void read_mdint_parms(int ilv)
-*     On process 0, this program scans stdin for a line starting with the
-*     string "[Level <int>]" (after any number of blanks), where <int> is
-*     the integer value passed by the argument. An error occurs if no such
-*     line or more than one is found. The lines
-*
-*       integrator   <integrator_t>
-*       lambda       <double>
-*       nstep        <int>
-*       forces       <int> [<int>]
-*
-*     are then read using read_line() [utils/mutils.c]. The line tagged
-*     "lambda" is required only when the specified integrator is the 2nd
-*     order OMF integrator. The line tagged "forces" must contain the
-*     indices of the forces (separated by white space) that are to be
-*     integrated at this level. On exit, the data are entered in the data
-*     base by calling set_mdint_parms(ilv,...).
-*
-*   void print_mdint_parms(void)
-*     Prints the parameters of the defined integrator levels to stdout
-*     on MPI process 0.
-*
-*   void write_mdint_parms(FILE *fdat)
-*     Writes the parameters of the defined integrator levels to the file
-*     fdat on MPI process 0.
-*
-*   void check_mdint_parms(FILE *fdat)
-*     Compares the parameters of the defined integrator levels with those
-*     stored on the file fdat on MPI process 0, assuming the latter were
-*     written to the file by the program write_mdint_parms().
-*
-* Notes:
-*
-* A structure of type mdint_parms_t contains the parameters of a hierarchical
-* molecular-dynamics integrator at a specified level (see update/README.mdint).
-* Its elements are
-*
-*   integrator   Elementary integrator used. This parameter is an enum
-*                type with one of the following values:
-*
-*                  LPFR     Leapfrog integrator
-*
-*                  OMF2     2nd order Omelyan-Mryglod-Folk integrator
-*
-*                  OMF4     4th order Omelyan-Mryglod-Folk integrator
-*
-*   lambda       Parameter of the 2nd order OMF integrator
-*
-*   nstep        Number of times the elementary integrator is applied
-*                at this level
-*
-*   nfr          Number of forces integrated at this level
-*
-*   ifr          Force indices ifr[i] (i=0,..,nfr-1)
-*
-* The parameter lambda is not used in the case of the leapfrog and the 4th
-* order OMF integrator. Up to 32 integrator levels, labeled by an index
-* ilv=0,1,..,31, can be specified.
-*
-* An example of valid section in an input file which can be read by calling
-* read_mdint(3) is
-*
-*  [Level 3]
-*  integrator OMF2
-*  lambda     0.2
-*  nstep      12
-*  forces     2 4 5
-*
-* In this case, there are three forces with index 2, 4 and 5.
-*
-* The programs set_mdint_parms() and read_mdint_parms() perform global
-* operations and must be called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File mdint_parms.c
+ *
+ * Copyright (C) 2011, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Molecular-dynamics integrator data base
+ *
+ * The externally accessible functions are
+ *
+ *   mdint_parms_t set_mdint_parms(int ilv,integrator_t integrator,double
+ *lambda, int nstep,int nfr,int *ifr) Sets the parameters of the
+ *molecular-dynamics integrator at level ilv and returns a structure
+ *containing them (see the notes).
+ *
+ *   mdint_parms_t mdint_parms(int ilv)
+ *     Returns a structure containing the parameters of the integrator at
+ *     level ilv (see the notes).
+ *
+ *   void read_mdint_parms(int ilv)
+ *     On process 0, this program scans stdin for a line starting with the
+ *     string "[Level <int>]" (after any number of blanks), where <int> is
+ *     the integer value passed by the argument. An error occurs if no such
+ *     line or more than one is found. The lines
+ *
+ *       integrator   <integrator_t>
+ *       lambda       <double>
+ *       nstep        <int>
+ *       forces       <int> [<int>]
+ *
+ *     are then read using read_line() [utils/mutils.c]. The line tagged
+ *     "lambda" is required only when the specified integrator is the 2nd
+ *     order OMF integrator. The line tagged "forces" must contain the
+ *     indices of the forces (separated by white space) that are to be
+ *     integrated at this level. On exit, the data are entered in the data
+ *     base by calling set_mdint_parms(ilv,...).
+ *
+ *   void print_mdint_parms(void)
+ *     Prints the parameters of the defined integrator levels to stdout
+ *     on MPI process 0.
+ *
+ *   void write_mdint_parms(FILE *fdat)
+ *     Writes the parameters of the defined integrator levels to the file
+ *     fdat on MPI process 0.
+ *
+ *   void check_mdint_parms(FILE *fdat)
+ *     Compares the parameters of the defined integrator levels with those
+ *     stored on the file fdat on MPI process 0, assuming the latter were
+ *     written to the file by the program write_mdint_parms().
+ *
+ * Notes:
+ *
+ * A structure of type mdint_parms_t contains the parameters of a hierarchical
+ * molecular-dynamics integrator at a specified level (see update/README.mdint).
+ * Its elements are
+ *
+ *   integrator   Elementary integrator used. This parameter is an enum
+ *                type with one of the following values:
+ *
+ *                  LPFR     Leapfrog integrator
+ *
+ *                  OMF2     2nd order Omelyan-Mryglod-Folk integrator
+ *
+ *                  OMF4     4th order Omelyan-Mryglod-Folk integrator
+ *
+ *   lambda       Parameter of the 2nd order OMF integrator
+ *
+ *   nstep        Number of times the elementary integrator is applied
+ *                at this level
+ *
+ *   nfr          Number of forces integrated at this level
+ *
+ *   ifr          Force indices ifr[i] (i=0,..,nfr-1)
+ *
+ * The parameter lambda is not used in the case of the leapfrog and the 4th
+ * order OMF integrator. Up to 32 integrator levels, labeled by an index
+ * ilv=0,1,..,31, can be specified.
+ *
+ * An example of valid section in an input file which can be read by calling
+ * read_mdint(3) is
+ *
+ *  [Level 3]
+ *  integrator OMF2
+ *  lambda     0.2
+ *  nstep      12
+ *  forces     2 4 5
+ *
+ * In this case, there are three forces with index 2, 4 and 5.
+ *
+ * The programs set_mdint_parms() and read_mdint_parms() perform global
+ * operations and must be called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define MDINT_PARMS_C
 

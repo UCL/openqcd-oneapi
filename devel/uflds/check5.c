@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check5.c
-*
-* Copyright (C) 2012, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the program set_bstap().
-*
-*******************************************************************************/
+ *
+ * File check5.c
+ *
+ * Copyright (C) 2012, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the program set_bstap().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

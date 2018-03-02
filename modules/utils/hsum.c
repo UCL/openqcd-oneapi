@@ -1,51 +1,51 @@
 
 /*******************************************************************************
-*
-* File hsum.c
-*
-* Copyright (C) 2015, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Hierarchical summation programs.
-*
-*   int init_hsum(int n)
-*     Creates a new instance of a hierarchical sum and returns the id of
-*     the instance. The parameter n>=1 specifies the number of streams
-*     of double-precision floating point numbers that are to be summed
-*     in parallel.
-*
-*   void reset_hsum(int id)
-*     Resets the hiearchical sum with the given id to zero.
-*
-*   void add_to_hsum(int id,double *x)
-*     Adds the numbers x[0],..,x[n-1] to the hiearchical sum with the
-*     given id. More precisely, the number x[k] is added to the k'th
-*     sum accumulated in parallel. The number n of parallel sums is
-*     the one set by init_hsum().
-*
-*   void local_hsum(int id,double *sx)
-*     Evaluates the hiearchical sum with the given id and assigns the
-*     k'th sum computed in parallel to sx[k] (k=0,..,n-1). The number
-*     n of parallel sums is the one set by init_hsum().
-*
-*   void global_hsum(int id,double *sx)
-*     Same as local_hsum(), but additionally sums the results over all
-*     MPI processes. The calculated sums are guaranteed to be exactly
-*     the same on all processes.
-*
-* Except for global_hsum(), all programs in this module can be locally
-* called.
-*
-* While the argument id of the program global_hsum() need not be globally
-* the same, the number of parallel sums processed by the hiearchical sums
-* with the specified id's may not vary from process to process.
-*
-* The maximal number of hsum instances is equal to INT_MAX. Any attempt to
-* initialize more than INT_MAX hsums generates an error.
-*
-*******************************************************************************/
+ *
+ * File hsum.c
+ *
+ * Copyright (C) 2015, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Hierarchical summation programs.
+ *
+ *   int init_hsum(int n)
+ *     Creates a new instance of a hierarchical sum and returns the id of
+ *     the instance. The parameter n>=1 specifies the number of streams
+ *     of double-precision floating point numbers that are to be summed
+ *     in parallel.
+ *
+ *   void reset_hsum(int id)
+ *     Resets the hiearchical sum with the given id to zero.
+ *
+ *   void add_to_hsum(int id,double *x)
+ *     Adds the numbers x[0],..,x[n-1] to the hiearchical sum with the
+ *     given id. More precisely, the number x[k] is added to the k'th
+ *     sum accumulated in parallel. The number n of parallel sums is
+ *     the one set by init_hsum().
+ *
+ *   void local_hsum(int id,double *sx)
+ *     Evaluates the hiearchical sum with the given id and assigns the
+ *     k'th sum computed in parallel to sx[k] (k=0,..,n-1). The number
+ *     n of parallel sums is the one set by init_hsum().
+ *
+ *   void global_hsum(int id,double *sx)
+ *     Same as local_hsum(), but additionally sums the results over all
+ *     MPI processes. The calculated sums are guaranteed to be exactly
+ *     the same on all processes.
+ *
+ * Except for global_hsum(), all programs in this module can be locally
+ * called.
+ *
+ * While the argument id of the program global_hsum() need not be globally
+ * the same, the number of parallel sums processed by the hiearchical sums
+ * with the specified id's may not vary from process to process.
+ *
+ * The maximal number of hsum instances is equal to INT_MAX. Any attempt to
+ * initialize more than INT_MAX hsums generates an error.
+ *
+ *******************************************************************************/
 
 #define HSUM_C
 

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2005, 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Checks on the programs in the module salg.c
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2005, 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Checks on the programs in the module salg.c
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

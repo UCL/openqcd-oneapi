@@ -1,49 +1,49 @@
 
 /*******************************************************************************
-*
-* File sap_com.c
-*
-* Copyright (C) 2005, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* SAP communication program.
-*
-* The externally accessible functions are
-*
-*   void alloc_sap_bufs(void)
-*     Allocates and initializes the buffers and index arrays needed for
-*     the program sap_com().
-*
-*   void sap_com(int ic,spinor *r)
-*     Subtracts the Weyl field b.bb.w[0] on the boundaries of all black
-*     (if ic=0) or all white (if ic=1) blocks b of the SAP_BLOCKS grid
-*     from the global spinor field r. Before subtraction, the Weyl fields
-*     on the block faces in direction ifc are expanded to Dirac spinor
-*     fields s satisfying theta[ifc]*s=0.
-*
-* Notes:
-*
-* The program alloc_sap_bufs() adds a single-precision Weyl field to the
-* boundaries of the blocks in the SAP_BLOCKS grid. In memory these fields
-* are arranged in particular way, but they are field arrays exactly like
-* the ones on any block created by the allocation programs in the module
-* block/block.c.
-*
-* alloc_sap_bufs() is called when the SAP_BLOCKS block grid is allocated.
-* This program is not intended to be called from anywhere else and does
-* nothing if called a second time.
-*
-* The operations performed by the program sap_com() are explained in some
-* detail in README.sap_com. In the case of boundary conditions of type 0,
-* 1 or 2, the Weyl fields residing at the exterior boundaries of the blocks
-* at global time -1 and NPROC0*L0 are not subtracted from the field r.
-*
-* All programs in this module may involve communications and must be called
-* simultaneously on all processes.
-*
-*******************************************************************************/
+ *
+ * File sap_com.c
+ *
+ * Copyright (C) 2005, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * SAP communication program.
+ *
+ * The externally accessible functions are
+ *
+ *   void alloc_sap_bufs(void)
+ *     Allocates and initializes the buffers and index arrays needed for
+ *     the program sap_com().
+ *
+ *   void sap_com(int ic,spinor *r)
+ *     Subtracts the Weyl field b.bb.w[0] on the boundaries of all black
+ *     (if ic=0) or all white (if ic=1) blocks b of the SAP_BLOCKS grid
+ *     from the global spinor field r. Before subtraction, the Weyl fields
+ *     on the block faces in direction ifc are expanded to Dirac spinor
+ *     fields s satisfying theta[ifc]*s=0.
+ *
+ * Notes:
+ *
+ * The program alloc_sap_bufs() adds a single-precision Weyl field to the
+ * boundaries of the blocks in the SAP_BLOCKS grid. In memory these fields
+ * are arranged in particular way, but they are field arrays exactly like
+ * the ones on any block created by the allocation programs in the module
+ * block/block.c.
+ *
+ * alloc_sap_bufs() is called when the SAP_BLOCKS block grid is allocated.
+ * This program is not intended to be called from anywhere else and does
+ * nothing if called a second time.
+ *
+ * The operations performed by the program sap_com() are explained in some
+ * detail in README.sap_com. In the case of boundary conditions of type 0,
+ * 1 or 2, the Weyl fields residing at the exterior boundaries of the blocks
+ * at global time -1 and NPROC0*L0 are not subtracted from the field r.
+ *
+ * All programs in this module may involve communications and must be called
+ * simultaneously on all processes.
+ *
+ *******************************************************************************/
 
 #define SAP_COM_C
 

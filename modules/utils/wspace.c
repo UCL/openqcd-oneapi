@@ -1,147 +1,147 @@
 
 /*******************************************************************************
-*
-* File wspace.c
-*
-* Copyright (C) 2010, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Workspace allocation.
-*
-* The externally accessible functions are
-*
-*   void alloc_wud(int n)
-*     Allocates a workspace of n double-precision gauge fields.
-*
-*   su3_dble **reserve_wud(int n)
-*     Reserves a new workspace of n global double-precision gauge fields
-*     and returns the array ud[0],..,ud[n-1] of the base addresses of the
-*     fields in the workspace. No workspace is reserved and a NULL pointer
-*     is returned if n<=0.
-*
-*   int release_wud(void)
-*     Releases the workspace of global double-precision gauge fields that
-*     was last reserved and returns the number of fields that are released.
-*
-*   int wud_size(void)
-*     Returns the number of global double-precision gauge fields that
-*     are currently reserved.
-*
-*   void alloc_wfd(int n)
-*     Allocates a workspace of n double-precision force fields.
-*
-*   su3_alg_dble **reserve_wfd(int n)
-*     Reserves a new workspace of n global double-precision force fields
-*     and returns the array fd[0],..,fd[n-1] of the base addresses of the
-*     fields in the workspace. No workspace is reserved and a NULL pointer
-*     is returned if n<=0.
-*
-*   int release_wfd(void)
-*     Releases the workspace of global double-precision force fields that
-*     was last reserved and returns the number of fields that are released.
-*
-*   int wfd_size(void)
-*     Returns the number of global double-precision force fields that
-*     are currently reserved.
-*
-*   void alloc_ws(int n)
-*     Allocates a workspace of n single-precision spinor fields.
-*
-*   spinor **reserve_ws(int n)
-*     Reserves a new workspace of n global single-precision spinor fields
-*     and returns the array s[0],..,s[n-1] of the base addresses of the
-*     fields in the workspace. No workspace is reserved and a NULL pointer
-*     is returned if n<=0.
-*
-*   int release_ws(void)
-*     Releases the workspace of global single-precision spinor fields that
-*     was last reserved and returns the number of fields that are released.
-*
-*   int ws_size(void)
-*     Returns the number of global single-precision spinor fields that
-*     are currently reserved.
-*
-*   void alloc_wsd(int n)
-*     Allocates a workspace of n double-precision spinor fields.
-*
-*   spinor_dble **reserve_wsd(int n)
-*     Reserves a new workspace of n global double-precision spinor fields
-*     and returns the array sd[0],..,sd[n-1] of the base addresses of the
-*     fields in the workspace. No workspace is reserved and a NULL pointer
-*     is returned if n<=0.
-*
-*   int release_wsd(void)
-*     Releases the workspace of global double-precision spinor fields that
-*     was last reserved and returns the number of fields that are released.
-*
-*   int wsd_size(void)
-*     Returns the number of global double-precision spinor fields that
-*     are currently reserved.
-*
-*   void alloc_wv(int n)
-*     Allocates a workspace of n single-precision vector fields.
-*
-*   complex **reserve_wv(int n)
-*     Reserves a new workspace of n global single-precision vector fields
-*     and returns the array v[0],..,v[n-1] of the base addresses of the
-*     fields in the workspace. No workspace is reserved and a NULL pointer
-*     is returned if n<=0.
-*
-*   int release_wv(void)
-*     Releases the workspace of global single-precision vector fields that
-*     was last reserved and returns the number of fields that are released.
-*
-*   int wv_size(void)
-*     Returns the number of global single-precision vector fields that
-*     are currently reserved.
-*
-*   void alloc_wvd(int n)
-*     Allocates a workspace of n double-precision vector fields.
-*
-*   complex_dble **reserve_wvd(int n)
-*     Reserves a new workspace of n global double-precision vector fields
-*     and returns the array vd[0],..,vd[n-1] of the base addresses of the
-*     fields in the workspace. No workspace is reserved and a NULL pointer
-*     is returned if n<=0.
-*
-*   int release_wvd(void)
-*     Releases the workspace of global double-precision vector fields that
-*     was last reserved and returns the number of fields that are released.
-*
-*   int wvd_size(void)
-*     Returns the number of global double-precision vector fields that
-*     are currently reserved.
-*
-* Notes:
-*
-* By definition a workspace is a set of global fields which is reserved for
-* the current program. This module allows to assign and release the required
-* workspaces dynamically in such a way that the privacy of the workspaces is
-* guaranteed.
-*
-* The total workspace is the set of all allocated fields of a given type. All
-* programs must reserve the required workspaces and must release them before
-* the program returns to the calling program. It is possible to reserve several
-* workspaces of the same type in a given program. In this case, a corresponding
-* number of calls to w*_release() is required to release all the workspaces
-* that were reserved.
-*
-* The fields in the gauge and force workspaces have 4*VOLUME elements and can
-* only store a copy of the field variables on the local lattice. In the case
-* of the spinor and spinor_dble fields, the number of spinors allocated per
-* field is NSPIN (see include/global.h). Vector fields are arrays of complex
-* numbers on which the little Dirac operator acts. They have Ns*(nb+nbb/2)
-* elements, where Ns is the number of local deflation modes, while nb and nbb
-* are the numbers blocks in the DFL_BLOCKS grid and its exterior boundary.
-*
-* Workspaces can always be freed and reallocated by calling alloc_w*() if no
-* fields in the workspace are in use. In particular, a workspace can be freed
-* by calling alloc_w*(0). Except for the w*_size() programs, all programs in
-* this module must be called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File wspace.c
+ *
+ * Copyright (C) 2010, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Workspace allocation.
+ *
+ * The externally accessible functions are
+ *
+ *   void alloc_wud(int n)
+ *     Allocates a workspace of n double-precision gauge fields.
+ *
+ *   su3_dble **reserve_wud(int n)
+ *     Reserves a new workspace of n global double-precision gauge fields
+ *     and returns the array ud[0],..,ud[n-1] of the base addresses of the
+ *     fields in the workspace. No workspace is reserved and a NULL pointer
+ *     is returned if n<=0.
+ *
+ *   int release_wud(void)
+ *     Releases the workspace of global double-precision gauge fields that
+ *     was last reserved and returns the number of fields that are released.
+ *
+ *   int wud_size(void)
+ *     Returns the number of global double-precision gauge fields that
+ *     are currently reserved.
+ *
+ *   void alloc_wfd(int n)
+ *     Allocates a workspace of n double-precision force fields.
+ *
+ *   su3_alg_dble **reserve_wfd(int n)
+ *     Reserves a new workspace of n global double-precision force fields
+ *     and returns the array fd[0],..,fd[n-1] of the base addresses of the
+ *     fields in the workspace. No workspace is reserved and a NULL pointer
+ *     is returned if n<=0.
+ *
+ *   int release_wfd(void)
+ *     Releases the workspace of global double-precision force fields that
+ *     was last reserved and returns the number of fields that are released.
+ *
+ *   int wfd_size(void)
+ *     Returns the number of global double-precision force fields that
+ *     are currently reserved.
+ *
+ *   void alloc_ws(int n)
+ *     Allocates a workspace of n single-precision spinor fields.
+ *
+ *   spinor **reserve_ws(int n)
+ *     Reserves a new workspace of n global single-precision spinor fields
+ *     and returns the array s[0],..,s[n-1] of the base addresses of the
+ *     fields in the workspace. No workspace is reserved and a NULL pointer
+ *     is returned if n<=0.
+ *
+ *   int release_ws(void)
+ *     Releases the workspace of global single-precision spinor fields that
+ *     was last reserved and returns the number of fields that are released.
+ *
+ *   int ws_size(void)
+ *     Returns the number of global single-precision spinor fields that
+ *     are currently reserved.
+ *
+ *   void alloc_wsd(int n)
+ *     Allocates a workspace of n double-precision spinor fields.
+ *
+ *   spinor_dble **reserve_wsd(int n)
+ *     Reserves a new workspace of n global double-precision spinor fields
+ *     and returns the array sd[0],..,sd[n-1] of the base addresses of the
+ *     fields in the workspace. No workspace is reserved and a NULL pointer
+ *     is returned if n<=0.
+ *
+ *   int release_wsd(void)
+ *     Releases the workspace of global double-precision spinor fields that
+ *     was last reserved and returns the number of fields that are released.
+ *
+ *   int wsd_size(void)
+ *     Returns the number of global double-precision spinor fields that
+ *     are currently reserved.
+ *
+ *   void alloc_wv(int n)
+ *     Allocates a workspace of n single-precision vector fields.
+ *
+ *   complex **reserve_wv(int n)
+ *     Reserves a new workspace of n global single-precision vector fields
+ *     and returns the array v[0],..,v[n-1] of the base addresses of the
+ *     fields in the workspace. No workspace is reserved and a NULL pointer
+ *     is returned if n<=0.
+ *
+ *   int release_wv(void)
+ *     Releases the workspace of global single-precision vector fields that
+ *     was last reserved and returns the number of fields that are released.
+ *
+ *   int wv_size(void)
+ *     Returns the number of global single-precision vector fields that
+ *     are currently reserved.
+ *
+ *   void alloc_wvd(int n)
+ *     Allocates a workspace of n double-precision vector fields.
+ *
+ *   complex_dble **reserve_wvd(int n)
+ *     Reserves a new workspace of n global double-precision vector fields
+ *     and returns the array vd[0],..,vd[n-1] of the base addresses of the
+ *     fields in the workspace. No workspace is reserved and a NULL pointer
+ *     is returned if n<=0.
+ *
+ *   int release_wvd(void)
+ *     Releases the workspace of global double-precision vector fields that
+ *     was last reserved and returns the number of fields that are released.
+ *
+ *   int wvd_size(void)
+ *     Returns the number of global double-precision vector fields that
+ *     are currently reserved.
+ *
+ * Notes:
+ *
+ * By definition a workspace is a set of global fields which is reserved for
+ * the current program. This module allows to assign and release the required
+ * workspaces dynamically in such a way that the privacy of the workspaces is
+ * guaranteed.
+ *
+ * The total workspace is the set of all allocated fields of a given type. All
+ * programs must reserve the required workspaces and must release them before
+ * the program returns to the calling program. It is possible to reserve several
+ * workspaces of the same type in a given program. In this case, a corresponding
+ * number of calls to w*_release() is required to release all the workspaces
+ * that were reserved.
+ *
+ * The fields in the gauge and force workspaces have 4*VOLUME elements and can
+ * only store a copy of the field variables on the local lattice. In the case
+ * of the spinor and spinor_dble fields, the number of spinors allocated per
+ * field is NSPIN (see include/global.h). Vector fields are arrays of complex
+ * numbers on which the little Dirac operator acts. They have Ns*(nb+nbb/2)
+ * elements, where Ns is the number of local deflation modes, while nb and nbb
+ * are the numbers blocks in the DFL_BLOCKS grid and its exterior boundary.
+ *
+ * Workspaces can always be freed and reallocated by calling alloc_w*() if no
+ * fields in the workspace are in use. In particular, a workspace can be freed
+ * by calling alloc_w*(0). Except for the w*_size() programs, all programs in
+ * this module must be called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define WSPACE_C
 

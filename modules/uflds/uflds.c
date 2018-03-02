@@ -1,65 +1,65 @@
 
 /*******************************************************************************
-*
-* File uflds.c
-*
-* Copyright (C) 2006, 2010-2013, 2016 Martin Luescher, Isabel Campos
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Allocation and initialization of the global gauge fields.
-*
-* The externally accessible functions are
-*
-*   su3 *ufld(void)
-*     Returns the base address of the single-precision gauge field. If it
-*     is not already allocated, the field is allocated and initialized to
-*     unity.
-*
-*   su3_dble *udfld(void)
-*     Returns the base address of the double-precision gauge field. If it
-*     is not already allocated, the field is allocated and initialized to
-*     unity. Then the boundary conditions are set according to the data
-*     base by calling set_bc() [bcnds.c].
-*
-*   void random_ud(void)
-*     Initializes the active double-precision link variables to uniformly
-*     distributed random SU(3) matrices. Then the boundary conditions are
-*     set according to the data base by calling set_bc() [bcnds.c].
-*
-*   void set_ud_phase(void)
-*     Multiplies the double-precision link variables U(x,k) by the phase
-*     factor exp{i*theta[k-1]/N[k]}, for all k=1,2,3, where N[mu] is the
-*     size of the (global) lattice in direction mu. The angles theta[0],
-*     theta[1],theta[2] are set by set_bc_parms() [flags/lat_parms.c]. If
-*     periodic boundary conditions are chosen in time, the variables U(x,0)
-*     at global time N[0]-1 are multiplied by -1. The program does nothing
-*     if the phase is already set according to the flags data base.
-*
-*   void unset_ud_phase(void)
-*     Removes the phase of the double-precision link variables previously
-*     set by set_ud_phase(). No action is performed if the phase is not
-*     set according to the flags data base.
-*
-*   void renormalize_ud(void)
-*     Projects the active double-precision link variables back to SU(3).
-*     The static link variables are left untouched. An error occurs if
-*     the phase of the field is set according to the flags data base [see
-*     set_ud_phase() and unset_ud_phase()].
-*
-*   void assign_ud2u(void)
-*     Assigns the double-precision gauge field to the single-precision
-*     gauge field. All link variables in the local field, including the
-*     static ones, are copied.
-*
-* Notes:
-*
-* The double-precision field can only be allocated after the geometry arrays
-* are set up. All programs in this module act globally and must be called on
-* all MPI processes simultaneously.
-*
-*******************************************************************************/
+ *
+ * File uflds.c
+ *
+ * Copyright (C) 2006, 2010-2013, 2016 Martin Luescher, Isabel Campos
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Allocation and initialization of the global gauge fields.
+ *
+ * The externally accessible functions are
+ *
+ *   su3 *ufld(void)
+ *     Returns the base address of the single-precision gauge field. If it
+ *     is not already allocated, the field is allocated and initialized to
+ *     unity.
+ *
+ *   su3_dble *udfld(void)
+ *     Returns the base address of the double-precision gauge field. If it
+ *     is not already allocated, the field is allocated and initialized to
+ *     unity. Then the boundary conditions are set according to the data
+ *     base by calling set_bc() [bcnds.c].
+ *
+ *   void random_ud(void)
+ *     Initializes the active double-precision link variables to uniformly
+ *     distributed random SU(3) matrices. Then the boundary conditions are
+ *     set according to the data base by calling set_bc() [bcnds.c].
+ *
+ *   void set_ud_phase(void)
+ *     Multiplies the double-precision link variables U(x,k) by the phase
+ *     factor exp{i*theta[k-1]/N[k]}, for all k=1,2,3, where N[mu] is the
+ *     size of the (global) lattice in direction mu. The angles theta[0],
+ *     theta[1],theta[2] are set by set_bc_parms() [flags/lat_parms.c]. If
+ *     periodic boundary conditions are chosen in time, the variables U(x,0)
+ *     at global time N[0]-1 are multiplied by -1. The program does nothing
+ *     if the phase is already set according to the flags data base.
+ *
+ *   void unset_ud_phase(void)
+ *     Removes the phase of the double-precision link variables previously
+ *     set by set_ud_phase(). No action is performed if the phase is not
+ *     set according to the flags data base.
+ *
+ *   void renormalize_ud(void)
+ *     Projects the active double-precision link variables back to SU(3).
+ *     The static link variables are left untouched. An error occurs if
+ *     the phase of the field is set according to the flags data base [see
+ *     set_ud_phase() and unset_ud_phase()].
+ *
+ *   void assign_ud2u(void)
+ *     Assigns the double-precision gauge field to the single-precision
+ *     gauge field. All link variables in the local field, including the
+ *     static ones, are copied.
+ *
+ * Notes:
+ *
+ * The double-precision field can only be allocated after the geometry arrays
+ * are set up. All programs in this module act globally and must be called on
+ * all MPI processes simultaneously.
+ *
+ *******************************************************************************/
 
 #define UFLDS_C
 
@@ -558,9 +558,10 @@ void renormalize_ud(void)
 
     set_flags(UPDATED_UD);
   } else
-    error(1, 1, "renormalize_ud [udflds.c]", "Attempt to renormalize dirty "
-                                             "(smeared or phase transformed) "
-                                             "link variables");
+    error(1, 1, "renormalize_ud [udflds.c]",
+          "Attempt to renormalize dirty "
+          "(smeared or phase transformed) "
+          "link variables");
 }
 
 void assign_ud2u(void)

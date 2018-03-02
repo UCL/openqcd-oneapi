@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check3.c
-*
-* Copyright (C) 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of assign_pauli() and apply_sw()
-*
-*******************************************************************************/
+ *
+ * File check3.c
+ *
+ * Copyright (C) 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of assign_pauli() and apply_sw()
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

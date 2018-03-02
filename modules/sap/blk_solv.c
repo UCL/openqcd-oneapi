@@ -1,42 +1,42 @@
 
 /*******************************************************************************
-*
-* File blk_solv.c
-*
-* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher, Isabel Campos
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Solution of the Dirac equation on the blocks of the SAP_BLOCKS grid.
-*
-* The externally accessible functions are
-*
-*   void blk_mres(int n,float mu,int nmr)
-*     Depending on whether the twisted-mass flag is set or not, this
-*     program approximately solves (Dw+i*mu*gamma_5*1e)*b.s[0]=b.s[1] or
-*     (Dw+i*mu*gamma_5)*b.s[0]=b.s[1] on the n'th block b of the SAP_BLOCKS
-*     grid. The solution is obtained by applying nmr minimal residual steps,
-*     using b.s[2] as workspace. On exit, the approximate solution and its
-*     residue are in b.s[0] and b.s[1], respectively.
-*
-*   void blk_eo_mres(int n,float mu,int nmr)
-*     Approximate solution of (Dwhat+i*mu*gamma_5)*b.s[0]=b.s[1] for given
-*     b.s[1] on the n'th block b of the SAP_BLOCKS grid. The solution is
-*     obtained by applying nmr minimal residual steps, using b.s[2] as
-*     workspace. On exit, the approximate solution and its residue are in
-*     b.s[0] and b.s[1], respectively, while b.s[0],b.s[1] and b.s[2] are
-*     unchanged on the odd points.
-*
-* Notes:
-*
-* The twisted-mass flag is retrieved from the parameter data base (see
-* flags/lat_parms.c). These programs do not perform any communications and
-* can be called locally. It is taken for granted that the SAP_BLOCKS grid
-* is allocated and that the gauge field and the SW term on the blocks are
-* in the proper condition.
-*
-*******************************************************************************/
+ *
+ * File blk_solv.c
+ *
+ * Copyright (C) 2005, 2011-2013, 2016 Martin Luescher, Isabel Campos
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Solution of the Dirac equation on the blocks of the SAP_BLOCKS grid.
+ *
+ * The externally accessible functions are
+ *
+ *   void blk_mres(int n,float mu,int nmr)
+ *     Depending on whether the twisted-mass flag is set or not, this
+ *     program approximately solves (Dw+i*mu*gamma_5*1e)*b.s[0]=b.s[1] or
+ *     (Dw+i*mu*gamma_5)*b.s[0]=b.s[1] on the n'th block b of the SAP_BLOCKS
+ *     grid. The solution is obtained by applying nmr minimal residual steps,
+ *     using b.s[2] as workspace. On exit, the approximate solution and its
+ *     residue are in b.s[0] and b.s[1], respectively.
+ *
+ *   void blk_eo_mres(int n,float mu,int nmr)
+ *     Approximate solution of (Dwhat+i*mu*gamma_5)*b.s[0]=b.s[1] for given
+ *     b.s[1] on the n'th block b of the SAP_BLOCKS grid. The solution is
+ *     obtained by applying nmr minimal residual steps, using b.s[2] as
+ *     workspace. On exit, the approximate solution and its residue are in
+ *     b.s[0] and b.s[1], respectively, while b.s[0],b.s[1] and b.s[2] are
+ *     unchanged on the odd points.
+ *
+ * Notes:
+ *
+ * The twisted-mass flag is retrieved from the parameter data base (see
+ * flags/lat_parms.c). These programs do not perform any communications and
+ * can be called locally. It is taken for granted that the SAP_BLOCKS grid
+ * is allocated and that the gauge field and the SW term on the blocks are
+ * in the proper condition.
+ *
+ *******************************************************************************/
 
 #define BLK_SOLV_C
 

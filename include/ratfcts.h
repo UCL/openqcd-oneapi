@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File ratfcts.h
-*
-* Copyright (C) 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File ratfcts.h
+ *
+ * Copyright (C) 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef RATFCTS_H
 #define RATFCTS_H

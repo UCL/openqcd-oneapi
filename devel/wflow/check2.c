@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2009-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Gauge covariance of the Wilson flow.
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2009-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Gauge covariance of the Wilson flow.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

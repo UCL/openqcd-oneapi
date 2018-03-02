@@ -1,74 +1,74 @@
 
 /*******************************************************************************
-*
-* File liealg.c
-*
-* Copyright (C) 2005, 2009-2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Basic functions for fields with values in the Lie algebra of SU(3)
-*
-* The externally accessible functions are
-*
-*   void random_alg(int vol,su3_alg_dble *X)
-*     Initializes the Lie algebra elements X to random values
-*     with distribution proportional to exp{tr[X^2]}.
-*
-*   double norm_square_alg(int vol,int icom,su3_alg_dble *X)
-*     Computes the square of the norm of the norm squared of the field X.
-*
-*   double scalar_prod_alg(int vol,int icom,su3_alg_dble *X,su3_alg_dble *Y)
-*     Computes the scalar product of the fields X and Y.
-*
-*   void set_alg2zero(int vol,su3_alg_dble *X)
-*     Sets the array elements X to zero.
-*
-*   void set_ualg2zero(int vol,u3_alg_dble *X)
-*     Sets the array elements X to zero.
-*
-*   void assign_alg2alg(int vol,su3_alg_dble *X,su3_alg_dble *Y)
-*     Assigns the field X to the field Y.
-*
-*   void swap_alg(int vol,su3_alg_dble *X,su3_alg_dble *Y)
-*     Swaps the fields X and Y.
-*
-*   void muladd_assign_alg(int vol,double r,su3_alg_dble *X,su3_alg_dble *Y)
-*     Adds r*X to Y.
-*
-*   void project_to_su3alg(const su3_dble *u, su3_alg_dble *X)
-*     Projects an arbitrary 3x3 complex matrix in u to the su3 algebra and
-*     stores the result in X. The projection formula is
-*
-*     X = P{U} = 1/2 (U - U^dag) - 1/6 tr (U - U^dag)
-*
-*   void su3alg_to_cm3x3(su3_alg_dble const *X, su3_dble *u)
-*     Computes the corresponding complex 3x3 matrix from the generator
-*     representation of an su3 algebra object.
-*
-* Notes:
-*
-* Lie algebra elements X are traceless antihermitian 3x3 matrices that
-* are represented by structures with real elements x1,...,x8 through
-*
-*  X_11=i*(x1+x2), X_22=i*(x2-2*x1), X_33=i*(x1-2*x2),
-*
-*  X_12=x3+i*x4, X_13=x5+i*x6, X_23=x7+i*x8
-*
-* The scalar product (X,Y) of any two elements of the Lie algebra is
-*
-*  (X,Y)=-2*tr{XY}
-*
-* and the norm of X is (X,X)^(1/2).
-*
-* All programs in this module operate on arrays of Lie algebra elements whose
-* base address is passed through the arguments. The length of the array is
-* specified by the parameter vol. Scalar products etc. are globally summed if
-* the parameter icom is equal to 1. In this case the calculated values are
-* guaranteed to be exactly the same on all processes.
-*
-*******************************************************************************/
+ *
+ * File liealg.c
+ *
+ * Copyright (C) 2005, 2009-2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Basic functions for fields with values in the Lie algebra of SU(3)
+ *
+ * The externally accessible functions are
+ *
+ *   void random_alg(int vol,su3_alg_dble *X)
+ *     Initializes the Lie algebra elements X to random values
+ *     with distribution proportional to exp{tr[X^2]}.
+ *
+ *   double norm_square_alg(int vol,int icom,su3_alg_dble *X)
+ *     Computes the square of the norm of the norm squared of the field X.
+ *
+ *   double scalar_prod_alg(int vol,int icom,su3_alg_dble *X,su3_alg_dble *Y)
+ *     Computes the scalar product of the fields X and Y.
+ *
+ *   void set_alg2zero(int vol,su3_alg_dble *X)
+ *     Sets the array elements X to zero.
+ *
+ *   void set_ualg2zero(int vol,u3_alg_dble *X)
+ *     Sets the array elements X to zero.
+ *
+ *   void assign_alg2alg(int vol,su3_alg_dble *X,su3_alg_dble *Y)
+ *     Assigns the field X to the field Y.
+ *
+ *   void swap_alg(int vol,su3_alg_dble *X,su3_alg_dble *Y)
+ *     Swaps the fields X and Y.
+ *
+ *   void muladd_assign_alg(int vol,double r,su3_alg_dble *X,su3_alg_dble *Y)
+ *     Adds r*X to Y.
+ *
+ *   void project_to_su3alg(const su3_dble *u, su3_alg_dble *X)
+ *     Projects an arbitrary 3x3 complex matrix in u to the su3 algebra and
+ *     stores the result in X. The projection formula is
+ *
+ *     X = P{U} = 1/2 (U - U^dag) - 1/6 tr (U - U^dag)
+ *
+ *   void su3alg_to_cm3x3(su3_alg_dble const *X, su3_dble *u)
+ *     Computes the corresponding complex 3x3 matrix from the generator
+ *     representation of an su3 algebra object.
+ *
+ * Notes:
+ *
+ * Lie algebra elements X are traceless antihermitian 3x3 matrices that
+ * are represented by structures with real elements x1,...,x8 through
+ *
+ *  X_11=i*(x1+x2), X_22=i*(x2-2*x1), X_33=i*(x1-2*x2),
+ *
+ *  X_12=x3+i*x4, X_13=x5+i*x6, X_23=x7+i*x8
+ *
+ * The scalar product (X,Y) of any two elements of the Lie algebra is
+ *
+ *  (X,Y)=-2*tr{XY}
+ *
+ * and the norm of X is (X,X)^(1/2).
+ *
+ * All programs in this module operate on arrays of Lie algebra elements whose
+ * base address is passed through the arguments. The length of the array is
+ * specified by the parameter vol. Scalar products etc. are globally summed if
+ * the parameter icom is equal to 1. In this case the calculated values are
+ * guaranteed to be exactly the same on all processes.
+ *
+ *******************************************************************************/
 
 #define LIEALG_C
 

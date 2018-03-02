@@ -1,17 +1,17 @@
 
 /*******************************************************************************
-*
-* File check4.c
-*
-* Copyright (C) 2005, 2007-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the programs for the plaquette sums of the double-precision
-* gauge field.
-*
-*******************************************************************************/
+ *
+ * File check4.c
+ *
+ * Copyright (C) 2005, 2007-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the programs for the plaquette sums of the double-precision
+ * gauge field.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

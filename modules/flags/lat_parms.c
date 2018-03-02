@@ -1,159 +1,159 @@
 
 /*******************************************************************************
-*
-* File lat_parms.c
-*
-* Copyright (C) 2009-2013, 2016 Martin Luescher, Isabel Campos
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Lattice parameters and boundary conditions.
-*
-* The externally accessible functions are
-*
-*   lat_parms_t set_lat_parms(double beta,double c0,
-*                             int nk,double *kappa,double csw)
-*     Sets the basic lattice parameters. The parameters are
-*
-*       beta           Inverse bare coupling (beta=6/g0^2).
-*
-*       c0             Coefficient of the plaquette loops in the gauge
-*                      action (see doc/gauge_action.pdf).
-*
-*       nk             Number of hopping parameter values.
-*
-*       kappa          Array of hopping parameter values.
-*
-*       csw            Coefficient of the Sheikholeslami-Wohlert term.
-*
-*     The return value is a structure that contains the lattice parameters
-*     and the associated bare quark masses m0[0],..,m0[nk-1].
-*
-*   lat_parms_t lat_parms(void)
-*     Returns the current lattice parameters in a structure that contains
-*     the above parameters plus the bare quark masses.
-*
-*   void print_lat_parms(void)
-*     Prints the lattice parameters to stdout on MPI process 0.
-*
-*   void write_lat_parms(FILE *fdat)
-*     Writes the global lattices sizes and lattice parameters to the
-*     file fdat on MPI process 0.
-*
-*   void check_lat_parms(FILE *fdat)
-*     Compares the global lattice sizes and the lattice parameters with
-*     the values stored on the file fdat on MPI process 0, assuming the
-*     latter were written to the file by the program write_lat_parms().
-*
-*   bc_parms_t set_bc_parms(int type,
-*                           double cG,double cG_prime,
-*                           double cF,double cF_prime,
-*                           double *phi,double *phi_prime,
-*                           double *theta)
-*     Sets the boundary conditions and the associated parameters of the
-*     action. The parameters are
-*
-*       type           Chosen type of boundary condition (0: open, 1: SF,
-*                      2: open-SF, 3: periodic).
-*
-*       cG,cG_prime    Gauge action improvement coefficients at time 0
-*                      and T, respectively.
-*
-*       cF,cF_prime    Fermion action improvement coefficients at time 0
-*                      and T, respectively.
-*
-*       phi[0],        First two angles that define the boundary values of
-*       phi[1]         the gauge field at time 0.
-*
-*       phi_prime[0],  First two angles that define the boundary values of
-*       phi_prime[1]   the gauge field at time T.
-*
-*       theta[0],      Angles specifying the phase-periodic boundary
-*       theta[1],      conditions for the quark fields in direction 1,2,3.
-*       theta[2]
-*
-*     The return value is a structure that contains these parameters plus
-*     the third angles. In this structure, the improvement coefficients and
-*     the angles are stored in the form of arrays cG[2],cF[2] and phi[2][3],
-*     where cG[0],cF[0],phi[0][3] and cG[1],cF[1],phi[1][3] are the para-
-*     meters at time 0 and T, respectively
-*      Parameters that are not required for the specification of the chosen
-*     boundary conditions are not read and are set to their default values
-*     in the data base (angles to 0, improvement coefficients to 1). In the
-*     case of SF boundary conditions (type 1), the program only reads cG,cF
-*     and the angles phi,phi_prime and then sets cG_prime=cG,cF_prime=cF.
-*     When open-SF boundary conditions are chosen, all parameters except for
-*     the angles phi are read.
-*
-*   bc_parms_t bc_parms(void)
-*     Returns a structure that contains the boundary parameters.
-*
-*   void print_bc_parms(int ipr)
-*     Prints the boundary parameters to stdout on MPI process 0. The
-*     improvement coefficients cG,cG' are printed if ipr&0x1!=0 and the
-*     parameters referring to the quark fields are printed if ipr&0x2!=0.
-*     All parameters are printed if ipr=3.
-*
-*   void write_bc_parms(FILE *fdat)
-*     Writes the boundary parameters to the file fdat on MPI process 0.
-*
-*   void check_bc_parms(FILE *fdat)
-*     Compares the currently set boundary parameters with the values stored
-*     on the file fdat on MPI process 0, assuming the latter were written to
-*     the file by the program write_bc_parms().
-*
-*   double sea_quark_mass(int im0)
-*     Returns the bare sea quark mass m0[im0] stored in the lattice
-*     parameter data base or DBL_MAX if the index im0 is out of range.
-*
-*   int bc_type(void)
-*     Returns the type of the chosen boundary conditions (0: open, 1: SF,
-*     2: open-SF, 3: periodic).
-*
-*   sw_parms_t set_sw_parms(double m0)
-*     Sets the parameters of the SW term. The adjustable parameter is
-*
-*       m0             Bare quark mass.
-*
-*     The return value is a structure that contains the mass m0 and the
-*     improvement coefficients csw and cF[2], the latter being copied from
-*     the list of the lattice and boundary parameters, respectively.
-*
-*   sw_parms_t sw_parms(void)
-*     Returns the parameters currently set for the SW term. The values
-*     of the coefficients csw and cF[2] are copied from the lattice and
-*     boundary parameter list.
-*
-*   tm_parms_t set_tm_parms(int eoflg)
-*     Sets the twisted-mass flag. The parameter is
-*
-*       eoflg          If the flag is set (eoflg!=0), the twisted-mass term
-*                      in the Dirac operator, the SAP preconditioner and the
-*                      little Dirac operator is turned off on the odd lattice
-*                      sites.
-*
-*     The return value is a structure that contains the twisted-mass flag.
-*
-*   tm_parms_t tm_parms(void)
-*     Returns a structure containing the twisted-mass flag.
-*
-* Notes:
-*
-* To ensure the consistency of the data base, the parameters must be set
-* simultaneously on all processes. The data types lat_parms_t,..,tm_parms_t
-* are defined in the file flags.h.
-*
-* The programs set_lat_parms() and set_bc_parms() may be called at most once.
-* Moreover, they may not be called after the geometry arrays are set up. The
-* default values of the lattice parameters beta=0.0, c0=1.0, nk=0 and csw=1.0
-* are used if set_lat_parms() is not called. In the case of set_bc_parms(),
-* the default is open boundary conditions and cG=cF=1.0.
-*
-* See the notes doc/gauge_action.pdf and doc/dirac.pdf for the detailed
-* description of the lattice action and the boundary conditions.
-*
-*******************************************************************************/
+ *
+ * File lat_parms.c
+ *
+ * Copyright (C) 2009-2013, 2016 Martin Luescher, Isabel Campos
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Lattice parameters and boundary conditions.
+ *
+ * The externally accessible functions are
+ *
+ *   lat_parms_t set_lat_parms(double beta,double c0,
+ *                             int nk,double *kappa,double csw)
+ *     Sets the basic lattice parameters. The parameters are
+ *
+ *       beta           Inverse bare coupling (beta=6/g0^2).
+ *
+ *       c0             Coefficient of the plaquette loops in the gauge
+ *                      action (see doc/gauge_action.pdf).
+ *
+ *       nk             Number of hopping parameter values.
+ *
+ *       kappa          Array of hopping parameter values.
+ *
+ *       csw            Coefficient of the Sheikholeslami-Wohlert term.
+ *
+ *     The return value is a structure that contains the lattice parameters
+ *     and the associated bare quark masses m0[0],..,m0[nk-1].
+ *
+ *   lat_parms_t lat_parms(void)
+ *     Returns the current lattice parameters in a structure that contains
+ *     the above parameters plus the bare quark masses.
+ *
+ *   void print_lat_parms(void)
+ *     Prints the lattice parameters to stdout on MPI process 0.
+ *
+ *   void write_lat_parms(FILE *fdat)
+ *     Writes the global lattices sizes and lattice parameters to the
+ *     file fdat on MPI process 0.
+ *
+ *   void check_lat_parms(FILE *fdat)
+ *     Compares the global lattice sizes and the lattice parameters with
+ *     the values stored on the file fdat on MPI process 0, assuming the
+ *     latter were written to the file by the program write_lat_parms().
+ *
+ *   bc_parms_t set_bc_parms(int type,
+ *                           double cG,double cG_prime,
+ *                           double cF,double cF_prime,
+ *                           double *phi,double *phi_prime,
+ *                           double *theta)
+ *     Sets the boundary conditions and the associated parameters of the
+ *     action. The parameters are
+ *
+ *       type           Chosen type of boundary condition (0: open, 1: SF,
+ *                      2: open-SF, 3: periodic).
+ *
+ *       cG,cG_prime    Gauge action improvement coefficients at time 0
+ *                      and T, respectively.
+ *
+ *       cF,cF_prime    Fermion action improvement coefficients at time 0
+ *                      and T, respectively.
+ *
+ *       phi[0],        First two angles that define the boundary values of
+ *       phi[1]         the gauge field at time 0.
+ *
+ *       phi_prime[0],  First two angles that define the boundary values of
+ *       phi_prime[1]   the gauge field at time T.
+ *
+ *       theta[0],      Angles specifying the phase-periodic boundary
+ *       theta[1],      conditions for the quark fields in direction 1,2,3.
+ *       theta[2]
+ *
+ *     The return value is a structure that contains these parameters plus
+ *     the third angles. In this structure, the improvement coefficients and
+ *     the angles are stored in the form of arrays cG[2],cF[2] and phi[2][3],
+ *     where cG[0],cF[0],phi[0][3] and cG[1],cF[1],phi[1][3] are the para-
+ *     meters at time 0 and T, respectively
+ *      Parameters that are not required for the specification of the chosen
+ *     boundary conditions are not read and are set to their default values
+ *     in the data base (angles to 0, improvement coefficients to 1). In the
+ *     case of SF boundary conditions (type 1), the program only reads cG,cF
+ *     and the angles phi,phi_prime and then sets cG_prime=cG,cF_prime=cF.
+ *     When open-SF boundary conditions are chosen, all parameters except for
+ *     the angles phi are read.
+ *
+ *   bc_parms_t bc_parms(void)
+ *     Returns a structure that contains the boundary parameters.
+ *
+ *   void print_bc_parms(int ipr)
+ *     Prints the boundary parameters to stdout on MPI process 0. The
+ *     improvement coefficients cG,cG' are printed if ipr&0x1!=0 and the
+ *     parameters referring to the quark fields are printed if ipr&0x2!=0.
+ *     All parameters are printed if ipr=3.
+ *
+ *   void write_bc_parms(FILE *fdat)
+ *     Writes the boundary parameters to the file fdat on MPI process 0.
+ *
+ *   void check_bc_parms(FILE *fdat)
+ *     Compares the currently set boundary parameters with the values stored
+ *     on the file fdat on MPI process 0, assuming the latter were written to
+ *     the file by the program write_bc_parms().
+ *
+ *   double sea_quark_mass(int im0)
+ *     Returns the bare sea quark mass m0[im0] stored in the lattice
+ *     parameter data base or DBL_MAX if the index im0 is out of range.
+ *
+ *   int bc_type(void)
+ *     Returns the type of the chosen boundary conditions (0: open, 1: SF,
+ *     2: open-SF, 3: periodic).
+ *
+ *   sw_parms_t set_sw_parms(double m0)
+ *     Sets the parameters of the SW term. The adjustable parameter is
+ *
+ *       m0             Bare quark mass.
+ *
+ *     The return value is a structure that contains the mass m0 and the
+ *     improvement coefficients csw and cF[2], the latter being copied from
+ *     the list of the lattice and boundary parameters, respectively.
+ *
+ *   sw_parms_t sw_parms(void)
+ *     Returns the parameters currently set for the SW term. The values
+ *     of the coefficients csw and cF[2] are copied from the lattice and
+ *     boundary parameter list.
+ *
+ *   tm_parms_t set_tm_parms(int eoflg)
+ *     Sets the twisted-mass flag. The parameter is
+ *
+ *       eoflg          If the flag is set (eoflg!=0), the twisted-mass term
+ *                      in the Dirac operator, the SAP preconditioner and the
+ *                      little Dirac operator is turned off on the odd lattice
+ *                      sites.
+ *
+ *     The return value is a structure that contains the twisted-mass flag.
+ *
+ *   tm_parms_t tm_parms(void)
+ *     Returns a structure containing the twisted-mass flag.
+ *
+ * Notes:
+ *
+ * To ensure the consistency of the data base, the parameters must be set
+ * simultaneously on all processes. The data types lat_parms_t,..,tm_parms_t
+ * are defined in the file flags.h.
+ *
+ * The programs set_lat_parms() and set_bc_parms() may be called at most once.
+ * Moreover, they may not be called after the geometry arrays are set up. The
+ * default values of the lattice parameters beta=0.0, c0=1.0, nk=0 and csw=1.0
+ * are used if set_lat_parms() is not called. In the case of set_bc_parms(),
+ * the default is open boundary conditions and cG=cF=1.0.
+ *
+ * See the notes doc/gauge_action.pdf and doc/dirac.pdf for the detailed
+ * description of the lattice action and the boundary conditions.
+ *
+ *******************************************************************************/
 
 #define LAT_PARMS_C
 

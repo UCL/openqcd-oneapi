@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File time4.c
-*
-* Copyright (C) 2005, 2009, 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Timing of prod2su3alg, prod2u3alg and rotate_su3alg
-*
-*******************************************************************************/
+ *
+ * File time4.c
+ *
+ * Copyright (C) 2005, 2009, 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of prod2su3alg, prod2u3alg and rotate_su3alg
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

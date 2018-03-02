@@ -1,109 +1,109 @@
 
 /*******************************************************************************
-*
-* File force3.c
-*
-* Copyright (C) 2012, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Rational function forces.
-*
-* The externally accessible functions are
-*
-*   double setpf3(int *irat,int ipf,int isw,int isp,int icom,int *status)
-*     Generates a pseudo-fermion field phi with probability proportional
-*     to exp(-Spf) and returns the action Spf+Sdet-(phi,phi) if isw=1 or
-*     Spf-(phi,phi) if isw!=1 (see the notes).
-*
-*   void force3(int *irat,int ipf,int isw,int isp,double c,int *status)
-*     Computes the force deriving from the action Spf+Sdet if isw=1 or
-*     Spf if isw!=1 (see the notes). The calculated force is multiplied
-*     by c and added to the molecular-dynamics force field.
-*
-*   double action3(int *irat,int ipf,int isw,int isp,int icom,int *status)
-*     Returns the action Spf+Sdet-(phi,phi) if isw=1 or Spf-(phi,phi) if
-*     isw!=1 (see the notes).
-*
-* Notes:
-*
-* Simulations including the charm and/or the strange quark are based on
-* a version of the RHMC algorithm. See the notes "Charm and strange quark
-* in openQCD simulations" (file doc/rhmc.pdf).
-*
-* The pseudo-fermion action Spf is given by
-*
-*   Spf=(phi,P_{k,l}*phi),
-*
-* where P_{k,l} is the fraction of a Zolotarev rational function, which
-* is defined by the parameters:
-*
-*   irat[0]       Index of the Zolotarev rational function in the
-*                 parameter data base.
-*
-*   irat[1]       Lower end k of the selected coefficient range.
-*
-*   irat[2]       Upper end l of the selected coefficient range.
-*
-* See ratfcts/ratfcts.c for further explanations. The inclusion of the
-* "small quark determinant" amounts to adding the action
-*
-*   Sdet=-ln{det(1e+Doo)}+constant
-*
-* to the molecular-dynamics Hamilton function, where 1e is the projector
-* to the quark fields that vanish on the odd lattice sites and Doo the
-* odd-odd component of the Dirac operator (the constant is adjusted so
-* as to reduce the significance losses when the action differences are
-* computed at the end of the molecular-dynamics trajectories).
-*
-* The other parameters of the programs in this module are:
-*
-*   ipf           Index of the pseudo-fermion field phi in the
-*                 structure returned by mdflds() [mdflds.c].
-*
-*   isp           Index of the solver parameter set that describes
-*                 the solver to be used for the solution of the
-*                 Dirac equation.
-*
-*   icom          The action returned by the programs setpf3() and
-*                 action3() is summed over all MPI processes if icom=1.
-*                 Otherwise the local part of the action is returned.
-*
-*   status        Array of the average status values returned by the
-*                 solver used for the solution of the Dirac equation
-*                 (in the case of the DFL_SAP_GCR solver, status[2]
-*                 and status[5] are not averaged).
-*
-* The supported solvers are MSCG, SAP_GCR and DFL_SAP_GCR. Depending
-* on the program and the solver, the number of status variables varies
-* and is given by:
-*
-*                  MSCG         SAP_GCR       DFL_SAP_GCR
-*   setpf3()         1             1               3
-*   force3()         1             2               6
-*   action3()        1             1               3
-*
-* Note that, in force3(), the GCR solvers solve the Dirac equations twice.
-* In these cases, the program writes the status values one after the other
-* to the array. The bare quark mass m0 is the one last set by sw_parms()
-* [flags/lat_parms.c] and it is taken for granted that the parameters of
-* the solver have been set by set_solver_parms() [flags/solver_parms.c].
-*
-* The required workspaces of double-precision spinor fields are
-*
-*                  MSCG         SAP_GCR       DFL_SAP_GCR
-*   setpf3()        np             2               2
-*   force3()        np             3               3
-*   action3()       np             1               1
-*
-* where np is the number of poles of P_{k,l} (these figures do not include
-* the workspace required by the solvers).
-*
-* The programs in this module perform global communications and must be
-* called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File force3.c
+ *
+ * Copyright (C) 2012, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Rational function forces.
+ *
+ * The externally accessible functions are
+ *
+ *   double setpf3(int *irat,int ipf,int isw,int isp,int icom,int *status)
+ *     Generates a pseudo-fermion field phi with probability proportional
+ *     to exp(-Spf) and returns the action Spf+Sdet-(phi,phi) if isw=1 or
+ *     Spf-(phi,phi) if isw!=1 (see the notes).
+ *
+ *   void force3(int *irat,int ipf,int isw,int isp,double c,int *status)
+ *     Computes the force deriving from the action Spf+Sdet if isw=1 or
+ *     Spf if isw!=1 (see the notes). The calculated force is multiplied
+ *     by c and added to the molecular-dynamics force field.
+ *
+ *   double action3(int *irat,int ipf,int isw,int isp,int icom,int *status)
+ *     Returns the action Spf+Sdet-(phi,phi) if isw=1 or Spf-(phi,phi) if
+ *     isw!=1 (see the notes).
+ *
+ * Notes:
+ *
+ * Simulations including the charm and/or the strange quark are based on
+ * a version of the RHMC algorithm. See the notes "Charm and strange quark
+ * in openQCD simulations" (file doc/rhmc.pdf).
+ *
+ * The pseudo-fermion action Spf is given by
+ *
+ *   Spf=(phi,P_{k,l}*phi),
+ *
+ * where P_{k,l} is the fraction of a Zolotarev rational function, which
+ * is defined by the parameters:
+ *
+ *   irat[0]       Index of the Zolotarev rational function in the
+ *                 parameter data base.
+ *
+ *   irat[1]       Lower end k of the selected coefficient range.
+ *
+ *   irat[2]       Upper end l of the selected coefficient range.
+ *
+ * See ratfcts/ratfcts.c for further explanations. The inclusion of the
+ * "small quark determinant" amounts to adding the action
+ *
+ *   Sdet=-ln{det(1e+Doo)}+constant
+ *
+ * to the molecular-dynamics Hamilton function, where 1e is the projector
+ * to the quark fields that vanish on the odd lattice sites and Doo the
+ * odd-odd component of the Dirac operator (the constant is adjusted so
+ * as to reduce the significance losses when the action differences are
+ * computed at the end of the molecular-dynamics trajectories).
+ *
+ * The other parameters of the programs in this module are:
+ *
+ *   ipf           Index of the pseudo-fermion field phi in the
+ *                 structure returned by mdflds() [mdflds.c].
+ *
+ *   isp           Index of the solver parameter set that describes
+ *                 the solver to be used for the solution of the
+ *                 Dirac equation.
+ *
+ *   icom          The action returned by the programs setpf3() and
+ *                 action3() is summed over all MPI processes if icom=1.
+ *                 Otherwise the local part of the action is returned.
+ *
+ *   status        Array of the average status values returned by the
+ *                 solver used for the solution of the Dirac equation
+ *                 (in the case of the DFL_SAP_GCR solver, status[2]
+ *                 and status[5] are not averaged).
+ *
+ * The supported solvers are MSCG, SAP_GCR and DFL_SAP_GCR. Depending
+ * on the program and the solver, the number of status variables varies
+ * and is given by:
+ *
+ *                  MSCG         SAP_GCR       DFL_SAP_GCR
+ *   setpf3()         1             1               3
+ *   force3()         1             2               6
+ *   action3()        1             1               3
+ *
+ * Note that, in force3(), the GCR solvers solve the Dirac equations twice.
+ * In these cases, the program writes the status values one after the other
+ * to the array. The bare quark mass m0 is the one last set by sw_parms()
+ * [flags/lat_parms.c] and it is taken for granted that the parameters of
+ * the solver have been set by set_solver_parms() [flags/solver_parms.c].
+ *
+ * The required workspaces of double-precision spinor fields are
+ *
+ *                  MSCG         SAP_GCR       DFL_SAP_GCR
+ *   setpf3()        np             2               2
+ *   force3()        np             3               3
+ *   action3()       np             1               1
+ *
+ * where np is the number of poles of P_{k,l} (these figures do not include
+ * the workspace required by the solvers).
+ *
+ * The programs in this module perform global communications and must be
+ * called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define FORCE3_C
 
@@ -476,9 +476,10 @@ void force3(int *irat, int ipf, int isw, int isp, double c, int *status)
 
       error_root((stat[0] < 0) || (stat[1] < 0) || (stat[3] < 0) ||
                      (stat[4] < 0),
-                 1, "force3 [force3.c]", "DFL_SAP_GCR solver failed "
-                                         "(irat=%d,%d,%d, isp=%d, "
-                                         "status=%d,%d,%d;%d,%d,%d)",
+                 1, "force3 [force3.c]",
+                 "DFL_SAP_GCR solver failed "
+                 "(irat=%d,%d,%d, isp=%d, "
+                 "status=%d,%d,%d;%d,%d,%d)",
                  irat[0], irat[1], irat[2], isp, stat[0], stat[1], stat[2],
                  stat[3], stat[4], stat[5]);
 

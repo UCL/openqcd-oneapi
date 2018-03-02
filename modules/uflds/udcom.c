@@ -1,40 +1,40 @@
 
 /*******************************************************************************
-*
-* File udcom.c
-*
-* Copyright (C) 2005, 2009, 2010, 2011, 2012, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Communication of the double-precision link variables residing at the
-* exterior boundaries of the local lattices.
-*
-* The externally accessible function is
-*
-*   void copy_boundaries_udfield(su3_dble* ud_field, event_t event)
-*     Copies the double-precision link variables stored in ud_field from the
-*     neighbouring MPI processes to the exterior boundaries of the local
-*     lattice. The field variables on the spatial links at the time NPROC*L0 are
-*     fetched only in the case of periodic boundary conditions.
-*
-*   void copy_bnd_ud(void)
-*     Calls "copy_boundaries_udfield" with the global gauge field udfld() as the
-*     gauge field and "COPIED_BND_UD" as the event. Same as the legacy call (in
-*     openqcd 1.4).
-*
-* Notes:
-*
-* After calling copy_bnd_ud(), the double-precision link variables at the
-* +0,+1,+2,+3 faces have the correct values (see main/README.global and
-* lattice/README.uidx). Whether they are up-to-date can always be checked
-* by querying the flags data base (see flags/flags.c).
-*
-* The program in this module performs global communications and must be
-* called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File udcom.c
+ *
+ * Copyright (C) 2005, 2009, 2010, 2011, 2012, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Communication of the double-precision link variables residing at the
+ * exterior boundaries of the local lattices.
+ *
+ * The externally accessible function is
+ *
+ *   void copy_boundaries_udfield(su3_dble* ud_field, event_t event)
+ *     Copies the double-precision link variables stored in ud_field from the
+ *     neighbouring MPI processes to the exterior boundaries of the local
+ *     lattice. The field variables on the spatial links at the time NPROC*L0
+ *are fetched only in the case of periodic boundary conditions.
+ *
+ *   void copy_bnd_ud(void)
+ *     Calls "copy_boundaries_udfield" with the global gauge field udfld() as
+ *the gauge field and "COPIED_BND_UD" as the event. Same as the legacy call (in
+ *     openqcd 1.4).
+ *
+ * Notes:
+ *
+ * After calling copy_bnd_ud(), the double-precision link variables at the
+ * +0,+1,+2,+3 faces have the correct values (see main/README.global and
+ * lattice/README.uidx). Whether they are up-to-date can always be checked
+ * by querying the flags data base (see flags/flags.c).
+ *
+ * The program in this module performs global communications and must be
+ * called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define UDCOM_C
 

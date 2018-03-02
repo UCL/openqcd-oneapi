@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check5.c
-*
-* Copyright (C) 2007, 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Checks on the programs in the module valg_dble
-*
-*******************************************************************************/
+ *
+ * File check5.c
+ *
+ * Copyright (C) 2007, 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Checks on the programs in the module valg_dble
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

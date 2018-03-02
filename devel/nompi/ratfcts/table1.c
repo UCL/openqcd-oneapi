@@ -1,17 +1,17 @@
 
 /*******************************************************************************
-*
-* File table1.c
-*
-* Copyright (C) 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Table of the relative error of the Zolotarev rational approximation to the
-* function f(x)=1/|x| (suitable for plotting, for example)
-*
-*******************************************************************************/
+ *
+ * File table1.c
+ *
+ * Copyright (C) 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Table of the relative error of the Zolotarev rational approximation to the
+ * function f(x)=1/|x| (suitable for plotting, for example)
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

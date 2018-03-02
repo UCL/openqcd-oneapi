@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check4.c
-*
-* Copyright (C) 2007, 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Consistency checks on Aw_dble(),..,Awhat().
-*
-*******************************************************************************/
+ *
+ * File check4.c
+ *
+ * Copyright (C) 2007, 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Consistency checks on Aw_dble(),..,Awhat().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2010 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of the modified Bessel function I0(x) [program i0m()]
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2010 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of the modified Bessel function I0(x) [program i0m()]
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

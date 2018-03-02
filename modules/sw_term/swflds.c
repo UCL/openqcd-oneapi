@@ -1,36 +1,36 @@
 
 /*******************************************************************************
-*
-* File swflds.c
-*
-* Copyright (C) 2006, 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Allocation and initialization of the global SW fields
-*
-* The externally accessible functions are
-*
-*   pauli *swfld(void)
-*     Returns the base address of the single-precision SW field. If it
-*     is not already allocated, the field is allocated and initialized
-*     to unity.
-*
-*   pauli_dble *swdfld(void)
-*     Returns the base address of the double-precision SW field. If it
-*     is not already allocated, the field is allocated and initialized
-*     to unity.
-*
-*   void assign_swd2sw(void)
-*     Assigns the double-precision to the single-precision SW field.
-*
-* Notes:
-*
-* All these programs act globally and must be called simultaneously on all
-* processes.
-*
-*******************************************************************************/
+ *
+ * File swflds.c
+ *
+ * Copyright (C) 2006, 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Allocation and initialization of the global SW fields
+ *
+ * The externally accessible functions are
+ *
+ *   pauli *swfld(void)
+ *     Returns the base address of the single-precision SW field. If it
+ *     is not already allocated, the field is allocated and initialized
+ *     to unity.
+ *
+ *   pauli_dble *swdfld(void)
+ *     Returns the base address of the double-precision SW field. If it
+ *     is not already allocated, the field is allocated and initialized
+ *     to unity.
+ *
+ *   void assign_swd2sw(void)
+ *     Assigns the double-precision to the single-precision SW field.
+ *
+ * Notes:
+ *
+ * All these programs act globally and must be called simultaneously on all
+ * processes.
+ *
+ *******************************************************************************/
 
 #define SWFLDS_C
 

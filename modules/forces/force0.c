@@ -1,52 +1,52 @@
 
 /*******************************************************************************
-*
-* File force0.c
-*
-* Copyright (C) 2005, 2009-2014, 2016 Martin Luescher, John Bulava
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Action of the double-precision gauge field and associated force.
-*
-* The externally accessible functions are
-*
-*   void plaq_frc(void)
-*     Computes the force deriving from the Wilson plaquette action,
-*     omitting the prefactor 1/g0^2, and assigns the result to the MD
-*     force field. In the case of open, SF or open-SF boundary conditions,
-*     the boundary improvement coefficients are set to their tree-level
-*     value independently of the values stored in the parameter data base.
-*
-*   void force0(double c)
-*     Computes the force deriving from the gauge action, including the
-*     prefactor 1/g0^2, multiplies the calculated force by c and assigns
-*     the result to the MD force field. The coupling g0 and the other
-*     parameters of the gauge action are retrieved from the parameter
-*     data base.
-*
-*   double action0(int icom)
-*     Computes the local part of the gauge action including the prefactor
-*     1/g0^2. The coupling g0 and the other parameters of the action are
-*     retrieved from the parameter data base. The program returns the sum
-*     of the local parts of the action over all MPI processes if icom=1
-*     and otherwise just the local part.
-*
-* Notes:
-*
-* See the notes doc/gauge_action.pdf for the definition of the gauge action
-* and a description of the computation of the force deriving from it. The
-* molecular-dynamics (MD) force field is the one returned by the program
-* mdflds() (see mdflds/mdflds.c).
-*
-* On the links in the local lattice where the static link variables reside,
-* the programs plaq_frc() and force0() set the force field to zero.
-*
-* The programs in this module perform global communications and must be
-* called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File force0.c
+ *
+ * Copyright (C) 2005, 2009-2014, 2016 Martin Luescher, John Bulava
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Action of the double-precision gauge field and associated force.
+ *
+ * The externally accessible functions are
+ *
+ *   void plaq_frc(void)
+ *     Computes the force deriving from the Wilson plaquette action,
+ *     omitting the prefactor 1/g0^2, and assigns the result to the MD
+ *     force field. In the case of open, SF or open-SF boundary conditions,
+ *     the boundary improvement coefficients are set to their tree-level
+ *     value independently of the values stored in the parameter data base.
+ *
+ *   void force0(double c)
+ *     Computes the force deriving from the gauge action, including the
+ *     prefactor 1/g0^2, multiplies the calculated force by c and assigns
+ *     the result to the MD force field. The coupling g0 and the other
+ *     parameters of the gauge action are retrieved from the parameter
+ *     data base.
+ *
+ *   double action0(int icom)
+ *     Computes the local part of the gauge action including the prefactor
+ *     1/g0^2. The coupling g0 and the other parameters of the action are
+ *     retrieved from the parameter data base. The program returns the sum
+ *     of the local parts of the action over all MPI processes if icom=1
+ *     and otherwise just the local part.
+ *
+ * Notes:
+ *
+ * See the notes doc/gauge_action.pdf for the definition of the gauge action
+ * and a description of the computation of the force deriving from it. The
+ * molecular-dynamics (MD) force field is the one returned by the program
+ * mdflds() (see mdflds/mdflds.c).
+ *
+ * On the links in the local lattice where the static link variables reside,
+ * the programs plaq_frc() and force0() set the force field to zero.
+ *
+ * The programs in this module perform global communications and must be
+ * called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define FORCE0_C
 

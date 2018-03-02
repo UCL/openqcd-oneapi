@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check4.c
-*
-* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of assign_swd2swbgr() and assign_swd2swdblk().
-*
-*******************************************************************************/
+ *
+ * File check4.c
+ *
+ * Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of assign_swd2swbgr() and assign_swd2swdblk().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

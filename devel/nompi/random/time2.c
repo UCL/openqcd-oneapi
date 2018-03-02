@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File time2.c
-*
-* Copyright (C) 2005 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Timing of ranlxd and gauss_dble
-*
-*******************************************************************************/
+ *
+ * File time2.c
+ *
+ * Copyright (C) 2005 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of ranlxd and gauss_dble
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

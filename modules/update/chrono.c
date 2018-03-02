@@ -1,72 +1,72 @@
 
 /*******************************************************************************
-*
-* File chrono.c
-*
-* Copyright (C) 2007, 2011, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Programs needed for the propagation of solutions of the Dirac equation
-* along the molecular-dynamics trajectories
-*
-* The externally accessible functions are
-*
-*   void setup_chrono(void)
-*     Allocates the required memory space for the stacks of previous
-*     solutions to be used in the course of the molecular-dynamics
-*     trajectories. The number and size of the stacks is inferred from
-*     the parameter data base.
-*
-*   double mdtime(void)
-*     Returns the current molecular-dynamics time.
-*
-*   void step_mdtime(double dt)
-*     Advances the molecular-dynamics time by dt.
-*
-*   void add_chrono(int icr,spinor_dble *psi)
-*     Adds the solution psi obtained at the current molecular-dynamics
-*     time to the stack number icr of previously calculated solutions.
-*
-*   int get_chrono(int icr,spinor_dble *psi)
-*     Extrapolates the solutions stored in the stack number icr to the
-*     current molecular-dynamics time. The program returns 0 and leaves
-*     psi unchanged if the stack does not contain any previous solutions.
-*     Otherwise the program assigns the extrapolated solution to psi and
-*     returns 1.
-*
-*   void reset_chrono(void)
-*     Sets the molecular-dynamics time and all counters of previously
-*     computed solutions to zero.
-*
-* Notes:
-*
-* The propagation of the solutions of the Dirac equation was proposed by
-*
-*   R.C. Brower et al., "Chronological inversion method for the Dirac
-*   matrix in Hybrid Monte Carlo", Nucl. Phys. B484 (1997) 353
-*
-* Here the solutions are propagated using a polynomial extrapolation. The
-* maximal number of solutions to be kept in memory can be chosen for each
-* solution stack separately.
-*
-* Each quark force specified in the parameter data base may have up to 4
-* solution stacks associated with it (see flags/force_parms.c). In all
-* cases, the chronological propagation of the solutions can be turned off
-* by setting the maximal numbers of fields to be kept in memory to zero.
-* Internally the stacks are labeled by an index icr>=0, where the empty
-* stack has index icr=0 and all other stacks have index icr>0. The stack
-* indices are included in the force parameter sets.
-*
-* The module includes a clock that serves to keep track of the molecular-
-* dynamics times at which the Dirac equation is solved. The clock is
-* advanced by the molecular-dynamics integrator (see update/mdint.c).
-*
-* All programs in this module should be called simultaneously on all MPI
-* processes.
-*
-*******************************************************************************/
+ *
+ * File chrono.c
+ *
+ * Copyright (C) 2007, 2011, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Programs needed for the propagation of solutions of the Dirac equation
+ * along the molecular-dynamics trajectories
+ *
+ * The externally accessible functions are
+ *
+ *   void setup_chrono(void)
+ *     Allocates the required memory space for the stacks of previous
+ *     solutions to be used in the course of the molecular-dynamics
+ *     trajectories. The number and size of the stacks is inferred from
+ *     the parameter data base.
+ *
+ *   double mdtime(void)
+ *     Returns the current molecular-dynamics time.
+ *
+ *   void step_mdtime(double dt)
+ *     Advances the molecular-dynamics time by dt.
+ *
+ *   void add_chrono(int icr,spinor_dble *psi)
+ *     Adds the solution psi obtained at the current molecular-dynamics
+ *     time to the stack number icr of previously calculated solutions.
+ *
+ *   int get_chrono(int icr,spinor_dble *psi)
+ *     Extrapolates the solutions stored in the stack number icr to the
+ *     current molecular-dynamics time. The program returns 0 and leaves
+ *     psi unchanged if the stack does not contain any previous solutions.
+ *     Otherwise the program assigns the extrapolated solution to psi and
+ *     returns 1.
+ *
+ *   void reset_chrono(void)
+ *     Sets the molecular-dynamics time and all counters of previously
+ *     computed solutions to zero.
+ *
+ * Notes:
+ *
+ * The propagation of the solutions of the Dirac equation was proposed by
+ *
+ *   R.C. Brower et al., "Chronological inversion method for the Dirac
+ *   matrix in Hybrid Monte Carlo", Nucl. Phys. B484 (1997) 353
+ *
+ * Here the solutions are propagated using a polynomial extrapolation. The
+ * maximal number of solutions to be kept in memory can be chosen for each
+ * solution stack separately.
+ *
+ * Each quark force specified in the parameter data base may have up to 4
+ * solution stacks associated with it (see flags/force_parms.c). In all
+ * cases, the chronological propagation of the solutions can be turned off
+ * by setting the maximal numbers of fields to be kept in memory to zero.
+ * Internally the stacks are labeled by an index icr>=0, where the empty
+ * stack has index icr=0 and all other stacks have index icr>0. The stack
+ * indices are included in the force parameter sets.
+ *
+ * The module includes a clock that serves to keep track of the molecular-
+ * dynamics times at which the Dirac equation is solved. The clock is
+ * advanced by the molecular-dynamics integrator (see update/mdint.c).
+ *
+ * All programs in this module should be called simultaneously on all MPI
+ * processes.
+ *
+ *******************************************************************************/
 
 #define CHRONO_C
 

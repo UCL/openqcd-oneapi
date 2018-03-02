@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File flags.h
-*
-* Copyright (C) 2009-2014, 2016 Martin Luescher, Isabel Campos
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File flags.h
+ *
+ * Copyright (C) 2009-2014, 2016 Martin Luescher, Isabel Campos
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef FLAGS_H
 #define FLAGS_H

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check3.c
-*
-* Copyright (C) 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the programs bnd_s2zero() and bnd_sd2zero().
-*
-*******************************************************************************/
+ *
+ * File check3.c
+ *
+ * Copyright (C) 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the programs bnd_s2zero() and bnd_sd2zero().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

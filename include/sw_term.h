@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File sw_term.h
-*
-* Copyright (C) 2005, 2009, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File sw_term.h
+ *
+ * Copyright (C) 2005, 2009, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef SW_TERM_H
 #define SW_TERM_H

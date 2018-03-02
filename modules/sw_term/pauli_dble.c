@@ -1,67 +1,67 @@
 
 /*******************************************************************************
-*
-* File pauli_dble.c
-*
-* Copyright (C) 2005, 2009, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Basic functions for double-precision Hermitian 6x6 matrices.
-*
-* The externally accessible functions are
-*
-*   void mul_pauli_dble(double mu,pauli_dble *m,weyl_dble *s,weyl_dble *r)
-*     Multiplies the Weyl spinor s by the matrix m+i*mu and assigns the
-*     result to the Weyl spinor r. The source spinor is overwritten if
-*     r=s and otherwise left unchanged.
-*
-*   int inv_pauli_dble(double mu,pauli_dble *m,pauli_dble *im)
-*     Assigns the Hermitian part of the matrix (m+i*mu)^(-1) to im. The
-*     matrix is overwritten if im=m and otherwise left unchanged. On
-*     exit the program returns 0 or 1 depending on whether the inversion
-*     was safe or not (in which case the calculated matrix is unusable).
-*
-*   complex_dble det_pauli_dble(double mu,pauli_dble *m)
-*     Returns the determinant of the matrix m+i*mu.
-*
-*   void apply_sw_dble(int vol,double mu,pauli_dble *m,spinor_dble *s,
-*                      spinor_dble *r)
-*     Applies the matrix field m[2*vol]+i*mu*gamma_5 to the spinor field
-*     s[vol] and assigns the result to the field r[vol]. The source field
-*     is overwritten if r=s and otherwise left unchanged (the arrays may
-*     not overlap in this case).
-*
-*   int apply_swinv_dble(int vol,double mu,pauli_dble *m,spinor_dble *s,
-*                        spinor_dble *r)
-*     Applies the inverse of the matrix field m[2*vol]+i*mu*gamma_5 to the
-*     spinor field s[vol] and assigns the result to the field r[vol]. The
-*     source field is overwritten if r=s and otherwise left unchanged (the
-*     arrays may not overlap in this case). On exit the program returns 0
-*     or 1 depending on whether the matrix inversions were safe or not (in
-*     the latter case, the output field is unusable).
-*
-* Notes:
-*
-* The storage format for Hermitian 6x6 matrices is described in the notes
-* "Implementation of the lattice Dirac operator" (file doc/dirac.pdf). As
-* explained there, the inversion of a complex matrix is considered to be
-* safe if and only if the Frobenius condition number of the matrix is less
-* than 100. The Hermitian part of any complex matrix M is defined to be
-* (M+M^dag)/2.
-*
-* Note that the program apply_swinv_dble() performs matrix inversions on
-* the fly and is therefore much slower than apply_sw_dble(). When calling
-* inv_pauli_dble() or apply_swinv_dble(), it is up to the calling program
-* to check the return value and to take the appropriate action when there
-* were unsafe matrix inversions.
-*
-* The programs perform no communications and can be called locally. If SSE
-* (AVX) instructions are used, the Pauli matrices, Dirac and Weyl spinors
-* must be aligned to a 16 (32) byte boundary.
-*
-*******************************************************************************/
+ *
+ * File pauli_dble.c
+ *
+ * Copyright (C) 2005, 2009, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Basic functions for double-precision Hermitian 6x6 matrices.
+ *
+ * The externally accessible functions are
+ *
+ *   void mul_pauli_dble(double mu,pauli_dble *m,weyl_dble *s,weyl_dble *r)
+ *     Multiplies the Weyl spinor s by the matrix m+i*mu and assigns the
+ *     result to the Weyl spinor r. The source spinor is overwritten if
+ *     r=s and otherwise left unchanged.
+ *
+ *   int inv_pauli_dble(double mu,pauli_dble *m,pauli_dble *im)
+ *     Assigns the Hermitian part of the matrix (m+i*mu)^(-1) to im. The
+ *     matrix is overwritten if im=m and otherwise left unchanged. On
+ *     exit the program returns 0 or 1 depending on whether the inversion
+ *     was safe or not (in which case the calculated matrix is unusable).
+ *
+ *   complex_dble det_pauli_dble(double mu,pauli_dble *m)
+ *     Returns the determinant of the matrix m+i*mu.
+ *
+ *   void apply_sw_dble(int vol,double mu,pauli_dble *m,spinor_dble *s,
+ *                      spinor_dble *r)
+ *     Applies the matrix field m[2*vol]+i*mu*gamma_5 to the spinor field
+ *     s[vol] and assigns the result to the field r[vol]. The source field
+ *     is overwritten if r=s and otherwise left unchanged (the arrays may
+ *     not overlap in this case).
+ *
+ *   int apply_swinv_dble(int vol,double mu,pauli_dble *m,spinor_dble *s,
+ *                        spinor_dble *r)
+ *     Applies the inverse of the matrix field m[2*vol]+i*mu*gamma_5 to the
+ *     spinor field s[vol] and assigns the result to the field r[vol]. The
+ *     source field is overwritten if r=s and otherwise left unchanged (the
+ *     arrays may not overlap in this case). On exit the program returns 0
+ *     or 1 depending on whether the matrix inversions were safe or not (in
+ *     the latter case, the output field is unusable).
+ *
+ * Notes:
+ *
+ * The storage format for Hermitian 6x6 matrices is described in the notes
+ * "Implementation of the lattice Dirac operator" (file doc/dirac.pdf). As
+ * explained there, the inversion of a complex matrix is considered to be
+ * safe if and only if the Frobenius condition number of the matrix is less
+ * than 100. The Hermitian part of any complex matrix M is defined to be
+ * (M+M^dag)/2.
+ *
+ * Note that the program apply_swinv_dble() performs matrix inversions on
+ * the fly and is therefore much slower than apply_sw_dble(). When calling
+ * inv_pauli_dble() or apply_swinv_dble(), it is up to the calling program
+ * to check the return value and to take the appropriate action when there
+ * were unsafe matrix inversions.
+ *
+ * The programs perform no communications and can be called locally. If SSE
+ * (AVX) instructions are used, the Pauli matrices, Dirac and Weyl spinors
+ * must be aligned to a 16 (32) byte boundary.
+ *
+ *******************************************************************************/
 
 #define PAULI_DBLE_C
 

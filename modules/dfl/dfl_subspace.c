@@ -1,76 +1,76 @@
 
 /*******************************************************************************
-*
-* File dfl_subspace.c
-*
-* Copyright (C) 2007, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Basic utility programs related to the deflation subspace.
-*
-* The externally accessible functions are
-*
-*   void dfl_sd2vd(spinor_dble *sd,complex_dble *vd)
-*     Assigns the components of the global double-precision spinor field
-*     sd along the deflation subspace to the double-precision vector
-*     field vd.
-*
-*   void dfl_vd2sd(complex_dble *vd,spinor_dble *sd)
-*     Assigns the element of the deflation subspace corresponding to the
-*     double-precision vector field vd to the global double-precision spinor
-*     field sd.
-*
-*   void dfl_sub_vd2sd(complex_dble *vd,spinor_dble *sd)
-*     Subtracts the element of the deflation subspace corresponding to the
-*     double-precision vector field vd from the global double-precision
-*     spinor field sd.
-*
-*   void dfl_s2v(spinor *s,complex *v)
-*     Assigns the components of the global single-precision spinor field
-*     s along the deflation subspace to the single-precision vector
-*     field v.
-*
-*   void dfl_v2s(complex *v,spinor *s)
-*     Assigns the element of the deflation subspace corresponding to the
-*     single-precision vector field v to the global single-precision spinor
-*     field s.
-*
-*   void dfl_sub_v2s(complex *v,spinor *s)
-*     Subtracts the element of the deflation subspace corresponding to the
-*     double-precision vector field v from the global single-precision spinor
-*     field s.
-*
-*   void dfl_subspace(spinor **mds)
-*     Copies the global single-precision spinor fields mds[0],..,mds[Ns-1]
-*     to the fields b.sd[1],..,b.sd[Ns] on the blocks b of the DFL_BLOCKS
-*     grid. The block fields are then orthonormalized and are assigned to
-*     the single-precision block fields b.s[1],..,b.s[Ns].
-*      In this basis of fields, the modes mds[0],..,mds[Ns-1] are given by
-*     fields vmds[0],..,vmds[Ns-1] of Ns*nb complex numbers, where nb is
-*     the number of blocks in the block grid. These fields are assigned to
-*     the last Ns single-precision vector fields of the array returned by
-*     vflds() [vflds/vflds.c].
-*
-* Notes:
-*
-* The deflation subspace is spanned by the fields (*b).sd[1],..,(*b).sd[Ns]
-* on the blocks b of the DFL_BLOCKS grid. The number Ns of fields is set by
-* the program dfl_set_parms() [flags/dfl_parms.c].
-*
-* Any spinor field in the deflation subspace is a linear combination of the
-* basis elements on the blocks. The associated complex coefficients form a
-* vector field of the type described in vflds/vflds.c. Such fields are thus
-* in one-to-one correspondence with the deflation modes. In particular, the
-* deflation subspace contains the global spinor fields from which it was
-* created by the program dfl_subspace().
-*
-* The program dfl_subspace() allocates the DFL_BLOCKS block grid if it is
-* not already allocated. This program involves global operations and must be
-* called simultaneously on all processes.
-*
-*******************************************************************************/
+ *
+ * File dfl_subspace.c
+ *
+ * Copyright (C) 2007, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Basic utility programs related to the deflation subspace.
+ *
+ * The externally accessible functions are
+ *
+ *   void dfl_sd2vd(spinor_dble *sd,complex_dble *vd)
+ *     Assigns the components of the global double-precision spinor field
+ *     sd along the deflation subspace to the double-precision vector
+ *     field vd.
+ *
+ *   void dfl_vd2sd(complex_dble *vd,spinor_dble *sd)
+ *     Assigns the element of the deflation subspace corresponding to the
+ *     double-precision vector field vd to the global double-precision spinor
+ *     field sd.
+ *
+ *   void dfl_sub_vd2sd(complex_dble *vd,spinor_dble *sd)
+ *     Subtracts the element of the deflation subspace corresponding to the
+ *     double-precision vector field vd from the global double-precision
+ *     spinor field sd.
+ *
+ *   void dfl_s2v(spinor *s,complex *v)
+ *     Assigns the components of the global single-precision spinor field
+ *     s along the deflation subspace to the single-precision vector
+ *     field v.
+ *
+ *   void dfl_v2s(complex *v,spinor *s)
+ *     Assigns the element of the deflation subspace corresponding to the
+ *     single-precision vector field v to the global single-precision spinor
+ *     field s.
+ *
+ *   void dfl_sub_v2s(complex *v,spinor *s)
+ *     Subtracts the element of the deflation subspace corresponding to the
+ *     double-precision vector field v from the global single-precision spinor
+ *     field s.
+ *
+ *   void dfl_subspace(spinor **mds)
+ *     Copies the global single-precision spinor fields mds[0],..,mds[Ns-1]
+ *     to the fields b.sd[1],..,b.sd[Ns] on the blocks b of the DFL_BLOCKS
+ *     grid. The block fields are then orthonormalized and are assigned to
+ *     the single-precision block fields b.s[1],..,b.s[Ns].
+ *      In this basis of fields, the modes mds[0],..,mds[Ns-1] are given by
+ *     fields vmds[0],..,vmds[Ns-1] of Ns*nb complex numbers, where nb is
+ *     the number of blocks in the block grid. These fields are assigned to
+ *     the last Ns single-precision vector fields of the array returned by
+ *     vflds() [vflds/vflds.c].
+ *
+ * Notes:
+ *
+ * The deflation subspace is spanned by the fields (*b).sd[1],..,(*b).sd[Ns]
+ * on the blocks b of the DFL_BLOCKS grid. The number Ns of fields is set by
+ * the program dfl_set_parms() [flags/dfl_parms.c].
+ *
+ * Any spinor field in the deflation subspace is a linear combination of the
+ * basis elements on the blocks. The associated complex coefficients form a
+ * vector field of the type described in vflds/vflds.c. Such fields are thus
+ * in one-to-one correspondence with the deflation modes. In particular, the
+ * deflation subspace contains the global spinor fields from which it was
+ * created by the program dfl_subspace().
+ *
+ * The program dfl_subspace() allocates the DFL_BLOCKS block grid if it is
+ * not already allocated. This program involves global operations and must be
+ * called simultaneously on all processes.
+ *
+ *******************************************************************************/
 
 #define DFL_SUBSPACE_C
 

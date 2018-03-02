@@ -1,20 +1,20 @@
 
 /*******************************************************************************
-*
-* File ms4.c
-*
-* Copyright (C) 2012, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of quark propagators.
-*
-* Syntax: ms4 -i <input file> [-noexp]
-*
-* For usage instructions see the file README.ms4.
-*
-*******************************************************************************/
+ *
+ * File ms4.c
+ *
+ * Copyright (C) 2012, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of quark propagators.
+ *
+ * Syntax: ms4 -i <input file> [-noexp]
+ *
+ * For usage instructions see the file README.ms4.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -176,8 +176,9 @@ static void read_bc_parms(void)
     read_line("type", "%d", &bc);
 
     error_root(((x0 == 0) && (bc != 3)) || ((x0 == (N0 - 1)) && (bc == 0)), 1,
-               "read_bc_parms [ms4.c]", "Incompatible choice of boundary "
-                                        "conditions and source time");
+               "read_bc_parms [ms4.c]",
+               "Incompatible choice of boundary "
+               "conditions and source time");
 
     phi[0] = 0.0;
     phi[1] = 0.0;

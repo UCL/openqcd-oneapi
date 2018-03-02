@@ -1,70 +1,70 @@
 
 /*******************************************************************************
-*
-* File rat_parms.c
-*
-* Copyright (C) 2012, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Rational function parameter data base
-*
-* The externally accessible functions are
-*
-*   rat_parms_t set_rat_parms(int irp,int degree,double *range)
-*     Sets the parameters in the rational function parameter set number
-*     irp and returns a structure containing them (see the notes).
-*
-*   rat_parms_t rat_parms(int irp)
-*     Returns a structure containing the rational function parameter set
-*     number irp (see the notes).
-*
-*   void read_rat_parms(int irp)
-*     On process 0, this program scans stdin for a line starting with the
-*     string "[Rational <int>]" (after any number of blanks), where <int> is
-*     the integer value passed by the argument. An error occurs if no such
-*     line or more than one is found. The lines
-*
-*       degree  <int>
-*       range   <double> <double>
-*
-*     are then read using read_line() [utils/mutils.c] and the data are
-*     entered into the data base by calling set_rat_parms().
-*
-*   void print_rat_parms(void)
-*     Prints the defined rational function parameter sets to stdout on MPI
-*     process 0.
-*
-*   void write_rat_parms(FILE *fdat)
-*     Writes the defined rational function parameter sets to the file fdat
-*     on MPI process 0.
-*
-*   void check_rat_parms(FILE *fdat)
-*     Compares the defined rational function parameter sets with those
-*     on the file fdat on MPI process 0, assuming the latter were written
-*     to the file by the program write_rat_parms().
-*
-* Notes:
-*
-* Currently only Zolotorev rational functions are supported (see the modules
-* ratfcts/zolotarev.c and ratfcts/ratfcts.c). The elements of a structure of
-* type rat_parms_t are
-*
-*   degree       Degree of the rational function
-*
-*   range[2]     Lower and upper end of the approximation range (see
-*                ratfcts/ratfcts.c)
-*
-* Up to 32 parameter sets, labeled by an index irp=0,1,..,31, can be
-* specified. Once a set is defined, it cannot be changed by calling
-* set_rat_parms() again. Rational function parameters must be globally
-* the same.
-*
-* Except for rat_parms(), the programs in this module perform global
-* operations and must be called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File rat_parms.c
+ *
+ * Copyright (C) 2012, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Rational function parameter data base
+ *
+ * The externally accessible functions are
+ *
+ *   rat_parms_t set_rat_parms(int irp,int degree,double *range)
+ *     Sets the parameters in the rational function parameter set number
+ *     irp and returns a structure containing them (see the notes).
+ *
+ *   rat_parms_t rat_parms(int irp)
+ *     Returns a structure containing the rational function parameter set
+ *     number irp (see the notes).
+ *
+ *   void read_rat_parms(int irp)
+ *     On process 0, this program scans stdin for a line starting with the
+ *     string "[Rational <int>]" (after any number of blanks), where <int> is
+ *     the integer value passed by the argument. An error occurs if no such
+ *     line or more than one is found. The lines
+ *
+ *       degree  <int>
+ *       range   <double> <double>
+ *
+ *     are then read using read_line() [utils/mutils.c] and the data are
+ *     entered into the data base by calling set_rat_parms().
+ *
+ *   void print_rat_parms(void)
+ *     Prints the defined rational function parameter sets to stdout on MPI
+ *     process 0.
+ *
+ *   void write_rat_parms(FILE *fdat)
+ *     Writes the defined rational function parameter sets to the file fdat
+ *     on MPI process 0.
+ *
+ *   void check_rat_parms(FILE *fdat)
+ *     Compares the defined rational function parameter sets with those
+ *     on the file fdat on MPI process 0, assuming the latter were written
+ *     to the file by the program write_rat_parms().
+ *
+ * Notes:
+ *
+ * Currently only Zolotorev rational functions are supported (see the modules
+ * ratfcts/zolotarev.c and ratfcts/ratfcts.c). The elements of a structure of
+ * type rat_parms_t are
+ *
+ *   degree       Degree of the rational function
+ *
+ *   range[2]     Lower and upper end of the approximation range (see
+ *                ratfcts/ratfcts.c)
+ *
+ * Up to 32 parameter sets, labeled by an index irp=0,1,..,31, can be
+ * specified. Once a set is defined, it cannot be changed by calling
+ * set_rat_parms() again. Rational function parameters must be globally
+ * the same.
+ *
+ * Except for rat_parms(), the programs in this module perform global
+ * operations and must be called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define RAT_PARMS_C
 

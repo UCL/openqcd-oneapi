@@ -1,89 +1,89 @@
 
 /*******************************************************************************
-*
-* File xtensor.c
-*
-* Copyright (C) 2011, 2012, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Spin parts of the quark force.
-*
-* The externally accessible functions are
-*
-*   u3_alg_dble **xtensor(void)
-*     Returns the pointers xt[0],..,xt[5] to the X tensor field components
-*     with Lorentz indices (0,1),(0,2),(0,3),(2,3),(3,1),(1,2). The arrays
-*     are automatically allocated and initialized to zero if they are not
-*     already allocated.
-*
-*   void set_xt2zero(void)
-*     Sets the X tensor field to zero.
-*
-*   int add_det2xt(double c,ptset_t set)
-*     Computes the spin part of the SW force deriving from the action
-*     -Tr{ln(D)}, where D=D_ee,D_oo,D_ee+D_oo or 1 when set=EVEN_PTS,
-*     ODD_PTS,ALL_PTS or NO_PTS (see the notes). The calculated matrices
-*     are then multiplied by c and are added to the X tensor field. When
-*     needed, the program recomputes and inverts the SW term. The program
-*     returns 0 if all inversions were safe and a non-zero value otherwise.
-*
-*   void add_prod2xt(double c,spinor_dble *r,spinor_dble *s)
-*     Computes the spin part of the SW force deriving from the "action"
-*     -2*Re(r,gamma_5*Dw*s), where Dw denotes the lattice Dirac operator
-*     (see the notes). The calculated matrices are then multiplied by c
-*     and are added to the X tensor field.
-*
-*   su3_dble *xvector(void)
-*     Returns the pointer xv to the X vector field. The components of
-*     field are stored in memory in the same order as the link variables.
-*     The array automatically allocated and initialized to zero if it is
-*     not already allocated.
-*
-*   void set_xv2zero(void)
-*     Sets the X vector field to zero.
-*
-*   void add_prod2xv(double c,spinor_dble *r,spinor_dble *s)
-*     Computes the spin part of the force deriving from the hopping terms
-*     in the "action" -2*Re(r,gamma_5*Dw*s), where Dw denotes the lattice
-*     Dirac operator (see the notes). The calculated matrices are then
-*     multiplied by c and are added to the X vector field.
-*
-* Notes:
-*
-* The computation of the quark forces is described in "Molecular-dynamics
-* quark forces" (doc/forces.pdf). For unexplained notation concerning the
-* SW term see "Implementation of the lattice Dirac operator" (doc/dirac.pdf).
-*
-* The SW contribution to the n'th component of the X tensor at the point x
-* is given by
-*
-*  X[n]=i*tr{sigma_{mu,nu}*M(x)^(-1)}
-*
-* where M(x)=is the 12x12 matrix representing the SW term at x and n labels
-* the (mu,nu)=(0,1),(0,2),(0,3),(2,3),(3,1),(1,2) index pairs. Similarly, for
-* given spinor fields r and s, the associated X tensor at x is defined by
-*
-*  X[n]=i*tr{[gamma_5*sigma_{mu,nu}*s(x) x r^dag(x)]+(s<->r)}
-*
-* The contribution of the fields r,s to the X vector component on the link
-* (x,x+mu) is given by
-*
-*  X=tr{[gamma_5*(1-gamma_mu)*s(x+mu) x r^dag(x)]+(s<->r)}
-*
-* In all cases, the trace is taken over the Dirac indices only.
-*
-* The components of the X tensor field are of type u3_alg_dble. As in the
-* case of symmetric gauge-field tensor, the field array includes additional
-* space for the field components on the boundaries of the local lattice
-* (see tcharge/ftensor.c and lattice/README.ftidx). The type u3_alg_dble
-* is explained in the module su3fcts/su3prod.c.
-*
-* The programs in this module may perform global operations and must be
-* called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File xtensor.c
+ *
+ * Copyright (C) 2011, 2012, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Spin parts of the quark force.
+ *
+ * The externally accessible functions are
+ *
+ *   u3_alg_dble **xtensor(void)
+ *     Returns the pointers xt[0],..,xt[5] to the X tensor field components
+ *     with Lorentz indices (0,1),(0,2),(0,3),(2,3),(3,1),(1,2). The arrays
+ *     are automatically allocated and initialized to zero if they are not
+ *     already allocated.
+ *
+ *   void set_xt2zero(void)
+ *     Sets the X tensor field to zero.
+ *
+ *   int add_det2xt(double c,ptset_t set)
+ *     Computes the spin part of the SW force deriving from the action
+ *     -Tr{ln(D)}, where D=D_ee,D_oo,D_ee+D_oo or 1 when set=EVEN_PTS,
+ *     ODD_PTS,ALL_PTS or NO_PTS (see the notes). The calculated matrices
+ *     are then multiplied by c and are added to the X tensor field. When
+ *     needed, the program recomputes and inverts the SW term. The program
+ *     returns 0 if all inversions were safe and a non-zero value otherwise.
+ *
+ *   void add_prod2xt(double c,spinor_dble *r,spinor_dble *s)
+ *     Computes the spin part of the SW force deriving from the "action"
+ *     -2*Re(r,gamma_5*Dw*s), where Dw denotes the lattice Dirac operator
+ *     (see the notes). The calculated matrices are then multiplied by c
+ *     and are added to the X tensor field.
+ *
+ *   su3_dble *xvector(void)
+ *     Returns the pointer xv to the X vector field. The components of
+ *     field are stored in memory in the same order as the link variables.
+ *     The array automatically allocated and initialized to zero if it is
+ *     not already allocated.
+ *
+ *   void set_xv2zero(void)
+ *     Sets the X vector field to zero.
+ *
+ *   void add_prod2xv(double c,spinor_dble *r,spinor_dble *s)
+ *     Computes the spin part of the force deriving from the hopping terms
+ *     in the "action" -2*Re(r,gamma_5*Dw*s), where Dw denotes the lattice
+ *     Dirac operator (see the notes). The calculated matrices are then
+ *     multiplied by c and are added to the X vector field.
+ *
+ * Notes:
+ *
+ * The computation of the quark forces is described in "Molecular-dynamics
+ * quark forces" (doc/forces.pdf). For unexplained notation concerning the
+ * SW term see "Implementation of the lattice Dirac operator" (doc/dirac.pdf).
+ *
+ * The SW contribution to the n'th component of the X tensor at the point x
+ * is given by
+ *
+ *  X[n]=i*tr{sigma_{mu,nu}*M(x)^(-1)}
+ *
+ * where M(x)=is the 12x12 matrix representing the SW term at x and n labels
+ * the (mu,nu)=(0,1),(0,2),(0,3),(2,3),(3,1),(1,2) index pairs. Similarly, for
+ * given spinor fields r and s, the associated X tensor at x is defined by
+ *
+ *  X[n]=i*tr{[gamma_5*sigma_{mu,nu}*s(x) x r^dag(x)]+(s<->r)}
+ *
+ * The contribution of the fields r,s to the X vector component on the link
+ * (x,x+mu) is given by
+ *
+ *  X=tr{[gamma_5*(1-gamma_mu)*s(x+mu) x r^dag(x)]+(s<->r)}
+ *
+ * In all cases, the trace is taken over the Dirac indices only.
+ *
+ * The components of the X tensor field are of type u3_alg_dble. As in the
+ * case of symmetric gauge-field tensor, the field array includes additional
+ * space for the field components on the boundaries of the local lattice
+ * (see tcharge/ftensor.c and lattice/README.ftidx). The type u3_alg_dble
+ * is explained in the module su3fcts/su3prod.c.
+ *
+ * The programs in this module may perform global operations and must be
+ * called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define XTENSOR_C
 

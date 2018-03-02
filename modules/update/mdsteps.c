@@ -1,70 +1,70 @@
 
 /*******************************************************************************
-*
-* File mdsteps.c
-*
-* Copyright (C) 2011, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Molecular-dynamics integrator
-*
-* The externally accessible functions are
-*
-*   void set_mdsteps(void)
-*     Constructs the integrator from the data available in the parameter
-*     data base (see the notes). The integrator is stored internally in
-*     the form of an array of elementary operations (force computations
-*     and gauge-field update steps).
-*
-*   mdstep_t *mdsteps(int *nop,int *ntu,int *itu)
-*     Returns the array of elementary operations that describe the current
-*     integrator. On exit the program assigns the total number of operations
-*     to nop and the index of the gauge-field update operation to itu.
-*
-*   void print_mdsteps(int ipr)
-*     Prints some information on the current integrator to stdout on MPI
-*     process 0. The program always prints the available information on
-*     the different levels of the integrator. Whether further information
-*     is printed depends on the 3 low bits of the print flat ipr:
-*
-*      if (ipr&0x1): Force descriptions
-*
-*      if (ipr&0x2): List of elementary operations
-*
-*      if (ipr&0x4): Integration time check
-*
-*     The full information is thus printed if ipr=0x7.
-*
-* Notes:
-*
-* The structure of the MD integrator is explained in the file README.mdint
-* in this directory. It is assumed here that the parameters of the integrator
-* have been entered to the parameter data base.
-*
-* An elementary update step is described by a structure of type mdstep_t
-* with the following elements:
-*
-*  iop     Operation index (0<=iop<=itu+1). If iop<itu, the force number
-*          iop is to be computed and to be assigned (gauge force) or added
-*          (fermion forces) to the force field. If iop=itu, the momentum
-*          and subsequently the gauge field are to be updated, using the
-*          current force field. If iop=itu+1, the momentum field is to be
-*          updated, using the current force, and the integration ends.
-*
-*  eps     Step sizes by which the forces (iop<itu) or the momentum field
-*          in the update of the gauge field must be multiplied.
-*
-* The forces are described by the structures returned by force_parms(iop)
-* if iop<itu (see flags/force_parms.c).
-*
-* In the operation list constructed by set_mdsteps(), the forces in each
-* period from the last update of the gauge field to the next are ordered
-* such that the gauge force comes first. The fermion forces are ordered
-* according to their index.
-*
-*******************************************************************************/
+ *
+ * File mdsteps.c
+ *
+ * Copyright (C) 2011, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Molecular-dynamics integrator
+ *
+ * The externally accessible functions are
+ *
+ *   void set_mdsteps(void)
+ *     Constructs the integrator from the data available in the parameter
+ *     data base (see the notes). The integrator is stored internally in
+ *     the form of an array of elementary operations (force computations
+ *     and gauge-field update steps).
+ *
+ *   mdstep_t *mdsteps(int *nop,int *ntu,int *itu)
+ *     Returns the array of elementary operations that describe the current
+ *     integrator. On exit the program assigns the total number of operations
+ *     to nop and the index of the gauge-field update operation to itu.
+ *
+ *   void print_mdsteps(int ipr)
+ *     Prints some information on the current integrator to stdout on MPI
+ *     process 0. The program always prints the available information on
+ *     the different levels of the integrator. Whether further information
+ *     is printed depends on the 3 low bits of the print flat ipr:
+ *
+ *      if (ipr&0x1): Force descriptions
+ *
+ *      if (ipr&0x2): List of elementary operations
+ *
+ *      if (ipr&0x4): Integration time check
+ *
+ *     The full information is thus printed if ipr=0x7.
+ *
+ * Notes:
+ *
+ * The structure of the MD integrator is explained in the file README.mdint
+ * in this directory. It is assumed here that the parameters of the integrator
+ * have been entered to the parameter data base.
+ *
+ * An elementary update step is described by a structure of type mdstep_t
+ * with the following elements:
+ *
+ *  iop     Operation index (0<=iop<=itu+1). If iop<itu, the force number
+ *          iop is to be computed and to be assigned (gauge force) or added
+ *          (fermion forces) to the force field. If iop=itu, the momentum
+ *          and subsequently the gauge field are to be updated, using the
+ *          current force field. If iop=itu+1, the momentum field is to be
+ *          updated, using the current force, and the integration ends.
+ *
+ *  eps     Step sizes by which the forces (iop<itu) or the momentum field
+ *          in the update of the gauge field must be multiplied.
+ *
+ * The forces are described by the structures returned by force_parms(iop)
+ * if iop<itu (see flags/force_parms.c).
+ *
+ * In the operation list constructed by set_mdsteps(), the forces in each
+ * period from the last update of the gauge field to the next are ordered
+ * such that the gauge force comes first. The fermion forces are ordered
+ * according to their index.
+ *
+ *******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>

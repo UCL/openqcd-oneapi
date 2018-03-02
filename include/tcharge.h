@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File tcharge.h
-*
-* Copyright (C) 2010, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File tcharge.h
+ *
+ * Copyright (C) 2010, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef TCHARGE_H
 #define TCHARGE_H

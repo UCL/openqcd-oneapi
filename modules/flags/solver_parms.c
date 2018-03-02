@@ -1,107 +1,107 @@
 
 /*******************************************************************************
-*
-* File solver_parms.c
-*
-* Copyright (C) 2011, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Solver parameter data base
-*
-* The externally accessible functions are
-*
-*   solver_parms_t set_solver_parms(int isp,solver_t solver,
-*                                   int nkv,int isolv,int nmr,int ncy,
-*                                   int nmx,double res)
-*     Sets the parameters in the solver parameter set number isp and returns
-*     a structure containing them (see the notes).
-*
-*   solver_parms_t solver_parms(int isp)
-*     Returns a structure containing the solver parameter set number
-*     isp (see the notes).
-*
-*   void read_solver_parms(int isp)
-*     On process 0, this program scans stdin for a line starting with the
-*     string "[Solver <int>]" (after any number of blanks), where <int> is
-*     the integer value passed by the argument. An error occurs if no such
-*     line or more than one is found. The lines
-*
-*       solver  <solver_t>
-*       nkv     <int>
-*       isolv   <int>
-*       nmr     <int>
-*       ncy     <int>
-*       nmx     <int>
-*       res     <double>
-*
-*     are then read one by one using read_line() [utils/mutils.c]. The
-*     lines with tags nkv,..,ncy may be absent in the case of the CGNE
-*     and MSCG solvers (see the notes). The data are then added to the
-*     data base by calling set_solver_parms(isp,...).
-*
-*   void print_solver_parms(int *isap,int *idfl)
-*     Prints the parameters of the defined solvers to stdout on MPI
-*     process 0. On exit the flag isap is 1 or 0 depending on whether
-*     one of the solvers makes use of the Schwarz Alternating Procedure
-*     (SAP) or not. Similarly, the flag idfl is set 1 or 0 depending on
-*     whether deflation is used or not. On MPI processes other than 0,
-*     the program does nothing and sets isap and idfl to zero.
-*
-*   void write_solver_parms(FILE *fdat)
-*     Writes the parameters of the defined solvers to the file fdat on
-*     MPI process 0.
-*
-*   void check_solver_parms(FILE *fdat)
-*     Compares the parameters of the defined solvers with those stored
-*     on the file fdat on MPI process 0, assuming the latter were written
-*     to the file by the program write_solver_parms() (mismatches of the
-*     maximal solver iteration number are not considered to be an error).
-*
-* Notes:
-*
-* The elements of a structure of type solver_parms_t are
-*
-*   solver  Solver program used. This parameter is an enum type with
-*           one of the following values:
-*
-*            CGNE           Program tmcg() [forces/tmcg.c].
-*
-*            MSCG           Program tmcgm() [forces/tmcgm.c].
-*
-*            SAP_GCR        Program sap_gcr() [sap/sap_gcr.c].
-*
-*            DFL_SAP_GCR    Program dfl_sap_gcr() [dfl/dfl_sap_gcr.c].
-*
-*   nkv     Maximal number of Krylov vectors generated before the GCR
-*           algorithm is restarted if solver=*_GCR.
-*
-*   isolv   Block solver to be used if solver=*SAP_GCR (0: plain MinRes,
-*           1: eo-preconditioned MinRes).
-*
-*   nmr     Number of block solver iterations if solver=*SAP_GCR.
-*
-*   ncy     Number of SAP cycles to be applied if solver=*SAP_GCR.
-*
-*   nmx     Maximal number of CG iterations if solver={CGNE,MSCG} or
-*           maximal total number of Krylov vectors that may be generated
-*           if solver={SAP_GCR,DFL_SAP_GCR}.
-*
-*   res     Desired maximal relative residue of the calculated solution.
-*
-* Depending on the solver, some parameters are not used. These are set to
-* zero by the program set_solver_parms() independently of the values of
-* the arguments.
-*
-* Up to 32 solver parameter sets, labeled by an index isp=0,1,..,31, can
-* be specified. Once a set is specified, it cannot be changed by calling
-* set_solver_parms() again. Solver parameters must be globally the same.
-*
-* Except for solver_parms(), the programs in this module perform global
-* operations and must be called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File solver_parms.c
+ *
+ * Copyright (C) 2011, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Solver parameter data base
+ *
+ * The externally accessible functions are
+ *
+ *   solver_parms_t set_solver_parms(int isp,solver_t solver,
+ *                                   int nkv,int isolv,int nmr,int ncy,
+ *                                   int nmx,double res)
+ *     Sets the parameters in the solver parameter set number isp and returns
+ *     a structure containing them (see the notes).
+ *
+ *   solver_parms_t solver_parms(int isp)
+ *     Returns a structure containing the solver parameter set number
+ *     isp (see the notes).
+ *
+ *   void read_solver_parms(int isp)
+ *     On process 0, this program scans stdin for a line starting with the
+ *     string "[Solver <int>]" (after any number of blanks), where <int> is
+ *     the integer value passed by the argument. An error occurs if no such
+ *     line or more than one is found. The lines
+ *
+ *       solver  <solver_t>
+ *       nkv     <int>
+ *       isolv   <int>
+ *       nmr     <int>
+ *       ncy     <int>
+ *       nmx     <int>
+ *       res     <double>
+ *
+ *     are then read one by one using read_line() [utils/mutils.c]. The
+ *     lines with tags nkv,..,ncy may be absent in the case of the CGNE
+ *     and MSCG solvers (see the notes). The data are then added to the
+ *     data base by calling set_solver_parms(isp,...).
+ *
+ *   void print_solver_parms(int *isap,int *idfl)
+ *     Prints the parameters of the defined solvers to stdout on MPI
+ *     process 0. On exit the flag isap is 1 or 0 depending on whether
+ *     one of the solvers makes use of the Schwarz Alternating Procedure
+ *     (SAP) or not. Similarly, the flag idfl is set 1 or 0 depending on
+ *     whether deflation is used or not. On MPI processes other than 0,
+ *     the program does nothing and sets isap and idfl to zero.
+ *
+ *   void write_solver_parms(FILE *fdat)
+ *     Writes the parameters of the defined solvers to the file fdat on
+ *     MPI process 0.
+ *
+ *   void check_solver_parms(FILE *fdat)
+ *     Compares the parameters of the defined solvers with those stored
+ *     on the file fdat on MPI process 0, assuming the latter were written
+ *     to the file by the program write_solver_parms() (mismatches of the
+ *     maximal solver iteration number are not considered to be an error).
+ *
+ * Notes:
+ *
+ * The elements of a structure of type solver_parms_t are
+ *
+ *   solver  Solver program used. This parameter is an enum type with
+ *           one of the following values:
+ *
+ *            CGNE           Program tmcg() [forces/tmcg.c].
+ *
+ *            MSCG           Program tmcgm() [forces/tmcgm.c].
+ *
+ *            SAP_GCR        Program sap_gcr() [sap/sap_gcr.c].
+ *
+ *            DFL_SAP_GCR    Program dfl_sap_gcr() [dfl/dfl_sap_gcr.c].
+ *
+ *   nkv     Maximal number of Krylov vectors generated before the GCR
+ *           algorithm is restarted if solver=*_GCR.
+ *
+ *   isolv   Block solver to be used if solver=*SAP_GCR (0: plain MinRes,
+ *           1: eo-preconditioned MinRes).
+ *
+ *   nmr     Number of block solver iterations if solver=*SAP_GCR.
+ *
+ *   ncy     Number of SAP cycles to be applied if solver=*SAP_GCR.
+ *
+ *   nmx     Maximal number of CG iterations if solver={CGNE,MSCG} or
+ *           maximal total number of Krylov vectors that may be generated
+ *           if solver={SAP_GCR,DFL_SAP_GCR}.
+ *
+ *   res     Desired maximal relative residue of the calculated solution.
+ *
+ * Depending on the solver, some parameters are not used. These are set to
+ * zero by the program set_solver_parms() independently of the values of
+ * the arguments.
+ *
+ * Up to 32 solver parameter sets, labeled by an index isp=0,1,..,31, can
+ * be specified. Once a set is specified, it cannot be changed by calling
+ * set_solver_parms() again. Solver parameters must be globally the same.
+ *
+ * Except for solver_parms(), the programs in this module perform global
+ * operations and must be called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define SOLVER_PARMS_C
 

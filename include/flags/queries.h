@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File flags/queries.h
-*
-* Copyright (C) 2009-2012, 2016 Martin Luescher, Isabel Campos
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Query descriptions
-*
-*******************************************************************************/
+ *
+ * File flags/queries.h
+ *
+ * Copyright (C) 2009-2012, 2016 Martin Luescher, Isabel Campos
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Query descriptions
+ *
+ *******************************************************************************/
 
 #define QUERIES_H
 
@@ -68,10 +68,7 @@ static int QueryAwhatUp2date(void)
   return ((lat.ud.tag > 0) && check_state(&lat.awh, &lat.ud));
 }
 
-static int QueryUdIsClean(void)
-{
-  return lat.ud.state == 0;
-}
+static int QueryUdIsClean(void) { return lat.ud.state == 0; }
 
 static int QueryUdIsSmeared(void)
 {

@@ -1,87 +1,87 @@
 
 /*******************************************************************************
-*
-* File fgcr.c
-*
-* Copyright (C) 2005, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Generic flexible GCR solver program for the lattice Dirac equation.
-*
-* The externally accessible function is
-*
-*   double fgcr(int vol,int icom,
-*               void (*Dop)(spinor_dble *s,spinor_dble *r),
-*               void (*Mop)(int k,spinor *rho,spinor *phi,spinor *chi),
-*               spinor **ws,spinor_dble **wsd,int nkv,int nmx,double res,
-*               spinor_dble *eta,spinor_dble *psi,int *status)
-*     Solution of the Dirac equation D*psi=eta for given source eta, using
-*     the preconditioned GCR algorithm. See the notes for the explanation
-*     of the parameters of the program.
-*
-* Notes:
-*
-* This program uses single-precision arithmetic to reduce the execution
-* time, but obtains the solution with double-precision accuracy.
-*
-* The programs Dop() and Mop() for the operator D and the preconditioner M
-* are assumed to have the following properties:
-*
-*   void Dop(spinor_dble *s,spinor_dble *r)
-*     Application of the operator D to the Dirac field s and assignment of
-*     the result to r. On exit s may be changed but must satisfy D*s=r.
-*
-*   void Mop(int k,spinor *rho,spinor *phi,spinor *chi)
-*     Approximate solution of the equation D*phi=rho in the k'th step of
-*     the GCR algorithm. On exit rho is unchanged and chi=D*phi.
-*
-* Mop() is not required to be a linear operator and may involve an iterative
-* procedure with a dynamical stopping criterion, for example. The field phi
-* merely defines the next search direction and can in principle be chosen
-* arbitrarily.
-*
-* The other parameters of the program fgcr() are:
-*
-*   vol     Number of spinors in the Dirac fields.
-*
-*   icom    Indicates whether the equation to be solved is a local
-*           equation (icom=0) or a global one (icom=1). Scalar products
-*           are summed over all MPI processes if icom=1, while no
-*           communications are performed if icom=0.
-*
-*   nkv     Maximal number of Krylov vectors generated before the GCR
-*           algorithm is restarted.
-*
-*   nmx     Maximal total number of Krylov vectors that may be generated.
-*
-*   res     Desired maximal relative residue |eta-D*psi|/|eta| of the
-*           calculated solution.
-*
-*   ws      Array of at least 2*nkv+1 single-precision spinor fields
-*           (used as work space).
-*
-*   wsd     Array of at least 1 double-precision spinor field (used
-*           as work space).
-*
-*   eta     Source field (unchanged on exit).
-*
-*   psi     Calculated approximate solution of the Dirac equation
-*           D*psi=eta.
-*
-*   status  On exit, this parameter reports the total number of Krylov
-*           vectors that were generated, or a negative value if the
-*           program failed.
-*
-* Independently of whether the program succeeds in solving the Dirac equation
-* to the desired accuracy, the program returns the norm of the residue of
-* the field psi.
-*
-* Some debugging output is printed to stdout on process 0 if FGCR_DBG is
-* defined at compilation time.
-*
-*******************************************************************************/
+ *
+ * File fgcr.c
+ *
+ * Copyright (C) 2005, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Generic flexible GCR solver program for the lattice Dirac equation.
+ *
+ * The externally accessible function is
+ *
+ *   double fgcr(int vol,int icom,
+ *               void (*Dop)(spinor_dble *s,spinor_dble *r),
+ *               void (*Mop)(int k,spinor *rho,spinor *phi,spinor *chi),
+ *               spinor **ws,spinor_dble **wsd,int nkv,int nmx,double res,
+ *               spinor_dble *eta,spinor_dble *psi,int *status)
+ *     Solution of the Dirac equation D*psi=eta for given source eta, using
+ *     the preconditioned GCR algorithm. See the notes for the explanation
+ *     of the parameters of the program.
+ *
+ * Notes:
+ *
+ * This program uses single-precision arithmetic to reduce the execution
+ * time, but obtains the solution with double-precision accuracy.
+ *
+ * The programs Dop() and Mop() for the operator D and the preconditioner M
+ * are assumed to have the following properties:
+ *
+ *   void Dop(spinor_dble *s,spinor_dble *r)
+ *     Application of the operator D to the Dirac field s and assignment of
+ *     the result to r. On exit s may be changed but must satisfy D*s=r.
+ *
+ *   void Mop(int k,spinor *rho,spinor *phi,spinor *chi)
+ *     Approximate solution of the equation D*phi=rho in the k'th step of
+ *     the GCR algorithm. On exit rho is unchanged and chi=D*phi.
+ *
+ * Mop() is not required to be a linear operator and may involve an iterative
+ * procedure with a dynamical stopping criterion, for example. The field phi
+ * merely defines the next search direction and can in principle be chosen
+ * arbitrarily.
+ *
+ * The other parameters of the program fgcr() are:
+ *
+ *   vol     Number of spinors in the Dirac fields.
+ *
+ *   icom    Indicates whether the equation to be solved is a local
+ *           equation (icom=0) or a global one (icom=1). Scalar products
+ *           are summed over all MPI processes if icom=1, while no
+ *           communications are performed if icom=0.
+ *
+ *   nkv     Maximal number of Krylov vectors generated before the GCR
+ *           algorithm is restarted.
+ *
+ *   nmx     Maximal total number of Krylov vectors that may be generated.
+ *
+ *   res     Desired maximal relative residue |eta-D*psi|/|eta| of the
+ *           calculated solution.
+ *
+ *   ws      Array of at least 2*nkv+1 single-precision spinor fields
+ *           (used as work space).
+ *
+ *   wsd     Array of at least 1 double-precision spinor field (used
+ *           as work space).
+ *
+ *   eta     Source field (unchanged on exit).
+ *
+ *   psi     Calculated approximate solution of the Dirac equation
+ *           D*psi=eta.
+ *
+ *   status  On exit, this parameter reports the total number of Krylov
+ *           vectors that were generated, or a negative value if the
+ *           program failed.
+ *
+ * Independently of whether the program succeeds in solving the Dirac equation
+ * to the desired accuracy, the program returns the norm of the residue of
+ * the field psi.
+ *
+ * Some debugging output is printed to stdout on process 0 if FGCR_DBG is
+ * defined at compilation time.
+ *
+ *******************************************************************************/
 
 #define FGCR_C
 

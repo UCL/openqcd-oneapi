@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File dirac.h
-*
-* Copyright (C) 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File dirac.h
+ *
+ * Copyright (C) 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef DIRAC_H
 #define DIRAC_H

@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File utils.h
-*
-* Copyright (C) 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File utils.h
+ *
+ * Copyright (C) 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef UTILS_H
 #define UTILS_H

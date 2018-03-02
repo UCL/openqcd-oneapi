@@ -1,48 +1,48 @@
 
 /*******************************************************************************
-*
-* File ftidx.c
-*
-* Copyright (C) 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Labeling of the field tensor components on the faces of the local lattice.
-*
-* The externally accessible functions are
-*
-*   ftidx_t *ftidx(void)
-*     Returns an array idx[6] of ftidx_t structures containing the offsets
-*     of the field tensor components on the boundaries of the local lattice
-*     (see the file README.ftidx).
-*
-*   void plaq_ftidx(int n,int ix,int *ip)
-*     Calculates the offsets ip[4] of the field tensor components at the
-*     corners of the (mu,nu)-plaquette at the point in the local lattice
-*     with label ix. The indices (mu,nu) are determined by the parameter
-*     n=0,..,5 (see the notes).
-*
-* Notes:
-*
-* For a detailed description of the layout of the field tensor array see the
-* file README.ftidx in this directory.
-*
-* There are six planes
-*
-*  (mu,nu)={(0,1),(0,2),(0,3),(2,3),(3,1),(1,2)}
-*
-* which may labeled by an integer n running from 0 to 5. The corners in
-* the (mu,nu)-plaquette at the point x are ordered such that
-*
-*   ip[0] -> F_{mu nu}(x)
-*   ip[1] -> F_{mu nu}(x+mu)
-*   ip[2] -> F_{mu nu}(x+nu)
-*   ip[3] -> F_{mu nu}(x+mu+nu)
-*
-* In the program plaq_ftidx() it is taken for granted that 0<=ix<VOLUME.
-*
-*******************************************************************************/
+ *
+ * File ftidx.c
+ *
+ * Copyright (C) 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Labeling of the field tensor components on the faces of the local lattice.
+ *
+ * The externally accessible functions are
+ *
+ *   ftidx_t *ftidx(void)
+ *     Returns an array idx[6] of ftidx_t structures containing the offsets
+ *     of the field tensor components on the boundaries of the local lattice
+ *     (see the file README.ftidx).
+ *
+ *   void plaq_ftidx(int n,int ix,int *ip)
+ *     Calculates the offsets ip[4] of the field tensor components at the
+ *     corners of the (mu,nu)-plaquette at the point in the local lattice
+ *     with label ix. The indices (mu,nu) are determined by the parameter
+ *     n=0,..,5 (see the notes).
+ *
+ * Notes:
+ *
+ * For a detailed description of the layout of the field tensor array see the
+ * file README.ftidx in this directory.
+ *
+ * There are six planes
+ *
+ *  (mu,nu)={(0,1),(0,2),(0,3),(2,3),(3,1),(1,2)}
+ *
+ * which may labeled by an integer n running from 0 to 5. The corners in
+ * the (mu,nu)-plaquette at the point x are ordered such that
+ *
+ *   ip[0] -> F_{mu nu}(x)
+ *   ip[1] -> F_{mu nu}(x+mu)
+ *   ip[2] -> F_{mu nu}(x+nu)
+ *   ip[3] -> F_{mu nu}(x+mu+nu)
+ *
+ * In the program plaq_ftidx() it is taken for granted that 0<=ix<VOLUME.
+ *
+ *******************************************************************************/
 
 #define FTIDX_C
 

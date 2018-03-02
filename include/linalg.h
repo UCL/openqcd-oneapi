@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File linalg.h
-*
-* Copyright (C) 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File linalg.h
+ *
+ * Copyright (C) 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef LINALG_H
 #define LINALG_H

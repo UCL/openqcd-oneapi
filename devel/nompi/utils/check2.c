@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Test of the program fdigits()
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Test of the program fdigits()
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,58 +1,58 @@
 
 /*******************************************************************************
-*
-* File sw_term.c
-*
-* Copyright (C) 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of the SW term.
-*
-* The externally accessible functions are
-*
-*   int sw_term(ptset_t set)
-*     Computes the SW term for the current double-precision gauge field
-*     and assigns the matrix to the global double-precision SW field. The
-*     matrices on the specified point set are then inverted and 0 or 1
-*     is returned depending on whether all inversions were safe or not.
-*
-* Notes:
-*
-* The program sets the SW term to unity at global time
-*
-*  x0=0                (open, SF and open-SF boundary conditions),
-*
-*  x0=NPROC0*L0-1      (open boundary conditions).
-*
-* In all other cases, it is given by
-*
-*    c(x0)+csw*(i/4)*sigma_{mu nu}*Fhat_{mu nu}(x)
-*
-* where
-*
-*    c(x0) = 4+m0+cF[0]-1     if x0=1 (open, SF or open-SF bc),
-*            4+m0+cF[1]-1     if x0=NPROCO*L0-2 (open bc),
-*                             or x0=NPROC0*L0-1 (SF or open-SF bc),
-*            4+m0             otherwise,
-*
-*    sigma_{mu nu}=(i/2)*[gamma_mu,gamma_nu],
-*
-* and Fhat_{mu nu} is the standard (clover) expression for the gauge field
-* tensor as computed by the program ftensor() [tcharge/ftensor.c]. The upper
-* and lower 6x6 blocks of the matrix are stored in the pauli_dble structures
-* swd[2*ix] and swd[2*ix+1], where ix is the label of the point x.
-*
-* The quark mass m0 and the improvement coefficients csw and cF are obtained
-* from the parameter data base by calling sw_parms() [flags/lat_parms.c]. Note
-* that this program checks the flags data base and only computes those parts
-* of the SW array that do not already have the correct values.
-*
-* This program performs global operations and must be called simultaneously
-* on all processes.
-*
-*******************************************************************************/
+ *
+ * File sw_term.c
+ *
+ * Copyright (C) 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of the SW term.
+ *
+ * The externally accessible functions are
+ *
+ *   int sw_term(ptset_t set)
+ *     Computes the SW term for the current double-precision gauge field
+ *     and assigns the matrix to the global double-precision SW field. The
+ *     matrices on the specified point set are then inverted and 0 or 1
+ *     is returned depending on whether all inversions were safe or not.
+ *
+ * Notes:
+ *
+ * The program sets the SW term to unity at global time
+ *
+ *  x0=0                (open, SF and open-SF boundary conditions),
+ *
+ *  x0=NPROC0*L0-1      (open boundary conditions).
+ *
+ * In all other cases, it is given by
+ *
+ *    c(x0)+csw*(i/4)*sigma_{mu nu}*Fhat_{mu nu}(x)
+ *
+ * where
+ *
+ *    c(x0) = 4+m0+cF[0]-1     if x0=1 (open, SF or open-SF bc),
+ *            4+m0+cF[1]-1     if x0=NPROCO*L0-2 (open bc),
+ *                             or x0=NPROC0*L0-1 (SF or open-SF bc),
+ *            4+m0             otherwise,
+ *
+ *    sigma_{mu nu}=(i/2)*[gamma_mu,gamma_nu],
+ *
+ * and Fhat_{mu nu} is the standard (clover) expression for the gauge field
+ * tensor as computed by the program ftensor() [tcharge/ftensor.c]. The upper
+ * and lower 6x6 blocks of the matrix are stored in the pauli_dble structures
+ * swd[2*ix] and swd[2*ix+1], where ix is the label of the point x.
+ *
+ * The quark mass m0 and the improvement coefficients csw and cF are obtained
+ * from the parameter data base by calling sw_parms() [flags/lat_parms.c]. Note
+ * that this program checks the flags data base and only computes those parts
+ * of the SW array that do not already have the correct values.
+ *
+ * This program performs global operations and must be called simultaneously
+ * on all processes.
+ *
+ *******************************************************************************/
 
 #define SW_TERM_C
 

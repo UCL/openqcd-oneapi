@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2012, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Gauge and translation invariance of the gauge action.
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2012, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Gauge and translation invariance of the gauge action.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

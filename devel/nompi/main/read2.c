@@ -1,21 +1,21 @@
 /*******************************************************************************
-*
-* File read2.c
-*
-* Copyright (C) 2012-2014 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Reads and evaluates data from the data files created by the program ms1.
-* The file to be read has to be specified on the command line.
-*
-* This program writes the history of the measured normalized reweighting
-* factors to the file <run name>.run2.dat in the plots directory. The
-* associated integrated  autocorrelation times are estimated and printed
-* to stdout.
-*
-*******************************************************************************/
+ *
+ * File read2.c
+ *
+ * Copyright (C) 2012-2014 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Reads and evaluates data from the data files created by the program ms1.
+ * The file to be read has to be specified on the command line.
+ *
+ * This program writes the history of the measured normalized reweighting
+ * factors to the file <run name>.run2.dat in the plots directory. The
+ * associated integrated  autocorrelation times are estimated and printed
+ * to stdout.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

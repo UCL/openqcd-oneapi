@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2007, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Allocation and initialization of the global vector fields
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2007, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Allocation and initialization of the global vector fields
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

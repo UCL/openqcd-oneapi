@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File lattice.h
-*
-* Copyright (C) 2011, 2012, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File lattice.h
+ *
+ * Copyright (C) 2011, 2012, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef LATTICE_H
 #define LATTICE_H

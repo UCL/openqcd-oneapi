@@ -1,37 +1,37 @@
 
 /*******************************************************************************
-*
-* File mdint.c
-*
-* Copyright (C) 2011-2013 Stefan Schaefer, Martin Luescher, John Bulava
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Integration of the molecular-dynamics equations.
-*
-* The externally accessible functions are
-*
-*   void run_mdint(void)
-*     Integrates the molecular-dynamics equations using the current
-*     integrator (see the notes).
-*
-* Notes:
-*
-* The integrator used is the one defined by the array of elementary operations
-* returned by mdsteps() (see update/mdsteps.c). It is assumed that the fields
-* and the integrator have been properly initialized.
-*
-* In the course of the integration, the solver iteration numbers are added
-* to the appropriate counters provided by the module update/counters.c.
-*
-* The program in this module performs global communications and must be
-* called simultaneously on all MPI processes.
-*
-* Some debugging information is printed to stdout if the macro MDINT_DBG is
-* defined. The norm of the forces printed is the norm per active link.
-*
-*******************************************************************************/
+ *
+ * File mdint.c
+ *
+ * Copyright (C) 2011-2013 Stefan Schaefer, Martin Luescher, John Bulava
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Integration of the molecular-dynamics equations.
+ *
+ * The externally accessible functions are
+ *
+ *   void run_mdint(void)
+ *     Integrates the molecular-dynamics equations using the current
+ *     integrator (see the notes).
+ *
+ * Notes:
+ *
+ * The integrator used is the one defined by the array of elementary operations
+ * returned by mdsteps() (see update/mdsteps.c). It is assumed that the fields
+ * and the integrator have been properly initialized.
+ *
+ * In the course of the integration, the solver iteration numbers are added
+ * to the appropriate counters provided by the module update/counters.c.
+ *
+ * The program in this module performs global communications and must be
+ * called simultaneously on all MPI processes.
+ *
+ * Some debugging information is printed to stdout if the macro MDINT_DBG is
+ * defined. The norm of the forces printed is the norm per active link.
+ *
+ *******************************************************************************/
 
 #define MDINT_C
 
@@ -216,8 +216,9 @@ static void dfl_upd(int isp)
     if (sp.solver == DFL_SAP_GCR) {
       dfl_update2(nsm, status);
       error_root((status[1] < 0) || ((status[1] == 0) && (status[0] < 0)), 1,
-                 "dfl_upd [mdint.c]", "Deflation subspace update "
-                                      "failed (status = %d;%d)",
+                 "dfl_upd [mdint.c]",
+                 "Deflation subspace update "
+                 "failed (status = %d;%d)",
                  status[0], status[1]);
 
       if (status[1] == 0)

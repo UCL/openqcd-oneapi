@@ -1,26 +1,26 @@
 
 /*******************************************************************************
-*
-* File gauss.c
-*
-* Copyright (C) 2005 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Generation of Gaussian random numbers
-*
-* The externally accessible functions are
-*
-*   void gauss(float r[],int n)
-*     Generates n single-precision Gaussian random numbers x with distribution
-*     proportional to exp(-x^2) and assigns them to r[0],..,r[n-1]
-*
-*   void gauss_dble(double rd[],int n)
-*     Generates n double-precision Gaussian random numbers x with distribution
-*     proportional to exp(-x^2) and assigns them to rd[0],..,rd[n-1]
-*
-*******************************************************************************/
+ *
+ * File gauss.c
+ *
+ * Copyright (C) 2005 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Generation of Gaussian random numbers
+ *
+ * The externally accessible functions are
+ *
+ *   void gauss(float r[],int n)
+ *     Generates n single-precision Gaussian random numbers x with distribution
+ *     proportional to exp(-x^2) and assigns them to r[0],..,r[n-1]
+ *
+ *   void gauss_dble(double rd[],int n)
+ *     Generates n double-precision Gaussian random numbers x with distribution
+ *     proportional to exp(-x^2) and assigns them to rd[0],..,rd[n-1]
+ *
+ *******************************************************************************/
 
 #define GAUSS_C
 

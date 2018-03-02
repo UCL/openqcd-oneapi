@@ -1,45 +1,45 @@
 
 /*******************************************************************************
-*
-* File vcom.c
-*
-* Copyright (C) 2007, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Communication functions for the global single-precision vector fields.
-*
-*   void cpv_int_bnd(complex *v)
-*     Copies the components of the field v on the interior boundary of
-*     the local block lattice to the corresponding field components at
-*     the exterior boundaries of the block lattices on the neighbouring
-*     MPI processes.
-*
-*   void cpv_ext_bnd(complex *v)
-*     *Adds* the components of the field v on the exterior boundary of
-*     the local block lattice to the corresponding field components on
-*     the interior boundaries of the block lattices on the neighbouring
-*     MPI processes.
-*
-* Notes:
-*
-* The fields passed to cpv_int_bnd() and cpv_ext_bnd() are interpreted as
-* elements of the deflation subspace spanned by the Ns local modes in the
-* DFL_BLOCKS block grid. They must have at least Ns*(nb+nbb/2) elements,
-* where nb and nbb are the numbers blocks in the DFL_BLOCKS grid and its
-* exterior boundary (see dfl/dfl_geometry.c for further explanations).
-*
-* In the case of boundary conditions of type 0,1 and 2, the programs do not
-* copy any components of the fields across the boundaries of the lattice at
-* global time 0 and NPROC0*L0-1. The program cpv_int_bnd() instead sets the
-* field at the exterior boundaries of the block lattice at these times to
-* zero.
-*
-* All these programs involve global communications and must be called on all
-* MPI processes simultaneously.
-*
-*******************************************************************************/
+ *
+ * File vcom.c
+ *
+ * Copyright (C) 2007, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Communication functions for the global single-precision vector fields.
+ *
+ *   void cpv_int_bnd(complex *v)
+ *     Copies the components of the field v on the interior boundary of
+ *     the local block lattice to the corresponding field components at
+ *     the exterior boundaries of the block lattices on the neighbouring
+ *     MPI processes.
+ *
+ *   void cpv_ext_bnd(complex *v)
+ *     *Adds* the components of the field v on the exterior boundary of
+ *     the local block lattice to the corresponding field components on
+ *     the interior boundaries of the block lattices on the neighbouring
+ *     MPI processes.
+ *
+ * Notes:
+ *
+ * The fields passed to cpv_int_bnd() and cpv_ext_bnd() are interpreted as
+ * elements of the deflation subspace spanned by the Ns local modes in the
+ * DFL_BLOCKS block grid. They must have at least Ns*(nb+nbb/2) elements,
+ * where nb and nbb are the numbers blocks in the DFL_BLOCKS grid and its
+ * exterior boundary (see dfl/dfl_geometry.c for further explanations).
+ *
+ * In the case of boundary conditions of type 0,1 and 2, the programs do not
+ * copy any components of the fields across the boundaries of the lattice at
+ * global time 0 and NPROC0*L0-1. The program cpv_int_bnd() instead sets the
+ * field at the exterior boundaries of the block lattice at these times to
+ * zero.
+ *
+ * All these programs involve global communications and must be called on all
+ * MPI processes simultaneously.
+ *
+ *******************************************************************************/
 
 #define VCOM_C
 

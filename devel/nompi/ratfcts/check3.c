@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check3.c
-*
-* Copyright (C) 2008 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Zolotarev rational approximation to the function f(x)=1/|x|
-*
-*******************************************************************************/
+ *
+ * File check3.c
+ *
+ * Copyright (C) 2008 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Zolotarev rational approximation to the function f(x)=1/|x|
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

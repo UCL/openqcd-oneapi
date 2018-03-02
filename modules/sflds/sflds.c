@@ -1,73 +1,73 @@
 
 /*******************************************************************************
-*
-* File sflds.c
-*
-* Copyright (C) 2005, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Generic assignment and initialization programs for single- and double-
-* precision spinor fields
-*
-* The externally accessible functions are
-*
-*   void set_s2zero(int vol,spinor *s)
-*     Sets the single-precision spinor field s to zero.
-*
-*   void set_sd2zero(int vol,spinor_dble *sd)
-*     Sets the double-precision spinor field sd to zero.
-*
-*   void random_s(int vol,spinor *s,float sigma)
-*     Initializes the components of the single-precision field s
-*     to (complex) random values z with distribution proportional
-*     to exp{-|z|^2/sigma^2}.
-*
-*   void random_sd(int vol,spinor_dble *sd,double sigma)
-*     Initializes the components of the double-precision field sd
-*     to (complex) random values z with distribution proportional
-*     to exp{-|z|^2/sigma^2}.
-*
-*   void assign_s2s(int vol,spinor *s,spinor *r)
-*     Assigns the single-precision field s to the single-precision
-*     field r.
-*
-*   void assign_s2sd(int vol,spinor *s,spinor_dble *rd)
-*     Assigns the single-precision field s to the double-precision
-*     field rd.
-*
-*   void assign_sd2s(int vol,spinor_dble *sd,spinor *r)
-*     Assigns the double-precision field sd to the single-precision
-*     field r.
-*
-*   void assign_sd2sd(int vol,spinor_dble *sd,spinor_dble *rd)
-*     Assigns the double-precision field sd to the double-precision
-*     field rd.
-*
-*   void diff_s2s(int vol,spinor *s,spinor *r)
-*     Assigns the difference s-r of the single-precision fields s and
-*     r to r.
-*
-*   void add_s2sd(int vol,spinor *s,spinor_dble *rd)
-*     Adds the single-precision field s to the double-precision field
-*     rd.
-*
-*   void diff_sd2s(int vol,spinor_dble *sd,spinor_dble *rd,spinor *r)
-*     Assigns the difference sd-rd of the double-precision fields sd
-*     and rd to the single-precision field r.
-*
-* Notes:
-*
-* All these programs operate on arrays of spinor fields, whose base address
-* is passed through the arguments. The length of the arrays is specified by
-* the parameter vol.
-*
-* Since no communications are performed, all programs in this file can be
-* called locally. If SSE instructions are used, the fields must be aligned
-* to a 16 byte boundary.
-*
-*******************************************************************************/
+ *
+ * File sflds.c
+ *
+ * Copyright (C) 2005, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Generic assignment and initialization programs for single- and double-
+ * precision spinor fields
+ *
+ * The externally accessible functions are
+ *
+ *   void set_s2zero(int vol,spinor *s)
+ *     Sets the single-precision spinor field s to zero.
+ *
+ *   void set_sd2zero(int vol,spinor_dble *sd)
+ *     Sets the double-precision spinor field sd to zero.
+ *
+ *   void random_s(int vol,spinor *s,float sigma)
+ *     Initializes the components of the single-precision field s
+ *     to (complex) random values z with distribution proportional
+ *     to exp{-|z|^2/sigma^2}.
+ *
+ *   void random_sd(int vol,spinor_dble *sd,double sigma)
+ *     Initializes the components of the double-precision field sd
+ *     to (complex) random values z with distribution proportional
+ *     to exp{-|z|^2/sigma^2}.
+ *
+ *   void assign_s2s(int vol,spinor *s,spinor *r)
+ *     Assigns the single-precision field s to the single-precision
+ *     field r.
+ *
+ *   void assign_s2sd(int vol,spinor *s,spinor_dble *rd)
+ *     Assigns the single-precision field s to the double-precision
+ *     field rd.
+ *
+ *   void assign_sd2s(int vol,spinor_dble *sd,spinor *r)
+ *     Assigns the double-precision field sd to the single-precision
+ *     field r.
+ *
+ *   void assign_sd2sd(int vol,spinor_dble *sd,spinor_dble *rd)
+ *     Assigns the double-precision field sd to the double-precision
+ *     field rd.
+ *
+ *   void diff_s2s(int vol,spinor *s,spinor *r)
+ *     Assigns the difference s-r of the single-precision fields s and
+ *     r to r.
+ *
+ *   void add_s2sd(int vol,spinor *s,spinor_dble *rd)
+ *     Adds the single-precision field s to the double-precision field
+ *     rd.
+ *
+ *   void diff_sd2s(int vol,spinor_dble *sd,spinor_dble *rd,spinor *r)
+ *     Assigns the difference sd-rd of the double-precision fields sd
+ *     and rd to the single-precision field r.
+ *
+ * Notes:
+ *
+ * All these programs operate on arrays of spinor fields, whose base address
+ * is passed through the arguments. The length of the arrays is specified by
+ * the parameter vol.
+ *
+ * Since no communications are performed, all programs in this file can be
+ * called locally. If SSE instructions are used, the fields must be aligned
+ * to a 16 byte boundary.
+ *
+ *******************************************************************************/
 
 #define SFLDS_C
 

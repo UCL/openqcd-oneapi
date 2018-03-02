@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File nompi/extras.h
-*
-* Copyright (C) 2009, 2010, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File nompi/extras.h
+ *
+ * Copyright (C) 2009, 2010, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef EXTRAS_H
 #define EXTRAS_H

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check8.c
-*
-* Copyright (C) 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Comparison of Dw_blk_dble(),..,Dwhat_blk_dble with Dw_dble().
-*
-*******************************************************************************/
+ *
+ * File check8.c
+ *
+ * Copyright (C) 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Comparison of Dw_blk_dble(),..,Dwhat_blk_dble with Dw_dble().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -268,8 +268,9 @@ int main(int argc, char *argv[])
     if (d > dmax)
       dmax = d;
 
-    error(ie, 1, "main [check8.c]", "Dwee_blk_dble() or Dwoo_blk_dble() "
-                                    "changes the fields where it should not");
+    error(ie, 1, "main [check8.c]",
+          "Dwee_blk_dble() or Dwoo_blk_dble() "
+          "changes the fields where it should not");
 
     dmax = sqrt(dmax);
 

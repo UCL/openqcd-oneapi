@@ -1,18 +1,18 @@
 
 /*******************************************************************************
-*
-* File avx.h
-*
-* Copyright (C) 2013, 2016 Martin Luescher, Isabel Campos
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Macros for Dirac spinors, SU(3) vectors and SU(3) matrices using inline
-* assembly AVX instructions. The machine is assumed to comply with the
-* x86-64 instruction set.
-*
-*******************************************************************************/
+ *
+ * File avx.h
+ *
+ * Copyright (C) 2013, 2016 Martin Luescher, Isabel Campos
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Macros for Dirac spinors, SU(3) vectors and SU(3) matrices using inline
+ * assembly AVX instructions. The machine is assumed to comply with the
+ * x86-64 instruction set.
+ *
+ *******************************************************************************/
 
 #ifndef AVX_H
 #define AVX_H
@@ -61,31 +61,31 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #define _avx_zeroupper() __asm__ __volatile__("vzeroupper")
 
 /*******************************************************************************
-*
-* Macros operating on single precision data
-*
-*******************************************************************************/
+ *
+ * Macros operating on single precision data
+ *
+ *******************************************************************************/
 
 /*******************************************************************************
-*
-* Macros for spinors in su3_vector order
-*
-*******************************************************************************/
+ *
+ * Macros for spinors in su3_vector order
+ *
+ *******************************************************************************/
 
 /*
-* Loads two spinors sl and sh to the low and high lanes of ymm0,..,ymm5. The
-* ordering of the spinor components in the low lane is
-*
-* xmm0 <- sl.c1.c1,sl.c2.c1
-* xmm1 <- sl.c1.c2,sl.c2.c2
-* xmm2 <- sl.c1.c3,sl.c2.c3
-* xmm3 <- sl.c3.c1,sl.c4.c1
-* xmm4 <- sl.c3.c2,sl.c4.c2
-* xmm5 <- sl.c3.c3,sl.c4.c3
-*
-* and those in the high lane are arranged in the same way. The registers
-* ymm6,..,ymm11 are changed on exit.
-*/
+ * Loads two spinors sl and sh to the low and high lanes of ymm0,..,ymm5. The
+ * ordering of the spinor components in the low lane is
+ *
+ * xmm0 <- sl.c1.c1,sl.c2.c1
+ * xmm1 <- sl.c1.c2,sl.c2.c2
+ * xmm2 <- sl.c1.c3,sl.c2.c3
+ * xmm3 <- sl.c3.c1,sl.c4.c1
+ * xmm4 <- sl.c3.c2,sl.c4.c2
+ * xmm5 <- sl.c3.c3,sl.c4.c3
+ *
+ * and those in the high lane are arranged in the same way. The registers
+ * ymm6,..,ymm11 are changed on exit.
+ */
 
 #define _avx_spinor_pair_load34(sl, sh)                                        \
   __asm__ __volatile__("vmovaps %0, %%xmm6 \n\t"                               \
@@ -127,19 +127,19 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Loads two spinors sl and sh to the low and high lanes of ymm0,..,ymm5. The
-* ordering of the spinor components in the low lane is
-*
-* xmm0 <- sl.c1.c1,sl.c2.c1
-* xmm1 <- sl.c1.c2,sl.c2.c2
-* xmm2 <- sl.c1.c3,sl.c2.c3
-* xmm3 <- sl.c4.c1,sl.c3.c1       (note: unusual order)
-* xmm4 <- sl.c4.c2,sl.c3.c2
-* xmm5 <- sl.c4.c3,sl.c3.c3
-*
-* and those in the high lane are arranged in the same way. The registers
-* ymm6,..,ymm11 are changed on exit.
-*/
+ * Loads two spinors sl and sh to the low and high lanes of ymm0,..,ymm5. The
+ * ordering of the spinor components in the low lane is
+ *
+ * xmm0 <- sl.c1.c1,sl.c2.c1
+ * xmm1 <- sl.c1.c2,sl.c2.c2
+ * xmm2 <- sl.c1.c3,sl.c2.c3
+ * xmm3 <- sl.c4.c1,sl.c3.c1       (note: unusual order)
+ * xmm4 <- sl.c4.c2,sl.c3.c2
+ * xmm5 <- sl.c4.c3,sl.c3.c3
+ *
+ * and those in the high lane are arranged in the same way. The registers
+ * ymm6,..,ymm11 are changed on exit.
+ */
 
 #define _avx_spinor_pair_load43(sl, sh)                                        \
   __asm__ __volatile__("vmovaps %0, %%xmm6 \n\t"                               \
@@ -181,18 +181,18 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Loads the spinor s to xmm0,..,xmm5 in the order
-*
-* xmm0 <- s.c1.c1,s.c2.c1
-* xmm1 <- s.c1.c2,s.c2.c2
-* xmm2 <- s.c1.c3,s.c2.c3
-* xmm3 <- s.c3.c1,s.c4.c1
-* xmm4 <- s.c3.c2,s.c4.c2
-* xmm5 <- s.c3.c3,s.c4.c3
-*
-* and duplicates these values to the upper lanes of ymm0,..ymm5. The registers
-* ymm6,..,ymm11 are changed on exit.
-*/
+ * Loads the spinor s to xmm0,..,xmm5 in the order
+ *
+ * xmm0 <- s.c1.c1,s.c2.c1
+ * xmm1 <- s.c1.c2,s.c2.c2
+ * xmm2 <- s.c1.c3,s.c2.c3
+ * xmm3 <- s.c3.c1,s.c4.c1
+ * xmm4 <- s.c3.c2,s.c4.c2
+ * xmm5 <- s.c3.c3,s.c4.c3
+ *
+ * and duplicates these values to the upper lanes of ymm0,..ymm5. The registers
+ * ymm6,..,ymm11 are changed on exit.
+ */
 
 #define _avx_spinor_load_dup(s)                                                \
   __asm__ __volatile__("vbroadcastf128 %0, %%ymm6 \n\t"                        \
@@ -220,11 +220,11 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Stores the low and high lanes of ymm0,..,ymm5 to the spinors rl and rh,
-* assuming the spinor components are ordered as if they were loaded with
-* _avx_spinor_pair_load34(rl,rh). The registers ymm6,..,ymm11 are changed
-* on exit.
-*/
+ * Stores the low and high lanes of ymm0,..,ymm5 to the spinors rl and rh,
+ * assuming the spinor components are ordered as if they were loaded with
+ * _avx_spinor_pair_load34(rl,rh). The registers ymm6,..,ymm11 are changed
+ * on exit.
+ */
 
 #define _avx_spinor_pair_store34(rl, rh)                                       \
   __asm__ __volatile__("vshufps $0x44, %%ymm1, %%ymm0, %%ymm6 \n\t"            \
@@ -261,11 +261,11 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "=m"((rh).c4.c1), "=m"((rh).c4.c2), "=m"((rh).c4.c3))
 
 /*
-* Stores the low and high lanes of ymm0,..,ymm5 to the spinors rl and rh,
-* assuming the spinor components are ordered as if they were loaded with
-* _avx_spinor_pair_load43(rl,rh). The registers ymm6,..,ymm11 are changed
-* on exit.
-*/
+ * Stores the low and high lanes of ymm0,..,ymm5 to the spinors rl and rh,
+ * assuming the spinor components are ordered as if they were loaded with
+ * _avx_spinor_pair_load43(rl,rh). The registers ymm6,..,ymm11 are changed
+ * on exit.
+ */
 
 #define _avx_spinor_pair_store43(rl, rh)                                       \
   __asm__ __volatile__("vshufps $0x44, %%ymm1, %%ymm0, %%ymm6 \n\t"            \
@@ -302,18 +302,18 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "=m"((rh).c4.c1), "=m"((rh).c4.c2), "=m"((rh).c4.c3))
 
 /*
-* Loads the lower Weyl spinors of the Dirac spinors sl and sh to the low and
-* high lanes of ymm0,..,ymm3. The ordering of the spinor components in the
-* low lane is
-*
-* xmm0 <- sl.c1.c1,sl.c2.c1
-* xmm1 <- sl.c1.c2,sl.c2.c2
-* xmm2 <- sl.c1.c3,sl.c2.c3
-*
-* and those in the high lane are arranged in the same way. The registers
-* ymm6,..,ymm8 are changed on exit. Also applies if sl and sh are Weyl
-* spinors.
-*/
+ * Loads the lower Weyl spinors of the Dirac spinors sl and sh to the low and
+ * high lanes of ymm0,..,ymm3. The ordering of the spinor components in the
+ * low lane is
+ *
+ * xmm0 <- sl.c1.c1,sl.c2.c1
+ * xmm1 <- sl.c1.c2,sl.c2.c2
+ * xmm2 <- sl.c1.c3,sl.c2.c3
+ *
+ * and those in the high lane are arranged in the same way. The registers
+ * ymm6,..,ymm8 are changed on exit. Also applies if sl and sh are Weyl
+ * spinors.
+ */
 
 #define _avx_weyl_pair_load12(sl, sh)                                          \
   __asm__ __volatile__("vmovaps %0, %%xmm6 \n\t"                               \
@@ -338,17 +338,17 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Loads the upper Weyl spinors of the Dirac spinors sl and sh to the low and
-* high lanes of ymm0,..,ymm3. The ordering of the spinor components in the
-* low lane is
-*
-* xmm0 <- sl.c3.c1,sl.c4.c1
-* xmm1 <- sl.c3.c2,sl.c4.c2
-* xmm2 <- sl.c3.c3,sl.c4.c3
-*
-* and those in the high lane are arranged in the same way. The registers
-* ymm6,..,ymm8 are changed on exit.
-*/
+ * Loads the upper Weyl spinors of the Dirac spinors sl and sh to the low and
+ * high lanes of ymm0,..,ymm3. The ordering of the spinor components in the
+ * low lane is
+ *
+ * xmm0 <- sl.c3.c1,sl.c4.c1
+ * xmm1 <- sl.c3.c2,sl.c4.c2
+ * xmm2 <- sl.c3.c3,sl.c4.c3
+ *
+ * and those in the high lane are arranged in the same way. The registers
+ * ymm6,..,ymm8 are changed on exit.
+ */
 
 #define _avx_weyl_pair_load34(sl, sh)                                          \
   __asm__ __volatile__("vmovaps %0, %%xmm6 \n\t"                               \
@@ -373,12 +373,12 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Stores the low and high lanes of ymm0,..,ymm3 to the lower Weyl spinors
-* of the Dirac spinors rl and rh, assuming the spinor components are ordered
-* as if they were loaded with _avx_weyl_pair_load12(rl,rh). The registers
-* ymm6,..,ymm8 are changed on exit. Also applies if rl and rh are Weyl
-* spinors.
-*/
+ * Stores the low and high lanes of ymm0,..,ymm3 to the lower Weyl spinors
+ * of the Dirac spinors rl and rh, assuming the spinor components are ordered
+ * as if they were loaded with _avx_weyl_pair_load12(rl,rh). The registers
+ * ymm6,..,ymm8 are changed on exit. Also applies if rl and rh are Weyl
+ * spinors.
+ */
 
 #define _avx_weyl_pair_store12(rl, rh)                                         \
   __asm__ __volatile__("vshufps $0x44, %%ymm1, %%ymm0, %%ymm6 \n\t"            \
@@ -400,11 +400,11 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "=m"((rh).c2.c1), "=m"((rh).c2.c2), "=m"((rh).c2.c3))
 
 /*
-* Stores the low and high lanes of ymm0,..,ymm3 to the upper Weyl spinors
-* of the Dirac spinors rl and rh, assuming the spinor components are ordered
-* as if they were loaded with _avx_weyl_pair_load34(rl,rh). The registers
-* ymm6,..,ymm8 are changed on exit.
-*/
+ * Stores the low and high lanes of ymm0,..,ymm3 to the upper Weyl spinors
+ * of the Dirac spinors rl and rh, assuming the spinor components are ordered
+ * as if they were loaded with _avx_weyl_pair_load34(rl,rh). The registers
+ * ymm6,..,ymm8 are changed on exit.
+ */
 
 #define _avx_weyl_pair_store34(rl, rh)                                         \
   __asm__ __volatile__("vshufps $0x44, %%ymm1, %%ymm0, %%ymm6 \n\t"            \
@@ -426,19 +426,19 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "=m"((rh).c4.c1), "=m"((rh).c4.c2), "=m"((rh).c4.c3))
 
 /*
-* Splits the registers ymm3,..,ymm5 according to
-*
-*  xmm3 <- ymm3_lo + ymm3_hi
-*  xmm4 <- ymm4_lo + ymm4_hi
-*  xmm5 <- ymm5_lo + ymm5_hi
-*
-*  xmm6 <- ymm3_lo - ymm3_hi
-*  xmm7 <- ymm4_lo - ymm4_hi
-*  xmm8 <- ymm5_lo - ymm5_hi
-*
-* where *_lo and *_hi are the low and high lanes of the registers. The
-* registers ymm9,..,ymm11 are used as workspace.
-*/
+ * Splits the registers ymm3,..,ymm5 according to
+ *
+ *  xmm3 <- ymm3_lo + ymm3_hi
+ *  xmm4 <- ymm4_lo + ymm4_hi
+ *  xmm5 <- ymm5_lo + ymm5_hi
+ *
+ *  xmm6 <- ymm3_lo - ymm3_hi
+ *  xmm7 <- ymm4_lo - ymm4_hi
+ *  xmm8 <- ymm5_lo - ymm5_hi
+ *
+ * where *_lo and *_hi are the low and high lanes of the registers. The
+ * registers ymm9,..,ymm11 are used as workspace.
+ */
 
 #define _avx_spinor_split()                                                    \
   __asm__ __volatile__("vextractf128 $0x1, %%ymm3, %%xmm9 \n\t"                \
@@ -456,8 +456,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "xmm9", "xmm10", "xmm11")
 
 /*
-* Moves the lower lanes of ymm6,..,ymm8 to the upper lanes of ymm3,..,ymm5.
-*/
+ * Moves the lower lanes of ymm6,..,ymm8 to the upper lanes of ymm3,..,ymm5.
+ */
 
 #define _avx_spinor_unsplit()                                                  \
   __asm__ __volatile__("vinsertf128 $0x1, %%xmm6, %%ymm3, %%ymm3 \n\t"         \
@@ -468,9 +468,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5")
 
 /*
-* Multiplies ymm3,..,ymm5 by the avx_float c. The register ymm15 is used as
-* workspace.
-*/
+ * Multiplies ymm3,..,ymm5 by the avx_float c. The register ymm15 is used as
+ * workspace.
+ */
 
 #define _avx_spinor_mul_up(c)                                                  \
   __asm__ __volatile__("vmovaps %0, %%ymm15 \n\t"                              \
@@ -482,10 +482,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5", "xmm15")
 
 /*
-* Exchanges real and imaginary parts of the double words in ymm3,..,ymm5
-* and multiplies these registers by the avx_float c. The register ymm15 is
-* used as workspace.
-*/
+ * Exchanges real and imaginary parts of the double words in ymm3,..,ymm5
+ * and multiplies these registers by the avx_float c. The register ymm15 is
+ * used as workspace.
+ */
 
 #define _avx_spinor_imul_up(c)                                                 \
   __asm__ __volatile__("vmovaps %0, %%ymm15 \n\t"                              \
@@ -500,8 +500,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5", "xmm15")
 
 /*
-* Exchanges the high and low words in the two lanes of ymm3,..,ymm5.
-*/
+ * Exchanges the high and low words in the two lanes of ymm3,..,ymm5.
+ */
 
 #define _avx_spinor_xch_up()                                                   \
   __asm__ __volatile__("vpermilps $0x4e, %%ymm3, %%ymm3 \n\t"                  \
@@ -512,10 +512,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5")
 
 /*
-* Exchanges the high and low words in the two lanes of ymm3,..,ymm5, then the
-* real and imaginary parts of the words and finally multiplies the registers
-* by the avx_float c. The register ymm15 is used as workspace.
-*/
+ * Exchanges the high and low words in the two lanes of ymm3,..,ymm5, then the
+ * real and imaginary parts of the words and finally multiplies the registers
+ * by the avx_float c. The register ymm15 is used as workspace.
+ */
 
 #define _avx_spinor_xch_imul_up(c)                                             \
   __asm__ __volatile__("vmovaps %0, %%ymm15 \n\t"                              \
@@ -530,9 +530,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5", "xmm15")
 
 /*
-* Multiplies xmm6,..,xmm8 by the sse_float c. The register ymm15 is used as
-* workspace.
-*/
+ * Multiplies xmm6,..,xmm8 by the sse_float c. The register ymm15 is used as
+ * workspace.
+ */
 
 #define _avx_weyl_mul(c)                                                       \
   __asm__ __volatile__("vmovaps %0, %%xmm15 \n\t"                              \
@@ -544,10 +544,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm6", "xmm7", "xmm8", "xmm15")
 
 /*
-* Exchanges real and imaginary parts of the double words in xmm6,..,xmm8
-* and multiplies these registers by the sse_float c. The register ymm15 is
-* used as workspace.
-*/
+ * Exchanges real and imaginary parts of the double words in xmm6,..,xmm8
+ * and multiplies these registers by the sse_float c. The register ymm15 is
+ * used as workspace.
+ */
 
 #define _avx_weyl_imul(c)                                                      \
   __asm__ __volatile__("vmovaps %0, %%xmm15 \n\t"                              \
@@ -562,8 +562,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm6", "xmm7", "xmm8", "xmm15")
 
 /*
-* Exchanges the high and low words of xmm6,..,xmm8.
-*/
+ * Exchanges the high and low words of xmm6,..,xmm8.
+ */
 
 #define _avx_weyl_xch()                                                        \
   __asm__ __volatile__("vpermilps $0x4e, %%xmm6, %%xmm6 \n\t"                  \
@@ -574,10 +574,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm6", "xmm7", "xmm8")
 
 /*
-* Exchanges the high and low words of xmm6,..,xmm8, then the real and
-* imaginary parts of the words and finally multiplies the registers by
-* the sse_float c. The register ymm15 is used as workspace.
-*/
+ * Exchanges the high and low words of xmm6,..,xmm8, then the real and
+ * imaginary parts of the words and finally multiplies the registers by
+ * the sse_float c. The register ymm15 is used as workspace.
+ */
 
 #define _avx_weyl_xch_imul(c)                                                  \
   __asm__ __volatile__("vmovaps %0, %%xmm15 \n\t"                              \
@@ -592,8 +592,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm6", "xmm7", "xmm8", "xmm15")
 
 /*
-* Adds ymm3,..,ymm5 to ymm0,..,ymm2
-*/
+ * Adds ymm3,..,ymm5 to ymm0,..,ymm2
+ */
 
 #define _avx_spinor_add()                                                      \
   __asm__ __volatile__("vaddps %%ymm3, %%ymm0, %%ymm0 \n\t"                    \
@@ -604,8 +604,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Subtracts ymm3,..,ymm5 from ymm0,..,ymm2
-*/
+ * Subtracts ymm3,..,ymm5 from ymm0,..,ymm2
+ */
 
 #define _avx_spinor_sub()                                                      \
   __asm__ __volatile__("vsubps %%ymm3, %%ymm0, %%ymm0 \n\t"                    \
@@ -616,9 +616,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Adds (subtracts) the low (high) words in the two lanes of ymm3,..,ymm5
-* to (from) ymm0,..,ymm2. The registers ymm6,ymm7,ymm8 are changed on exit.
-*/
+ * Adds (subtracts) the low (high) words in the two lanes of ymm3,..,ymm5
+ * to (from) ymm0,..,ymm2. The registers ymm6,ymm7,ymm8 are changed on exit.
+ */
 
 #define _avx_spinor_addsub()                                                   \
   __asm__ __volatile__("vaddps %%ymm3, %%ymm0, %%ymm6 \n\t"                    \
@@ -635,9 +635,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm6", "xmm7", "xmm8")
 
 /*
-* Adds (subtracts) the high (low) words in the two lanes of ymm3,..,ymm5
-* to (from) ymm0,..,ymm2. The registers ymm6,..,ymm8 are changed on exit.
-*/
+ * Adds (subtracts) the high (low) words in the two lanes of ymm3,..,ymm5
+ * to (from) ymm0,..,ymm2. The registers ymm6,..,ymm8 are changed on exit.
+ */
 
 #define _avx_spinor_subadd()                                                   \
   __asm__ __volatile__("vaddps %%ymm3, %%ymm0, %%ymm6 \n\t"                    \
@@ -654,9 +654,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm6", "xmm7", "xmm8")
 
 /*
-* Multiplies ymm3,..,ymm5 with i and adds them to ymm0,..,ymm2. The
-* registers ymm3,..,ymm5 are changed on exit.
-*/
+ * Multiplies ymm3,..,ymm5 with i and adds them to ymm0,..,ymm2. The
+ * registers ymm3,..,ymm5 are changed on exit.
+ */
 
 #define _avx_spinor_i_add()                                                    \
   __asm__ __volatile__("vpermilps $0xb1, %%ymm3, %%ymm3 \n\t"                  \
@@ -670,8 +670,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Multiplies ymm3,..,ymm5 with i and subtracts them from ymm0,..,ymm2.
-*/
+ * Multiplies ymm3,..,ymm5 with i and subtracts them from ymm0,..,ymm2.
+ */
 
 #define _avx_spinor_i_sub()                                                    \
   __asm__ __volatile__("vpermilps $0xb1, %%ymm0, %%ymm0 \n\t"                  \
@@ -688,10 +688,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Exchanges the high and low words of ymm3,..,ymm5, multiplies them with i
-* and adds the result to ymm0,..,ymm2. The registers ymm3,..,ymm5 are
-* changed on exit.
-*/
+ * Exchanges the high and low words of ymm3,..,ymm5, multiplies them with i
+ * and adds the result to ymm0,..,ymm2. The registers ymm3,..,ymm5 are
+ * changed on exit.
+ */
 
 #define _avx_spinor_xch_i_add()                                                \
   __asm__ __volatile__("vpermilps $0x1b, %%ymm3, %%ymm3 \n\t"                  \
@@ -705,9 +705,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Exchanges the high and low words of ymm3,..,ymm5, multiplies them with i
-* and subtracts the result from ymm0,..,ymm2.
-*/
+ * Exchanges the high and low words of ymm3,..,ymm5, multiplies them with i
+ * and subtracts the result from ymm0,..,ymm2.
+ */
 
 #define _avx_spinor_xch_i_sub()                                                \
   __asm__ __volatile__("vpermilps $0x1b, %%ymm0, %%ymm0 \n\t"                  \
@@ -724,10 +724,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Multiplies the low and high words in the two lanes of ymm3,..,ymm5 with
-* i and -i respectively and adds these registers to ymm0,..,ymm2. The
-* registers ymm3,..,ymm5 are changed on exit.
-*/
+ * Multiplies the low and high words in the two lanes of ymm3,..,ymm5 with
+ * i and -i respectively and adds these registers to ymm0,..,ymm2. The
+ * registers ymm3,..,ymm5 are changed on exit.
+ */
 
 #define _avx_spinor_i_addsub()                                                 \
   __asm__ __volatile__("vpermilps $0xb4, %%ymm0, %%ymm0 \n\t"                  \
@@ -747,10 +747,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Multiplies the low and high words in the two lanes of ymm3,..,ymm5 with
-* -i and i respectively and adds these registers to ymm0,..,ymm2. The
-* registers ymm3,..,ymm5 are changed on exit.
-*/
+ * Multiplies the low and high words in the two lanes of ymm3,..,ymm5 with
+ * -i and i respectively and adds these registers to ymm0,..,ymm2. The
+ * registers ymm3,..,ymm5 are changed on exit.
+ */
 
 #define _avx_spinor_i_subadd()                                                 \
   __asm__ __volatile__("vpermilps $0xe1, %%ymm0, %%ymm0 \n\t"                  \
@@ -770,8 +770,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Exchanges the high and low words in each lane of ymm3,..,ymm5.
-*/
+ * Exchanges the high and low words in each lane of ymm3,..,ymm5.
+ */
 
 #define _avx_spinor_xch()                                                      \
   __asm__ __volatile__("vpermilps $0x4e, %%ymm3, %%ymm3 \n\t"                  \
@@ -782,18 +782,18 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5")
 
 /******************************************************************************
-*
-*  Action of su3 matrices on su3 vectors
-*
-******************************************************************************/
+ *
+ *  Action of su3 matrices on su3 vectors
+ *
+ ******************************************************************************/
 
 /*
-* Multiplies pairs of su3 vectors, stored in the low and high lanes of
-* ymm0,..,ymm2, with su3 matrices ul and uh, respectively. The vectors
-* are assumed to be in vertical order and the products are returned in the
-* same order in the registers ymm3,..,ymm5. All registers except for
-* ymm15 are changed on exit.
-*/
+ * Multiplies pairs of su3 vectors, stored in the low and high lanes of
+ * ymm0,..,ymm2, with su3 matrices ul and uh, respectively. The vectors
+ * are assumed to be in vertical order and the products are returned in the
+ * same order in the registers ymm3,..,ymm5. All registers except for
+ * ymm15 are changed on exit.
+ */
 
 #if (defined FMA3)
 
@@ -1017,12 +1017,12 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Multiplies pairs of su3 vectors, stored in the low and high lanes of
-* ymm0,..,ymm2, by the su3 matrices ul^dagger and uh^dagger, respectively.
-* The vectors are assumed to be in vertical order and the products are returned
-* in the same order in the registers ymm3,..,ymm5. All registers except for
-* ymm15 are changed on exit.
-*/
+ * Multiplies pairs of su3 vectors, stored in the low and high lanes of
+ * ymm0,..,ymm2, by the su3 matrices ul^dagger and uh^dagger, respectively.
+ * The vectors are assumed to be in vertical order and the products are returned
+ * in the same order in the registers ymm3,..,ymm5. All registers except for
+ * ymm15 are changed on exit.
+ */
 
 #if (defined FMA3)
 
@@ -1248,12 +1248,12 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Multiplies pairs of su3 vectors, stored in the low and high lanes of
-* ymm0,..,ymm2, by the su3 matrices ul and uh^dagger, respectively. The
-* vectors are assumed to be in vertical order and the products are returned
-* in the same order in the registers ymm3,..,ymm5. All registers except
-* for ymm15 are changed on exit.
-*/
+ * Multiplies pairs of su3 vectors, stored in the low and high lanes of
+ * ymm0,..,ymm2, by the su3 matrices ul and uh^dagger, respectively. The
+ * vectors are assumed to be in vertical order and the products are returned
+ * in the same order in the registers ymm3,..,ymm5. All registers except
+ * for ymm15 are changed on exit.
+ */
 
 #if (defined FMA3)
 
@@ -1498,14 +1498,14 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /******************************************************************************
-*
-*  Macros for single precision Dirac spinors in linear order
-*
-******************************************************************************/
+ *
+ *  Macros for single precision Dirac spinors in linear order
+ *
+ ******************************************************************************/
 
 /*
-*  Loads the spinor s to the registers ymm0,..,ymm2 in linear order.
-*/
+ *  Loads the spinor s to the registers ymm0,..,ymm2 in linear order.
+ */
 
 #define _avx_spinor_load(s)                                                    \
   __asm__ __volatile__("vmovaps %0, %%ymm0"                                    \
@@ -1525,8 +1525,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm2")
 
 /*
-*  Loads the spinor s to the registers ymm3,..,ymm5 in linear order.
-*/
+ *  Loads the spinor s to the registers ymm3,..,ymm5 in linear order.
+ */
 
 #define _avx_spinor_load_up(s)                                                 \
   __asm__ __volatile__("vmovaps %0, %%ymm3"                                    \
@@ -1546,8 +1546,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm5")
 
 /*
-*  Stores the registers ymm0,..,ymm2 to the spinor s in linear order.
-*/
+ *  Stores the registers ymm0,..,ymm2 to the spinor s in linear order.
+ */
 
 #define _avx_spinor_store(s)                                                   \
   __asm__ __volatile__("vmovaps %%ymm0, %0 \n\t"                               \
@@ -1561,8 +1561,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "=m"((s).c4.c3))
 
 /*
-*  Stores the registers ymm3,..,ymm5 to the spinor s in linear order.
-*/
+ *  Stores the registers ymm3,..,ymm5 to the spinor s in linear order.
+ */
 
 #define _avx_spinor_store_up(s)                                                \
   __asm__ __volatile__("vmovaps %%ymm3, %0 \n\t"                               \
@@ -1576,8 +1576,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "=m"((s).c4.c3))
 
 /*
-*  Loads (z.re,z.re,..,z.re) to ymm12 and (-z.im,z.im,..,z.im) to ymm13.
-*/
+ *  Loads (z.re,z.re,..,z.re) to ymm12 and (-z.im,z.im,..,z.im) to ymm13.
+ */
 
 #define _avx_load_cmplx(z)                                                     \
   __asm__ __volatile__("vxorps %%ymm13, %%ymm13, %%ymm13 \n\t"                 \
@@ -1589,8 +1589,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm12", "xmm13")
 
 /*
-*  Loads (z.re,z.re,..,z.re) to ymm14 and (-z.im,z.im,..,z.im) to ymm15
-*/
+ *  Loads (z.re,z.re,..,z.re) to ymm14 and (-z.im,z.im,..,z.im) to ymm15
+ */
 
 #define _avx_load_cmplx_up(z)                                                  \
   __asm__ __volatile__("vxorps %%ymm15, %%ymm15, %%ymm15 \n\t"                 \
@@ -1602,10 +1602,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm14", "xmm15")
 
 /*
-*  Multiplies the spinor s by the complex number z and assigns the result to
-*  ymm0,..,ymm2, assuming z was loaded using _avx_load_cmplx(z). The registers
-*  ymm3,..,ymm5 are used as workspace.
-*/
+ *  Multiplies the spinor s by the complex number z and assigns the result to
+ *  ymm0,..,ymm2, assuming z was loaded using _avx_load_cmplx(z). The registers
+ *  ymm3,..,ymm5 are used as workspace.
+ */
 
 #if (defined FMA3)
 
@@ -1650,10 +1650,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-*  Multiplies the spinor s by the complex number z and adds the result to
-*  ymm0,..,ymm2, assuming z was loaded using _avx_load_cmplx_up(z). The
-*  registers ymm3,..,ymm8 are used as workspace.
-*/
+ *  Multiplies the spinor s by the complex number z and adds the result to
+ *  ymm0,..,ymm2, assuming z was loaded using _avx_load_cmplx_up(z). The
+ *  registers ymm3,..,ymm8 are used as workspace.
+ */
 
 #if (defined FMA3)
 
@@ -1699,8 +1699,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-*  Broadcasts the real number c to ymm12 and ymm13.
-*/
+ *  Broadcasts the real number c to ymm12 and ymm13.
+ */
 
 #define _avx_load_real(c)                                                      \
   __asm__ __volatile__("vbroadcastss %0, %%ymm12 \n\t"                         \
@@ -1710,8 +1710,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm12", "xmm13")
 
 /*
-*  Broadcasts the real number c to ymm14 and ymm15.
-*/
+ *  Broadcasts the real number c to ymm14 and ymm15.
+ */
 
 #define _avx_load_real_up(c)                                                   \
   __asm__ __volatile__("vbroadcastss %0, %%ymm14 \n\t"                         \
@@ -1721,9 +1721,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm14", "xmm15")
 
 /*
-*  Multiplies the spinor s by the real number c and assigns the result to
-*  ymm0,..,ymm2, assuming c was loaded using _avx_load_real(c).
-*/
+ *  Multiplies the spinor s by the real number c and assigns the result to
+ *  ymm0,..,ymm2, assuming c was loaded using _avx_load_real(c).
+ */
 
 #define _avx_mulr_spinor(s)                                                    \
   _avx_spinor_load(s);                                                         \
@@ -1735,10 +1735,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-*  Multiplies the spinor s by the real number c and adds the result to
-*  ymm0,..,ymm2, assuming c was loaded using _avx_load_real_up(c). The
-*  registers ymm3,..,ymm5 are used as workspace.
-*/
+ *  Multiplies the spinor s by the real number c and adds the result to
+ *  ymm0,..,ymm2, assuming c was loaded using _avx_load_real_up(c). The
+ *  registers ymm3,..,ymm5 are used as workspace.
+ */
 
 #if (defined FMA3)
 
@@ -1768,29 +1768,29 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*******************************************************************************
-*
-* Macros operating on double precision data
-*
-*******************************************************************************/
+ *
+ * Macros operating on double precision data
+ *
+ *******************************************************************************/
 
 /*******************************************************************************
-*
-* Macros for su3_vector data
-*
-* Most of these macros operate on pairs of su3 vectors that are stored
-* in the low and high lanes of ymm0,..,ymm2 or ymm3,..,ymm5. For example,
-*
-* ymm0 <- sl.c1.re,sl.c1.im,sh.c1.re,sh.c1.im
-* ymm1 <- sl.c2.re,sl.c2.im,sh.c2.re,sh.c2.im
-* ymm2 <- sl.c3.re,sl.c3.im,sh.c3.re,sh.c3.im
-*
-* (where sl and sh are of type su3_vector).
-*
-*******************************************************************************/
+ *
+ * Macros for su3_vector data
+ *
+ * Most of these macros operate on pairs of su3 vectors that are stored
+ * in the low and high lanes of ymm0,..,ymm2 or ymm3,..,ymm5. For example,
+ *
+ * ymm0 <- sl.c1.re,sl.c1.im,sh.c1.re,sh.c1.im
+ * ymm1 <- sl.c2.re,sl.c2.im,sh.c2.re,sh.c2.im
+ * ymm2 <- sl.c3.re,sl.c3.im,sh.c3.re,sh.c3.im
+ *
+ * (where sl and sh are of type su3_vector).
+ *
+ *******************************************************************************/
 
 /*
-* Loads two su3 vectors sl and sh to the low and high lanes of ymm0,..,ymm2.
-*/
+ * Loads two su3 vectors sl and sh to the low and high lanes of ymm0,..,ymm2.
+ */
 
 #define _avx_pair_load_dble(sl, sh)                                            \
   __asm__ __volatile__("vmovapd %0, %%xmm0 \n\t"                               \
@@ -1805,8 +1805,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Loads two su3 vectors sl and sh to the low and high lanes of ymm3,..,ymm5.
-*/
+ * Loads two su3 vectors sl and sh to the low and high lanes of ymm3,..,ymm5.
+ */
 
 #define _avx_pair_load_up_dble(sl, sh)                                         \
   __asm__ __volatile__("vmovapd %0, %%xmm3 \n\t"                               \
@@ -1821,8 +1821,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5")
 
 /*
-* Stores the low and high lanes of ymm0,..,ymm2 to the su3 vectors rl and rh.
-*/
+ * Stores the low and high lanes of ymm0,..,ymm2 to the su3 vectors rl and rh.
+ */
 
 #define _avx_pair_store_dble(rl, rh)                                           \
   __asm__ __volatile__("vmovapd %%xmm0, %0 \n\t"                               \
@@ -1835,8 +1835,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "=m"((rh).c1), "=m"((rh).c2), "=m"((rh).c3))
 
 /*
-* Stores the low and high lanes of ymm3,..,ymm5 to the su3 vectors rl and rh.
-*/
+ * Stores the low and high lanes of ymm3,..,ymm5 to the su3 vectors rl and rh.
+ */
 
 #define _avx_pair_store_up_dble(rl, rh)                                        \
   __asm__ __volatile__("vmovapd %%xmm3, %0 \n\t"                               \
@@ -1849,8 +1849,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "=m"((rh).c1), "=m"((rh).c2), "=m"((rh).c3))
 
 /*
-* Loads the components of a Weyl spinor s to ymm0,..,ymm2 in linear order.
-*/
+ * Loads the components of a Weyl spinor s to ymm0,..,ymm2 in linear order.
+ */
 
 #define _avx_weyl_load_dble(s)                                                 \
   __asm__ __volatile__("vmovapd %0, %%ymm0 \n\t"                               \
@@ -1862,8 +1862,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Loads the components of a Weyl spinor s to ymm3,..,ymm5 in linear order.
-*/
+ * Loads the components of a Weyl spinor s to ymm3,..,ymm5 in linear order.
+ */
 
 #define _avx_weyl_load_up_dble(s)                                              \
   __asm__ __volatile__("vmovapd %0, %%ymm3 \n\t"                               \
@@ -1875,8 +1875,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5")
 
 /*
-* Stores ymm0,..,ymm2 to the components of a Weyl spinor s in linear order.
-*/
+ * Stores ymm0,..,ymm2 to the components of a Weyl spinor s in linear order.
+ */
 
 #define _avx_weyl_store_dble(s)                                                \
   __asm__ __volatile__("vmovapd %%ymm0, %0 \n\t"                               \
@@ -1886,8 +1886,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "=m"((s).c2.c1), "=m"((s).c2.c2), "=m"((s).c2.c3))
 
 /*
-* Stores ymm3,..,ymm5 to the components of a Weyl spinor s in linear order.
-*/
+ * Stores ymm3,..,ymm5 to the components of a Weyl spinor s in linear order.
+ */
 
 #define _avx_weyl_store_up_dble(s)                                             \
   __asm__ __volatile__("vmovapd %%ymm3, %0 \n\t"                               \
@@ -1897,8 +1897,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "=m"((s).c2.c1), "=m"((s).c2.c2), "=m"((s).c2.c3))
 
 /*
-* Adds ymm3,..,ymm5 to ymm0,..,ymm2.
-*/
+ * Adds ymm3,..,ymm5 to ymm0,..,ymm2.
+ */
 
 #define _avx_vector_add_dble()                                                 \
   __asm__ __volatile__("vaddpd %%ymm3, %%ymm0, %%ymm0 \n\t"                    \
@@ -1909,8 +1909,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Subtracts ymm3,..,ymm5 from ymm0,..,ymm2.
-*/
+ * Subtracts ymm3,..,ymm5 from ymm0,..,ymm2.
+ */
 
 #define _avx_vector_sub_dble()                                                 \
   __asm__ __volatile__("vsubpd %%ymm3, %%ymm0, %%ymm0 \n\t"                    \
@@ -1921,9 +1921,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2")
 
 /*
-* Multiplies the high lanes of ymm3,..,ymm5 by -1 and adds these registers
-* to ymm0,..,ymm2.
-*/
+ * Multiplies the high lanes of ymm3,..,ymm5 by -1 and adds these registers
+ * to ymm0,..,ymm2.
+ */
 
 #if (defined FMA3)
 
@@ -1951,9 +1951,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Multiplies the low lanes of ymm3,..,ymm5 by -1 and adds these registers
-* to ymm0,..,ymm2.
-*/
+ * Multiplies the low lanes of ymm3,..,ymm5 by -1 and adds these registers
+ * to ymm0,..,ymm2.
+ */
 
 #if (defined FMA3)
 
@@ -1981,8 +1981,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Multiplies the registers ymm3,..,ymm5 by i and adds them to ymm0,..,ymm2.
-*/
+ * Multiplies the registers ymm3,..,ymm5 by i and adds them to ymm0,..,ymm2.
+ */
 
 #define _avx_vector_i_add_dble()                                               \
   __asm__ __volatile__("vpermilpd $0x5, %%ymm3, %%ymm3 \n\t"                   \
@@ -1996,9 +1996,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Multiplies the registers ymm3,..,ymm5 by i and subtracts them from
-* ymm0,..,ymm2.
-*/
+ * Multiplies the registers ymm3,..,ymm5 by i and subtracts them from
+ * ymm0,..,ymm2.
+ */
 
 #if (defined FMA3)
 
@@ -2032,9 +2032,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Exchanges the high and low lanes of ymm3,..,ymm5, multiplies them by i
-* and adds the result to ymm0,..,ymm2.
-*/
+ * Exchanges the high and low lanes of ymm3,..,ymm5, multiplies them by i
+ * and adds the result to ymm0,..,ymm2.
+ */
 
 #define _avx_vector_xch_i_add_dble()                                           \
   __asm__ __volatile__("vpermilpd $0x5, %%ymm3, %%ymm3 \n\t"                   \
@@ -2051,9 +2051,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Exchanges the high and low lanes of ymm3,..,ymm5, multiplies them by i
-* and subtracts the result from ymm0,..,ymm2.
-*/
+ * Exchanges the high and low lanes of ymm3,..,ymm5, multiplies them by i
+ * and subtracts the result from ymm0,..,ymm2.
+ */
 
 #if (defined FMA3)
 
@@ -2093,9 +2093,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Multiplies the low and high lanes of ymm3,..,ymm5 by i and -i
-* respectively and adds these registers to ymm0,..,ymm2.
-*/
+ * Multiplies the low and high lanes of ymm3,..,ymm5 by i and -i
+ * respectively and adds these registers to ymm0,..,ymm2.
+ */
 
 #if (defined FMA3)
 
@@ -2129,9 +2129,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Multiplies the low and high words of ymm3,..,ymm5 by -i and i
-* respectively and adds these registers to ymm0,..,ymm2.
-*/
+ * Multiplies the low and high words of ymm3,..,ymm5 by -i and i
+ * respectively and adds these registers to ymm0,..,ymm2.
+ */
 
 #if (defined FMA3)
 
@@ -2165,8 +2165,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Exchanges the high and low lanes of ymm3,..,ymm5.
-*/
+ * Exchanges the high and low lanes of ymm3,..,ymm5.
+ */
 
 #define _avx_vector_xch_dble()                                                 \
   __asm__ __volatile__("vperm2f128 $0x1, %%ymm3, %%ymm3, %%ymm3 \n\t"          \
@@ -2177,18 +2177,18 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5")
 
 /******************************************************************************
-*
-*  Action of su3 matrices on su3 vectors
-*
-******************************************************************************/
+ *
+ *  Action of su3 matrices on su3 vectors
+ *
+ ******************************************************************************/
 
 /*
-* Multiplies an su3 vector s with an su3 matrix u, assuming s is
-* stored in  xmm0,xmm1,xmm2.
-*
-* On output the result is in xmm3,xmm4,xmm5 and all registers except
-* for xmm15 are changed.
-*/
+ * Multiplies an su3 vector s with an su3 matrix u, assuming s is
+ * stored in  xmm0,xmm1,xmm2.
+ *
+ * On output the result is in xmm3,xmm4,xmm5 and all registers except
+ * for xmm15 are changed.
+ */
 
 #if (defined FMA3)
 
@@ -2297,12 +2297,12 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Multiplies an su3 vector s with an su3 matrix u^dagger, assuming s is
-* stored in  xmm0,xmm1,xmm2.
-*
-* On output the result is in xmm3,xmm4,xmm5 and all registers except
-* for xmm15 are changed.
-*/
+ * Multiplies an su3 vector s with an su3 matrix u^dagger, assuming s is
+ * stored in  xmm0,xmm1,xmm2.
+ *
+ * On output the result is in xmm3,xmm4,xmm5 and all registers except
+ * for xmm15 are changed.
+ */
 
 #if (defined FMA3)
 
@@ -2417,10 +2417,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Multiplies a pair sl,sh of su3 vectors by an su3 matrix u, assuming sl and
-* sh are in the low and high lanes of ymm0,..,ymm2. On output the result is
-* in ymm3,..,ymm5 and all registers except for ymm15 are changed.
-*/
+ * Multiplies a pair sl,sh of su3 vectors by an su3 matrix u, assuming sl and
+ * sh are in the low and high lanes of ymm0,..,ymm2. On output the result is
+ * in ymm3,..,ymm5 and all registers except for ymm15 are changed.
+ */
 
 #if (defined FMA3)
 
@@ -2573,10 +2573,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Multiplies a pair sl,sh of su3 vectors by an su3 matrix u^dagger, assuming
-* sl and sh are in the low and high lanes of ymm0,..,ymm2. On output the
-* result is in ymm3,..,ymm5 and all registers are changed.
-*/
+ * Multiplies a pair sl,sh of su3 vectors by an su3 matrix u^dagger, assuming
+ * sl and sh are in the low and high lanes of ymm0,..,ymm2. On output the
+ * result is in ymm3,..,ymm5 and all registers are changed.
+ */
 
 #if (defined FMA3)
 
@@ -2735,14 +2735,14 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /******************************************************************************
-*
-*  Macros for double precision Dirac spinors in linear order.
-*
-******************************************************************************/
+ *
+ *  Macros for double precision Dirac spinors in linear order.
+ *
+ ******************************************************************************/
 
 /*
-* Loads the spinor s to the registers ymm0,..,ymm5 in linear order.
-*/
+ * Loads the spinor s to the registers ymm0,..,ymm5 in linear order.
+ */
 
 #define _avx_spinor_load_dble(s)                                               \
   __asm__ __volatile__("vmovapd %0, %%ymm0 \n\t"                               \
@@ -2761,8 +2761,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm3", "xmm4", "xmm5")
 
 /*
-* Loads the spinor s to the registers ymm6,..,ymm11 in linear order.
-*/
+ * Loads the spinor s to the registers ymm6,..,ymm11 in linear order.
+ */
 
 #define _avx_spinor_load_up_dble(s)                                            \
   __asm__ __volatile__("vmovapd %0, %%ymm6 \n\t"                               \
@@ -2781,8 +2781,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm9", "xmm10", "xmm11")
 
 /*
-* Stores the registers ymm0,..,ymm5 to the spinor s in linear order.
-*/
+ * Stores the registers ymm0,..,ymm5 to the spinor s in linear order.
+ */
 
 #define _avx_spinor_store_dble(s)                                              \
   __asm__ __volatile__("vmovapd %%ymm0, %0 \n\t"                               \
@@ -2797,8 +2797,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "=m"((s).c4.c1), "=m"((s).c4.c2), "=m"((s).c4.c3))
 
 /*
-* Stores the registers ymm6,..,ymm11 to the spinor s in linear order.
-*/
+ * Stores the registers ymm6,..,ymm11 to the spinor s in linear order.
+ */
 
 #define _avx_spinor_store_up_dble(s)                                           \
   __asm__ __volatile__("vmovapd %%ymm6, %0 \n\t"                               \
@@ -2813,8 +2813,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                          "=m"((s).c4.c1), "=m"((s).c4.c2), "=m"((s).c4.c3))
 
 /*
-* Loads (z.re,z.re,z.re,z.re) to ymm12 and (-z.im,z.im,-z.im,z.im) to ymm13.
-*/
+ * Loads (z.re,z.re,z.re,z.re) to ymm12 and (-z.im,z.im,-z.im,z.im) to ymm13.
+ */
 
 #define _avx_load_cmplx_dble(z)                                                \
   __asm__ __volatile__("vxorpd %%ymm13, %%ymm13, %%ymm13 \n\t"                 \
@@ -2826,8 +2826,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm12", "xmm13")
 
 /*
-* Loads (z.re,z.re,z.re,z.re) to ymm14 and (-z.im,z.im,-z.im,z.im) to ymm15.
-*/
+ * Loads (z.re,z.re,z.re,z.re) to ymm14 and (-z.im,z.im,-z.im,z.im) to ymm15.
+ */
 
 #define _avx_load_cmplx_up_dble(z)                                             \
   __asm__ __volatile__("vxorpd %%ymm15, %%ymm15, %%ymm15 \n\t"                 \
@@ -2839,10 +2839,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm14", "xmm15")
 
 /*
-* Multiplies the spinor s by the complex number z and assigns the result to
-* ymm0,..,ymm5, assuming z was loaded using _avx_load_cmplx_dble(z). The
-* registers ymm6,..,ymm11 are used as workspace.
-*/
+ * Multiplies the spinor s by the complex number z and assigns the result to
+ * ymm0,..,ymm5, assuming z was loaded using _avx_load_cmplx_dble(z). The
+ * registers ymm6,..,ymm11 are used as workspace.
+ */
 
 #if (defined FMA3)
 
@@ -2914,10 +2914,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Multiplies the spinor s by the complex number z and adds the result to
-* ymm0,..,ymm5, assuming z was loaded using _avx_load_cmplx_up_dble(z). The
-* registers ymm6,..,ymm11 are used as workspace.
-*/
+ * Multiplies the spinor s by the complex number z and adds the result to
+ * ymm0,..,ymm5, assuming z was loaded using _avx_load_cmplx_up_dble(z). The
+ * registers ymm6,..,ymm11 are used as workspace.
+ */
 
 #if (defined FMA3)
 
@@ -3005,8 +3005,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
 #endif
 
 /*
-* Broadcasts the real number c to ymm12 and ymm13.
-*/
+ * Broadcasts the real number c to ymm12 and ymm13.
+ */
 
 #define _avx_load_real_dble(c)                                                 \
   __asm__ __volatile__("vbroadcastsd %0, %%ymm12 \n\t"                         \
@@ -3016,8 +3016,8 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm12", "xmm13")
 
 /*
-* Broadcasts the real number c to ymm14 and ymm15.
-*/
+ * Broadcasts the real number c to ymm14 and ymm15.
+ */
 
 #define _avx_load_real_up_dble(c)                                              \
   __asm__ __volatile__("vbroadcastsd %0, %%ymm14 \n\t"                         \
@@ -3027,9 +3027,9 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm14", "xmm15")
 
 /*
-* Multiplies the spinor s by the real number c and assigns the result to
-* ymm0,..,ymm5, assuming c was loaded using _avx_load_real_dble(c).
-*/
+ * Multiplies the spinor s by the real number c and assigns the result to
+ * ymm0,..,ymm5, assuming c was loaded using _avx_load_real_dble(c).
+ */
 
 #define _avx_mulr_spinor_dble(s)                                               \
   _avx_spinor_load_dble(s);                                                    \
@@ -3044,10 +3044,10 @@ static avx_float _avx_sgn_i_addsub __attribute__((unused)) = {
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
 
 /*
-* Multiplies the spinor s by the real number c and adds the result to
-* ymm0,..,ymm5, assuming c was loaded using _avx_load_real_up_dble(c).
-* The registers ymm6,..,ymm11 are used as workspace.
-*/
+ * Multiplies the spinor s by the real number c and adds the result to
+ * ymm0,..,ymm5, assuming c was loaded using _avx_load_real_up_dble(c).
+ * The registers ymm6,..,ymm11 are used as workspace.
+ */
 
 #if (defined FMA3)
 

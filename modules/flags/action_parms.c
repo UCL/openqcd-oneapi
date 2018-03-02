@@ -1,113 +1,113 @@
 
 /*******************************************************************************
-*
-* File action_parms.c
-*
-* Copyright (C) 2011-2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Action parameter data base.
-*
-* The externally accessible functions are
-*
-*   action_parms_t set_action_parms(int iact,action_t action,int ipf,
-*                                   int im0,int *irat,int *imu,int *isp)
-*     Sets the parameters in the action parameter set number iact and returns
-*     a structure containing them (see the notes).
-*
-*   action_parms_t action_parms(int iact)
-*     Returns a structure containing the action parameter set number iact
-*     (see the notes).
-*
-*   void read_action_parms(int iact)
-*     On process 0, this program scans stdin for a line starting with the
-*     string "[Action <int>]" (after any number of blanks), where <int> is
-*     the integer value passed by the argument. An error occurs if no such
-*     line or more than one is found. The lines
-*
-*       action   <action_t>
-*       ipf      <int>
-*       im0      <int>
-*       irat     <int> <int> <int>
-*       imu      <int> [<int>]
-*       isp      <int> [<int>]
-*
-*     are then read using read_line() [utils/mutils.c]. Depending on the
-*     value of "action", some lines are not read and can be omitted in
-*     the input file. The number of integer items on the lines with tag
-*     "imu" and "isp" depends on the action too. The data are then added
-*     to the data base by calling set_action_parms(iact,...).
-*
-*   void print_action_parms(void)
-*     Prints the parameters of the defined actions to stdout on MPI
-*     process 0.
-*
-*   void write_action_parms(FILE *fdat)
-*     Writes the parameters of the defined actions to the file fdat on
-*     MPI process 0.
-*
-*   void check_action_parms(FILE *fdat)
-*     Compares the parameters of the defined actions with those stored
-*     on the file fdat on MPI process 0, assuming the latter were written
-*     to the file by the program write_action_parms().
-*
-* Notes:
-*
-* For a description of the supported actions and their parameters see
-* forces/README.forces.
-*
-* The elements of a structure of type action_parms_t are
-*
-*   action  Action program used. This parameter is an enum type with
-*           one of the following values:
-*
-*            ACG             (program action0() [forces/force0.c]),
-*
-*            ACF_TM1         (program action1() [forces/force1.c]),
-*
-*            ACF_TM1_EO      (program action4() [forces/force4.c]),
-*
-*            ACF_TM1_EO_SDET (program action4() [forces/force4.c]),
-*
-*            ACF_TM2         (program action2() [forces/force2.c]),
-*
-*            ACF_TM2_EO      (program action5() [forces/force5.c]),
-*
-*            ACF_RAT         (program action3() [forces/force3.c]),
-*
-*            ACF_RAT_SDET    (program action3() [forces/force3.c]),
-*
-*   ipf     Pseudo-fermion field index (see mdflds/mdflds.c),
-*
-*   im0     Index of the bare sea quark mass in parameter data base
-*           (see flags/lat_parms.c),
-*
-*   irat    Indices specifying a rational function (see ratfcts/ratfcts.c),
-*
-*   imu     Twisted mass indices (see flags/hmc_parms.c),
-*
-*   isp     Solver parameter set indices (see flags/solver_parms.c).
-*
-* Depending on the action, some parameters are not used and are set to zero
-* by set_action_parms() independently of the values of the arguments. In
-* particular, for a given action, only the required number of integers are
-* read from the arrays imu and isp passed to the program.
-*
-* The number of twisted mass indices and solver parameter set indices is
-* 1 and 2 in the case of the actions ACF_TM1* and ACF_TM2*, where isp[k] is
-* the solver parameter set used for the solution of the Dirac equation with
-* twisted mass index imu[k].
-*
-* Up to 32 action parameter sets, labeled by an index iact=0,1,..,31, can
-* be specified. Once a set is specified, it cannot be changed by calling
-* set_action_parms() again. Action parameters must be globally the same.
-*
-* Except for action_parms(), the programs in this module perform global
-* operations and must be called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File action_parms.c
+ *
+ * Copyright (C) 2011-2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Action parameter data base.
+ *
+ * The externally accessible functions are
+ *
+ *   action_parms_t set_action_parms(int iact,action_t action,int ipf,
+ *                                   int im0,int *irat,int *imu,int *isp)
+ *     Sets the parameters in the action parameter set number iact and returns
+ *     a structure containing them (see the notes).
+ *
+ *   action_parms_t action_parms(int iact)
+ *     Returns a structure containing the action parameter set number iact
+ *     (see the notes).
+ *
+ *   void read_action_parms(int iact)
+ *     On process 0, this program scans stdin for a line starting with the
+ *     string "[Action <int>]" (after any number of blanks), where <int> is
+ *     the integer value passed by the argument. An error occurs if no such
+ *     line or more than one is found. The lines
+ *
+ *       action   <action_t>
+ *       ipf      <int>
+ *       im0      <int>
+ *       irat     <int> <int> <int>
+ *       imu      <int> [<int>]
+ *       isp      <int> [<int>]
+ *
+ *     are then read using read_line() [utils/mutils.c]. Depending on the
+ *     value of "action", some lines are not read and can be omitted in
+ *     the input file. The number of integer items on the lines with tag
+ *     "imu" and "isp" depends on the action too. The data are then added
+ *     to the data base by calling set_action_parms(iact,...).
+ *
+ *   void print_action_parms(void)
+ *     Prints the parameters of the defined actions to stdout on MPI
+ *     process 0.
+ *
+ *   void write_action_parms(FILE *fdat)
+ *     Writes the parameters of the defined actions to the file fdat on
+ *     MPI process 0.
+ *
+ *   void check_action_parms(FILE *fdat)
+ *     Compares the parameters of the defined actions with those stored
+ *     on the file fdat on MPI process 0, assuming the latter were written
+ *     to the file by the program write_action_parms().
+ *
+ * Notes:
+ *
+ * For a description of the supported actions and their parameters see
+ * forces/README.forces.
+ *
+ * The elements of a structure of type action_parms_t are
+ *
+ *   action  Action program used. This parameter is an enum type with
+ *           one of the following values:
+ *
+ *            ACG             (program action0() [forces/force0.c]),
+ *
+ *            ACF_TM1         (program action1() [forces/force1.c]),
+ *
+ *            ACF_TM1_EO      (program action4() [forces/force4.c]),
+ *
+ *            ACF_TM1_EO_SDET (program action4() [forces/force4.c]),
+ *
+ *            ACF_TM2         (program action2() [forces/force2.c]),
+ *
+ *            ACF_TM2_EO      (program action5() [forces/force5.c]),
+ *
+ *            ACF_RAT         (program action3() [forces/force3.c]),
+ *
+ *            ACF_RAT_SDET    (program action3() [forces/force3.c]),
+ *
+ *   ipf     Pseudo-fermion field index (see mdflds/mdflds.c),
+ *
+ *   im0     Index of the bare sea quark mass in parameter data base
+ *           (see flags/lat_parms.c),
+ *
+ *   irat    Indices specifying a rational function (see ratfcts/ratfcts.c),
+ *
+ *   imu     Twisted mass indices (see flags/hmc_parms.c),
+ *
+ *   isp     Solver parameter set indices (see flags/solver_parms.c).
+ *
+ * Depending on the action, some parameters are not used and are set to zero
+ * by set_action_parms() independently of the values of the arguments. In
+ * particular, for a given action, only the required number of integers are
+ * read from the arrays imu and isp passed to the program.
+ *
+ * The number of twisted mass indices and solver parameter set indices is
+ * 1 and 2 in the case of the actions ACF_TM1* and ACF_TM2*, where isp[k] is
+ * the solver parameter set used for the solution of the Dirac equation with
+ * twisted mass index imu[k].
+ *
+ * Up to 32 action parameter sets, labeled by an index iact=0,1,..,31, can
+ * be specified. Once a set is specified, it cannot be changed by calling
+ * set_action_parms() again. Action parameters must be globally the same.
+ *
+ * Except for action_parms(), the programs in this module perform global
+ * operations and must be called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define ACTION_PARMS_C
 

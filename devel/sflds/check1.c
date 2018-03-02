@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2005, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the programs in the module sflds.c.
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2005, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the programs in the module sflds.c.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

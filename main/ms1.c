@@ -1,20 +1,20 @@
 
 /*******************************************************************************
-*
-* File ms1.c
-*
-* Copyright (C) 2012-2014, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Stochastic estimation of reweighting factors.
-*
-* Syntax: ms1 -i <input file> [-noexp] [-a [-norng]]
-*
-* For usage instructions see the file README.ms1.
-*
-*******************************************************************************/
+ *
+ * File ms1.c
+ *
+ * Copyright (C) 2012-2014, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Stochastic estimation of reweighting factors.
+ *
+ * Syntax: ms1 -i <input file> [-noexp] [-a [-norng]]
+ *
+ * For usage instructions see the file README.ms1.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check4.c
-*
-* Copyright (C) 2007, 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Consistency checks on the programs in the module valg
-*
-*******************************************************************************/
+ *
+ * File check4.c
+ *
+ * Copyright (C) 2007, 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Consistency checks on the programs in the module valg
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

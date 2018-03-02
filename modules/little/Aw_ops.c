@@ -1,59 +1,59 @@
 
 /*******************************************************************************
-*
-* File Aw_ops.c
-*
-* Copyright (C) 2011, 2012, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Allocation and initialization of the little Dirac operator.
-*
-* The externally accessible functions are
-*
-*   Aw_t Awop(void)
-*     Returns a structure containing the matrices that describe the
-*     single-precision little Dirac operator.
-*
-*   Aw_t Awophat(void)
-*     Returns a structure containing the matrices that describe the
-*     single-precision even-odd preconditioned little Dirac operator.
-*
-*   Aw_dble_t Awop_dble(void)
-*     Returns a structure containing the matrices that describe the
-*     double-precision little Dirac operator.
-*
-*   Aw_dble_t Awophat_dble(void)
-*     Returns a structure containing the matrices that describe the
-*     double-precision even-odd preconditioned little Dirac operator.
-*
-*   void set_Aw(double mu)
-*     Computes the single- and the double-precision little Dirac operator.
-*     The SW term is updated if needed and the twisted mass is set to mu.
-*     If the twisted-mass flag is set, the twisted-mass term is switched
-*     on the odd sites of the lattice.
-*
-*   int set_Awhat(double mu)
-*     Computes the single- and the double-precision even-odd preconditioned
-*     little Dirac operator. The program calls set_Aw(mu) and thus updates
-*     the operator w/o even-odd preconditioning too. The little modes are
-*     updated as well (see ltl_modes.c). On exit the program returns 0 if
-*     all matrix inversions were safe and 1 if not.
-*
-* Notes:
-*
-* For a description of the little Dirac operator and the associated data
-* structures see README.Aw. The twisted-mass flag is retrieved from the
-* parameter data base (see flags/lat_parms.c).
-*
-* The inversion of a double-precision complex matrix is considered to be
-* safe if and only if its Frobenius condition number is less than 10^6.
-*
-* All programs in this module may involve global communications and must
-* be called simultaneously on all processes.
-*
-*******************************************************************************/
+ *
+ * File Aw_ops.c
+ *
+ * Copyright (C) 2011, 2012, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Allocation and initialization of the little Dirac operator.
+ *
+ * The externally accessible functions are
+ *
+ *   Aw_t Awop(void)
+ *     Returns a structure containing the matrices that describe the
+ *     single-precision little Dirac operator.
+ *
+ *   Aw_t Awophat(void)
+ *     Returns a structure containing the matrices that describe the
+ *     single-precision even-odd preconditioned little Dirac operator.
+ *
+ *   Aw_dble_t Awop_dble(void)
+ *     Returns a structure containing the matrices that describe the
+ *     double-precision little Dirac operator.
+ *
+ *   Aw_dble_t Awophat_dble(void)
+ *     Returns a structure containing the matrices that describe the
+ *     double-precision even-odd preconditioned little Dirac operator.
+ *
+ *   void set_Aw(double mu)
+ *     Computes the single- and the double-precision little Dirac operator.
+ *     The SW term is updated if needed and the twisted mass is set to mu.
+ *     If the twisted-mass flag is set, the twisted-mass term is switched
+ *     on the odd sites of the lattice.
+ *
+ *   int set_Awhat(double mu)
+ *     Computes the single- and the double-precision even-odd preconditioned
+ *     little Dirac operator. The program calls set_Aw(mu) and thus updates
+ *     the operator w/o even-odd preconditioning too. The little modes are
+ *     updated as well (see ltl_modes.c). On exit the program returns 0 if
+ *     all matrix inversions were safe and 1 if not.
+ *
+ * Notes:
+ *
+ * For a description of the little Dirac operator and the associated data
+ * structures see README.Aw. The twisted-mass flag is retrieved from the
+ * parameter data base (see flags/lat_parms.c).
+ *
+ * The inversion of a double-precision complex matrix is considered to be
+ * safe if and only if its Frobenius condition number is less than 10^6.
+ *
+ * All programs in this module may involve global communications and must
+ * be called simultaneously on all processes.
+ *
+ *******************************************************************************/
 
 #define AW_OPS_C
 

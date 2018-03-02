@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File time1.c
-*
-* Copyright (C) 2007, 2009, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Timing of cmat_vec and cmat_mul
-*
-*******************************************************************************/
+ *
+ * File time1.c
+ *
+ * Copyright (C) 2007, 2009, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of cmat_vec and cmat_mul
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

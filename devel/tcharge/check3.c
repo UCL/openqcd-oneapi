@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check3.c
-*
-* Copyright (C) 2009-2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the program tcharge_slices().
-*
-*******************************************************************************/
+ *
+ * File check3.c
+ *
+ * Copyright (C) 2009-2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the program tcharge_slices().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

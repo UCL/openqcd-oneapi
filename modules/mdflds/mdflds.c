@@ -1,63 +1,63 @@
 
 /*******************************************************************************
-*
-* File mdflds.c
-*
-* Copyright (C) 2011, 2012, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Allocation and initialization of the MD auxiliary fields.
-*
-* The externally accessible functions are
-*
-*   mdflds_t *mdflds(void)
-*     Returns the pointer to a mdflds_t structure containing the force and
-*     momentum field. The fields are automatically allocated if needed.
-*
-*   void set_frc2zero(void)
-*     Sets all force variables, including those on the boundary, to zero.
-*
-*   void bnd_mom2zero(void)
-*     Sets the components of the momentum field on the static links
-*     to zero (see the notes).
-*
-*   void random_mom(void)
-*     Sets the elements X of the momentum field on the active links to
-*     random values with distribution proportional to exp(tr{X^2}). On
-*     the static links the field is set to zero (see the notes).
-*
-*   double momentum_action(int icom)
-*     Returns the action of the momentum field. The action is summed
-*     over all MPI processes if (and only if) icom=1.
-*
-* Notes:
-*
-* The arrays *.mom and *.frc in the structure returned by mflds() are the
-* molecular-dynamics momentum and force fields. Their elements are ordered
-* in the same way as the link variables (see main/README.global). Moreover,
-* the force field includes space for 7*(BNDRY/4) additional links as do the
-* gauge fields (see lattice/README.uidx).
-*
-* Before the momentum and force fields are allocated, the geometry arrays
-* must be set. The sets of static and active links depend on the chosen
-* boundary conditions. Only the field variables on the active links are
-* updated in the simulations.
-*
-* The number npf of pseudo-fermion fields is retrieved from the parameter
-* data base (see flags/hmc_parms.c). It is thus assumed that npf has been
-* set when the programs in this module are called for the first time (the
-* field array is otherwise set to NULL).
-*
-* Pseudo-fermion fields are of the same size NSPIN as other quark fields.
-* In the structure returned by mdflds(), the address of the pseudo-fermion
-* field with index ipf is *.pf[ipf].
-*
-* The programs potentially perform global operations and must be called
-* simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File mdflds.c
+ *
+ * Copyright (C) 2011, 2012, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Allocation and initialization of the MD auxiliary fields.
+ *
+ * The externally accessible functions are
+ *
+ *   mdflds_t *mdflds(void)
+ *     Returns the pointer to a mdflds_t structure containing the force and
+ *     momentum field. The fields are automatically allocated if needed.
+ *
+ *   void set_frc2zero(void)
+ *     Sets all force variables, including those on the boundary, to zero.
+ *
+ *   void bnd_mom2zero(void)
+ *     Sets the components of the momentum field on the static links
+ *     to zero (see the notes).
+ *
+ *   void random_mom(void)
+ *     Sets the elements X of the momentum field on the active links to
+ *     random values with distribution proportional to exp(tr{X^2}). On
+ *     the static links the field is set to zero (see the notes).
+ *
+ *   double momentum_action(int icom)
+ *     Returns the action of the momentum field. The action is summed
+ *     over all MPI processes if (and only if) icom=1.
+ *
+ * Notes:
+ *
+ * The arrays *.mom and *.frc in the structure returned by mflds() are the
+ * molecular-dynamics momentum and force fields. Their elements are ordered
+ * in the same way as the link variables (see main/README.global). Moreover,
+ * the force field includes space for 7*(BNDRY/4) additional links as do the
+ * gauge fields (see lattice/README.uidx).
+ *
+ * Before the momentum and force fields are allocated, the geometry arrays
+ * must be set. The sets of static and active links depend on the chosen
+ * boundary conditions. Only the field variables on the active links are
+ * updated in the simulations.
+ *
+ * The number npf of pseudo-fermion fields is retrieved from the parameter
+ * data base (see flags/hmc_parms.c). It is thus assumed that npf has been
+ * set when the programs in this module are called for the first time (the
+ * field array is otherwise set to NULL).
+ *
+ * Pseudo-fermion fields are of the same size NSPIN as other quark fields.
+ * In the structure returned by mdflds(), the address of the pseudo-fermion
+ * field with index ipf is *.pf[ipf].
+ *
+ * The programs potentially perform global operations and must be called
+ * simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define MDFLDS_C
 

@@ -1,55 +1,55 @@
 
 /*******************************************************************************
-*
-* File uidx.c
-*
-* Copyright (C) 2010, 2011, 2012, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Labeling of the link variables on the faces of the local lattice.
-*
-* The externally accessible functions are
-*
-*   uidx_t *uidx(void)
-*     Returns an array idx[4] of uidx_t structures containing the offsets
-*     of the link variables at the faces of the local lattice.
-*
-*   void plaq_uidx(int n,int ix,int *ip)
-*     Calculates the offsets ip[4] of the links in the (mu,nu)-plaquette at
-*     the point on the local lattice with label ix. The indices (mu,nu) are
-*     determined by the parameter n=0,..,5.
-*
-* Notes:
-*
-* The layout of the double-precision gauge field array and contents of the
-* index structures returned by uidx() are described in the file README.uidx
-* in this directory. The index arrays calculated by uidx() are determined
-* by the local geometry of the lattice and are therefore independent of the
-* boundary conditions.
-*
-* There are six planes
-*
-*  (mu,nu)={(0,1),(0,2),(0,3),(2,3),(3,1),(1,2)}
-*
-* labeled by an integer n running from 0 to 5 and the links in the
-* (mu,nu)-plaquette at the point x are ordered such that
-*
-*   ip[0] -> U(x,mu)
-*   ip[1] -> U(x+mu,nu)
-*   ip[2] -> U(x,nu)
-*   ip[3] -> U(x+nu,mu)
-*
-* In the program plaq_uidx() it is taken for granted that 0<=ix<VOLUME.
-*
-* If SF or open-SF boundary conditions are chosen, the offsets ip[4]
-* returned by plaq_uidx() at global time NPROC0*L0-1 take into account the
-* fact that the boundary values of the gauge field are stored at the end
-* of the field array. On all MPI processes, and for all boundary conditions,
-* the correct field variables are thus found at the calculated offsets.
-*
-*******************************************************************************/
+ *
+ * File uidx.c
+ *
+ * Copyright (C) 2010, 2011, 2012, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Labeling of the link variables on the faces of the local lattice.
+ *
+ * The externally accessible functions are
+ *
+ *   uidx_t *uidx(void)
+ *     Returns an array idx[4] of uidx_t structures containing the offsets
+ *     of the link variables at the faces of the local lattice.
+ *
+ *   void plaq_uidx(int n,int ix,int *ip)
+ *     Calculates the offsets ip[4] of the links in the (mu,nu)-plaquette at
+ *     the point on the local lattice with label ix. The indices (mu,nu) are
+ *     determined by the parameter n=0,..,5.
+ *
+ * Notes:
+ *
+ * The layout of the double-precision gauge field array and contents of the
+ * index structures returned by uidx() are described in the file README.uidx
+ * in this directory. The index arrays calculated by uidx() are determined
+ * by the local geometry of the lattice and are therefore independent of the
+ * boundary conditions.
+ *
+ * There are six planes
+ *
+ *  (mu,nu)={(0,1),(0,2),(0,3),(2,3),(3,1),(1,2)}
+ *
+ * labeled by an integer n running from 0 to 5 and the links in the
+ * (mu,nu)-plaquette at the point x are ordered such that
+ *
+ *   ip[0] -> U(x,mu)
+ *   ip[1] -> U(x+mu,nu)
+ *   ip[2] -> U(x,nu)
+ *   ip[3] -> U(x+nu,mu)
+ *
+ * In the program plaq_uidx() it is taken for granted that 0<=ix<VOLUME.
+ *
+ * If SF or open-SF boundary conditions are chosen, the offsets ip[4]
+ * returned by plaq_uidx() at global time NPROC0*L0-1 take into account the
+ * fact that the boundary values of the gauge field are stored at the end
+ * of the field array. On all MPI processes, and for all boundary conditions,
+ * the correct field variables are thus found at the calculated offsets.
+ *
+ *******************************************************************************/
 
 #define UIDX_C
 

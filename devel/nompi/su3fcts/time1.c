@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File time1.c
-*
-* Copyright (C) 2005, 2008, 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Timing of the SU(3) x SU(3)-vector multiplication (single-precision programs)
-*
-*******************************************************************************/
+ *
+ * File time1.c
+ *
+ * Copyright (C) 2005, 2008, 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of the SU(3) x SU(3)-vector multiplication (single-precision programs)
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

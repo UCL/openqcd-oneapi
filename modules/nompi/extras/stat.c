@@ -1,99 +1,99 @@
 
 /*******************************************************************************
-*
-* File stat.c
-*
-* Copyright (C) 2005, 2011 Martin Luescher, Leonardo Giusti
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Collection of simple statistical analysis programs
-*
-* The externally accessible functions are
-*
-*   double average(int n,double *a)
-*     Returns the average of the array elements a[0],..,a[n-1]
-*
-*   double sigma0(int n,double *a)
-*     Returns the naive statistical error of the average of the array
-*     elements a[0],..,a[n-1]
-*
-*   double auto_corr(int n,double *a,int tmax,double *g)
-*     Computes the normalized autocorrelation function g[t] at time
-*     separations t=0,..,tmax-1 of the sequence a[0],..,a[n-1] and
-*     returns the value of the (unnormalized) autocorrelation function
-*     at t=0. The inequality tmax<=n must be respected
-*
-*   void sigma_auto_corr(int n,double *a,int tmax,int lambda,double *eg)
-*     Computes the statistical error eg[t] at time t=0,..,tmax-1 of the
-*     normalized autocorrelation function of the sequence a[0],..,a[n-1].
-*     The choice of the summation cutoff lambda is not critical, but it
-*     should be set to a value not smaller than a few times the integrated
-*     autocorrelation time of the sequence (see the notes below). The
-*     inequality 2*tmax+lambda-1<=n must be respected
-*
-*   double tauint(int n,double *a,int tmax,int lambda,int *w,double *sigma)
-*     Returns an estimate of the integrated autocorrelation time of the
-*     sequence a[0],..,a[n-1]. On exit the summation window determined by
-*     the program is assigned to *w and an estimate of the statistical
-*     error on the calculated autocorrelation time is assigned to *sigma.
-*     The parameter tmax sets an upper limit on the summation window and
-*     the summation cutoff lambda should be set to a value not smaller than
-*     a few times the integrated autocorrelation time (see the notes below).
-*     The inequality 2*tmax+lambda-1<=n must be respected
-*
-*   double print_auto(int n,double *a)
-*     Prints a table of the approximate integrated auto-correlation time
-*     tau(w)=1/2+sum_{t=1}^w g[t] and the associated statistical error
-*     sigma(w)=sigma0*sqrt{2*tau(w)}, where g[t] denotes the normalized
-*     autocorrelation function of the sequence a[0],..,a[n-1]. On exit
-*     the program returns the average of the array elements
-*
-*   double jack_err(int nx,int n,double **a,double (*f)(int nx,double *x),
-*                   int bmax,double *sig)
-*     Computes the standard estimate of an arbitrary function f() of
-*     nx primary stochastic variables x[k], k=0,..,nx-1, for a given
-*     sequence a[k][0],..,a[k][n-1] of values of these. The associated
-*     jackknife errors sig[bs-1] for bin size bs=1,..,bmax are also
-*     computed. On exit the program returns the standard estimate of
-*     the function f()
-*
-*   double print_jack(int nx,int n,double **a,double (*f)(int nx,double *x))
-*     Prints a table of the jackknife errors calculated by the program
-*     jack_err(), together with the estimated integrated autocorrelation
-*     times, as a function of the bin size bs. On exit the program returns
-*     the standard estimate of the function f()
-*
-* Notes:
-*
-* For a recent discussion of statistical error estimation see
-*
-*  Ulli Wolff, Monte Carlo errors with less errors,
-*  Comput. Phys. Commun. 156 (2004) 143 [hep-lat/0306017]
-*
-* The jackknife procedure is explained in appendix B of this paper and
-* an improved Madras-Sokal formula is derived [eq.(42)] for the statistical
-* error of the integrated autocorrelation time. The program tauint() makes
-* use of this formula, while print_auto() uses the unimproved formula
-*
-* The standard estimate of a function f() of a vector x[0],..,x[nx-1] of
-* primary stochastic variables is obtained by setting the arguments x[k]
-* to the ensemble averages <x[k]>
-*
-* The computation of the autocorrelation function and the integrated
-* autocorrelation time follows the lines of appendix A of
-*
-*  M. L"uscher, Schwarz-preconditioned HMC algorithm for two-flavor
-*  lattice QCD, Comput. Phys. Commun. 165 (2005) 199 [hep-lat/0409106]
-*
-* In particular, the summation cutoff lambda is introduced there and
-* the selection of the summation window *w is explained
-*
-* The programs in this module may be used in MPI programs, but should then
-* only be called from the root process
-*
-*******************************************************************************/
+ *
+ * File stat.c
+ *
+ * Copyright (C) 2005, 2011 Martin Luescher, Leonardo Giusti
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Collection of simple statistical analysis programs
+ *
+ * The externally accessible functions are
+ *
+ *   double average(int n,double *a)
+ *     Returns the average of the array elements a[0],..,a[n-1]
+ *
+ *   double sigma0(int n,double *a)
+ *     Returns the naive statistical error of the average of the array
+ *     elements a[0],..,a[n-1]
+ *
+ *   double auto_corr(int n,double *a,int tmax,double *g)
+ *     Computes the normalized autocorrelation function g[t] at time
+ *     separations t=0,..,tmax-1 of the sequence a[0],..,a[n-1] and
+ *     returns the value of the (unnormalized) autocorrelation function
+ *     at t=0. The inequality tmax<=n must be respected
+ *
+ *   void sigma_auto_corr(int n,double *a,int tmax,int lambda,double *eg)
+ *     Computes the statistical error eg[t] at time t=0,..,tmax-1 of the
+ *     normalized autocorrelation function of the sequence a[0],..,a[n-1].
+ *     The choice of the summation cutoff lambda is not critical, but it
+ *     should be set to a value not smaller than a few times the integrated
+ *     autocorrelation time of the sequence (see the notes below). The
+ *     inequality 2*tmax+lambda-1<=n must be respected
+ *
+ *   double tauint(int n,double *a,int tmax,int lambda,int *w,double *sigma)
+ *     Returns an estimate of the integrated autocorrelation time of the
+ *     sequence a[0],..,a[n-1]. On exit the summation window determined by
+ *     the program is assigned to *w and an estimate of the statistical
+ *     error on the calculated autocorrelation time is assigned to *sigma.
+ *     The parameter tmax sets an upper limit on the summation window and
+ *     the summation cutoff lambda should be set to a value not smaller than
+ *     a few times the integrated autocorrelation time (see the notes below).
+ *     The inequality 2*tmax+lambda-1<=n must be respected
+ *
+ *   double print_auto(int n,double *a)
+ *     Prints a table of the approximate integrated auto-correlation time
+ *     tau(w)=1/2+sum_{t=1}^w g[t] and the associated statistical error
+ *     sigma(w)=sigma0*sqrt{2*tau(w)}, where g[t] denotes the normalized
+ *     autocorrelation function of the sequence a[0],..,a[n-1]. On exit
+ *     the program returns the average of the array elements
+ *
+ *   double jack_err(int nx,int n,double **a,double (*f)(int nx,double *x),
+ *                   int bmax,double *sig)
+ *     Computes the standard estimate of an arbitrary function f() of
+ *     nx primary stochastic variables x[k], k=0,..,nx-1, for a given
+ *     sequence a[k][0],..,a[k][n-1] of values of these. The associated
+ *     jackknife errors sig[bs-1] for bin size bs=1,..,bmax are also
+ *     computed. On exit the program returns the standard estimate of
+ *     the function f()
+ *
+ *   double print_jack(int nx,int n,double **a,double (*f)(int nx,double *x))
+ *     Prints a table of the jackknife errors calculated by the program
+ *     jack_err(), together with the estimated integrated autocorrelation
+ *     times, as a function of the bin size bs. On exit the program returns
+ *     the standard estimate of the function f()
+ *
+ * Notes:
+ *
+ * For a recent discussion of statistical error estimation see
+ *
+ *  Ulli Wolff, Monte Carlo errors with less errors,
+ *  Comput. Phys. Commun. 156 (2004) 143 [hep-lat/0306017]
+ *
+ * The jackknife procedure is explained in appendix B of this paper and
+ * an improved Madras-Sokal formula is derived [eq.(42)] for the statistical
+ * error of the integrated autocorrelation time. The program tauint() makes
+ * use of this formula, while print_auto() uses the unimproved formula
+ *
+ * The standard estimate of a function f() of a vector x[0],..,x[nx-1] of
+ * primary stochastic variables is obtained by setting the arguments x[k]
+ * to the ensemble averages <x[k]>
+ *
+ * The computation of the autocorrelation function and the integrated
+ * autocorrelation time follows the lines of appendix A of
+ *
+ *  M. L"uscher, Schwarz-preconditioned HMC algorithm for two-flavor
+ *  lattice QCD, Comput. Phys. Commun. 165 (2005) 199 [hep-lat/0409106]
+ *
+ * In particular, the summation cutoff lambda is introduced there and
+ * the selection of the summation window *w is explained
+ *
+ * The programs in this module may be used in MPI programs, but should then
+ * only be called from the root process
+ *
+ *******************************************************************************/
 
 #define STAT_C
 

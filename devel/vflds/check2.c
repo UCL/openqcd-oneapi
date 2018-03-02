@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2005, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the programs in the module vinit.c
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2005, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the programs in the module vinit.c
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

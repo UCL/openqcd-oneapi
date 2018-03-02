@@ -1,48 +1,48 @@
 
 /*******************************************************************************
-*
-* File map_u2blk.c
-*
-* Copyright (C) 2006, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Copying of the gauge fields to the blocks in a block grid.
-*
-* The externally accessible functions are
-*
-*   void assign_ud2ubgr(blk_grid_t grid)
-*     Assigns the global double-precision gauge field to the corresponding
-*     single-precision fields in the specified block grid (see the notes).
-*
-*   void assign_ud2udblk(blk_grid_t grid,int n)
-*     Assigns the global double-precision gauge field to the corresponding
-*     double-precision field on the n'th block of the specified block grid
-*     (see the notes).
-*
-* Notes:
-*
-* The program assign_ud2ubgr() copies the gauge field to all blocks and their
-* exterior boundaries (if the field is allocated there). An error occurs if
-* the single-precision gauge field on the blocks is shared. On the exterior
-* block boundaries at time 0 (boundary conditions type 0,1 and 2) and time
-* NPROC0*L0-1 (boundary condition type 0), the link variables are not copied
-* and are instead set to zero.
-*
-* The program assign_ud2udblk() does *not* copy the link variables to the
-* boundaries of the block. The double-precision gauge field on the blocks
-* must be shared in this case.
-*
-* As explained in README.block, the field arrays on the blocks reserve space
-* for all 8 link variables at the odd points, including those on the links
-* that "stick out" of the block. While the latter are used for technical
-* purposes only, the programs in this module copy these too.
-*
-* Both programs in this module may involve communications and must be called
-* on all MPI processes simultaneously.
-*
-*******************************************************************************/
+ *
+ * File map_u2blk.c
+ *
+ * Copyright (C) 2006, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Copying of the gauge fields to the blocks in a block grid.
+ *
+ * The externally accessible functions are
+ *
+ *   void assign_ud2ubgr(blk_grid_t grid)
+ *     Assigns the global double-precision gauge field to the corresponding
+ *     single-precision fields in the specified block grid (see the notes).
+ *
+ *   void assign_ud2udblk(blk_grid_t grid,int n)
+ *     Assigns the global double-precision gauge field to the corresponding
+ *     double-precision field on the n'th block of the specified block grid
+ *     (see the notes).
+ *
+ * Notes:
+ *
+ * The program assign_ud2ubgr() copies the gauge field to all blocks and their
+ * exterior boundaries (if the field is allocated there). An error occurs if
+ * the single-precision gauge field on the blocks is shared. On the exterior
+ * block boundaries at time 0 (boundary conditions type 0,1 and 2) and time
+ * NPROC0*L0-1 (boundary condition type 0), the link variables are not copied
+ * and are instead set to zero.
+ *
+ * The program assign_ud2udblk() does *not* copy the link variables to the
+ * boundaries of the block. The double-precision gauge field on the blocks
+ * must be shared in this case.
+ *
+ * As explained in README.block, the field arrays on the blocks reserve space
+ * for all 8 link variables at the odd points, including those on the links
+ * that "stick out" of the block. While the latter are used for technical
+ * purposes only, the programs in this module copy these too.
+ *
+ * Both programs in this module may involve communications and must be called
+ * on all MPI processes simultaneously.
+ *
+ *******************************************************************************/
 
 #define MAP_U2BLK_C
 

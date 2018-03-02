@@ -1,57 +1,57 @@
 
 /*******************************************************************************
-*
-* File elliptic.c
-*
-* Copyright (C) 2008, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of the Jacobi elliptic functions sn, cn and dn
-*
-* The externally accessible functions are
-*
-*   double ellipticK(double rk)
-*     Returns the complete elliptic integral K(k) for 0<=k<1. The value
-*     of k is to be passed through the argument rk=k/k' (see the notes).
-*
-*   void sncndn(double u,double rk,double *sn,double *cn,double *dn)
-*     Computes the Jacobi elliptic functions sn(u,k), cn(u,k), dn(u,k)
-*     for specified real u and 0<=k<1. The value of k is to be passed
-*     through the argument rk=k/k' (see the notes).
-*
-* Notes:
-*
-* The complete elliptic integral and the Jacobi elliptic functions in the
-* range -K/2<=u<=K/2 are obtained practically to machine precision. In
-* particular, sn(u,k)=u+O(u^3) and cn(u,k)=1-u^2/2+O(u^4) exactly.
-*
-* Other values of u are first mapped to the interval 0<=u<=K/2 using the
-* symmetry properties of the elliptic functions and the numerically computed
-* value of K. In general this implies a loss of significance of the argument
-* which propagates to the computed functions.
-*
-* The complete elliptic integral is obtained via the arithmetic-geometric
-* mean. For small u, the Jacobi elliptic functions are calculated using
-* the Taylor expansion. Elsewhere the descending Landen transformation is
-* used. See
-*
-*   M. Abramowitz, I. A. Stegun: "Handbook of mathematical functions",
-*   (Dover Publications, New York, 1972)
-*
-* for example.
-*
-* These methods eventually require both k and k'=sqrt(1-k*k) as input. While
-* k' can be computed for given k, there can be important significance losses
-* at this point if k is close to 1. On the other hand, if rk=k/k' is given,
-* k and k' can be computed with negligible significance losses through
-*
-*   k=rk/sqrt(1+rk^2),   k'=1/sqrt(1+rk^2).
-*
-* This is why rk is chosen as input parameter in the programs in this file.
-*
-*******************************************************************************/
+ *
+ * File elliptic.c
+ *
+ * Copyright (C) 2008, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of the Jacobi elliptic functions sn, cn and dn
+ *
+ * The externally accessible functions are
+ *
+ *   double ellipticK(double rk)
+ *     Returns the complete elliptic integral K(k) for 0<=k<1. The value
+ *     of k is to be passed through the argument rk=k/k' (see the notes).
+ *
+ *   void sncndn(double u,double rk,double *sn,double *cn,double *dn)
+ *     Computes the Jacobi elliptic functions sn(u,k), cn(u,k), dn(u,k)
+ *     for specified real u and 0<=k<1. The value of k is to be passed
+ *     through the argument rk=k/k' (see the notes).
+ *
+ * Notes:
+ *
+ * The complete elliptic integral and the Jacobi elliptic functions in the
+ * range -K/2<=u<=K/2 are obtained practically to machine precision. In
+ * particular, sn(u,k)=u+O(u^3) and cn(u,k)=1-u^2/2+O(u^4) exactly.
+ *
+ * Other values of u are first mapped to the interval 0<=u<=K/2 using the
+ * symmetry properties of the elliptic functions and the numerically computed
+ * value of K. In general this implies a loss of significance of the argument
+ * which propagates to the computed functions.
+ *
+ * The complete elliptic integral is obtained via the arithmetic-geometric
+ * mean. For small u, the Jacobi elliptic functions are calculated using
+ * the Taylor expansion. Elsewhere the descending Landen transformation is
+ * used. See
+ *
+ *   M. Abramowitz, I. A. Stegun: "Handbook of mathematical functions",
+ *   (Dover Publications, New York, 1972)
+ *
+ * for example.
+ *
+ * These methods eventually require both k and k'=sqrt(1-k*k) as input. While
+ * k' can be computed for given k, there can be important significance losses
+ * at this point if k is close to 1. On the other hand, if rk=k/k' is given,
+ * k and k' can be computed with negligible significance losses through
+ *
+ *   k=rk/sqrt(1+rk^2),   k'=1/sqrt(1+rk^2).
+ *
+ * This is why rk is chosen as input parameter in the programs in this file.
+ *
+ *******************************************************************************/
 
 #define ELLIPTIC_C
 

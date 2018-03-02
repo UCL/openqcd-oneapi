@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check5.c
-*
-* Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Action of Dw_dble() on plane waves.
-*
-*******************************************************************************/
+ *
+ * File check5.c
+ *
+ * Copyright (C) 2005, 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Action of Dw_dble() on plane waves.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

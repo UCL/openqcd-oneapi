@@ -1,81 +1,81 @@
 
 /*******************************************************************************
-*
-* File tmcg.c
-*
-* Copyright (C) 2011-2013 Martin Luescher, Stefan Schaefer
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* CG solver for the normal Wilson-Dirac equation with a twisted-mass term.
-*
-* The externally accessible function is
-*
-*   double tmcg(int nmx,double res,double mu,
-*               spinor_dble *eta,spinor_dble *psi,int *status)
-*     Obtains an approximate solution psi of the normal Wilson-Dirac
-*     equation for given source eta (see the notes).
-*
-*   double tmcgeo(int nmx,double res,double mu,
-*                 spinor_dble *eta,spinor_dble *psi,int *status)
-*     Obtains an approximate solution psi of the normal even-odd
-*     preconditioned Wilson-Dirac equation for given source eta (see
-*     the notes).
-*
-* Notes:
-*
-* The normal and the normal even-odd preconditioned Wilson-Dirac equations
-* are
-*
-*   (Dw^dag*Dw+mu^2)*psi=eta
-*
-*   (Dwhat^dag*Dwhat+mu^2)*psi=eta
-*
-* respectively.
-*
-* The programs are based on the standard CG algorithm (see linsolv/cgne.c).
-* They assume that the improvement coefficients and the quark mass in the
-* SW term have been set through set_lat_parms() and set_sw_parms() (see
-* flags/lat_parms.c).
-*
-* All other parameters are passed through the argument list:
-*
-*   nmx     Maximal total number of CG iterations that may be performed.
-*
-*   res     Desired maximal relative residue |eta-(Dw^dag*Dw+mu^2)*psi|/|eta|
-*           of the calculated solution.
-*
-*   mu      Value of the twisted mass in the Dirac equation.
-*
-*   eta     Source field. Note that source fields must respect the chosen
-*           boundary conditions at time 0 and NPR0C0*L0-1, as has to be the
-*           the case for physical quark fields (see doc/dirac.pdf). On exit
-*           eta is unchanged unless psi=eta (which is permissible).
-*
-*   psi     Calculated approximate solution of the Dirac equation.
-*
-*   status  If the program is able to solve the Dirac equation to the
-*           desired accuracy, status reports the number of CG iterations
-*           that were required for the solution. Negative values indicate
-*           that the program failed (-1: the algorithm did not converge,
-*           -2: the solution went out of range, -3: the inversion of the
-*           SW term was not safe).
-*
-* The programs return the norm of the residue of the calculated approximate
-* solution if status[0]>=-1. Otherwise the field psi is set to zero and the
-* programs return the norm of the source eta.
-*
-* The SW term is recalculated when needed. Evidently the solver is a global
-* program that must be called on all processes simultaneously. The required
-* workspaces are
-*
-*  spinor              5
-*  spinor_dble         3
-*
-* (see utils/wspace.c).
-*
-*******************************************************************************/
+ *
+ * File tmcg.c
+ *
+ * Copyright (C) 2011-2013 Martin Luescher, Stefan Schaefer
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * CG solver for the normal Wilson-Dirac equation with a twisted-mass term.
+ *
+ * The externally accessible function is
+ *
+ *   double tmcg(int nmx,double res,double mu,
+ *               spinor_dble *eta,spinor_dble *psi,int *status)
+ *     Obtains an approximate solution psi of the normal Wilson-Dirac
+ *     equation for given source eta (see the notes).
+ *
+ *   double tmcgeo(int nmx,double res,double mu,
+ *                 spinor_dble *eta,spinor_dble *psi,int *status)
+ *     Obtains an approximate solution psi of the normal even-odd
+ *     preconditioned Wilson-Dirac equation for given source eta (see
+ *     the notes).
+ *
+ * Notes:
+ *
+ * The normal and the normal even-odd preconditioned Wilson-Dirac equations
+ * are
+ *
+ *   (Dw^dag*Dw+mu^2)*psi=eta
+ *
+ *   (Dwhat^dag*Dwhat+mu^2)*psi=eta
+ *
+ * respectively.
+ *
+ * The programs are based on the standard CG algorithm (see linsolv/cgne.c).
+ * They assume that the improvement coefficients and the quark mass in the
+ * SW term have been set through set_lat_parms() and set_sw_parms() (see
+ * flags/lat_parms.c).
+ *
+ * All other parameters are passed through the argument list:
+ *
+ *   nmx     Maximal total number of CG iterations that may be performed.
+ *
+ *   res     Desired maximal relative residue |eta-(Dw^dag*Dw+mu^2)*psi|/|eta|
+ *           of the calculated solution.
+ *
+ *   mu      Value of the twisted mass in the Dirac equation.
+ *
+ *   eta     Source field. Note that source fields must respect the chosen
+ *           boundary conditions at time 0 and NPR0C0*L0-1, as has to be the
+ *           the case for physical quark fields (see doc/dirac.pdf). On exit
+ *           eta is unchanged unless psi=eta (which is permissible).
+ *
+ *   psi     Calculated approximate solution of the Dirac equation.
+ *
+ *   status  If the program is able to solve the Dirac equation to the
+ *           desired accuracy, status reports the number of CG iterations
+ *           that were required for the solution. Negative values indicate
+ *           that the program failed (-1: the algorithm did not converge,
+ *           -2: the solution went out of range, -3: the inversion of the
+ *           SW term was not safe).
+ *
+ * The programs return the norm of the residue of the calculated approximate
+ * solution if status[0]>=-1. Otherwise the field psi is set to zero and the
+ * programs return the norm of the source eta.
+ *
+ * The SW term is recalculated when needed. Evidently the solver is a global
+ * program that must be called on all processes simultaneously. The required
+ * workspaces are
+ *
+ *  spinor              5
+ *  spinor_dble         3
+ *
+ * (see utils/wspace.c).
+ *
+ *******************************************************************************/
 
 #define TMCG_C
 

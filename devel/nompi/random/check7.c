@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check7.c
-*
-* Copyright (C) 2010 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Reweighting of gaussian distributions [statistical test of gauss_dble()]
-*
-*******************************************************************************/
+ *
+ * File check7.c
+ *
+ * Copyright (C) 2010 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Reweighting of gaussian distributions [statistical test of gauss_dble()]
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check4.c
-*
-* Copyright (C) 2011, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of apply_sw_dble() and apply_swinv_dble()
-*
-*******************************************************************************/
+ *
+ * File check4.c
+ *
+ * Copyright (C) 2011, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of apply_sw_dble() and apply_swinv_dble()
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check3.c
-*
-* Copyright (C) 2005, 2008-2013, 2016 Martin Luescher, Filippo Palombi
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Check of the programs force0() and action0().
-*
-*******************************************************************************/
+ *
+ * File check3.c
+ *
+ * Copyright (C) 2005, 2008-2013, 2016 Martin Luescher, Filippo Palombi
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the programs force0() and action0().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

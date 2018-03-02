@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check1.c
-*
-* Copyright (C) 2008, 2012 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of the complete elliptic integral K(k)
-*
-*******************************************************************************/
+ *
+ * File check1.c
+ *
+ * Copyright (C) 2008, 2012 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of the complete elliptic integral K(k)
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -74,9 +74,8 @@ int main(void)
     k = rk / sqrt(1.0 + rk * rk);
     kp = 1.0 / sqrt(1.0 + rk * rk);
 
-    dev = fabs(1.0 -
-               ellipticK(2.0 * sqrt(k) * (1.0 + k) / (kp * kp)) /
-                   ((1.0 + k) * ellipticK(rk)));
+    dev = fabs(1.0 - ellipticK(2.0 * sqrt(k) * (1.0 + k) / (kp * kp)) /
+                         ((1.0 + k) * ellipticK(rk)));
 
     if (dev > dmax)
       dmax = dev;

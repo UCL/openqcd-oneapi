@@ -1,35 +1,35 @@
 
 /*******************************************************************************
-*
-* File ks_test.c
-*
-* Copyright (C) 2005, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Kolmogorov-Smirnov test
-*
-* The externally accessible functions are
-*
-*   void ks_test(int n,double f[],double *pkp,double *pkm)
-*     For a given array f[0],f[1],...,f[n-1], the program calculates
-*     the Kolmogorov-Smirnov statistics K_n^{+}=*pkp and K_n^{-}=*pkm
-*
-*   void ks_prob(int n,double kp,double km,double *pp,double *pm)
-*     Computes the approximate probabilites *pp and *pm for the Kolmogorov-
-*     Smirnov statistics K_n^{+} and K_n^{-} to be less than or equal to
-*     kp and km respectively (eq.(4) in the notes).
-*
-* Notes:
-*
-* See the notes
-*
-*   M. Luescher: Statistical tests
-*
-* for a detailed description.
-*
-*******************************************************************************/
+ *
+ * File ks_test.c
+ *
+ * Copyright (C) 2005, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Kolmogorov-Smirnov test
+ *
+ * The externally accessible functions are
+ *
+ *   void ks_test(int n,double f[],double *pkp,double *pkm)
+ *     For a given array f[0],f[1],...,f[n-1], the program calculates
+ *     the Kolmogorov-Smirnov statistics K_n^{+}=*pkp and K_n^{-}=*pkm
+ *
+ *   void ks_prob(int n,double kp,double km,double *pp,double *pm)
+ *     Computes the approximate probabilites *pp and *pm for the Kolmogorov-
+ *     Smirnov statistics K_n^{+} and K_n^{-} to be less than or equal to
+ *     kp and km respectively (eq.(4) in the notes).
+ *
+ * Notes:
+ *
+ * See the notes
+ *
+ *   M. Luescher: Statistical tests
+ *
+ * for a detailed description.
+ *
+ *******************************************************************************/
 
 #define KS_TEST_C
 

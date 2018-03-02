@@ -1,86 +1,86 @@
 
 /*******************************************************************************
-*
-* File chexp.c
-*
-* Copyright (C) 2009-2011, 2013, 2016 Filippo Palombi, Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Computation of the SU(3) exponential function and its first and second
-* derivatives using the Cayley-Hamilton representation.
-*
-* The externally accessible functions are
-*
-*   void ch2mat(complex_dble *p,su3_alg_dble *X,su3_dble *u)
-*     Computes u=p[0]+p[1]*X+p[2]*X^2 given the Cayley-Hamilton coefficients
-*     p[0],p[1],p[2] and the matrix X.
-*
-*   void chexp_drv0(su3_alg_dble *X,ch_drv0_t *s);
-*     Assigns the Cayley-Hamilton coefficients of the exponential function
-*     exp(X) to the elements of s, assuming the norm of X is not be larger
-*     than 1 (an error occurs if this condition is violated).
-*
-*   void chexp_drv1(su3_alg_dble *X,ch_drv1_t *s);
-*     Assigns the Cayley-Hamilton coefficients of the exponential function
-*     exp(X) and their first derivatives to the elements of s, assuming the
-*     the norm of X is not larger than 1 (an error occurs if this condition
-*     is violated).
-*
-*   void chexp_drv2(su3_alg_dble *X,ch_drv2_t *s);
-*     Assigns the Cayley-Hamilton coefficients of the exponential function
-*     exp(X) and their first and second derivatives to the elements of s,
-*     assuming the norm of X is not larger than 1 (an error occurs if this
-*     condition is violated).
-*
-*   void expXsu3(double eps,su3_alg_dble *X,su3_dble *u)
-*     Replaces u by exp(eps*X)*u, where "exp" is the SU(3) exponential
-*     function.
-*
-* Notes:
-*
-* The programs are based on the notes
-*
-*   M. Luescher: "SU(3) matrix functions", August 2009
-*
-* The output is delivered in structures of the type
-*
-*   typedef struct
-*   {
-*      double t,d;
-*      complex_dble p[3];
-*   } ch_drv0_t;
-*
-*   typedef struct
-*   {
-*      double t,d;
-*      complex_dble p[3];
-*      complex_dble pt[3];
-*      complex_dble pd[3];
-*   } ch_drv1_t;
-*
-*   typedef struct
-*   {
-*      double t,d;
-*      complex_dble p[3];
-*      complex_dble pt[3];
-*      complex_dble pd[3];
-*      complex_dble ptt[3];
-*      complex_dble ptd[3];
-*      complex_dble pdd[3];
-*   } ch_drv2_t;
-*
-* defined in su3fcts.h. Their elements are the Cayley-Hamilton coefficients
-* of the exponential function and their derivatives with respect to the
-* parameters t and d (see the notes cited above).
-*
-* The programs in this module do not perform any communications and can be
-* called locally. If SSE* or AVX* inline assembly is used, the arguments of
-* type complex_dble, su3_alg_dble and su3_dble must be aligned to a 16 byte
-* boundary.
-*
-*******************************************************************************/
+ *
+ * File chexp.c
+ *
+ * Copyright (C) 2009-2011, 2013, 2016 Filippo Palombi, Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Computation of the SU(3) exponential function and its first and second
+ * derivatives using the Cayley-Hamilton representation.
+ *
+ * The externally accessible functions are
+ *
+ *   void ch2mat(complex_dble *p,su3_alg_dble *X,su3_dble *u)
+ *     Computes u=p[0]+p[1]*X+p[2]*X^2 given the Cayley-Hamilton coefficients
+ *     p[0],p[1],p[2] and the matrix X.
+ *
+ *   void chexp_drv0(su3_alg_dble *X,ch_drv0_t *s);
+ *     Assigns the Cayley-Hamilton coefficients of the exponential function
+ *     exp(X) to the elements of s, assuming the norm of X is not be larger
+ *     than 1 (an error occurs if this condition is violated).
+ *
+ *   void chexp_drv1(su3_alg_dble *X,ch_drv1_t *s);
+ *     Assigns the Cayley-Hamilton coefficients of the exponential function
+ *     exp(X) and their first derivatives to the elements of s, assuming the
+ *     the norm of X is not larger than 1 (an error occurs if this condition
+ *     is violated).
+ *
+ *   void chexp_drv2(su3_alg_dble *X,ch_drv2_t *s);
+ *     Assigns the Cayley-Hamilton coefficients of the exponential function
+ *     exp(X) and their first and second derivatives to the elements of s,
+ *     assuming the norm of X is not larger than 1 (an error occurs if this
+ *     condition is violated).
+ *
+ *   void expXsu3(double eps,su3_alg_dble *X,su3_dble *u)
+ *     Replaces u by exp(eps*X)*u, where "exp" is the SU(3) exponential
+ *     function.
+ *
+ * Notes:
+ *
+ * The programs are based on the notes
+ *
+ *   M. Luescher: "SU(3) matrix functions", August 2009
+ *
+ * The output is delivered in structures of the type
+ *
+ *   typedef struct
+ *   {
+ *      double t,d;
+ *      complex_dble p[3];
+ *   } ch_drv0_t;
+ *
+ *   typedef struct
+ *   {
+ *      double t,d;
+ *      complex_dble p[3];
+ *      complex_dble pt[3];
+ *      complex_dble pd[3];
+ *   } ch_drv1_t;
+ *
+ *   typedef struct
+ *   {
+ *      double t,d;
+ *      complex_dble p[3];
+ *      complex_dble pt[3];
+ *      complex_dble pd[3];
+ *      complex_dble ptt[3];
+ *      complex_dble ptd[3];
+ *      complex_dble pdd[3];
+ *   } ch_drv2_t;
+ *
+ * defined in su3fcts.h. Their elements are the Cayley-Hamilton coefficients
+ * of the exponential function and their derivatives with respect to the
+ * parameters t and d (see the notes cited above).
+ *
+ * The programs in this module do not perform any communications and can be
+ * called locally. If SSE* or AVX* inline assembly is used, the arguments of
+ * type complex_dble, su3_alg_dble and su3_dble must be aligned to a 16 byte
+ * boundary.
+ *
+ *******************************************************************************/
 
 #define CHEXP_C
 

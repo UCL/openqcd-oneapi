@@ -1,102 +1,102 @@
 
 /*******************************************************************************
-*
-* File rwrat.c
-*
-* Copyright (C) 2012-2014 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Rational function reweighting factor.
-*
-* The externally accessible function is
-*
-*   double rwrat(int irp,int n,int *np,int *isp,double *sqn,int **status)
-*     Generates a random pseudo-fermion field with normal distribution,
-*     assigns its square norm to sqn and returns -ln(r) (see the notes).
-*
-* Notes:
-*
-* The computation of the reweighting factor needed to correct for the inexact
-* pseudo-fermion action used for the charm and the strange quark is discussed
-* in the notes "Charm and strange quark in openQCD simulations" (doc/rhmc.pdf).
-*
-* As explained there, an unbiased stochastic estimate r of the reweighting
-* factor is obtained by choosing a pseudo-fermion field eta randomly with
-* distribution proportional to exp{-(eta,eta)} and by calculating
-*
-*  r=exp{-(eta,[(1+Z)^(-1/2)-1]*eta)},
-*
-* where
-*
-*  Z=Dwhat^dag*Dwhat*R^2-1
-*
-* involves the Zolotarev rational function R of Dwhat^dag*Dwhat employed
-* in the simulations and Dwhat denotes the even-odd preconditioned, O(a)-
-* improved Wilson-Dirac operator.
-*
-* The computation requires R to be applied a number of times to a given
-* spinor field. For this calculation, R is divided into n parts according
-* to
-*
-*  R=A*{1+R_0+R_1+..+R_{n-1}},
-*
-*  R_k=Sum{rmu[j]/(Dwhat^dag*Dwhat+mu[j]^2),j=l[k]..l[k]+np[k]-1}
-*
-*  l[k+1]=l[k]+np[k], l[0]=0,
-*
-* mu[j] and rmu[j] being the poles and associated residues of R. The constant
-* A is such that Z is of order delta, the approximation error of the Zolotarev
-* rational function (see ratfcts/ratfcts.c).
-*
-* The arguments of the program rwrat() are:
-*
-*  irp      Index of the Zolotarev rational function R in the parameter
-*           data base.
-*
-*  n        Number of parts R_k of R.
-*
-*  np       Array of the numbers np[k] of poles of the parts R_k. The
-*           poles and zeros of R are ordered such that larger values come
-*           first. R_0 includes the first np[0] poles and zeros, R_1 the
-*           next np[1] poles and zeros, and so on.
-*
-*  isp      Array of the indices isp[k] of the solvers to be used for the
-*           computation of the action of R_k on a given spinor field (the
-*           supported solvers are MSCG, SAP_GCR and DFL_SAP_GCR).
-*
-*  sqn      Square norm of the generated random pseudo-fermion field.
-*
-*  status   Array of the average of the status variables returned by the
-*           solvers. The array status[k] refers to the part R_k and must
-*           have as many elements as are returned by the solver with index
-*           isp[k] (1 for MSCG and SAP_GCR and 3 for DFL_SAP_GCR). In the
-*           case of the DFL_SAP_GCR solver, status[k][2] reports the
-*           number of subspace regenerations that were required.
-*
-* It is taken for granted that the solver parameters have been set by
-* set_solver_parms() [flags/sparms.c]. The bare quark mass is taken to be
-* the one last set by set_sw_parms() [flags/lat_parms.c].
-*
-* The computation of -ln(r) involves a series expansion of (1+Z)^(-1/2),
-* which is stopped when the remainder of the series is estimated to be
-* less than PRECISION_LIMIT (a macro defined below). The true accuracy
-* of -ln(r) however also depends on the chosen solver residues.
-*
-* The program requires a workspace of double-precision spinor fields, whose
-* size depends on the chosen solvers and division of R into parts R_k. For
-* a given k, the required workspace is 3+np[k] (MSCG) and 5 (SAP_GCR and
-* DFL_SAP_GCR). Note that these figures do not include the workspace for the
-* solver programs (see forces/tmcgm.c, sap/sap_gcr.c and dfl/dfl_sap_gcr.c).
-* The numbers of fields to be allocated must be greater or equal to those
-* required for any k=0,..,n-1.
-*
-* The program in this module performs global communications and must be
-* called simultaneously on all MPI processes. Some debugging information
-* is printed to stdout if the macro RWRAT_DBG is defined.
-*
-*******************************************************************************/
+ *
+ * File rwrat.c
+ *
+ * Copyright (C) 2012-2014 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Rational function reweighting factor.
+ *
+ * The externally accessible function is
+ *
+ *   double rwrat(int irp,int n,int *np,int *isp,double *sqn,int **status)
+ *     Generates a random pseudo-fermion field with normal distribution,
+ *     assigns its square norm to sqn and returns -ln(r) (see the notes).
+ *
+ * Notes:
+ *
+ * The computation of the reweighting factor needed to correct for the inexact
+ * pseudo-fermion action used for the charm and the strange quark is discussed
+ * in the notes "Charm and strange quark in openQCD simulations" (doc/rhmc.pdf).
+ *
+ * As explained there, an unbiased stochastic estimate r of the reweighting
+ * factor is obtained by choosing a pseudo-fermion field eta randomly with
+ * distribution proportional to exp{-(eta,eta)} and by calculating
+ *
+ *  r=exp{-(eta,[(1+Z)^(-1/2)-1]*eta)},
+ *
+ * where
+ *
+ *  Z=Dwhat^dag*Dwhat*R^2-1
+ *
+ * involves the Zolotarev rational function R of Dwhat^dag*Dwhat employed
+ * in the simulations and Dwhat denotes the even-odd preconditioned, O(a)-
+ * improved Wilson-Dirac operator.
+ *
+ * The computation requires R to be applied a number of times to a given
+ * spinor field. For this calculation, R is divided into n parts according
+ * to
+ *
+ *  R=A*{1+R_0+R_1+..+R_{n-1}},
+ *
+ *  R_k=Sum{rmu[j]/(Dwhat^dag*Dwhat+mu[j]^2),j=l[k]..l[k]+np[k]-1}
+ *
+ *  l[k+1]=l[k]+np[k], l[0]=0,
+ *
+ * mu[j] and rmu[j] being the poles and associated residues of R. The constant
+ * A is such that Z is of order delta, the approximation error of the Zolotarev
+ * rational function (see ratfcts/ratfcts.c).
+ *
+ * The arguments of the program rwrat() are:
+ *
+ *  irp      Index of the Zolotarev rational function R in the parameter
+ *           data base.
+ *
+ *  n        Number of parts R_k of R.
+ *
+ *  np       Array of the numbers np[k] of poles of the parts R_k. The
+ *           poles and zeros of R are ordered such that larger values come
+ *           first. R_0 includes the first np[0] poles and zeros, R_1 the
+ *           next np[1] poles and zeros, and so on.
+ *
+ *  isp      Array of the indices isp[k] of the solvers to be used for the
+ *           computation of the action of R_k on a given spinor field (the
+ *           supported solvers are MSCG, SAP_GCR and DFL_SAP_GCR).
+ *
+ *  sqn      Square norm of the generated random pseudo-fermion field.
+ *
+ *  status   Array of the average of the status variables returned by the
+ *           solvers. The array status[k] refers to the part R_k and must
+ *           have as many elements as are returned by the solver with index
+ *           isp[k] (1 for MSCG and SAP_GCR and 3 for DFL_SAP_GCR). In the
+ *           case of the DFL_SAP_GCR solver, status[k][2] reports the
+ *           number of subspace regenerations that were required.
+ *
+ * It is taken for granted that the solver parameters have been set by
+ * set_solver_parms() [flags/sparms.c]. The bare quark mass is taken to be
+ * the one last set by set_sw_parms() [flags/lat_parms.c].
+ *
+ * The computation of -ln(r) involves a series expansion of (1+Z)^(-1/2),
+ * which is stopped when the remainder of the series is estimated to be
+ * less than PRECISION_LIMIT (a macro defined below). The true accuracy
+ * of -ln(r) however also depends on the chosen solver residues.
+ *
+ * The program requires a workspace of double-precision spinor fields, whose
+ * size depends on the chosen solvers and division of R into parts R_k. For
+ * a given k, the required workspace is 3+np[k] (MSCG) and 5 (SAP_GCR and
+ * DFL_SAP_GCR). Note that these figures do not include the workspace for the
+ * solver programs (see forces/tmcgm.c, sap/sap_gcr.c and dfl/dfl_sap_gcr.c).
+ * The numbers of fields to be allocated must be greater or equal to those
+ * required for any k=0,..,n-1.
+ *
+ * The program in this module performs global communications and must be
+ * called simultaneously on all MPI processes. Some debugging information
+ * is printed to stdout if the macro RWRAT_DBG is defined.
+ *
+ *******************************************************************************/
 
 #define RWRAT_C
 
@@ -188,8 +188,9 @@ static void apply_Rk(int np, int isp, double *mu, double *rmu, spinor_dble *eta,
     set_res(np, sp.res);
     tmcgm(sp.nmx, rs, np, mu, eta, rsd, status);
 
-    error_root(status[0] < 0, 1, "apply_Rk [rwrat.c]", "MSCG solver failed "
-                                                       "(isp=%d, status=%d)",
+    error_root(status[0] < 0, 1, "apply_Rk [rwrat.c]",
+               "MSCG solver failed "
+               "(isp=%d, status=%d)",
                isp, status[0]);
 
     for (k = 0; k < np; k++)
@@ -243,8 +244,9 @@ static void apply_Rk(int np, int isp, double *mu, double *rmu, spinor_dble *eta,
 
       error_root((stat[0] < 0) || (stat[1] < 0) || (stat[3] < 0) ||
                      (stat[4] < 0),
-                 1, "apply_Rk [rwrat.c]", "DFL_SAP_GCR solver failed (isp=%d, "
-                                          "status=%d,%d,%d;%d,%d,%d)",
+                 1, "apply_Rk [rwrat.c]",
+                 "DFL_SAP_GCR solver failed (isp=%d, "
+                 "status=%d,%d,%d;%d,%d,%d)",
                  isp, stat[0], stat[1], stat[2], stat[3], stat[4], stat[5]);
 
       for (l = 0; l < 3; l++) {

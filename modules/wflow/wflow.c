@@ -1,61 +1,61 @@
 
 /*******************************************************************************
-*
-* File wflow.c
-*
-* Copyright (C) 2009-2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Integration of the Wilson flow.
-*
-* The externally accessible functions are
-*
-*   void fwd_euler(int n,double eps)
-*     Applies n forward Euler integration steps, with step size eps, to the
-*     current gauge field.
-*
-*   void fwd_rk2(int n,double eps)
-*     Applies n forward 2nd-order Runge-Kutta integration steps, with step
-*     size eps, to the current gauge field.
-*
-*   void fwd_rk3(int n,double eps)
-*     Applies n forward 3rd-order Runge-Kutta integration steps, with step
-*     size eps, to the current gauge field.
-*
-* Notes:
-*
-* On lattices with periodic boundary conditions, the Wilson flow is defined
-* through equations (1.3) and (1.4) in
-*
-*   M. Luescher: "Properties and uses of the Wilson flow in lattice QCD",
-*   JHEP 1008 (2010) 071.
-*
-* The Runge-Kutta integrators used here are described in appendix C of this
-* paper.
-*
-* In the case of open, SF and open-SF boundary conditions, the flow evolves
-* the active link variables only, where the action on the right of the flow
-* equation is taken to be the tree-level O(a)-improved plaquette action.
-* O(a)-improvement moreover requires the derivative of the action on the
-* space-like links at the boundaries with open boundary conditions to be
-* multiplied by 2. See appendix B in
-*
-*   M. Luescher, S. Schaefer: "Lattice QCD with open boundary conditions
-*   and twisted-mass reweighting", Comput.Phys.Commun. 184 (2013) 519,
-*
-* for the exact form of the flow equation in this case.
-*
-* The integration programs make use of the force field in the structure
-* returned by mdflds [mdflds.c]. On exit the force field must therefore be
-* expected to be changed.
-*
-* The Runge-Kutta integrators require a workspace of 1 force field. All
-* programs in this module involve global communications and must be called
-* on all MPI processes simultaneously with the same values of the parameters.
-*
-*******************************************************************************/
+ *
+ * File wflow.c
+ *
+ * Copyright (C) 2009-2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Integration of the Wilson flow.
+ *
+ * The externally accessible functions are
+ *
+ *   void fwd_euler(int n,double eps)
+ *     Applies n forward Euler integration steps, with step size eps, to the
+ *     current gauge field.
+ *
+ *   void fwd_rk2(int n,double eps)
+ *     Applies n forward 2nd-order Runge-Kutta integration steps, with step
+ *     size eps, to the current gauge field.
+ *
+ *   void fwd_rk3(int n,double eps)
+ *     Applies n forward 3rd-order Runge-Kutta integration steps, with step
+ *     size eps, to the current gauge field.
+ *
+ * Notes:
+ *
+ * On lattices with periodic boundary conditions, the Wilson flow is defined
+ * through equations (1.3) and (1.4) in
+ *
+ *   M. Luescher: "Properties and uses of the Wilson flow in lattice QCD",
+ *   JHEP 1008 (2010) 071.
+ *
+ * The Runge-Kutta integrators used here are described in appendix C of this
+ * paper.
+ *
+ * In the case of open, SF and open-SF boundary conditions, the flow evolves
+ * the active link variables only, where the action on the right of the flow
+ * equation is taken to be the tree-level O(a)-improved plaquette action.
+ * O(a)-improvement moreover requires the derivative of the action on the
+ * space-like links at the boundaries with open boundary conditions to be
+ * multiplied by 2. See appendix B in
+ *
+ *   M. Luescher, S. Schaefer: "Lattice QCD with open boundary conditions
+ *   and twisted-mass reweighting", Comput.Phys.Commun. 184 (2013) 519,
+ *
+ * for the exact form of the flow equation in this case.
+ *
+ * The integration programs make use of the force field in the structure
+ * returned by mdflds [mdflds.c]. On exit the force field must therefore be
+ * expected to be changed.
+ *
+ * The Runge-Kutta integrators require a workspace of 1 force field. All
+ * programs in this module involve global communications and must be called
+ * on all MPI processes simultaneously with the same values of the parameters.
+ *
+ *******************************************************************************/
 
 #define WFLOW_C
 

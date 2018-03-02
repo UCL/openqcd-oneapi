@@ -1,48 +1,48 @@
 
 /*******************************************************************************
-*
-* File scom.c
-*
-* Copyright (C) 2005, 2008, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Communication functions for single-precision spinor fields.
-*
-*   void cps_int_bnd(int is,spinor *s)
-*     Copies the spinors s at the even interior boundary points of the
-*     local lattice to the corresponding points on the neighbouring MPI
-*     processes. Only half of the spinor components are copied, namely
-*     theta[ifc^(is&0x1)]*s, where ifc labels the faces of the local
-*     lattice on the sending process.
-*
-*   void cps_ext_bnd(int is,spinor *s)
-*     Copies the spinors s at the even exterior boundary points of the
-*     local lattice to the neighbouring MPI processes and *adds* them to
-*     the field on the matching points of the target lattices. Only half
-*     of the spinor components are copied, assuming the spinors s satisfy
-*     s=theta[ifc^(is&0x1)]*s, where ifc labels the faces of the local
-*     lattice on the sending process.
-*
-* Notes:
-*
-* The spinor fields passed to cps_int_bnd() and cps_ext_bnd() must have at
-* least NSPIN elements. They are interpreted as quark fields on the local
-* lattice as described in main/README.global and doc/dirac.pdf. The projector
-* theta[ifc] is defined at the top of the module sflds/Pbnd.c.
-*
-* If open, SF or open-SF boundary conditions are chosen, the programs do
-* not copy any spinors in the time direction across the boundaries of the
-* global lattice. The spinors on the even points at the boundaries are instead
-* set zero as required by the boundary conditions (see doc/dirac.pdf). More
-* precisely, cps_int_bnd() sets them to zero *before* copying any spinors in
-* the space directions, while cps_ext_bnd() does the opposite.
-*
-* All these programs involve global communications and must be called on
-* all processes simultaneously.
-*
-*******************************************************************************/
+ *
+ * File scom.c
+ *
+ * Copyright (C) 2005, 2008, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Communication functions for single-precision spinor fields.
+ *
+ *   void cps_int_bnd(int is,spinor *s)
+ *     Copies the spinors s at the even interior boundary points of the
+ *     local lattice to the corresponding points on the neighbouring MPI
+ *     processes. Only half of the spinor components are copied, namely
+ *     theta[ifc^(is&0x1)]*s, where ifc labels the faces of the local
+ *     lattice on the sending process.
+ *
+ *   void cps_ext_bnd(int is,spinor *s)
+ *     Copies the spinors s at the even exterior boundary points of the
+ *     local lattice to the neighbouring MPI processes and *adds* them to
+ *     the field on the matching points of the target lattices. Only half
+ *     of the spinor components are copied, assuming the spinors s satisfy
+ *     s=theta[ifc^(is&0x1)]*s, where ifc labels the faces of the local
+ *     lattice on the sending process.
+ *
+ * Notes:
+ *
+ * The spinor fields passed to cps_int_bnd() and cps_ext_bnd() must have at
+ * least NSPIN elements. They are interpreted as quark fields on the local
+ * lattice as described in main/README.global and doc/dirac.pdf. The projector
+ * theta[ifc] is defined at the top of the module sflds/Pbnd.c.
+ *
+ * If open, SF or open-SF boundary conditions are chosen, the programs do
+ * not copy any spinors in the time direction across the boundaries of the
+ * global lattice. The spinors on the even points at the boundaries are instead
+ * set zero as required by the boundary conditions (see doc/dirac.pdf). More
+ * precisely, cps_int_bnd() sets them to zero *before* copying any spinors in
+ * the space directions, while cps_ext_bnd() does the opposite.
+ *
+ * All these programs involve global communications and must be called on
+ * all processes simultaneously.
+ *
+ *******************************************************************************/
 
 #define SCOM_C
 

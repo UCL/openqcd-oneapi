@@ -1,47 +1,47 @@
 /*******************************************************************************
-*
-* File genfrc.c
-*
-* Copyright (C) 2006, 2011, 2013 Martin Luescher, Stefan Schaefer
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Calculation of quark forces.
-*
-* The externally accessible functions are
-*
-*   void sw_frc(double c)
-*     Computes the SW part of the quark force, using the current value
-*     of the X tensor field (see the notes). The calculated force is then
-*     multiplied by c and added to the MD force field.
-*
-*   void hop_frc(double c)
-*     Computes the hopping part of the quark force, using the current
-*     value of the X vector field (see the notes). The calculated force
-*     is then multiplied by c and added to the MD force field.
-*
-* Notes:
-*
-* The computation of the quark forces is described in the notes
-*
-*  M. Luescher: "Molecular-dynamics quark forces" (January 2012)
-*
-* For explanations of the X tensor and vector fields, see xtensor.c and
-* frcfcts.c. The MD force field is the one returned by the program mdflds()
-* (see mdflds/mdflds.c).
-*
-* If the X tensor field is obtained from the SW term calculated by sw_term(),
-* and if the X vector field is obtained from quark fields vanishing at the
-* boundaries of the lattice, as required by the chosen boundary conditions,
-* the programs sw_frc() and hop_frc() leave the force field on the static
-* links unchanged.
-*
-* The coefficient csw of the SW term is retrieved from the parameter data
-* base (flags/lat_parms.c). The programs in this module perform global
-* operations and must be called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File genfrc.c
+ *
+ * Copyright (C) 2006, 2011, 2013 Martin Luescher, Stefan Schaefer
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Calculation of quark forces.
+ *
+ * The externally accessible functions are
+ *
+ *   void sw_frc(double c)
+ *     Computes the SW part of the quark force, using the current value
+ *     of the X tensor field (see the notes). The calculated force is then
+ *     multiplied by c and added to the MD force field.
+ *
+ *   void hop_frc(double c)
+ *     Computes the hopping part of the quark force, using the current
+ *     value of the X vector field (see the notes). The calculated force
+ *     is then multiplied by c and added to the MD force field.
+ *
+ * Notes:
+ *
+ * The computation of the quark forces is described in the notes
+ *
+ *  M. Luescher: "Molecular-dynamics quark forces" (January 2012)
+ *
+ * For explanations of the X tensor and vector fields, see xtensor.c and
+ * frcfcts.c. The MD force field is the one returned by the program mdflds()
+ * (see mdflds/mdflds.c).
+ *
+ * If the X tensor field is obtained from the SW term calculated by sw_term(),
+ * and if the X vector field is obtained from quark fields vanishing at the
+ * boundaries of the lattice, as required by the chosen boundary conditions,
+ * the programs sw_frc() and hop_frc() leave the force field on the static
+ * links unchanged.
+ *
+ * The coefficient csw of the SW term is retrieved from the parameter data
+ * base (flags/lat_parms.c). The programs in this module perform global
+ * operations and must be called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define GENFRC_C
 

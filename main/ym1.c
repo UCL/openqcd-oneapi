@@ -1,21 +1,21 @@
 
 /*******************************************************************************
-*
-* File ym1.c
-*
-* Copyright (C) 2010-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* HMC simulation program for the SU(3) gauge theory.
-*
-* Syntax: ym1 -i <filename> [-noloc] [-noexp] [-rmold] [-noms]
-*                           [-c <filename> [-a [-norng]]]
-*
-* For usage instructions see the file README.ym1.
-*
-*******************************************************************************/
+ *
+ * File ym1.c
+ *
+ * Copyright (C) 2010-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * HMC simulation program for the SU(3) gauge theory.
+ *
+ * Syntax: ym1 -i <filename> [-noloc] [-noexp] [-rmold] [-noms]
+ *                           [-c <filename> [-a [-norng]]]
+ *
+ * For usage instructions see the file README.ym1.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

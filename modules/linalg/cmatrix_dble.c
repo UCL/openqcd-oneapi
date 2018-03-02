@@ -1,62 +1,62 @@
 
 /*******************************************************************************
-*
-* File cmatrix_dble.c
-*
-* Copyright (C) 2007, 2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Complex matrix algebra (double-precision version).
-*
-* The externally accessible functions are
-*
-*   void cmat_vec_dble(int n,complex_dble *a,complex_dble *v,complex_dble *w)
-*     Computes w=a*v, where v and w are n-vectors and a an nxn matrix.
-*
-*   void cmat_vec_assign_dble(int n,complex_dble *a,complex_dble *v,
-*                             complex_dble *w)
-*     Adds a*v to w, where v and w are n-vectors and a an nxn matrix.
-*
-*   void cmat_add_dble(int n,complex_dble *a,complex_dble *b,complex_dble *c)
-*     Computes the sum c=a+b of two nxn matrices a and b.
-*
-*   void cmat_sub_dble(int n,complex_dble *a,complex_dble *b,complex_dble *c)
-*     Computes the difference c=a-b of two nxn matrices a and b.
-*
-*   void cmat_mul_dble(int n,complex_dble *a,complex_dble *b,complex_dble *c)
-*     Computes the product c=a*b of two nxn matrices a and b.
-*
-*   void cmat_dag_dble(int n,complex_dble *a,complex_dble *b)
-*     Assigns the hermitian conjugate of a to b.
-*
-*   int cmat_inv_dble(int n,complex_dble *a,complex_dble *b,double *k)
-*     Computes the inverse b of the nxn matrix a, using Householder
-*     reflections. The Frobenius condition number k of a is also computed.
-*     A non-zero return value indicates that the input matrix was found to
-*     be singular within rounding errors and that the program terminated
-*     prematurely.
-*
-* Notes:
-*
-* All of these programs can be called locally. Complex nxn matrices with
-* matrix elements A_{ij} are represented by linear arrays a of complex
-* numbers such that
-*
-*   A_{ij} = a[i*n+j]
-*
-* where i,j=0,1,..,n-1. It is assumed that the input and output arrays do
-* not overlap in memory (the results are otherwise unpredictable).
-*
-* The inverse of a given matrix computed by cmat_inv_dble() may suffer
-* from significance losses on the order of its condition number.
-*
-* If inline SSE or AVX assembly is used (option -Dx64 or -DAVX), the arrays
-* must be aligned to a 16 byte boundary (32 byte boundary if n is even and
-* AVX is used).
-*
-*******************************************************************************/
+ *
+ * File cmatrix_dble.c
+ *
+ * Copyright (C) 2007, 2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Complex matrix algebra (double-precision version).
+ *
+ * The externally accessible functions are
+ *
+ *   void cmat_vec_dble(int n,complex_dble *a,complex_dble *v,complex_dble *w)
+ *     Computes w=a*v, where v and w are n-vectors and a an nxn matrix.
+ *
+ *   void cmat_vec_assign_dble(int n,complex_dble *a,complex_dble *v,
+ *                             complex_dble *w)
+ *     Adds a*v to w, where v and w are n-vectors and a an nxn matrix.
+ *
+ *   void cmat_add_dble(int n,complex_dble *a,complex_dble *b,complex_dble *c)
+ *     Computes the sum c=a+b of two nxn matrices a and b.
+ *
+ *   void cmat_sub_dble(int n,complex_dble *a,complex_dble *b,complex_dble *c)
+ *     Computes the difference c=a-b of two nxn matrices a and b.
+ *
+ *   void cmat_mul_dble(int n,complex_dble *a,complex_dble *b,complex_dble *c)
+ *     Computes the product c=a*b of two nxn matrices a and b.
+ *
+ *   void cmat_dag_dble(int n,complex_dble *a,complex_dble *b)
+ *     Assigns the hermitian conjugate of a to b.
+ *
+ *   int cmat_inv_dble(int n,complex_dble *a,complex_dble *b,double *k)
+ *     Computes the inverse b of the nxn matrix a, using Householder
+ *     reflections. The Frobenius condition number k of a is also computed.
+ *     A non-zero return value indicates that the input matrix was found to
+ *     be singular within rounding errors and that the program terminated
+ *     prematurely.
+ *
+ * Notes:
+ *
+ * All of these programs can be called locally. Complex nxn matrices with
+ * matrix elements A_{ij} are represented by linear arrays a of complex
+ * numbers such that
+ *
+ *   A_{ij} = a[i*n+j]
+ *
+ * where i,j=0,1,..,n-1. It is assumed that the input and output arrays do
+ * not overlap in memory (the results are otherwise unpredictable).
+ *
+ * The inverse of a given matrix computed by cmat_inv_dble() may suffer
+ * from significance losses on the order of its condition number.
+ *
+ * If inline SSE or AVX assembly is used (option -Dx64 or -DAVX), the arrays
+ * must be aligned to a 16 byte boundary (32 byte boundary if n is even and
+ * AVX is used).
+ *
+ *******************************************************************************/
 
 #define CMATRIX_DBLE_C
 

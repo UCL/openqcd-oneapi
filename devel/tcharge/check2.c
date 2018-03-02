@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check2.c
-*
-* Copyright (C) 2009-2011, 2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Topological charge of constant abelian background fields.
-*
-*******************************************************************************/
+ *
+ * File check2.c
+ *
+ * Copyright (C) 2009-2011, 2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Topological charge of constant abelian background fields.
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

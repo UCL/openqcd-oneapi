@@ -1,40 +1,40 @@
 
 /*******************************************************************************
-*
-* File fcom.c
-*
-* Copyright (C) 2010, 2011, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Communication of the force variables residing at the exterior boundaries
-* of the local lattices.
-*
-* The externally accessible functions are
-*
-*   void copy_bnd_frc(void)
-*     Copies the force variables from the neighbouring MPI processes to
-*     the exterior boundaries of the local lattice. The field variables
-*     on the spatial links at time NPROC0*L0 are fetched only in the case
-*     of periodic boundary conditions.
-*
-*   void add_bnd_frc(void)
-*     Adds the force variables on the exterior boundaries of the local
-*     lattice to the field variables on the neighbouring MPI processes.
-*     The field variables on the spatial links at time NPROC0*L0 are
-*     added only in the case of periodic boundary conditions.
-*
-* Notes:
-*
-* The force field is the one returned by mdflds(). Its elements are ordered
-* in the same way as those of the global gauge fields (see main/README.global
-* and lattice/README.uidx).
-*
-* The programs in this module perform global communications and must be
-* called simultaneously on all MPI processes.
-*
-*******************************************************************************/
+ *
+ * File fcom.c
+ *
+ * Copyright (C) 2010, 2011, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Communication of the force variables residing at the exterior boundaries
+ * of the local lattices.
+ *
+ * The externally accessible functions are
+ *
+ *   void copy_bnd_frc(void)
+ *     Copies the force variables from the neighbouring MPI processes to
+ *     the exterior boundaries of the local lattice. The field variables
+ *     on the spatial links at time NPROC0*L0 are fetched only in the case
+ *     of periodic boundary conditions.
+ *
+ *   void add_bnd_frc(void)
+ *     Adds the force variables on the exterior boundaries of the local
+ *     lattice to the field variables on the neighbouring MPI processes.
+ *     The field variables on the spatial links at time NPROC0*L0 are
+ *     added only in the case of periodic boundary conditions.
+ *
+ * Notes:
+ *
+ * The force field is the one returned by mdflds(). Its elements are ordered
+ * in the same way as those of the global gauge fields (see main/README.global
+ * and lattice/README.uidx).
+ *
+ * The programs in this module perform global communications and must be
+ * called simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
 
 #define FCOM_C
 

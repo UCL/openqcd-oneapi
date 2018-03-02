@@ -1,16 +1,16 @@
 
 /*******************************************************************************
-*
-* File check9.c
-*
-* Copyright (C) 2011-2013, 2016 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Comparison of Dw_bnd() with Dw().
-*
-*******************************************************************************/
+ *
+ * File check9.c
+ *
+ * Copyright (C) 2011-2013, 2016 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Comparison of Dw_bnd() with Dw().
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
