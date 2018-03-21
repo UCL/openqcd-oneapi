@@ -14,18 +14,12 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "utils.h"
-#include "lattice.h"
-#include "sflds.h"
-#include "linalg.h"
 #include "archive.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "random.h"
 
 static spinor_dble **psd;
 static const spinor_dble sd0 = {{{0.0}}};

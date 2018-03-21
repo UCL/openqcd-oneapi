@@ -13,9 +13,7 @@
 #ifndef TCHARGE_H
 #define TCHARGE_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
 
 /* FTCOM_C */
 extern void copy_bnd_ft(int n, u3_alg_dble *ft);

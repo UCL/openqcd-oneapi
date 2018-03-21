@@ -473,7 +473,7 @@ static void read_bc_parms(void)
     theta[1] = 0.0;
     theta[2] = 0.0;
 
-    read_dprms("theta", 3, theta);
+    read_optional_dprms("theta", 3, theta);
   }
 
   mpc_bcast_i(&bc, 1);
@@ -661,6 +661,7 @@ static void read_actions(void)
 static void read_smearing(void)
 {
   long section_pos;
+  int has_smearing = 0;
   int n_smear, smear_gauge, smear_fermion;
   double rho_t, rho_s;
 
@@ -668,12 +669,9 @@ static void read_smearing(void)
     section_pos = find_optional_section("Smearing parameters");
 
     if (section_pos == No_Section_Found) {
-      n_smear = 0;
-      rho_t = 0.0;
-      rho_s = 0.0;
-      smear_gauge = 0;
-      smear_fermion = 0;
+      has_smearing = 0;
     } else {
+      has_smearing = 1;
       read_line("n_smear", "%d", &n_smear);
       read_line("rho_t", "%lf", &rho_t);
       read_line("rho_s", "%lf", &rho_s);
@@ -682,13 +680,24 @@ static void read_smearing(void)
     }
   }
 
-  mpc_bcast_i(&n_smear, 1);
-  mpc_bcast_d(&rho_t, 1);
-  mpc_bcast_d(&rho_s, 1);
-  mpc_bcast_i(&smear_gauge, 1);
-  mpc_bcast_i(&smear_fermion, 1);
+  mpc_bcast_i(&has_smearing, 1);
 
-  set_stout_smearing_parms(n_smear, rho_t, rho_s, smear_gauge, smear_fermion);
+  if (has_smearing == 1) {
+    mpc_bcast_i(&n_smear, 1);
+    mpc_bcast_d(&rho_t, 1);
+    mpc_bcast_d(&rho_s, 1);
+    mpc_bcast_i(&smear_gauge, 1);
+    mpc_bcast_i(&smear_fermion, 1);
+
+    set_stout_smearing_parms(n_smear, rho_t, rho_s, smear_gauge, smear_fermion);
+  } else {
+    set_no_stout_smearing_parms();
+  }
+
+  if (append)
+    check_stout_smearing_parms(fdat);
+  else
+    write_stout_smearing_parms(fdat);
 }
 
 static void read_integrator(void)
@@ -1009,7 +1018,7 @@ static void read_wflow_parms(void)
 
 static void read_ani_parms(void)
 {
-  int has_tts;
+  int has_ani, has_tts;
   long section_pos;
   double nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion, ut_fermion;
 
@@ -1017,16 +1026,9 @@ static void read_ani_parms(void)
     section_pos = find_optional_section("Anisotropy parameters");
 
     if (section_pos == No_Section_Found) {
-      has_tts = 1;
-      nu = 1.0;
-      xi = 1.0;
-      cR = 1.0;
-      cT = 1.0;
-      us_gauge = 1.0;
-      ut_gauge = 1.0;
-      us_fermion = 1.0;
-      ut_fermion = 1.0;
+      has_ani = 0;
     } else {
+      has_ani = 1;
       read_line("use_tts", "%d", &has_tts);
       read_line("nu", "%lf", &nu);
       read_line("xi", "%lf", &xi);
@@ -1039,18 +1041,29 @@ static void read_ani_parms(void)
     }
   }
 
-  mpc_bcast_i(&has_tts, 1);
-  mpc_bcast_d(&nu, 1);
-  mpc_bcast_d(&xi, 1);
-  mpc_bcast_d(&cR, 1);
-  mpc_bcast_d(&cT, 1);
-  mpc_bcast_d(&us_gauge, 1);
-  mpc_bcast_d(&ut_gauge, 1);
-  mpc_bcast_d(&us_fermion, 1);
-  mpc_bcast_d(&ut_fermion, 1);
+  mpc_bcast_i(&has_ani, 1);
 
-  set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion,
-                ut_fermion);
+  if (has_ani == 1) {
+    mpc_bcast_i(&has_tts, 1);
+    mpc_bcast_d(&nu, 1);
+    mpc_bcast_d(&xi, 1);
+    mpc_bcast_d(&cR, 1);
+    mpc_bcast_d(&cT, 1);
+    mpc_bcast_d(&us_gauge, 1);
+    mpc_bcast_d(&ut_gauge, 1);
+    mpc_bcast_d(&us_fermion, 1);
+    mpc_bcast_d(&ut_fermion, 1);
+
+    set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion,
+                  ut_fermion);
+  } else {
+    set_no_ani_parms();
+  }
+
+  if (append)
+    check_ani_parms(fdat);
+  else
+    write_ani_parms(fdat);
 }
 
 static void read_infile(int argc, char *argv[])
@@ -1515,7 +1528,7 @@ static void print_info(int icnfg)
     if (append == 0) {
       print_lat_parms();
       print_ani_parms();
-      print_smearing_parms();
+      print_stout_smearing_parms();
       print_bc_parms(3);
     }
 
@@ -1606,7 +1619,8 @@ static void print_log(dat_t *ndat)
     }
 
     if (bc_type() == 3) {
-      if ((smear_params.num_smear > 1) && (smear_params.rho_temporal != 0.0)) {
+      if ((smear_params.num_smear > 1) &&
+          not_equal_d(smear_params.rho_temporal, 0.0)) {
         printf("Average temporal link (thin)  = %.15f\n",
                (*ndat).average_t_link);
         printf("Average temporal link (stout) = %.15f\n",
@@ -1775,7 +1789,7 @@ static dat_t compute_log_values(double const *act0, double const *act1,
     w0[3] = spatial_link_sum(0) / (3 * volume);
   }
 
-  if (stout_smearing_parms().num_smear > 1) {
+  if (stout_smearing_parms().num_smear > 0) {
     smear_fields();
     w0[4] = plaq_wsum_dble(0) / npl;
 

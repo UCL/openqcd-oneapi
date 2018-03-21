@@ -32,21 +32,17 @@
 
 #define RANLUX_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <limits.h>
-#include "mpi.h"
-#include "utils.h"
-#include "lattice.h"
-#include "random.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "random.h"
 
 static int **rlxs_state = NULL, **rlxd_state;
 static stdint_t **state;
 
 static int alloc_state(int x)
 {
-  int nlxs, nlxd, n;
+  int nlxs, nlxd, n, i;
 
   nlxs = rlxs_size();
   nlxd = rlxd_size();
@@ -56,9 +52,10 @@ static int alloc_state(int x)
     rlxs_state = malloc(VOLUME * sizeof(int *));
     rlxd_state = malloc(VOLUME * sizeof(int *));
     state = malloc(VOLUME * sizeof(stdint_t *));
-    int x;
-    for (x = 0; x < VOLUME; x++)
-      rlxs_state[x] = NULL;
+
+    for (i = 0; i < VOLUME; i++)
+      rlxs_state[i] = NULL;
+
     error((rlxs_state == NULL) || (rlxd_state == NULL) || (state == NULL), 1,
           "alloc_state [ranlux.c]", "Unable to allocate arrays");
   }
@@ -79,6 +76,7 @@ static int alloc_state(int x)
 void ranlxs_site(float r[], int n, int x)
 {
   int *global_state = malloc(rlxs_size() * sizeof(int));
+
   rlxs_get(global_state);
   rlxs_reset(rlxs_state[x]);
   ranlxs(r, n);
@@ -86,9 +84,11 @@ void ranlxs_site(float r[], int n, int x)
   rlxs_reset(global_state);
   free(global_state);
 }
+
 void ranlxd_site(double r[], int n, int x)
 {
   int *global_state = malloc(rlxd_size() * sizeof(int));
+
   rlxd_get(global_state);
   rlxd_reset(rlxd_state[x]);
   ranlxd(r, n);
@@ -100,7 +100,8 @@ void ranlxd_site(double r[], int n, int x)
 void start_ranlux_site(int level, int seed)
 {
   int my_rank, max_seed, loc_seed;
-  int iprms[2];
+  int site_rank, site_index, global_index;
+  int iprms[2], x[4];
 
   if (NPROC > 1) {
     iprms[0] = level;
@@ -121,12 +122,10 @@ void start_ranlux_site(int level, int seed)
 
   /* Loop over lattice sites and seed random number generators at local sites
    */
-  int x[4];
-  for (x[0] = 0; x[0] < NPROC0 * L0; x[0]++)
-    for (x[1] = 0; x[1] < NPROC1 * L1; x[1]++)
-      for (x[2] = 0; x[2] < NPROC2 * L2; x[2]++)
+  for (x[0] = 0; x[0] < NPROC0 * L0; x[0]++) {
+    for (x[1] = 0; x[1] < NPROC1 * L1; x[1]++) {
+      for (x[2] = 0; x[2] < NPROC2 * L2; x[2]++) {
         for (x[3] = 0; x[3] < NPROC3 * L3; x[3]++) {
-          int site_rank, site_index, global_index;
           ipt_global(x, &site_rank, &site_index);
           if (site_rank == my_rank) {
             alloc_state(site_index);
@@ -142,4 +141,7 @@ void start_ranlux_site(int level, int seed)
             rlxd_get(rlxd_state[site_index]);
           }
         }
+      }
+    }
+  }
 }

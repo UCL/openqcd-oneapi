@@ -13,13 +13,9 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "random.h"
-#include "utils.h"
-#include "su3fcts.h"
 #include "extras.h"
+#include "random.h"
+#include "su3fcts.h"
 
 int main(void)
 {

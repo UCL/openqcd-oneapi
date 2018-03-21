@@ -14,20 +14,14 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "flags.h"
-#include "utils.h"
+#include "global.h"
 #include "lattice.h"
-#include "sflds.h"
 #include "linalg.h"
 #include "mdflds.h"
+#include "mpi.h"
+#include "random.h"
+#include "sflds.h"
 #include "update.h"
-#include "global.h"
 
 static void set_psi(spinor_dble **chi, spinor_dble *psi)
 {
@@ -48,7 +42,8 @@ static void set_psi(spinor_dble **chi, spinor_dble *psi)
 int main(int argc, char *argv[])
 {
   int my_rank, i;
-  int nop, ismear, iunsmear, iop, itu;
+  size_t nop;
+  int ismear, iunsmear, iop, itu;
   int ncr, ifr, zero;
   double phi[2], phi_prime[2], theta[3];
   double kappa, mu, eps, dev;
@@ -77,6 +72,7 @@ int main(int argc, char *argv[])
   ncr = 4;
 
   kappa = 0.1365;
+  set_no_ani_parms();
   set_lat_parms(5.3, 1.6667, 1, &kappa, 1.789);
   phi[0] = 0.0;
   phi[1] = 0.0;

@@ -77,25 +77,26 @@
 *
 * (see utils/wspace.c).
 *
+* CONST_CORRECTNESS:
+*   The algorithm should have a signature that represents its const-ness,
+*   however this is currently not possible due to the fact that most callers of
+*   this algorithm specifies Dop and Mop using Dw, which is currently not const
+*   correct (and hard to make const correct). This algorithm will thus be left
+*   until that has been fixed.
+*
 *******************************************************************************/
 
 #define SAP_GCR_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "block.h"
-#include "sw_term.h"
 #include "dirac.h"
-#include "linsolv.h"
-#include "sap.h"
+#include "flags.h"
 #include "global.h"
+#include "linalg.h"
+#include "linsolv.h"
+#include "mpi.h"
+#include "sap.h"
+#include "sflds.h"
+#include "sw_term.h"
 
 static double mud;
 static sap_parms_t spr;
@@ -183,7 +184,7 @@ double sap_gcr(int nkv, int nmx, double res, double mu, spinor_dble *eta,
     mud = mu;
     fact = rho0 / sqrt((double)(VOLUME) * (double)(24 * NPROC));
 
-    if (fact != 0.0) {
+    if (not_equal_d(fact, 0.0)) {
       assign_sd2sd(VOLUME, eta, rsd[0]);
       scale_dble(VOLUME, 1.0 / fact, rsd[0]);
 

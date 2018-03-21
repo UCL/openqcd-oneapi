@@ -1,10 +1,7 @@
 #ifndef DATA_TYPE_DIFFS_H
 #define DATA_TYPE_DIFFS_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
-
 #include <stdlib.h>
 
 extern double abs_diff_double(double l, double r);

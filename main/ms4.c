@@ -199,7 +199,7 @@ static void read_bc_parms(void)
     if (bc == 2)
       read_line("cF'", "%lf", &cF_prime);
 
-    read_dprms("theta", 3, theta);
+    read_optional_dprms("theta", 3, theta);
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -284,6 +284,51 @@ static void read_solver(void)
     read_dfl_parms();
 }
 
+static void read_ani_parms(void)
+{
+  int has_ani, has_tts;
+  long section_pos;
+  double nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion, ut_fermion;
+
+  if (my_rank == 0) {
+    section_pos = find_optional_section("Anisotropy parameters");
+
+    if (section_pos == No_Section_Found) {
+      has_ani = 0;
+    } else {
+      has_ani = 1;
+      read_line("use_tts", "%d", &has_tts);
+      read_line("nu", "%lf", &nu);
+      read_line("xi", "%lf", &xi);
+      read_line("cR", "%lf", &cR);
+      read_line("cT", "%lf", &cT);
+      read_optional_line("us_gauge", "%lf", &us_gauge, 1.0);
+      read_optional_line("ut_gauge", "%lf", &ut_gauge, 1.0);
+      read_optional_line("us_fermion", "%lf", &us_fermion, 1.0);
+      read_optional_line("ut_fermion", "%lf", &ut_fermion, 1.0);
+    }
+  }
+
+  mpc_bcast_i(&has_ani, 1);
+
+  if (has_ani == 1) {
+    mpc_bcast_i(&has_tts, 1);
+    mpc_bcast_d(&nu, 1);
+    mpc_bcast_d(&xi, 1);
+    mpc_bcast_d(&cR, 1);
+    mpc_bcast_d(&cT, 1);
+    mpc_bcast_d(&us_gauge, 1);
+    mpc_bcast_d(&ut_gauge, 1);
+    mpc_bcast_d(&us_fermion, 1);
+    mpc_bcast_d(&ut_fermion, 1);
+
+    set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion,
+                  ut_fermion);
+  } else {
+    set_no_ani_parms();
+  }
+}
+
 static void read_infile(int argc, char *argv[])
 {
   int ifile;
@@ -312,6 +357,7 @@ static void read_infile(int argc, char *argv[])
 
   read_dirs();
   setup_files();
+  read_ani_parms();
   read_lat_parms();
   read_bc_parms();
   read_solver();
@@ -380,6 +426,8 @@ static void print_info(void)
     printf("mu = %.*f\n", IMAX(n, 1), mus);
     n = fdigits(lat.csw);
     printf("csw = %.*f\n\n", IMAX(n, 1), lat.csw);
+
+    print_ani_parms();
     print_bc_parms(2);
 
     printf("Source fields:\n");

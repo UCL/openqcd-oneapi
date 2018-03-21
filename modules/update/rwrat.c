@@ -100,24 +100,18 @@
 
 #define RWRAT_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
+#include "dfl.h"
+#include "dirac.h"
+#include "forces.h"
+#include "global.h"
 #include "lattice.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "ratfcts.h"
+#include "sap.h"
 #include "sflds.h"
 #include "sw_term.h"
-#include "dirac.h"
-#include "linalg.h"
-#include "sap.h"
-#include "dfl.h"
-#include "ratfcts.h"
-#include "forces.h"
 #include "update.h"
-#include "global.h"
 
 #define PRECISION_LIMIT 1.0e-10
 
@@ -125,7 +119,7 @@ static int nps = 0, ns = 0, *nsps;
 static double *rs;
 static double cfs[4] = {-0.5, 0.375, -0.3125, 0.2734375};
 
-static void set_nsps(int n, int *np, int *isp)
+static void set_nsps(int n, int const *np, int const *isp)
 {
   int k;
 
@@ -269,8 +263,8 @@ static void apply_Rk(int np, int isp, double *mu, double *rmu, spinor_dble *eta,
     error_root(1, 1, "apply_Rk [rwrat.c]", "Unknown or unsupported solver");
 }
 
-static void apply_QR(int n, int *np, int *isp, ratfct_t *rf, spinor_dble *eta,
-                     spinor_dble *psi, int **status)
+static void apply_QR(int n, int const *np, int const *isp, ratfct_t *rf,
+                     spinor_dble *eta, spinor_dble *psi, int **status)
 {
   int k, l, stat[3];
   double *mu, *rmu;
@@ -308,8 +302,8 @@ static void apply_QR(int n, int *np, int *isp, ratfct_t *rf, spinor_dble *eta,
   release_wsd();
 }
 
-static void apply_Z(int n, int *np, int *isp, ratfct_t *rf, spinor_dble *eta,
-                    spinor_dble *psi, int **status)
+static void apply_Z(int n, int const *np, int const *isp, ratfct_t *rf,
+                    spinor_dble *eta, spinor_dble *psi, int **status)
 {
   spinor_dble **wsd;
 
@@ -322,7 +316,7 @@ static void apply_Z(int n, int *np, int *isp, ratfct_t *rf, spinor_dble *eta,
   release_wsd();
 }
 
-static void init_stat(int n, int *isp, int **status)
+static void init_stat(int n, int const *isp, int **status)
 {
   int k, l;
   solver_parms_t sp;
@@ -338,7 +332,7 @@ static void init_stat(int n, int *isp, int **status)
   }
 }
 
-static void avg_stat(int nz, int n, int *isp, int **status)
+static void avg_stat(int nz, int n, int const *isp, int **status)
 {
   int k, l;
   solver_parms_t sp;
@@ -364,7 +358,8 @@ static void avg_stat(int nz, int n, int *isp, int **status)
   }
 }
 
-double rwrat(int irp, int n, int *np, int *isp, double *sqn, int **status)
+double rwrat(int irp, int n, int const *np, int const *isp, double *sqn,
+             int **status)
 {
   int k, l, ie, irat[3], iprms[2];
   double lnr, delta, r[2];

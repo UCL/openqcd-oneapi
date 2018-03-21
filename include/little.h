@@ -13,9 +13,7 @@
 #ifndef LITTLE_H
 #define LITTLE_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
 
 typedef struct
 {
@@ -59,14 +57,16 @@ extern void Aweo_dble(complex_dble *v, complex_dble *w);
 extern void Awhat_dble(complex_dble *v, complex_dble *w);
 
 /* AW_GEN_C */
-extern void gather_ud(int vol, int *imb, su3_dble *ud, su3_dble *vd);
-extern void gather_sd(int vol, int *imb, spinor_dble *sd, spinor_dble *rd);
-extern void apply_u2sd(int vol, int *imb, su3_dble *ud, spinor_dble *sd,
-                       spinor_dble *rd);
-extern void apply_udag2sd(int vol, int *imb, su3_dble *ud, spinor_dble *sd,
-                          spinor_dble *rd);
-extern void (*spinor_prod_gamma[])(int vol, spinor_dble *sd, spinor_dble *rd,
-                                   complex_dble *sp);
+extern void gather_ud(int vol, int const *imb, su3_dble const *ud,
+                      su3_dble *vd);
+extern void gather_sd(int vol, int const *imb, spinor_dble const *sd,
+                      spinor_dble *rd);
+extern void apply_u2sd(int vol, int const *imb, su3_dble const *ud,
+                       spinor_dble const *sd, spinor_dble *rd);
+extern void apply_udag2sd(int vol, int const *imb, su3_dble const *ud,
+                          spinor_dble const *sd, spinor_dble *rd);
+extern void (*spinor_prod_gamma[])(int vol, spinor_dble const *sd,
+                                   spinor_dble const *rd, complex_dble *sp);
 
 /* AW_OPS_C */
 extern Aw_t Awop(void);

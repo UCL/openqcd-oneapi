@@ -42,19 +42,18 @@
  * particular, the SW term must not be inverted if isolv=0, but should be
  * inverted on the odd sites if isolv=1.
  *
+ * CONST_CORRECTNESS:
+ *   The algorithm should have a signature that represents its const-ness,
+ *   however this is currently not possible due to the fact that the functions
+ *   in Dw aren't (and cannot easily made to be) const correct.
+ *
  *******************************************************************************/
 
 #define SAP_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "su3.h"
-#include "flags.h"
-#include "block.h"
-#include "dirac.h"
 #include "sap.h"
+#include "dirac.h"
+#include "flags.h"
 #include "global.h"
 
 static int vol;

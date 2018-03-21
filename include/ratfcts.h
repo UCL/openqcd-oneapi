@@ -13,6 +13,8 @@
 #ifndef RATFCTS_H
 #define RATFCTS_H
 
+#include "utils.h"
+
 typedef struct
 {
   int np;
@@ -26,7 +28,7 @@ extern double ellipticK(double rk);
 extern void sncndn(double u, double rk, double *sn, double *cn, double *dn);
 
 /* RATFCTS_C */
-extern ratfct_t ratfct(int *irat);
+extern ratfct_t ratfct(int const *irat);
 
 /* ZOLOTAREV_C */
 extern void zolotarev(int n, double eps, double *A, double *ar, double *delta);

@@ -64,23 +64,17 @@
 
 #define HMC_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "random.h"
-#include "su3fcts.h"
-#include "flags.h"
-#include "lattice.h"
-#include "utils.h"
-#include "uflds.h"
-#include "mdflds.h"
-#include "linalg.h"
 #include "dfl.h"
 #include "forces.h"
-#include "update.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mdflds.h"
+#include "mpi.h"
+#include "random.h"
 #include "stout_smearing.h"
+#include "uflds.h"
+#include "update.h"
 
 #define MAX(n, m)                                                              \
   if ((n) < (m))                                                               \

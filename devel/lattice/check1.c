@@ -14,14 +14,10 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "lattice.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include <stdio.h>
 
 #define NPROC_BLK (NPROC0_BLK * NPROC1_BLK * NPROC2_BLK * NPROC3_BLK)
 

@@ -7,17 +7,13 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "lattice.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
 #include "stout_smearing.h"
 
 #include <devel/testing_utilities/data_type_diffs.c>
+#include <devel/testing_utilities/test_counter.c>
 #include <modules/stout_smearing/stout_smearing.c>
 
 double diff_identity(su3_dble const *X, double val)
@@ -35,25 +31,30 @@ int main(int argc, char *argv[])
   double expected_value = 0.;
   double theta[3] = {0.0, 0.0, 0.0};
   su3_dble *ud;
-  double total_diff, rho_t, rho_s;
+  double local_diff, total_diff, rho_t, rho_s;
+  double volume_inv;
 
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
   if (my_rank == 0) {
-    printf("Checks of the programs in the module stout_smearing\n");
-    printf("-------------------------------------------\n\n");
+    printf("Checking omega field for identity gauge fields\n");
+    printf("---------------------------------------------------\n\n");
 
-    printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
+    printf("%dx%dx%dx%d lattice,\n", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
            NPROC3 * L3);
-    printf("%dx%dx%dx%d process grid, ", NPROC0, NPROC1, NPROC2, NPROC3);
+    printf("%dx%dx%dx%d process grid,\n", NPROC0, NPROC1, NPROC2, NPROC3);
     printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
+    printf("---------------------------------------------------\n\n");
   }
+
+  new_test_module();
 
   set_bc_parms(3, 0., 0., 0., 0., NULL, NULL, theta);
   set_stout_smearing_parms(1, 1., 1., 1, 1);
 
   geometry();
+  volume_inv = 1. / ((double)(NPROC) * (double)(L0 * L1) * (double)(L2 * L3));
 
   ud = udfld();
 
@@ -66,7 +67,7 @@ int main(int argc, char *argv[])
   copy_bnd_ud();
   compute_omega_field(ud);
 
-  total_diff = 0.;
+  local_diff = 0.;
 
   for (ix = 0; ix < 4 * VOLUME; ix++) {
     mu = (ix % 8) / 2;
@@ -85,21 +86,31 @@ int main(int argc, char *argv[])
       expected_value = 448.;
     }
 
-    total_diff += diff_identity(omega_matrix + ix, expected_value);
+    local_diff += diff_identity(omega_matrix + ix, expected_value);
   }
 
+  MPI_Reduce(&local_diff, &total_diff, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
   if (my_rank == 0) {
-    printf("Check of compute_omega_field() with rho = 1.:\n");
-    printf("|omega - expected_value| = %.1e (should be 0.0)\n\n", total_diff);
+    register_test(1, "Check of compute_omega_field() with rho = 1.0");
+    print_test_header(1);
+
+    printf("Total diff: %.1e (should be 0.0)\n", total_diff);
+    printf("Average total diff: %.1e (should be 0.0)\n", total_diff * volume_inv);
+
+    fail_test_if(1, total_diff * volume_inv > 1e-12);
+
+    printf("\n---------------------------------------------------\n\n");
   }
 
   rho_t = 0.24;
   rho_s = 0.79;
 
+  reset_stout_smearing();
   set_stout_smearing_parms(1, rho_t, rho_s, 1, 1);
   compute_omega_field(ud);
 
-  total_diff = 0.;
+  local_diff = 0.;
 
   for (ix = 0; ix < 4 * VOLUME; ix++) {
     mu = (ix % 8) / 2;
@@ -118,13 +129,25 @@ int main(int argc, char *argv[])
       expected_value = 32 * rho_t + 416 * rho_s;
     }
 
-    total_diff += diff_identity(omega_matrix + ix, expected_value);
+    local_diff += diff_identity(omega_matrix + ix, expected_value);
+  }
+
+  MPI_Reduce(&local_diff, &total_diff, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+  if (my_rank == 0) {
+    register_test(2, "Check of compute_omega_field() with rho_t:  0.24, rho_s:  0.79");
+    print_test_header(2);
+
+    printf("Total diff: %.1e (should be < 1e-8)\n", total_diff);
+    printf("Average total diff: %.1e (should be < 1e-12)\n", total_diff * volume_inv);
+
+    fail_test_if(2, total_diff * volume_inv > 1e-12);
+
+    printf("\n---------------------------------------------------\n\n");
   }
 
   if (my_rank == 0) {
-    printf("Check of compute_omega_field() with rho_t: %.2f, rho_s: %.2f:\n",
-           rho_t, rho_s);
-    printf("|omega - expected_value| = %.1e (should be 0.0)\n\n", total_diff);
+    report_test_results();
   }
 
   MPI_Finalize();

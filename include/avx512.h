@@ -14,9 +14,7 @@
 #ifndef AVX512_H
 #define AVX512_H
 
-#ifndef SSE2_H
 #include "sse2.h"
-#endif
 
 #ifdef EMULATEAVX
 #include "emmintrin.h"

@@ -83,16 +83,10 @@
 
 #define BCNDS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "uflds.h"
-#include "lattice.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "uflds.h"
 
 #define N0 (NPROC0 * L0)
 
@@ -112,11 +106,16 @@ static su3_dble ubnd[2][3];
 
 static void alloc_lks(void)
 {
-  int ix, iy, t, *lk;
+  int ix, iy, t, bc, *lk;
   int pidx[4];
+  bc_parms_t bcp;
 
   error(iup[0][0] == 0, 1, "alloc_lks [bcnds.c]",
         "Geometry arrays are not set");
+
+  alloc_uidx();
+  bcp = bc_parms();
+  bc = bcp.type;
 
   if ((cpr[0] == 0) || (cpr[0] == (NPROC0 - 1))) {
     nlks = (L1 * L2 * L3) / 2;
@@ -131,7 +130,6 @@ static void alloc_lks(void)
     }
 
     lks = malloc(nlks * sizeof(*lks));
-    bclks = malloc(nbclks * sizeof(*bclks));
 
     if (lks != NULL) {
       lk = lks;
@@ -149,8 +147,15 @@ static void alloc_lks(void)
       }
     }
 
+    if ( (bc == 3) && (nbclks != 0) ) {
+      bclks = malloc(nbclks * sizeof(*bclks));
+    } else {
+      nbclks = 0;
+    }
+
     /* Links on the boundary that crosses the temporal boundary */
-    if ((nbclks != 0) && (bclks != NULL)) {
+    if ((bc == 3) && (nbclks != 0) && (bclks != NULL)) {
+
       lk = bclks;
 
       /* Type 1 links at FACE0 */
@@ -206,7 +211,10 @@ static void alloc_lks(void)
   }
 
   error((nlks > 0) && (lks == NULL), 1, "alloc_lks [bcnds.c]",
-        "Unable to allocate index array");
+        "Unable to allocate index array for bulk links");
+  error((bc == 3) && (nbclks > 0) && (bclks == NULL), 1, "alloc_lks [bcnds.c]",
+        "Unable to allocate index array for halo links");
+
   init0 = 1;
 }
 
@@ -278,7 +286,7 @@ int *bnd_pts(int *n)
   return pts;
 }
 
-static int is_zero(su3_dble *u)
+static int is_zero(su3_dble const *u)
 {
   int i, it;
   umat_t *um;
@@ -287,15 +295,15 @@ static int is_zero(su3_dble *u)
   it = 1;
 
   for (i = 0; i < 18; i++)
-    it &= ((*um).r[i] == 0.0);
+    it &= is_equal_d((*um).r[i], 0.0);
 
   return it;
 }
 
-static int is_equal(double tol, su3_dble *u, su3_dble *v)
+static int is_equal(double tol, su3_dble const *u, su3_dble const *v)
 {
   int i, it;
-  umat_t *um, *vm;
+  umat_t const *um, *vm;
 
   um = (umat_t *)(u);
   vm = (umat_t *)(v);

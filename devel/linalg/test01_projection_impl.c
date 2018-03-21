@@ -6,14 +6,9 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "linalg.h"
 #include "global.h"
+#include "linalg.h"
+#include "mpi.h"
 #include "su3fcts.h"
 
 #include <devel/testing_utilities/data_type_diffs.c>
@@ -414,5 +409,6 @@ int main(int argc, char *argv[])
   if (my_rank == 0)
     report_test_results();
 
+  MPI_Finalize();
   return 0;
 }

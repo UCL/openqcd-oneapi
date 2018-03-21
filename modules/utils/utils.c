@@ -47,11 +47,11 @@
  *     Note that the counter for these tags wraps around after 16384
  *     tags have been delivered
  *
- *   void message(char *format,...)
+ *   void message(char const *format,...)
  *     Prints a message from process 0 to stdout. The usage and argument
  *     list is the same as in the case of the printf function
  *
- *   void mpc_gsum_d(double *src, double *dst, int num)
+ *   void mpc_gsum_d(double const *src, double *dst, int num)
  *     Compute global sum of num double precision values from src and
  *     store results in dst
  *
@@ -83,14 +83,12 @@
 
 #define UTILS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <math.h>
-#include <string.h>
-#include "mpi.h"
 #include "utils.h"
 #include "global.h"
+#include "mpi.h"
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
 
 #define MAX_TAG 32767
 #define MAX_PERMANENT_TAG MAX_TAG / 2
@@ -104,6 +102,12 @@ static int pcmn_cnt = -1, cmn_cnt = MAX_TAG;
 
 static long long int amem_use = 0;
 static long long int amem_max = 0;
+
+static const float fixed_epsilon_float = 1e-12;
+static const double fixed_epsilon_double = 1e-24;
+
+static const int32_t ulp_epsilon_float = 4;
+static const int64_t ulp_epsilon_double = 8;
 
 struct addr_t
 {
@@ -207,7 +211,7 @@ int mpi_tag(void)
   return cmn_cnt;
 }
 
-void message(char *format, ...)
+void message(char const *format, ...)
 {
   int my_rank;
   va_list args;
@@ -312,7 +316,7 @@ void mpc_bcast_i(int *buf, int num)
 #endif
 }
 
-void mpc_gsum_d(double *src, double *dst, int num)
+void mpc_gsum_d(double const *src, double *dst, int num)
 {
 #ifdef USE_MPI_ALLREDUCE
   MPI_Allreduce(src, dst, num, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -367,3 +371,129 @@ void mul_assign_scalar_complex(double d, complex_dble *c)
   (*c).re = d * (*c).re;
   (*c).im = d * (*c).im;
 }
+
+/* Floating point comparison functions */
+
+typedef union
+{
+  float f;
+  int32_t i;
+} float_as_int;
+
+typedef union
+{
+  double d;
+  int64_t i;
+} double_as_int;
+
+static float fabs_float(float f) { return (f < 0.0f) ? -f : f; }
+
+static int isnan_float(float f) { return (f != f); }
+
+static int isnan_double(double d) { return (d != d); }
+
+static int isinf_float(float f) { return (f > FLT_MAX || f < -FLT_MAX); }
+
+static int isinf_double(double d) { return (d > DBL_MAX || d < -DBL_MAX); }
+
+static int32_t max32(void)
+{
+  int32_t max = 1;
+  max <<= 31;
+  return max - 1;
+}
+
+static int64_t max64(void)
+{
+  int64_t max = 1;
+  max <<= 63;
+  return max - 1;
+}
+
+/* Return the ULP distance between two floating points */
+/* If they differ in sign the value will be max32() */
+static int32_t ulp_distance_f(float f1, float f2)
+{
+  int32_t max, distance;
+  float_as_int if1, if2;
+
+  if (f1 == f2)
+    return 0;
+
+  max = max32();
+
+  if (isnan_float(f1) || isnan_double(f2))
+    return max;
+
+  if (isinf_float(f1) || isinf_float(f2))
+    return max;
+
+  if1.f = f1;
+  if2.f = f2;
+
+  /* Do not compare floats of different signs */
+  if ((if1.i < 0) != (if2.i < 0))
+    return max;
+
+  distance = if1.i - if2.i;
+
+  /* Absolute value of distance */
+  if (distance < 0)
+    distance = -distance;
+
+  return distance;
+}
+
+/* Return the ULP distance between two double precision floating points */
+/* If they differ in sign the value will be max64() */
+static int64_t ulp_distance_d(double d1, double d2)
+{
+  int64_t max, distance;
+  double_as_int id1, id2;
+
+  if (d1 == d2)
+    return 0;
+
+  max = max64();
+
+  if (isnan_double(d1) || isnan_double(d2))
+    return max;
+
+  if (isinf_double(d1) || isinf_double(d2))
+    return max;
+
+  id1.d = d1;
+  id2.d = d2;
+
+  /* Do not compare doubles of different signs */
+  if ((id1.i < 0) != (id2.i < 0))
+    return max;
+
+  distance = id1.i - id2.i;
+
+  /* Absolute value of distance */
+  if (distance < 0)
+    distance = -distance;
+
+  return distance;
+}
+
+int is_equal_f(float f1, float f2)
+{
+  if (fabs_float(f1 - f2) < fixed_epsilon_float)
+    return 1;
+  else
+    return ulp_distance_f(f1, f2) <= ulp_epsilon_float;
+}
+
+int not_equal_f(float f1, float f2) { return !is_equal_f(f1, f2); }
+
+int is_equal_d(double d1, double d2)
+{
+  if (fabs(d1 - d2) < fixed_epsilon_double)
+    return 1;
+  else
+    return ulp_distance_d(d1, d2) <= ulp_epsilon_double;
+}
+
+int not_equal_d(double d1, double d2) { return !is_equal_d(d1, d2); }

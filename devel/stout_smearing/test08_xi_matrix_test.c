@@ -7,16 +7,11 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "lattice.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
 #include "stout_smearing.h"
+#include <time.h>
 
 #include <devel/testing_utilities/data_type_diffs.c>
 #include <devel/testing_utilities/diff_printing.c>

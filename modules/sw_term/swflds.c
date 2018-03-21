@@ -34,15 +34,10 @@
 
 #define SWFLDS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
 #include "flags.h"
-#include "utils.h"
-#include "sw_term.h"
 #include "global.h"
+#include "mpi.h"
+#include "sw_term.h"
 
 static pauli *swb = NULL;
 static pauli_dble *swdb = NULL;

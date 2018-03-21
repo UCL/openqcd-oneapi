@@ -31,11 +31,6 @@
 
 #define RANDOM_SU3_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "su3.h"
 #include "random.h"
 #include "su3fcts.h"
 

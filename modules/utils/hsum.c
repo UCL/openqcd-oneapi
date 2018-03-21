@@ -19,18 +19,18 @@
  *   void reset_hsum(int id)
  *     Resets the hiearchical sum with the given id to zero.
  *
- *   void add_to_hsum(int id,double *x)
+ *   void add_to_hsum(int id, double const *x)
  *     Adds the numbers x[0],..,x[n-1] to the hiearchical sum with the
  *     given id. More precisely, the number x[k] is added to the k'th
  *     sum accumulated in parallel. The number n of parallel sums is
  *     the one set by init_hsum().
  *
- *   void local_hsum(int id,double *sx)
+ *   void local_hsum(int id, double *sx)
  *     Evaluates the hiearchical sum with the given id and assigns the
  *     k'th sum computed in parallel to sx[k] (k=0,..,n-1). The number
  *     n of parallel sums is the one set by init_hsum().
  *
- *   void global_hsum(int id,double *sx)
+ *   void global_hsum(int id, double *sx)
  *     Same as local_hsum(), but additionally sums the results over all
  *     MPI processes. The calculated sums are guaranteed to be exactly
  *     the same on all processes.
@@ -49,12 +49,9 @@
 
 #define HSUM_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <limits.h>
+#include "global.h"
 #include "mpi.h"
 #include "utils.h"
-#include "global.h"
 
 #define BLK_LENGTH 8
 #define MAX_LEVELS 12
@@ -157,7 +154,7 @@ void reset_hsum(int id)
     error_loc(1, 1, "reset_hsum [hsum.c]", "Parameter id is out of range");
 }
 
-void add_to_hsum(int id, double *x)
+void add_to_hsum(int id, double const *x)
 {
   int n, i, j, *cnt;
   double **sm;

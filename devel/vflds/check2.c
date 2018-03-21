@@ -14,18 +14,13 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
 #include "flags.h"
-#include "utils.h"
+#include "global.h"
 #include "lattice.h"
 #include "linalg.h"
+#include "mpi.h"
+#include "random.h"
 #include "vflds.h"
-#include "global.h"
 
 #define NFLDS 5
 

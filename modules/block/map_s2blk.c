@@ -12,7 +12,7 @@
  *
  * The externally accessible functions are
  *
- *   void assign_s2sblk(blk_grid_t grid,int n,ptset_t set,spinor *s,int k)
+ *   void assign_s2sblk(blk_grid_t grid,int n,ptset_t set,spinor const *s,int k)
  *     Assigns the relevant part of the global single-precision spinor field s
  *     to the single-precision field b.s[k] on the n'th block of the specified
  *     block grid. Depending on the specified point set, the field on the even,
@@ -24,14 +24,14 @@
  *     precision field s. Depending on the specified point set, the field on
  *     the even, odd or all points is copied.
  *
- *   void assign_s2sdblk(blk_grid_t grid,int n,ptset_t set,spinor *s,int k)
- *     Assigns the relevant part of the global single-precision spinor field s
- *     to the double-precision field b.sd[k] on the n'th block of the specified
+ *   void assign_s2sdblk(blk_grid_t grid,int n,ptset_t set,spinor const *s,int
+ *k) Assigns the relevant part of the global single-precision spinor field s to
+ *the double-precision field b.sd[k] on the n'th block of the specified
  *     block grid. Depending on the specified point set, the field on the even,
  *     odd or all points is copied.
  *
  *   void assign_sd2sdblk(blk_grid_t grid,int n,ptset_t set,
- *                        spinor_dble *sd,int k)
+ *                        spinor_dble const *sd,int k)
  *     Assigns the relevant part of the global double-precision spinor field sd
  *     to the double-precision field b.sd[k] on the n'th block of the specified
  *     block grid. Depending on the specified point set, the field on the even,
@@ -53,22 +53,19 @@
 
 #define MAP_S2BLK_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
 #include "block.h"
 #include "global.h"
+#include "mpi.h"
+#include "su3.h"
 
 #if (defined x64)
 #include "sse2.h"
 
-void assign_s2sblk(blk_grid_t grid, int n, ptset_t set, spinor *s, int k)
+void assign_s2sblk(blk_grid_t grid, int n, ptset_t set, spinor const *s, int k)
 {
   int nb, isw, vol, *imb;
-  spinor *sb, *sm, *rs1, *rs2;
+  spinor const *rs1, *rs2;
+  spinor *sb, *sm;
   block_t *b;
 
   b = blk_list(grid, &nb, &isw) + n;
@@ -213,10 +210,10 @@ void assign_sblk2s(blk_grid_t grid, int n, ptset_t set, int k, spinor *s)
   }
 }
 
-void assign_s2sdblk(blk_grid_t grid, int n, ptset_t set, spinor *s, int k)
+void assign_s2sdblk(blk_grid_t grid, int n, ptset_t set, spinor const *s, int k)
 {
   int nb, isw, vol, *imb;
-  spinor *rs1, *rs2;
+  spinor const *rs1, *rs2;
   spinor_dble *sb, *sm;
   block_t *b;
 
@@ -324,11 +321,12 @@ void assign_s2sdblk(blk_grid_t grid, int n, ptset_t set, spinor *s, int k)
   }
 }
 
-void assign_sd2sdblk(blk_grid_t grid, int n, ptset_t set, spinor_dble *sd,
+void assign_sd2sdblk(blk_grid_t grid, int n, ptset_t set, spinor_dble const *sd,
                      int k)
 {
   int nb, isw, vol, *imb;
-  spinor_dble *sb, *sm, *rs1, *rs2;
+  spinor_dble const *rs1, *rs2;
+  spinor_dble *sb, *sm;
   block_t *b;
 
   b = blk_list(grid, &nb, &isw) + n;
@@ -500,7 +498,7 @@ void assign_sdblk2sd(blk_grid_t grid, int n, ptset_t set, int k,
 
 #else
 
-void assign_s2sblk(blk_grid_t grid, int n, ptset_t set, spinor *s, int k)
+void assign_s2sblk(blk_grid_t grid, int n, ptset_t set, spinor const *s, int k)
 {
   int nb, isw, vol, *imb;
   spinor *sb, *sm;
@@ -582,10 +580,10 @@ void assign_sblk2s(blk_grid_t grid, int n, ptset_t set, int k, spinor *s)
   }
 }
 
-void assign_s2sdblk(blk_grid_t grid, int n, ptset_t set, spinor *s, int k)
+void assign_s2sdblk(blk_grid_t grid, int n, ptset_t set, spinor const *s, int k)
 {
   int nb, isw, vol, *imb;
-  spinor *r;
+  spinor const *r;
   spinor_dble *sb, *sm;
   block_t *b;
 
@@ -653,7 +651,7 @@ void assign_s2sdblk(blk_grid_t grid, int n, ptset_t set, spinor *s, int k)
   }
 }
 
-void assign_sd2sdblk(blk_grid_t grid, int n, ptset_t set, spinor_dble *sd,
+void assign_sd2sdblk(blk_grid_t grid, int n, ptset_t set, spinor_dble const *sd,
                      int k)
 {
   int nb, isw, vol, *imb;

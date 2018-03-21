@@ -19,25 +19,25 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include "mpi.h"
-#include "flags.h"
-#include "random.h"
-#include "su3fcts.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
 #include "archive.h"
+#include "flags.h"
 #include "forces.h"
-#include "update.h"
-#include "wflow.h"
-#include "tcharge.h"
-#include "version.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "random.h"
 #include "stout_smearing.h"
+#include "su3fcts.h"
+#include "tcharge.h"
+#include "uflds.h"
+#include "update.h"
+#include "utils.h"
+#include "version.h"
+#include "wflow.h"
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -401,6 +401,7 @@ static void setup_files(void)
 static void read_smearing(void)
 {
   long section_pos;
+  int has_smearing = 0;
   int n_smear, smear_gauge;
   double rho_t, rho_s;
 
@@ -408,11 +409,9 @@ static void read_smearing(void)
     section_pos = find_optional_section("Smearing parameters");
 
     if (section_pos == No_Section_Found) {
-      n_smear = 0;
-      rho_t = 0.0;
-      rho_s = 0.0;
-      smear_gauge = 0;
+      has_smearing = 0;
     } else {
+      has_smearing = 1;
       read_line("n_smear", "%d", &n_smear);
       read_line("rho_t", "%lf", &rho_t);
       read_line("rho_s", "%lf", &rho_s);
@@ -420,12 +419,23 @@ static void read_smearing(void)
     }
   }
 
-  mpc_bcast_i(&n_smear, 1);
-  mpc_bcast_d(&rho_t, 1);
-  mpc_bcast_d(&rho_s, 1);
-  mpc_bcast_i(&smear_gauge, 1);
+  mpc_bcast_i(&has_smearing, 1);
 
-  set_stout_smearing_parms(n_smear, rho_t, rho_s, smear_gauge, 0);
+  if (has_smearing == 1) {
+    mpc_bcast_i(&n_smear, 1);
+    mpc_bcast_d(&rho_t, 1);
+    mpc_bcast_d(&rho_s, 1);
+    mpc_bcast_i(&smear_gauge, 1);
+
+    set_stout_smearing_parms(n_smear, rho_t, rho_s, smear_gauge, 0);
+  } else {
+    set_no_stout_smearing_parms();
+  }
+
+  if (append)
+    check_stout_smearing_parms(fdat);
+  else
+    write_stout_smearing_parms(fdat);
 }
 
 static void read_lat_parms(void)
@@ -458,48 +468,43 @@ static void read_lat_parms(void)
 
 static void read_ani_parms(void)
 {
-  int has_tts;
+  int has_ani, has_tts;
   long section_pos;
-  double nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion, ut_fermion;
+  double nu, xi, us_fermion, ut_fermion;
 
   if (my_rank == 0) {
     section_pos = find_optional_section("Anisotropy parameters");
 
     if (section_pos == No_Section_Found) {
-      has_tts = 1;
-      nu = 1.0;
-      xi = 1.0;
-      cR = 1.0;
-      cT = 1.0;
-      us_gauge = 1.0;
-      ut_gauge = 1.0;
-      us_fermion = 1.0;
-      ut_fermion = 1.0;
+      has_ani = 0;
     } else {
+      has_ani = 1;
       read_line("use_tts", "%d", &has_tts);
       read_line("nu", "%lf", &nu);
       read_line("xi", "%lf", &xi);
-      read_line("cR", "%lf", &cR);
-      read_line("cT", "%lf", &cT);
-      read_optional_line("us_gauge", "%lf", &us_gauge, 1.0);
-      read_optional_line("ut_gauge", "%lf", &ut_gauge, 1.0);
       read_optional_line("us_fermion", "%lf", &us_fermion, 1.0);
       read_optional_line("ut_fermion", "%lf", &ut_fermion, 1.0);
     }
   }
 
-  mpc_bcast_i(&has_tts, 1);
-  mpc_bcast_d(&nu, 1);
-  mpc_bcast_d(&xi, 1);
-  mpc_bcast_d(&cR, 1);
-  mpc_bcast_d(&cT, 1);
-  mpc_bcast_d(&us_gauge, 1);
-  mpc_bcast_d(&ut_gauge, 1);
-  mpc_bcast_d(&us_fermion, 1);
-  mpc_bcast_d(&ut_fermion, 1);
+  mpc_bcast_i(&has_ani, 1);
 
-  set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion,
-                ut_fermion);
+  if (has_ani == 1) {
+    mpc_bcast_i(&has_tts, 1);
+    mpc_bcast_d(&nu, 1);
+    mpc_bcast_d(&xi, 1);
+    mpc_bcast_d(&us_fermion, 1);
+    mpc_bcast_d(&ut_fermion, 1);
+
+    set_ani_parms(has_tts, nu, xi, 1.0, 1.0, 1.0, 1.0, us_fermion, ut_fermion);
+  } else {
+    set_no_ani_parms();
+  }
+
+  if (append)
+    check_ani_parms(fdat);
+  else
+    write_ani_parms(fdat);
 }
 
 static void read_bc_parms(void)
@@ -1168,6 +1173,7 @@ static void print_info(int icnfg)
   int n;
   long ip;
   mdint_parms_t mdp;
+  ani_params_t ani;
 
   if (my_rank == 0) {
     ip = ftell(flog);
@@ -1237,6 +1243,19 @@ static void print_info(int icnfg)
       printf("c0 = %.*f, ", IMAX(n, 1), lat.c0);
       n = fdigits(lat.c1);
       printf("c1 = %.*f\n\n", IMAX(n, 1), lat.c1);
+
+      ani = ani_parms();
+
+      if (ani.has_ani) {
+        printf("Anisotropy parameters:\n");
+        printf("use tts = %s\n", ani.has_tts ? "true" : "false");
+        n = fdigits(ani.xi);
+        printf("xi = %.*f\n", IMAX(n, 1), ani.xi);
+        n = fdigits(ani.ut_gauge);
+        printf("ut_gauge = %.*f\n", IMAX(n, 1), ani.ut_gauge);
+        n = fdigits(ani.us_gauge);
+        printf("us_gauge = %.*f\n", IMAX(n, 1), ani.us_gauge);
+      }
 
       print_bc_parms(1);
     }
@@ -1326,7 +1345,8 @@ static void print_log(dat_t *ndat)
     }
 
     if (bc_type() == 3) {
-      if ((smear_params.num_smear > 1) && (smear_params.rho_temporal != 0.0)) {
+      if ((smear_params.num_smear > 1) &&
+          not_equal_d(smear_params.rho_temporal, 0.0)) {
         printf("Average temporal link (thin)  = %.15f\n",
                (*ndat).average_t_link);
         printf("Average temporal link (stout) = %.15f\n",
@@ -1493,7 +1513,7 @@ static dat_t compute_log_values(double const *act0, double const *act1,
     w0[3] = spatial_link_sum(0) / (3 * volume);
   }
 
-  if (stout_smearing_parms().num_smear > 1) {
+  if (stout_smearing_parms().num_smear > 0) {
     smear_fields();
     w0[4] = plaq_wsum_dble(0) / npl;
 
@@ -1501,6 +1521,7 @@ static dat_t compute_log_values(double const *act0, double const *act1,
       w0[5] = temporal_link_sum(0) / volume;
       w0[6] = spatial_link_sum(0) / (3 * volume);
     }
+
     unsmear_fields();
   }
 

@@ -13,9 +13,7 @@
 #ifndef DFL_H
 #define DFL_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
 
 typedef struct
 {
@@ -42,12 +40,12 @@ extern double dfl_sap_gcr2(int nkv, int nmx, double res, double mu,
                            spinor_dble *eta, spinor_dble *psi, int *status);
 
 /* DFL_SUBSPACE_C */
-extern void dfl_sd2vd(spinor_dble *sd, complex_dble *vd);
-extern void dfl_vd2sd(complex_dble *vd, spinor_dble *sd);
-extern void dfl_sub_vd2sd(complex_dble *vd, spinor_dble *sd);
-extern void dfl_s2v(spinor *s, complex *v);
-extern void dfl_v2s(complex *v, spinor *s);
-extern void dfl_sub_v2s(complex *v, spinor *s);
+extern void dfl_sd2vd(spinor_dble const *sd, complex_dble *vd);
+extern void dfl_vd2sd(complex_dble const *vd, spinor_dble *sd);
+extern void dfl_sub_vd2sd(complex_dble const *vd, spinor_dble *sd);
+extern void dfl_s2v(spinor const *s, complex *v);
+extern void dfl_v2s(complex const *v, spinor *s);
+extern void dfl_sub_v2s(complex const *v, spinor *s);
 extern void dfl_subspace(spinor **mds);
 
 /* LTL_GCR */

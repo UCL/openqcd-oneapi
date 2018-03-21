@@ -40,12 +40,6 @@
 
 #define RANLXS_C
 
-#include <limits.h>
-#include <float.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "utils.h"
 #include "random.h"
 
 #if ((defined AVX) || (defined x64))

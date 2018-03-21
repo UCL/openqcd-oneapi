@@ -14,19 +14,14 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "su3fcts.h"
-#include "utils.h"
 #include "flags.h"
-#include "sflds.h"
+#include "global.h"
 #include "linalg.h"
 #include "little.h"
-#include "global.h"
+#include "mpi.h"
+#include "random.h"
+#include "sflds.h"
+#include "su3fcts.h"
 
 #define NPTS 2048
 
@@ -182,8 +177,6 @@ int main(int argc, char *argv[])
     printf("%dx%dx%dx%d local lattice\n", L0, L1, L2, L3);
     fflush(flog);
   }
-
-  set_ani_parms(1.0, 2.0);
 
   start_ranlux(0, 123456);
 

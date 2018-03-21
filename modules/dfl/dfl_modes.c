@@ -124,25 +124,19 @@
 
 #define DFL_MODES_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "utils.h"
-#include "flags.h"
-#include "random.h"
-#include "lattice.h"
-#include "block.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "vflds.h"
-#include "linalg.h"
-#include "sw_term.h"
-#include "dirac.h"
-#include "sap.h"
-#include "little.h"
 #include "dfl.h"
+#include "dirac.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "little.h"
+#include "mpi.h"
+#include "random.h"
+#include "sap.h"
+#include "sflds.h"
+#include "sw_term.h"
+#include "uflds.h"
+#include "vflds.h"
 
 typedef union
 {

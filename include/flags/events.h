@@ -33,7 +33,7 @@ static void LatUpdatedUd(void)
   error(check_bit_state(lat.ud.state, SMEARED_STATE_BIT) != 0, 1,
         "LatUpdatedUd [events.h]",
         "Trying to update a double precision gauge "
-        "field that is not in its smeared state");
+        "field that is in its smeared state");
 
   lat.ud.tag = next_tag();
 }

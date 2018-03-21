@@ -12,51 +12,50 @@
  *
  * The externally accessible functions are
  *
- *   complex_dble spinor_prod_dble(int vol,int icom,spinor_dble *s,
- *                                 spinor_dble *r)
+ *   complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
+ *                                 spinor_dble const *r)
  *     Computes the scalar product of the fields s and r.
  *
- *   double spinor_prod_re_dble(int vol,int icom,spinor_dble *s,
- *                              spinor_dble *r)
- *     Computes the real part of the scalar product of the fields
- *     s and r.
+ *   double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
+ *                              spinor_dble const *r)
+ *     Computes the real part of the scalar product of the fields s and r.
  *
- *   complex_dble spinor_prod5_dble(int vol,int icom,spinor_dble *s,
- *                                  spinor_dble *r)
+ *   complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
+ *                                  spinor_dble const *r)
  *     Computes the scalar product of the fields s and gamma_5*r.
  *
- *   double norm_square_dble(int vol,int icom,spinor_dble *s)
+ *   double norm_square_dble(int vol, int icom, spinor_dble const *s)
  *     Computes the square of the norm of the field s.
  *
- *   void mulc_spinor_add_dble(int vol,spinor_dble *s,spinor_dble *r,
+ *   void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
  *                             complex_dble z)
  *     Replaces the field s by s+z*r.
  *
- *   void mulr_spinor_add_dble(int vol,spinor_dble *s,spinor_dble *r,
+ *   void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
  *                             double c)
  *     Replaces the field s by s+c*r.
  *
- *   void combine_spinor_dble(int vol,spinor_dble *s,spinor_dble *r,
- *                            double cs,double cr)
+ *   void combine_spinor_dble(int vol, spinor_dble *s, spinor_dble const *r,
+ *                            double cs, double cr)
  *     Replaces the field s by cs*s+cr*r.
  *
- *   void project_dble(int vol,int icom,spinor_dble *s,spinor_dble *r)
- *     Replaces the field s by s-(r,s)*r.
+ *   void project_dble(int vol, int icom, spinor_dble *s, spinor_dble const *r)
+ *     Replaces the field s by s-(r, s)*r.
  *
- *   void scale_dble(int vol,double c,spinor_dble *s)
+ *   void scale_dble(int vol, double c, spinor_dble *s)
  *     Replaces the field s by c*s.
  *
- *   double normalize_dble(int vol,int icom,spinor_dble *s)
+ *   double normalize_dble(int vol, int icom, spinor_dble *s)
  *     Replaces the field s by s/||s|| and returns the norm ||s||.
  *
- *   void rotate_dble(int vol,int n,spinor_dble **ppk,complex_dble *v)
- *     Replaces the fields pk by sum_j pj*v[n*j+k] where 0<=k,j<n and
+ *   void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble const *v)
+ *     Replaces the fields pk by sum_j pj*v[n*j+k] where 0<=k, j<n and
  *     pk=ppk[k].
  *
- *   void mulg5_dble(int vol,spinor_dble *s)
+ *   void mulg5_dble(int vol, spinor_dble *s)
  *     Multiplies the field s with gamma_5.
  *
- *   void mulmg5_dble(int vol,spinor_dble *s)
+ *   void mulmg5_dble(int vol, spinor_dble *s)
  *     Multiplies the field s with -gamma_5.
  *
  * Notes:
@@ -75,15 +74,10 @@
 
 #define SALG_DBLE_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "sflds.h"
-#include "linalg.h"
 #include "global.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "sflds.h"
 
 static int nrot = 0;
 static int isx, isz, init = 0;
@@ -108,9 +102,10 @@ static void alloc_wrotate(int n)
 
 #if (defined FMA3)
 
-complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
+                              spinor_dble const *r)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -238,9 +233,10 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
   return smz;
 }
 
-double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
+                           spinor_dble const *r)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -336,10 +332,10 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
   return smx;
 }
 
-complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
-                               spinor_dble *r)
+complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
+                               spinor_dble const *r)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -467,9 +463,9 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
   return smz;
 }
 
-double norm_square_dble(int vol, int icom, spinor_dble *s)
+double norm_square_dble(int vol, int icom, spinor_dble const *s)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -537,9 +533,10 @@ double norm_square_dble(int vol, int icom, spinor_dble *s)
 
 #else
 
-complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
+                              spinor_dble const *r)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -665,9 +662,10 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
   return smz;
 }
 
-double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
+                           spinor_dble const *r)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -768,10 +766,10 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
   return smx;
 }
 
-complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
-                               spinor_dble *r)
+complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
+                               spinor_dble const *r)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -897,9 +895,9 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
   return smz;
 }
 
-double norm_square_dble(int vol, int icom, spinor_dble *s)
+double norm_square_dble(int vol, int icom, spinor_dble const *s)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -973,7 +971,7 @@ double norm_square_dble(int vol, int icom, spinor_dble *s)
 
 #endif
 
-void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r,
+void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
                           complex_dble z)
 {
   spinor_dble *sm;
@@ -992,7 +990,8 @@ void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r,
   _avx_zeroupper();
 }
 
-void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r, double c)
+void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
+                          double c)
 {
   spinor_dble *sm;
 
@@ -1010,8 +1009,8 @@ void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r, double c)
   _avx_zeroupper();
 }
 
-void combine_spinor_dble(int vol, spinor_dble *s, spinor_dble *r, double cs,
-                         double cr)
+void combine_spinor_dble(int vol, spinor_dble *s, spinor_dble const *r,
+                         double cs, double cr)
 {
   spinor_dble *sm;
 
@@ -1045,10 +1044,10 @@ void scale_dble(int vol, double c, spinor_dble *s)
   _avx_zeroupper();
 }
 
-void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble *v)
+void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble const *v)
 {
   int k, j, ix;
-  complex_dble *z;
+  complex_dble const *z;
   spinor_dble *pk, *pj;
 
   if (n > nrot)
@@ -1160,9 +1159,10 @@ void mulmg5_dble(int vol, spinor_dble *s)
 #elif (defined x64)
 #include "sse2.h"
 
-complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
+                              spinor_dble const *r)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -1333,9 +1333,10 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
   return smz;
 }
 
-double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
+                           spinor_dble const *r)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -1429,10 +1430,10 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
   return smx;
 }
 
-complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
-                               spinor_dble *r)
+complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
+                               spinor_dble const *r)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -1603,9 +1604,9 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
   return smz;
 }
 
-double norm_square_dble(int vol, int icom, spinor_dble *s)
+double norm_square_dble(int vol, int icom, spinor_dble const *s)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -1695,7 +1696,7 @@ double norm_square_dble(int vol, int icom, spinor_dble *s)
   return smx;
 }
 
-void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r,
+void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
                           complex_dble z)
 {
   spinor_dble *sm;
@@ -1722,7 +1723,8 @@ void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r,
   }
 }
 
-void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r, double c)
+void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
+                          double c)
 {
   spinor_dble *sm;
 
@@ -1749,8 +1751,8 @@ void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r, double c)
   }
 }
 
-void combine_spinor_dble(int vol, spinor_dble *s, spinor_dble *r, double cs,
-                         double cr)
+void combine_spinor_dble(int vol, spinor_dble *s, spinor_dble const *r,
+                         double cs, double cr)
 {
   spinor_dble *sm;
 
@@ -1896,10 +1898,10 @@ void scale_dble(int vol, double c, spinor_dble *s)
   }
 }
 
-void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble *v)
+void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble const *v)
 {
   int k, j, ix;
-  complex_dble *z;
+  complex_dble const *z;
   spinor_dble *pk, *pj;
 
   if (n > nrot)
@@ -2018,12 +2020,13 @@ void mulmg5_dble(int vol, spinor_dble *s)
 #include "qpx.h"
 static double smy[MAX_LEVELS] ALIGNED16;
 
-complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
+                              spinor_dble const *r)
 {
   int n;
   double x, y;
   complex_dble w, z;
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
   vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
   vector4double res11, res12, res13;
 
@@ -2096,11 +2099,12 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
   return z;
 }
 
-double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
+                           spinor_dble const *r)
 {
   int n;
   double x, y;
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
   vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
   vector4double res11, res12, res13;
 
@@ -2164,13 +2168,13 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
   }
 }
 
-complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
-                               spinor_dble *r)
+complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
+                               spinor_dble const *r)
 {
   int n;
   double x, y;
   complex_dble w, z;
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
   vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
   vector4double res11, res12, res13, res21, res22, res23;
 
@@ -2246,11 +2250,11 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
   return z;
 }
 
-double norm_square_dble(int vol, int icom, spinor_dble *s)
+double norm_square_dble(int vol, int icom, spinor_dble const *s)
 {
   int n;
   double x, y;
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
   vector4double v11, v12, v13, v21, v22, v23;
   vector4double res11, res12, res13;
 
@@ -2309,7 +2313,7 @@ double norm_square_dble(int vol, int icom, spinor_dble *s)
   }
 }
 
-void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r,
+void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
                           complex_dble z)
 {
   spinor_dble *sm;
@@ -2339,7 +2343,8 @@ void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r,
   }
 }
 
-void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r, double c)
+void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
+                          double c)
 {
   spinor_dble *sm;
   vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
@@ -2367,8 +2372,8 @@ void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r, double c)
   }
 }
 
-void combine_spinor_dble(int vol, spinor_dble *s, spinor_dble *r, double cs,
-                         double cr)
+void combine_spinor_dble(int vol, spinor_dble *s, spinor_dble const *r,
+                         double cs, double cr)
 {
   spinor_dble *sm;
 
@@ -2409,10 +2414,10 @@ void scale_dble(int vol, double c, spinor_dble *s)
   }
 }
 
-void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble *v)
+void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble const *v)
 {
   int k, j, ix;
-  complex_dble *z;
+  complex_dble const *z;
   spinor_dble *pk, *pj;
   vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
   vector4double z11, z12;
@@ -2502,9 +2507,10 @@ void mulmg5_dble(int vol, spinor_dble *s)
 
 #else
 
-complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
+                              spinor_dble const *r)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -2548,9 +2554,10 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
   return smz;
 }
 
-double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
+                           spinor_dble const *r)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -2588,10 +2595,10 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
   return smx;
 }
 
-complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
-                               spinor_dble *r)
+complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
+                               spinor_dble const *r)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -2637,9 +2644,9 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble *s,
   return smz;
 }
 
-double norm_square_dble(int vol, int icom, spinor_dble *s)
+double norm_square_dble(int vol, int icom, spinor_dble const *s)
 {
-  spinor_dble *sm, *smb;
+  spinor_dble const *sm, *smb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -2675,7 +2682,7 @@ double norm_square_dble(int vol, int icom, spinor_dble *s)
   return smx;
 }
 
-void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r,
+void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
                           complex_dble z)
 {
   spinor_dble *sm;
@@ -2692,7 +2699,8 @@ void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r,
   }
 }
 
-void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r, double c)
+void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
+                          double c)
 {
   spinor_dble *sm;
 
@@ -2708,8 +2716,8 @@ void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble *r, double c)
   }
 }
 
-void combine_spinor_dble(int vol, spinor_dble *s, spinor_dble *r, double cs,
-                         double cr)
+void combine_spinor_dble(int vol, spinor_dble *s, spinor_dble const *r,
+                         double cs, double cr)
 {
   spinor_dble *sm;
 
@@ -2739,10 +2747,10 @@ void scale_dble(int vol, double c, spinor_dble *s)
   }
 }
 
-void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble *v)
+void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble const *v)
 {
   int k, j, ix;
-  complex_dble *z;
+  complex_dble const *z;
   spinor_dble *pk, *pj;
 
   if (n > nrot)
@@ -2821,7 +2829,7 @@ void mulmg5_dble(int vol, spinor_dble *s)
 
 #endif
 
-void project_dble(int vol, int icom, spinor_dble *s, spinor_dble *r)
+void project_dble(int vol, int icom, spinor_dble *s, spinor_dble const *r)
 {
   complex_dble z;
 
@@ -2838,7 +2846,7 @@ double normalize_dble(int vol, int icom, spinor_dble *s)
   r = norm_square_dble(vol, icom, s);
   r = sqrt(r);
 
-  if (r != 0.0)
+  if (not_equal_d(r, 0.0))
     scale_dble(vol, 1.0 / r, s);
   else
     error_loc(1, 1, "normalize_dble [salg_dble.c]",

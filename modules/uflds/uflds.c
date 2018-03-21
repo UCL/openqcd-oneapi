@@ -63,18 +63,13 @@
 
 #define UFLDS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include "uflds.h"
+#include "field_com.h"
+#include "global.h"
+#include "lattice.h"
 #include "mpi.h"
-#include "su3.h"
 #include "random.h"
 #include "su3fcts.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
-#include "global.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -306,17 +301,17 @@ static int set_phase(int pm, double *theta)
   p = theta[0] / (double)(N1);
   phase[0].re = cos(p);
   phase[0].im = sin(p);
-  is = (p != 0.0);
+  is = (not_equal_d(p, 0.0));
 
   p = theta[1] / (double)(N2);
   phase[1].re = cos(p);
   phase[1].im = sin(p);
-  is |= (p != 0.0);
+  is |= (not_equal_d(p, 0.0));
 
   p = theta[2] / (double)(N3);
   phase[2].re = cos(p);
   phase[2].im = sin(p);
-  is |= (p != 0.0);
+  is |= (not_equal_d(p, 0.0));
 
   if (pm == -1) {
     phase[0].im = -phase[0].im;
@@ -327,7 +322,7 @@ static int set_phase(int pm, double *theta)
   return is;
 }
 
-static void mult_ud_phase(void)
+static void mult_ud_phase(int bc)
 {
   int k;
   su3_dble *ud, *um;
@@ -345,6 +340,11 @@ static void mult_ud_phase(void)
       cm3x3_mulc(phase + k, ud, ud);
       ud += 1;
     }
+  }
+
+  /* Only update the links in the halo for periodic bc's */
+  if (bc != 3) {
+    return;
   }
 
   /* Multiply the type 1 boundary links with a phase */
@@ -456,15 +456,17 @@ void set_ud_phase(void)
 
   if (query_flags(UD_PHASE_SET) == 0) {
 
-    if (query_flags(UDBUF_UP2DATE) == 0)
-      copy_bnd_ud();
-
     bcp = bc_parms();
     bc = bcp.type;
+
+    if ((bc == 3) && (query_flags(UDBUF_UP2DATE) == 0)) {
+      copy_bnd_ud();
+    }
+
     is = set_phase(1, bcp.theta);
 
     if (is) {
-      mult_ud_phase();
+      mult_ud_phase(bc);
 
       if ((cpr[0] == (NPROC0 - 1)) && ((bc == 1) || (bc == 2))) {
         ud = udfld() + 4 * VOLUME + 7 * (BNDRY / 4);
@@ -476,8 +478,14 @@ void set_ud_phase(void)
       }
     }
 
-    if (bc == 3)
+    if (bc == 3) {
       chs_ud0();
+    }
+
+    /* Halo only updated for periodic boundary conditions */
+    if (bc != 3) {
+      set_flags(UPDATED_UD);
+    }
 
     set_flags(SET_UD_PHASE);
   }
@@ -490,26 +498,35 @@ void unset_ud_phase(void)
 
   if (query_flags(UD_PHASE_SET) == 1) {
 
-    error(
-        query_flags(UDBUF_UP2DATE) == 0, 1, "unset_ud_phase [uflds.c]",
-        "Trying to unset ud phase for a config where the boundary is not up to "
-        "date. This means an update has happened on a dirty configuration.");
+    set_flags(UNSET_UD_PHASE);
 
     bcp = bc_parms();
     bc = bcp.type;
+
+    error(
+        (bc == 3) && (query_flags(UDBUF_UP2DATE) == 0), 1,
+        "unset_ud_phase [uflds.c]",
+        "Trying to unset ud phase for a config where the boundary is not up to "
+        "date. This means an update has happened on a dirty configuration.");
+
     is = set_phase(-1, bcp.theta);
 
     if (is) {
-      mult_ud_phase();
+      mult_ud_phase(bc);
 
-      if ((bc == 1) || (bc == 2))
+      if ((bc == 1) || (bc == 2)) {
         set_bc();
+      }
     }
 
-    if (bc == 3)
+    if (bc == 3) {
       chs_ud0();
+    }
 
-    set_flags(UNSET_UD_PHASE);
+    /* Halo only updated for periodic boundary conditions */
+    if (bc != 3) {
+      set_flags(UPDATED_UD);
+    }
   }
 }
 
@@ -606,4 +623,10 @@ void swap_udfld(su3_dble **new_field)
   su3_dble *tmp = udb;
   udb = (*new_field);
   (*new_field) = tmp;
+}
+
+void copy_bnd_ud(void)
+{
+  copy_boundary_su3_field(udfld());
+  set_flags(COPIED_BND_UD);
 }

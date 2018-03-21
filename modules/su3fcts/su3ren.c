@@ -31,11 +31,8 @@
 
 #define SU3REN_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
 #include "su3fcts.h"
+#include "utils.h"
 
 static int normalize(su3_vector *v)
 {
@@ -44,7 +41,7 @@ static int normalize(su3_vector *v)
   r = _vector_prod_re((*v), (*v));
   r = (float)sqrt((double)(r));
 
-  if (r == 0.0f)
+  if (is_equal_f(r, 0.0f))
     return 1;
   else {
     r = 1.0f / r;
@@ -60,7 +57,7 @@ static int normalize_dble(su3_vector_dble *v)
   r = _vector_prod_re((*v), (*v));
   r = sqrt(r);
 
-  if (r == 0.0)
+  if (is_equal_d(r, 0.0))
     return 1;
   else {
     r = 1.0 / r;

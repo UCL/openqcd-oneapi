@@ -14,19 +14,14 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
+#include "block.h"
 #include "flags.h"
-#include "random.h"
-#include "utils.h"
+#include "global.h"
 #include "lattice.h"
+#include "mpi.h"
+#include "random.h"
 #include "sflds.h"
 #include "sw_term.h"
-#include "block.h"
-#include "global.h"
 
 typedef union
 {

@@ -12,28 +12,30 @@
  *
  * The externally accessible functions are
  *
- *   void mul_pauli_dble(double mu,pauli_dble *m,weyl_dble *s,weyl_dble *r)
+ *   void mul_pauli_dble(double mu, pauli_dble const *m, weyl_dble const *s,
+ *                       weyl_dble *r)
  *     Multiplies the Weyl spinor s by the matrix m+i*mu and assigns the
  *     result to the Weyl spinor r. The source spinor is overwritten if
  *     r=s and otherwise left unchanged.
  *
- *   int inv_pauli_dble(double mu,pauli_dble *m,pauli_dble *im)
+ *   int inv_pauli_dble(double mu, pauli_dble const *m, pauli_dble *im)
  *     Assigns the Hermitian part of the matrix (m+i*mu)^(-1) to im. The
  *     matrix is overwritten if im=m and otherwise left unchanged. On
  *     exit the program returns 0 or 1 depending on whether the inversion
  *     was safe or not (in which case the calculated matrix is unusable).
  *
- *   complex_dble det_pauli_dble(double mu,pauli_dble *m)
+ *   complex_dble det_pauli_dble(double mu, pauli_dble const *m)
  *     Returns the determinant of the matrix m+i*mu.
  *
- *   void apply_sw_dble(int vol,double mu,pauli_dble *m,spinor_dble *s,
- *                      spinor_dble *r)
+ *   void apply_sw_dble(int vol, double mu, pauli_dble const *m,
+ *                      spinor_dble const *s, spinor_dble *r)
  *     Applies the matrix field m[2*vol]+i*mu*gamma_5 to the spinor field
  *     s[vol] and assigns the result to the field r[vol]. The source field
  *     is overwritten if r=s and otherwise left unchanged (the arrays may
  *     not overlap in this case).
  *
- *   int apply_swinv_dble(int vol,double mu,pauli_dble *m,spinor_dble *s,
+ *   int apply_swinv_dble(int vol, double mu, pauli_dble const *m,
+ *                        spinor_dble const *s,
  *                        spinor_dble *r)
  *     Applies the inverse of the matrix field m[2*vol]+i*mu*gamma_5 to the
  *     spinor field s[vol] and assigns the result to the field r[vol]. The
@@ -65,11 +67,6 @@
 
 #define PAULI_DBLE_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "su3.h"
 #include "linalg.h"
 #include "sw_term.h"
 
@@ -93,7 +90,8 @@ static complex_dble dd[6] ALIGNED16;
 #if (defined AVX)
 #include "avx.h"
 
-void mul_pauli_dble(double mu, pauli_dble *m, weyl_dble *s, weyl_dble *r)
+void mul_pauli_dble(double mu, pauli_dble const *m, weyl_dble const *s,
+                    weyl_dble *r)
 {
   m += 2;
   _prefetch_pauli_dble(m);
@@ -352,7 +350,8 @@ void mul_pauli_dble(double mu, pauli_dble *m, weyl_dble *s, weyl_dble *r)
 
 #else
 
-void mul_pauli_dble(double mu, pauli_dble *m, weyl_dble *s, weyl_dble *r)
+void mul_pauli_dble(double mu, pauli_dble const *m, weyl_dble const *s,
+                    weyl_dble *r)
 {
   m += 2;
   _prefetch_pauli_dble(m);
@@ -1077,7 +1076,8 @@ void mul_pauli_dble_qpx(pauli_dble *m, vector4double *im1[3],
   *(im2[2]) = vec_xxnpmadd(s11, vec_mul(sign0, v9), vec_xmadd(v9, s11, r14));
 }
 
-void mul_pauli_dble(double mu, pauli_dble *m, weyl_dble *s, weyl_dble *r)
+void mul_pauli_dble(double mu, pauli_dble const *m, weyl_dble const *s,
+                    weyl_dble *r)
 {
   vector4double s1, s2, s3, s4, s5, s6, s10, s11;
   vector4double v1, v2, v3, v4, v5, v6, v7, v71, v8, v9, v10, v11, v12, v13,
@@ -1304,9 +1304,10 @@ static void bck_house(void)
 
 static weyl_dble rs;
 
-void mul_pauli_dble(double mu, pauli_dble *m, weyl_dble *s, weyl_dble *r)
+void mul_pauli_dble(double mu, pauli_dble const *m, weyl_dble const *s,
+                    weyl_dble *r)
 {
-  double *u;
+  double const *u;
 
   u = (*m).u;
 
@@ -1536,10 +1537,10 @@ static weyl_dble rs2;
 #include "avx512.h"
 #include "sse.h"
 
-void mul_pauli2_dble(double mu, pauli_dble *m, weyl_dble *s, weyl_dble *r)
+void mul_pauli2_dble(double mu, pauli_dble const *m, weyl_dble const *s, weyl_dble *r)
 {
-  weyl_dble *s2 = s + 1;
-  double *u = m->u, *u2 = (m + 1)->u;
+  weyl_dble const *s2 = s + 1;
+  double const *u = m->u, *u2 = (m + 1)->u;
 
   register __m512d r1, r2, r3;
   register __m512d s512, u512;
@@ -1691,7 +1692,7 @@ void mul_pauli2_dble(double mu, pauli_dble *m, weyl_dble *s, weyl_dble *r)
 
 #else
 
-void mul_pauli2_dble(double mu, pauli_dble *m, weyl_dble *s, weyl_dble *r)
+void mul_pauli2_dble(double mu, pauli_dble const *m, weyl_dble const *s, weyl_dble *r)
 {
   mul_pauli_dble(mu, m, s, r);
   mul_pauli_dble(-mu, m + 1, s + 1, r + 1);
@@ -1699,10 +1700,11 @@ void mul_pauli2_dble(double mu, pauli_dble *m, weyl_dble *s, weyl_dble *r)
 
 #endif
 
-static double set_aa(double mu, pauli_dble *m)
+static double set_aa(double mu, pauli_dble const *m)
 {
   int i, j;
-  double sm, *u, *v;
+  double sm;
+  double const *u, *v;
 
   sm = 0.0;
   u = (*m).u;
@@ -1761,7 +1763,7 @@ static void apply_aa(complex_dble *v, complex_dble *w)
   w[5].im = cc[5].im;
 }
 
-int inv_pauli_dble(double mu, pauli_dble *m, pauli_dble *im)
+int inv_pauli_dble(double mu, pauli_dble const *m, pauli_dble *im)
 {
   int i, j, ifail;
   double eps, sm, *u, *v;
@@ -1800,7 +1802,7 @@ int inv_pauli_dble(double mu, pauli_dble *m, pauli_dble *im)
   return ifail;
 }
 
-complex_dble det_pauli_dble(double mu, pauli_dble *m)
+complex_dble det_pauli_dble(double mu, pauli_dble const *m)
 {
   int i, j, k;
   double eps, r1, r2, r3;
@@ -1873,7 +1875,7 @@ complex_dble det_pauli_dble(double mu, pauli_dble *m)
   return w;
 }
 
-void apply_sw_dble(int vol, double mu, pauli_dble *m, spinor_dble *s,
+void apply_sw_dble(int vol, double mu, pauli_dble const *m, spinor_dble const *s,
                    spinor_dble *r)
 {
   spin_t *ps, *pr, *pm;
@@ -1897,7 +1899,7 @@ void apply_sw_dble(int vol, double mu, pauli_dble *m, spinor_dble *s,
   }
 }
 
-int apply_swinv_dble(int vol, double mu, pauli_dble *m, spinor_dble *s,
+int apply_swinv_dble(int vol, double mu, pauli_dble const *m, spinor_dble const *s,
                      spinor_dble *r)
 {
   int ifail;

@@ -13,9 +13,7 @@
 #ifndef LINSOLV_H
 #define LINSOLV_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
 
 /* CGNE_C */
 extern double cgne(int vol, int icom, void (*Dop)(spinor *s, spinor *r),

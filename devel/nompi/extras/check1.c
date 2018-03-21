@@ -12,11 +12,8 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "utils.h"
 #include "extras.h"
+#include "utils.h"
 
 int main(void)
 {

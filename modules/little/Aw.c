@@ -54,22 +54,21 @@
  * All programs in this module may perform global operations and should be
  * called simultaneously on all processes.
  *
+ * CONST_CORRECTNESS:
+ *   These functions all copy the boundaries of the input field and can
+ *   therefore not be made const correct in their current state.
+ *
  *******************************************************************************/
 
 #define AW_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "vflds.h"
-#include "linalg.h"
 #include "dfl.h"
-#include "little.h"
+#include "flags.h"
 #include "global.h"
+#include "linalg.h"
+#include "little.h"
+#include "mpi.h"
+#include "vflds.h"
 
 static int Ns = 0, nb, nbh;
 static int nbbh, (*inn)[8];

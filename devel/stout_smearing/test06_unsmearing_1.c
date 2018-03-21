@@ -7,21 +7,14 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "lattice.h"
-#include "global.h"
 #include "archive.h"
-#include "flags.h"
-#include "uflds.h"
+#include "global.h"
+#include "lattice.h"
+#include "mpi.h"
 #include "stout_smearing.h"
+#include "uflds.h"
 
 #include <devel/testing_utilities/data_type_diffs.c>
-/*#include <devel/testing_utilities/diff_printing.c>*/
 #include <devel/testing_utilities/test_counter.c>
 #include <modules/stout_smearing/force_unsmearing.c>
 
@@ -30,6 +23,10 @@ int main(int argc, char *argv[])
   int my_rank, ix, mu;
   double t_diff, s_diff, diff_total;
   double theta[3] = {0.0, 0.0, 0.0};
+
+  double inv_tot_links =
+      0.25 / ((double)(NPROC) * (double)(L0 * L1) * (double)(L2 * L3));
+
   su3_alg_dble *force, *force_copy;
   su3_alg_dble const_force;
 
@@ -39,12 +36,12 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf("Checks of the programs in the module stout_smearing\n");
-    printf("-------------------------------------------\n\n");
+    printf("Basic check on force unsmearing routine\n");
+    printf("-------------------------------------------\n");
 
-    printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
+    printf("%dx%dx%dx%d lattice,\n", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
            NPROC3 * L3);
-    printf("%dx%dx%dx%d process grid, ", NPROC0, NPROC1, NPROC2, NPROC3);
+    printf("%dx%dx%dx%d process grid,\n", NPROC0, NPROC1, NPROC2, NPROC3);
     printf("%dx%dx%dx%d local lattice\n", L0, L1, L2, L3);
     printf("-------------------------------------------\n\n");
   }
@@ -92,10 +89,12 @@ int main(int argc, char *argv[])
 
     print_test_header(1);
 
-    printf("Diff force for temporal-links: %+.2e (should be 0.0)\n",
+    printf("Total force diff for temporal-links: %+.2e (should be 0.0)\n",
            diff_total);
+    printf("Average force diff for temporal-links: %+.2e (should be 0.0)\n",
+           diff_total * inv_tot_links);
 
-    fail_test_if(1, diff_total > 1e-10);
+    fail_test_if(1, (diff_total * inv_tot_links) > 1e-10);
   }
 
   diff_total = 0.;

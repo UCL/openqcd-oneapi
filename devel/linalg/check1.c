@@ -14,18 +14,12 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "su3fcts.h"
-#include "utils.h"
+#include "global.h"
 #include "lattice.h"
 #include "linalg.h"
-#include "global.h"
+#include "mpi.h"
+#include "random.h"
+#include "su3fcts.h"
 
 #define NMOM 100033
 

@@ -59,19 +59,15 @@
 
 #define WFLOW_C
 
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "flags.h"
-#include "su3fcts.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
-#include "mdflds.h"
-#include "linalg.h"
-#include "forces.h"
 #include "wflow.h"
+#include "forces.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mdflds.h"
+#include "mpi.h"
+#include "su3fcts.h"
+#include "uflds.h"
 
 #define N0 (NPROC0 * L0)
 

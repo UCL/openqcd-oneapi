@@ -12,12 +12,8 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "random.h"
-#include "utils.h"
 #include "extras.h"
+#include "random.h"
 
 #define NSMALL 100
 #define NLARGE 1000

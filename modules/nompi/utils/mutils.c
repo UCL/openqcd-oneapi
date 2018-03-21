@@ -113,12 +113,9 @@
 
 #define MUTILS_C
 
-#include <stdlib.h>
-#include <stdio.h>
+#include "utils.h"
 #include <stdarg.h>
 #include <string.h>
-#include <math.h>
-#include "utils.h"
 
 static char line[NAME_SIZE + 1];
 static char inum[3 * sizeof(int) + 4];
@@ -141,14 +138,14 @@ int digits(double x, double dx, char *fmt)
         "Improper input data (negative error)");
 
   if (strcmp(fmt, "e") == 0) {
-    if (dx == 0.0)
+    if (is_equal_d(dx, 0.0))
       return DBL_DIG;
     else if (dx >= fabs(x))
       return 1;
     else
       return (int)(floor(1.0 + log10(fabs(x))) - floor(log10(dx)));
   } else if (strcmp(fmt, "f") == 0) {
-    error((dx == 0.0) || (dx >= 1.0), 1, "digits [mutils.c]",
+    error((is_equal_d(dx, 0.0)) || (dx >= 1.0), 1, "digits [mutils.c]",
           "Improper input data (error out of range for fixed format)");
 
     return (int)(1.0 - floor(log10(dx)));
@@ -163,7 +160,7 @@ int fdigits(double x)
   int m, n, ne, k;
   double y, z;
 
-  if (x == 0.0)
+  if (is_equal_d(x, 0.0))
     return 0;
 
   y = fabs(x);

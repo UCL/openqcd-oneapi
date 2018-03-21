@@ -7,15 +7,10 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "global.h"
-#include "update.h"
 #include "flags.h"
+#include "global.h"
+#include "mpi.h"
+#include "update.h"
 
 #include <devel/testing_utilities/data_type_diffs.c>
 #include <devel/testing_utilities/diff_printing.c>
@@ -30,10 +25,11 @@ void get_steplist(mdstep_t const *begin, mdstep_t const *end, int *out)
 
 int main(int argc, char *argv[])
 {
+  size_t nop;
   int my_rank, i, j, n;
   int iact[32], irat[3], imu[4], isp[4];
   int ifr[32], ncr[4];
-  int nop, itu, ismear, iunsmear, step_diff;
+  int itu, ismear, iunsmear, step_diff;
   int *expected_steplist, *computed_steplist;
   double tau, diff;
   double tau_total[32];

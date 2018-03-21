@@ -24,10 +24,6 @@
 
 #define GAUSS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "utils.h"
 #include "random.h"
 
 static int init = 0;

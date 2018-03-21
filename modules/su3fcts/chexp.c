@@ -84,12 +84,8 @@
 
 #define CHEXP_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "utils.h"
 #include "su3fcts.h"
+#include "utils.h"
 
 static int N, init = 0;
 static double t, d, *c;
@@ -808,7 +804,7 @@ static void square_ch_drv0_coeffs(ch_drv0_t *s_in)
                          t_in * p2.re * p2.im);
 }
 
-void expXsu3(double eps, su3_alg_dble *X, su3_dble *u)
+void expXsu3(double eps, su3_alg_dble const *X, su3_dble *u)
 {
   int k, n;
   double nfrb;
@@ -853,7 +849,7 @@ void expXsu3(double eps, su3_alg_dble *X, su3_dble *u)
   su3xsu3(u2, u, u);
 }
 
-void expXsu3_w_factors(double eps, su3_alg_dble *X, su3_dble *u,
+void expXsu3_w_factors(double eps, su3_alg_dble const *X, su3_dble *u,
                        ch_drv0_t *s_in)
 {
   int k, n;

@@ -12,17 +12,20 @@
  *
  * The externally accessible functions are
  *
- *   double setpf3(int *irat,int ipf,int isw,int isp,int icom,int *status)
+ *   double setpf3(int const *irat, int ipf, int isw, int isp, int icom,
+ *                 int *status)
  *     Generates a pseudo-fermion field phi with probability proportional
  *     to exp(-Spf) and returns the action Spf+Sdet-(phi,phi) if isw=1 or
  *     Spf-(phi,phi) if isw!=1 (see the notes).
  *
- *   void force3(int *irat,int ipf,int isw,int isp,double c,int *status)
+ *   void force3(int const *irat, int ipf, int isw, int isp, double c,
+ *               int *status)
  *     Computes the force deriving from the action Spf+Sdet if isw=1 or
  *     Spf if isw!=1 (see the notes). The calculated force is multiplied
  *     by c and added to the molecular-dynamics force field.
  *
- *   double action3(int *irat,int ipf,int isw,int isp,int icom,int *status)
+ *   double action3(int const *irat, int ipf, int isw, int isp, int icom,
+ *                  int *status)
  *     Returns the action Spf+Sdet-(phi,phi) if isw=1 or Spf-(phi,phi) if
  *     isw!=1 (see the notes).
  *
@@ -107,24 +110,19 @@
 
 #define FORCE3_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "mdflds.h"
-#include "sw_term.h"
-#include "sflds.h"
-#include "dirac.h"
-#include "linalg.h"
-#include "sap.h"
 #include "dfl.h"
-#include "ratfcts.h"
+#include "dirac.h"
+#include "flags.h"
 #include "forces.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mdflds.h"
+#include "mpi.h"
+#include "ratfcts.h"
+#include "sap.h"
+#include "sflds.h"
+#include "sw_term.h"
 
 #define N0 (NPROC0 * L0)
 
@@ -219,7 +217,7 @@ static double sdet(void)
   return smx;
 }
 
-double setpf3(int *irat, int ipf, int isw, int isp, int icom, int *status)
+double setpf3(int const *irat, int ipf, int isw, int isp, int icom, int *status)
 {
   int np, k, l, stat[3];
   double r, act, *nu, *rnu;
@@ -363,7 +361,7 @@ double setpf3(int *irat, int ipf, int isw, int isp, int icom, int *status)
   return act;
 }
 
-void force3(int *irat, int ipf, int isw, int isp, double c, int *status)
+void force3(int const *irat, int ipf, int isw, int isp, double c, int *status)
 {
   int np, k, l, ifail, stat[6];
   double *mu, *rmu;
@@ -512,7 +510,8 @@ void force3(int *irat, int ipf, int isw, int isp, double c, int *status)
   hop_frc(c);
 }
 
-double action3(int *irat, int ipf, int isw, int isp, int icom, int *status)
+double action3(int const *irat, int ipf, int isw, int isp, int icom,
+               int *status)
 {
   int np, k, l, stat[3];
   double act, r, *mu, *rmu;

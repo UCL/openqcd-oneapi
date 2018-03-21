@@ -13,22 +13,22 @@
  *
  * The externally accessible functions are
  *
- *   void cmat_vec(int n,complex *a,complex *v,complex *w)
+ *   void cmat_vec(int n, complex const *a, complex const *v, complex *w)
  *     Computes w=a*v, where v and w are n-vectors and a an nxn matrix.
  *
- *   void cmat_vec_assign(int n,complex *a,complex *v,complex *w)
+ *   void cmat_vec_assign(int n, complex const *a, complex const *v, complex *w)
  *     Adds a*v to w, where v and w are n-vectors and a an nxn matrix.
  *
- *   void cmat_add(int n,complex *a,complex *b,complex *c)
+ *   void cmat_add(int n, complex const *a, complex const *b, complex *c)
  *     Computes the sum c=a+b of two nxn matrices a and b.
  *
- *   void cmat_sub(int n,complex *a,complex *b,complex *c)
+ *   void cmat_sub(int n, complex const *a, complex const *b, complex *c)
  *     Computes the difference c=a-b of two nxn matrices a and b.
  *
- *   void cmat_mul(int n,complex *a,complex *b,complex *c)
+ *   void cmat_mul(int n, complex const *a, complex const *b, complex *c)
  *     Computes the product c=a*b of two nxn matrices a and b.
  *
- *   void cmat_dag(int n,complex *a,complex *b)
+ *   void cmat_dag(int n, complex const *a, complex *b)
  *     Assigns the hermitian conjugate of a to b.
  *
  * Notes:
@@ -49,11 +49,6 @@
 
 #define CMATRIX_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
-#include "utils.h"
 #include "linalg.h"
 
 #if (defined AVX)
@@ -61,9 +56,10 @@
 
 #if (defined FMA3)
 
-void cmat_vec(int n, complex *a, complex *v, complex *w)
+void cmat_vec(int n, complex const *a, complex const *v, complex *w)
 {
-  complex *b[4], *vv, *vm, *vmm, *wm;
+  complex *wm;
+  complex const *b[4], *vv, *vm, *vmm;
 
   wm = w + n;
 
@@ -304,9 +300,10 @@ void cmat_vec(int n, complex *a, complex *v, complex *w)
   _avx_zeroupper();
 }
 
-void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
+void cmat_vec_assign(int n, complex const *a, complex const *v, complex *w)
 {
-  complex *b[4], *vv, *vm, *vmm, *wm;
+  complex *wm;
+  complex const *b[4], *vv, *vm, *vmm;
 
   wm = w + n;
 
@@ -549,9 +546,10 @@ void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
 
 #else
 
-void cmat_vec(int n, complex *a, complex *v, complex *w)
+void cmat_vec(int n, complex const *a, complex const *v, complex *w)
 {
-  complex *b, *vv, *vm, *wm;
+  complex *wm;
+  complex const *b, *vv, *vm;
 
   if ((n & 0x3) == 0x0) {
     vm = v + n;
@@ -797,9 +795,10 @@ void cmat_vec(int n, complex *a, complex *v, complex *w)
   _avx_zeroupper();
 }
 
-void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
+void cmat_vec_assign(int n, complex const *a, complex const *v, complex *w)
 {
-  complex *b, *vv, *vm, *wm;
+  complex *wm;
+  complex const *b, *vv, *vm;
 
   if ((n & 0x3) == 0x0) {
     vm = v + n;
@@ -1050,9 +1049,10 @@ void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
 #elif (defined x64)
 #include "sse2.h"
 
-void cmat_vec(int n, complex *a, complex *v, complex *w)
+void cmat_vec(int n, complex const *a, complex const *v, complex *w)
 {
-  complex *vv, *vm, *wm;
+  complex *wm;
+  complex const *vv, *vm;
 
   if ((n & 0x3) == 0x0) {
     vm = v + n;
@@ -1288,9 +1288,10 @@ void cmat_vec(int n, complex *a, complex *v, complex *w)
   }
 }
 
-void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
+void cmat_vec_assign(int n, complex const *a, complex const *v, complex *w)
 {
-  complex *vv, *vm, *wm;
+  complex *wm;
+  complex const *vv, *vm;
 
   if ((n & 0x3) == 0x0) {
     vm = v + n;
@@ -1531,9 +1532,10 @@ void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
 static vector4double perm1 = {2.000000, 2.250000, 3.000000, 3.250000};
 static vector4double perm2 = {2.500000, 2.750000, 3.500000, 3.750000};
 
-void cmat_vec(int n, complex *a, complex *v, complex *w)
+void cmat_vec(int n, complex const *a, complex const *v, complex *w)
 {
-  complex *vv, *vm, *wm, *b;
+  complex *wm;
+  complex const *vv, *vm, *wm, *b;
   vector4double v1, v2, v3, v4, v5, v6, res1, res2;
 
   if ((n & 0x1) == 0x0) {
@@ -1577,10 +1579,10 @@ void cmat_vec(int n, complex *a, complex *v, complex *w)
   }
 }
 
-void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
+void cmat_vec_assign(int n, complex const *a, complex const *v, complex *w)
 {
-  complex *vv, *vm, *wm, *b;
-  ;
+  complex *wm;
+  complex const *vv, *wm, *b;
   vector4double v1, v2, v3, v4, v5, v6, res1, res2;
 
   if ((n & 0x1) == 0x0) {
@@ -1624,9 +1626,10 @@ void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
 
 #else
 
-void cmat_vec(int n, complex *a, complex *v, complex *w)
+void cmat_vec(int n, complex const *a, complex const *v, complex *w)
 {
-  complex *vv, *vm, *wm;
+  complex *wm;
+  complex const *vv, *vm;
 
   vm = v + n;
   wm = w + n;
@@ -1643,9 +1646,10 @@ void cmat_vec(int n, complex *a, complex *v, complex *w)
   }
 }
 
-void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
+void cmat_vec_assign(int n, complex const *a, complex const *v, complex *w)
 {
-  complex *vv, *vm, *wm;
+  complex *wm;
+  complex const *vv, *vm;
 
   vm = v + n;
   wm = w + n;
@@ -1661,9 +1665,9 @@ void cmat_vec_assign(int n, complex *a, complex *v, complex *w)
 
 #endif
 
-void cmat_add(int n, complex *a, complex *b, complex *c)
+void cmat_add(int n, complex const *a, complex const *b, complex *c)
 {
-  complex *am;
+  complex const *am;
 
   am = a + n * n;
 
@@ -1675,9 +1679,9 @@ void cmat_add(int n, complex *a, complex *b, complex *c)
   }
 }
 
-void cmat_sub(int n, complex *a, complex *b, complex *c)
+void cmat_sub(int n, complex const *a, complex const *b, complex *c)
 {
-  complex *am;
+  complex const *am;
 
   am = a + n * n;
 
@@ -1689,9 +1693,9 @@ void cmat_sub(int n, complex *a, complex *b, complex *c)
   }
 }
 
-void cmat_mul(int n, complex *a, complex *b, complex *c)
+void cmat_mul(int n, complex const *a, complex const *b, complex *c)
 {
-  complex *aa, *bb, *am, *bm, *bbm;
+  complex const *aa, *bb, *am, *bm, *bbm;
 
   am = a + n * n;
   bm = b + n;
@@ -1716,9 +1720,10 @@ void cmat_mul(int n, complex *a, complex *b, complex *c)
   }
 }
 
-void cmat_dag(int n, complex *a, complex *b)
+void cmat_dag(int n, complex const *a, complex *b)
 {
-  complex *bb, *am, *bbm;
+  complex const *am;
+  complex *bb, *bbm;
 
   am = a + n * n;
   bbm = b + n * n;

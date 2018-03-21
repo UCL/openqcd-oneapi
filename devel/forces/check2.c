@@ -14,19 +14,12 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "su3fcts.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
 #include "forces.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "random.h"
+#include "uflds.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -190,15 +183,23 @@ static double Amt(void)
   int mu, nu;
   double c0, c1, *cG;
   double smt0, smt1, sms0, sms1, pi;
-  double xl[4], phi, n0, s0, s1, bs0, bs1;
+  double xl[4], phi, n0, s0t, s0s, s1t, s1s, bs0, bs1;
+  double gamma_g, ut2, us2, us4, us6;
   lat_parms_t lat;
   bc_parms_t bcp;
+  ani_params_t ani;
 
   lat = lat_parms();
   c0 = lat.c0;
   c1 = lat.c1;
   bcp = bc_parms();
   cG = bcp.cG;
+  ani = ani_parms();
+  gamma_g = ani.xi;
+  ut2 = 1.0 / (ani.ut_gauge * ani.ut_gauge);
+  us2 = 1.0 / (ani.us_gauge * ani.us_gauge);
+  us4 = us2 * 1.0 / (ani.us_gauge * ani.us_gauge);
+  us6 = us4 * 1.0 / (ani.us_gauge * ani.us_gauge);
 
   xl[0] = (double)(N0);
   xl[1] = (double)(N1);
@@ -215,15 +216,15 @@ static double Amt(void)
     for (nu = 0; nu < mu; nu++) {
       phi = 2.0 * pi * mt[mu][nu] / (xl[mu] * xl[nu]);
 
-      s0 = 3.0 - 2.0 * cos(phi) - cos(2.0 * phi);
-      s1 = 3.0 - 2.0 * cos(2.0 * phi) - cos(4.0 * phi);
+      s0t = 3.0 - 2.0 * cos(phi) - cos(2.0 * phi);
+      s1t = 3.0 - 2.0 * cos(2.0 * phi) - cos(4.0 * phi);
 
       if (nu == 0) {
-        smt0 += s0;
-        smt1 += s1;
+        smt0 += s0t;
+        smt1 += s1t;
       } else {
-        sms0 += s0;
-        sms1 += s1;
+        sms0 += s0t;
+        sms1 += s1t;
       }
     }
   }
@@ -231,27 +232,46 @@ static double Amt(void)
   n0 = (double)(N0);
 
   if (bc == 0) {
-    s0 = (n0 - 1.0) * smt0 + (n0 - 2.0 + 0.5 * cG[0] + 0.5 * cG[1]) * sms0;
-    s1 = (n0 - 1.0) * smt1 + (n0 - 2.0) * smt1 +
-         (2.0 * (n0 - 2.0) + cG[0] + cG[1]) * sms1;
+    s0t = (n0 - 1.0) * smt0;
+    s0s = (n0 - 2.0 + 0.5 * cG[0] + 0.5 * cG[1]) * sms0;
+    s1t = (n0 - 1.0) * smt1 + (n0 - 2.0) * smt1;
+    s1s = (2.0 * (n0 - 2.0) + cG[0] + cG[1]) * sms1;
   } else if (bc == 1) {
-    s0 = (n0 - 2.0) * smt0 + (n0 - 1.0) * sms0;
-    s1 = (n0 - 2.0) * smt1 + (n0 - 3.0) * smt1 + 2.0 * (n0 - 1.0) * sms1;
+    s0t = (n0 - 2.0) * smt0;
+    s0s = (n0 - 1.0) * sms0;
+    s1t = (n0 - 2.0) * smt1 + (n0 - 3.0) * smt1;
+    s1s = 2.0 * (n0 - 1.0) * sms1;
   } else if (bc == 2) {
-    s0 = (n0 - 1.0) * smt0 + (n0 - 1.0 + 0.5 * cG[0]) * sms0;
-    s1 = (n0 - 1.0) * smt1 + (n0 - 2.0) * smt1 +
-         (2.0 * (n0 - 1.0) + cG[0]) * sms1;
+    s0t = (n0 - 1.0) * smt0;
+    s0s = (n0 - 1.0 + 0.5 * cG[0]) * sms0;
+    s1t = (n0 - 1.0) * smt1 + (n0 - 2.0) * smt1;
+    s1s = (2.0 * (n0 - 1.0) + cG[0]) * sms1;
   } else {
-    s0 = n0 * smt0 + n0 * sms0;
-    s1 = 2.0 * n0 * smt1 + 2.0 * n0 * sms1;
+    s0t = ut2 * us2 * n0 * smt0;
+    s0s = us4 * n0 * sms0;
+    if (ani.has_tts) {
+      s1t = ut2 * (us4 + us2 * ut2) * n0 * smt1;
+    } else {
+      s1t = ut2 * us4 * n0 * smt1;
+    }
+    s1s = 2.0 * us6 * n0 * sms1;
   }
 
-  s0 *= (double)(N1 * N2 * N3);
-  s1 *= (double)(N1 * N2 * N3);
+  s0t *= (double)(N1 * N2 * N3);
+  s0s *= (double)(N1 * N2 * N3);
+  s1t *= (double)(N1 * N2 * N3);
+  s1s *= (double)(N1 * N2 * N3);
 
   Abnd(&bs0, &bs1);
 
-  return (lat.beta / 3.0) * (c0 * (s0 + bs0) + c1 * (s1 + bs1));
+  if (ani.has_tts) {
+    return (lat.beta / 3.0) * (c0 * (s0s / gamma_g + gamma_g * s0t + bs0) +
+                               c1 * (s1s / gamma_g + gamma_g * s1t + bs1));
+  } else {
+    return (lat.beta / 3.0) *
+           (c0 * (s0s / gamma_g + gamma_g * (c0 + 4 * c1) * s0t / c0 + bs0) +
+            c1 * (s1s / gamma_g + gamma_g * s1t + bs1));
+  }
 }
 
 static void choose_mt(void)
@@ -332,7 +352,7 @@ static void set_ud(void)
 
 int main(int argc, char *argv[])
 {
-  int my_rank, i;
+  int my_rank, i, no_tts;
   double A1, A2, d, dmax;
   double phi[2], phi_prime[2], theta[3];
   FILE *flog = NULL;
@@ -356,6 +376,26 @@ int main(int argc, char *argv[])
     if (bc != 0)
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check2.c]",
                  "Syntax: check2 [-bc <type>]");
+
+    no_tts = find_opt(argc, argv, "-no-tts");
+
+    if (no_tts != 0) {
+      no_tts = 1;
+
+      error_root(bc != 3, 1, "main [check2.c]",
+                 "Can only specify the -no-tts option with periodic boundary "
+                 "conditions");
+    }
+  }
+
+  MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&no_tts, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (bc == 3) {
+    set_ani_parms(!no_tts, 1.0, 2.5, 1.0, 1.0, 0.87, 1.23, 1.0, 1.0);
+    print_ani_parms();
+  } else {
+    set_no_ani_parms();
   }
 
   set_lat_parms(3.5, 0.33, 0, NULL, 1.0);
@@ -370,7 +410,6 @@ int main(int argc, char *argv[])
   theta[1] = 0.0;
   theta[2] = 0.0;
   set_bc_parms(bc, 0.9012, 1.2034, 1.0, 1.0, phi, phi_prime, theta);
-  set_ani_parms(1, 1.1, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
   print_bc_parms(1);
 
   start_ranlux(0, 123);

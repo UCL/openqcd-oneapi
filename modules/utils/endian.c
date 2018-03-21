@@ -41,8 +41,6 @@
 
 #define ENDIAN_C
 
-#include <stdlib.h>
-#include <stdio.h>
 #include "utils.h"
 
 int endianness(void)

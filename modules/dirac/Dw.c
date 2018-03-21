@@ -88,24 +88,30 @@
  * The programs Dw(),..,Dwhat() perform global operations and must be called
  * simultaneously on all processes.
  *
+ * CONST_CORRECTNESS:
+ *   The functions here are the main culprints why the entire codebase cannot be
+ *   made to satisfy const correctness. All the functions should have the
+ *   signature:
+ *    
+ *   Dw...(float mu, spinor const *s, spinor *r)
+ *   
+ *   However, due to the fact that these routines manipulate the boundary of the
+ *   field s this cannot be the case. The boundary storage is fairly ingrained
+ *   into the computation, so it will be a bit of work to decouple these. Any
+ *   future attempt at making the rest of the code const correct will have to
+ *   start here.
+ *
  *****************************************************************************/
 
 #define DW_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "flags.h"
-#include "lattice.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "sw_term.h"
-#include "block.h"
 #include "dirac.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "sflds.h"
+#include "sw_term.h"
+#include "uflds.h"
 
 #define N0 (NPROC0 * L0)
 
@@ -117,12 +123,23 @@ typedef union
 
 static float coe, ceo;
 static float gamma_f, one_over_gammaf;
-static float one_over_ut_fermion;
 static const spinor s0 = {{{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}},
                           {{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}},
                           {{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}},
                           {{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}}};
 static spin_t rs ALIGNED32;
+
+static void set_aniso_hopping_coeffs(void)
+{
+  ani_params_t ani;
+  ani = ani_parms();
+
+  gamma_f = (float)(ani.xi / ani.nu);
+  one_over_gammaf = (float)(ani.nu / ani.xi);
+
+  coe *= (float)(1.0 / ani.ut_fermion);
+  ceo *= (float)(1.0 / ani.ut_fermion);
+}
 
 #if (defined AVX512)
 
@@ -1551,26 +1568,19 @@ void Dw(float mu, spinor *s, spinor *r)
   pauli *m;
   spin_t *so, *ro;
   tm_parms_t tm;
-  ani_params_t ani;
 
   cps_int_bnd(0x1, s);
   m = swfld();
   apply_sw(VOLUME / 2, mu, m, s, r);
   set_s2zero(BNDRY / 2, r + VOLUME);
+
   tm = tm_parms();
   if (tm.eoflg == 1)
     mu = 0.0f;
 
-  ani = ani_parms();
-  gamma_f = (float)(ani.xi / ani.nu);
-  one_over_gammaf = (float)(ani.nu / ani.xi);
-  one_over_ut_fermion = (float)(1.0 / ani.ut_fermion);
-
   coe = -0.5f;
   ceo = -0.5f;
-
-  coe *= one_over_ut_fermion;
-  ceo *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   bc = bc_type();
   piup = iup[VOLUME / 2];
@@ -1756,17 +1766,11 @@ void Dwoe(spinor *s, spinor *r)
   int *piup, *pidn;
   su3 *u, *um;
   spin_t *ro;
-  ani_params_t ani;
 
   cps_int_bnd(0x1, s);
 
-  ani = ani_parms();
-  gamma_f = (float)(ani.xi / ani.nu);
-  one_over_gammaf = (float)(ani.nu / ani.xi);
-  one_over_ut_fermion = (float)(1.0 / ani.ut_fermion);
-
   coe = -0.5f;
-  coe *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   bc = bc_type();
   piup = iup[VOLUME / 2];
@@ -1823,17 +1827,11 @@ void Dweo(spinor *s, spinor *r)
   int *piup, *pidn;
   su3 *u, *um;
   spin_t *so;
-  ani_params_t ani;
 
   set_s2zero(BNDRY / 2, r + VOLUME);
 
-  ani = ani_parms();
-  gamma_f = (float)(ani.xi / ani.nu);
-  one_over_gammaf = (float)(ani.nu / ani.xi);
-  one_over_ut_fermion = (float)(1.0 / ani.ut_fermion);
-
   ceo = 0.5f;
-  ceo *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   bc = bc_type();
   piup = iup[VOLUME / 2];
@@ -1893,23 +1891,15 @@ void Dwhat(float mu, spinor *s, spinor *r)
   int *piup, *pidn;
   su3 *u, *um;
   pauli *m;
-  ani_params_t ani;
 
   cps_int_bnd(0x1, s);
   m = swfld();
   apply_sw(VOLUME / 2, mu, m, s, r);
   set_s2zero(BNDRY / 2, r + VOLUME);
 
-  ani = ani_parms();
-  gamma_f = (float)(ani.xi / ani.nu);
-  one_over_gammaf = (float)(ani.nu / ani.xi);
-  one_over_ut_fermion = (float)(1.0 / ani.ut_fermion);
-
   coe = -0.5f;
   ceo = 0.5f;
-
-  coe *= one_over_ut_fermion;
-  ceo *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   bc = bc_type();
   piup = iup[VOLUME / 2];
@@ -1981,7 +1971,6 @@ void Dw_blk(blk_grid_t grid, int n, float mu, int k, int l)
   spin_t *so, *ro;
   block_t *b;
   tm_parms_t tm;
-  ani_params_t ani;
 
   b = blk_list(grid, &nb, &isw);
 
@@ -2014,16 +2003,9 @@ void Dw_blk(blk_grid_t grid, int n, float mu, int k, int l)
   if (tm.eoflg == 1)
     mu = 0.0f;
 
-  ani = ani_parms();
-  gamma_f = (float)(ani.xi / ani.nu);
-  one_over_gammaf = (float)(ani.nu / ani.xi);
-  one_over_ut_fermion = (float)(1.0 / ani.ut_fermion);
-
   coe = -0.5f;
   ceo = -0.5f;
-
-  coe *= one_over_ut_fermion;
-  ceo *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
@@ -2267,7 +2249,6 @@ void Dwoe_blk(blk_grid_t grid, int n, int k, int l)
   spinor *s;
   spin_t *ro;
   block_t *b;
-  ani_params_t ani;
 
   b = blk_list(grid, &nb, &isw);
 
@@ -2291,15 +2272,8 @@ void Dwoe_blk(blk_grid_t grid, int n, int k, int l)
   ro = (spin_t *)((*b).s[l] + volh);
   s[vol] = s0;
 
-  ani = ani_parms();
-  gamma_f = (float)(ani.xi / ani.nu);
-  one_over_gammaf = (float)(ani.nu / ani.xi);
-
-  one_over_ut_fermion = (float)(1.0 / ani.ut_fermion);
-
   coe = -0.5f;
-
-  coe *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
@@ -2360,7 +2334,6 @@ void Dweo_blk(blk_grid_t grid, int n, int k, int l)
   spinor *r;
   spin_t *so;
   block_t *b;
-  ani_params_t ani;
 
   b = blk_list(grid, &nb, &isw);
 
@@ -2384,13 +2357,8 @@ void Dweo_blk(blk_grid_t grid, int n, int k, int l)
   r = (*b).s[l];
   r[vol] = s0;
 
-  ani = ani_parms();
-  gamma_f = (float)(ani.xi / ani.nu);
-  one_over_gammaf = (float)(ani.nu / ani.xi);
-  one_over_ut_fermion = (float)(1.0 / ani.ut_fermion);
-
   ceo = 0.5f;
-  ceo *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
@@ -2452,7 +2420,6 @@ void Dwhat_blk(blk_grid_t grid, int n, float mu, int k, int l)
   pauli *m;
   spinor *s, *r;
   block_t *b;
-  ani_params_t ani;
 
   b = blk_list(grid, &nb, &isw);
 
@@ -2480,16 +2447,9 @@ void Dwhat_blk(blk_grid_t grid, int n, float mu, int k, int l)
   m = (*b).sw;
   apply_sw(volh, mu, m, s, r);
 
-  ani = ani_parms();
-  gamma_f = (float)(ani.xi / ani.nu);
-  one_over_gammaf = (float)(ani.nu / ani.xi);
-  one_over_ut_fermion = (float)(1.0 / ani.ut_fermion);
-
   coe = -0.5f;
   ceo = 0.5f;
-
-  coe *= one_over_ut_fermion;
-  ceo *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];

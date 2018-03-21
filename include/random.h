@@ -13,6 +13,9 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
+#include "utils.h"
+#include <stdio.h>
+
 /* GAUSS_C */
 #ifdef SITERANDOM
 extern void gauss(float r[], int n, int ix);
@@ -25,7 +28,7 @@ extern void gauss_dble(double r[], int n);
 /* RANLUX_C */
 extern void start_ranlux(int level, int seed);
 extern void export_ranlux(int tag, char *out);
-extern int import_ranlux(char *in);
+extern int import_ranlux(char const *in);
 
 /* RANLXS_C */
 extern void ranlxs(float r[], int n);

@@ -11,6 +11,11 @@ double abs_diff_complex(complex_dble l, complex_dble r)
   return abs_diff_double(l.re, r.re) + abs_diff_double(l.im, r.im);
 }
 
+double norm_complex(complex_dble l)
+{
+  return sqrt(l.re * l.re + l.im * l.im);
+}
+
 double norm_diff_complex(complex_dble l, complex_dble r)
 {
   return sqrt(square_dble(l.re - r.re) + square_dble(l.im - r.im));
@@ -66,6 +71,26 @@ double abs_diff_su3(su3_dble const *l, su3_dble const *r)
   result += abs_diff_complex((*l).c33, (*r).c33);
 
   return result;
+}
+
+double norm_su3(su3_dble const* l)
+{
+  double result = 0.;
+
+  result += norm_complex((*l).c11);
+  result += norm_complex((*l).c12);
+  result += norm_complex((*l).c13);
+
+  result += norm_complex((*l).c21);
+  result += norm_complex((*l).c22);
+  result += norm_complex((*l).c23);
+
+  result += norm_complex((*l).c31);
+  result += norm_complex((*l).c32);
+  result += norm_complex((*l).c33);
+
+  return result;
+
 }
 
 double norm_diff_su3(su3_dble const *l, su3_dble const *r)

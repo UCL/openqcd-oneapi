@@ -62,17 +62,11 @@
 
 #define SARCHIVE_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "lattice.h"
-#include "linalg.h"
 #include "archive.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mpi.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -82,7 +76,7 @@
 static int endian;
 static spinor_dble *sbuf = NULL;
 
-void write_sfld(char *out, spinor_dble *sd)
+void write_sfld(char const *out, spinor_dble const *sd)
 {
   int ldat[16], iw;
   double norm;
@@ -127,7 +121,7 @@ void write_sfld(char *out, spinor_dble *sd)
   fclose(fout);
 }
 
-void read_sfld(char *in, spinor_dble *sd)
+void read_sfld(char const *in, spinor_dble *sd)
 {
   int ldat[16], ir, ie;
   double norm0, norm1, eps;
@@ -191,7 +185,7 @@ static void alloc_sbuf(void)
         "Unable to allocate auxiliary array");
 }
 
-static void get_spinors(int iy, spinor_dble *sd)
+static void get_spinors(int iy, spinor_dble const *sd)
 {
   int y3, iz;
   spinor_dble *sb;
@@ -221,7 +215,7 @@ static void set_spinors(int iy, spinor_dble *sd)
   }
 }
 
-void export_sfld(char *out, spinor_dble *sd)
+void export_sfld(char const *out, spinor_dble const *sd)
 {
   int my_rank, np[4], n, iw;
   int iwa, dmy, tag0, tag1;
@@ -314,7 +308,7 @@ void export_sfld(char *out, spinor_dble *sd)
   }
 }
 
-void import_sfld(char *in, spinor_dble *sd)
+void import_sfld(char const *in, spinor_dble *sd)
 {
   int my_rank, np[4], n, ir;
   int ira, dmy, tag0, tag1;

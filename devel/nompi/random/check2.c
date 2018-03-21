@@ -14,12 +14,7 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <math.h>
 #include "random.h"
-#include "utils.h"
 
 #define N 147
 

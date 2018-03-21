@@ -75,25 +75,24 @@
  *
  * (see utils/wspace.c).
  *
+ * CONST_CORRECTNESS:
+ *   The methods here should have the eta argument be constant, however this is
+ *   currently not possible due to the implementation of the Dw and Dw_dble
+ *   functions.
+ *
  *******************************************************************************/
 
 #define TMCG_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "sw_term.h"
 #include "dirac.h"
-#include "linsolv.h"
 #include "forces.h"
 #include "global.h"
+#include "linalg.h"
+#include "linsolv.h"
+#include "mpi.h"
+#include "sflds.h"
+#include "sw_term.h"
+#include "uflds.h"
 
 static float mus;
 static double mud;
@@ -142,7 +141,7 @@ double tmcg(int nmx, double res, double mu, spinor_dble *eta, spinor_dble *psi,
   rho0 = sqrt(norm_square_dble(VOLUME, 1, eta));
   fact = rho0 / sqrt((double)(VOLUME) * (double)(24 * NPROC));
 
-  if (fact != 0.0) {
+  if (not_equal_d(fact, 0.0)) {
     assign_sd2sd(VOLUME, eta, rsd[0]);
     scale_dble(VOLUME, 1.0 / fact, rsd[0]);
 
@@ -213,7 +212,7 @@ double tmcgeo(int nmx, double res, double mu, spinor_dble *eta,
     mud = mu;
     fact = rho0 / sqrt((double)(VOLUME / 2) * (double)(24 * NPROC));
 
-    if (fact != 0.0) {
+    if (not_equal_d(fact, 0.0)) {
       assign_sd2sd(VOLUME / 2, eta, rsd[0]);
       scale_dble(VOLUME / 2, 1.0 / fact, rsd[0]);
 

@@ -30,16 +30,10 @@
 
 #define SHIFT_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "flags.h"
-#include "lattice.h"
-#include "uflds.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "uflds.h"
 
 typedef struct
 {

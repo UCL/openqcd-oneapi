@@ -66,20 +66,13 @@
  *
  *******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include <float.h>
-#include "mpi.h"
-#include "utils.h"
-#include "flags.h"
-#include "update.h"
 #include "global.h"
+#include "mpi.h"
 #include "stout_smearing.h"
+#include "update.h"
 
-/* TODO: Make these counters size_t to prevent possible (?) overflow */
-static int nsmx, nmds = 0, iend = 1;
+static size_t nsmx;
+static int nmds = 0, iend = 1;
 static mdstep_t *mds = NULL, *mdw[3];
 
 static void set_nsmx(int nlv)
@@ -654,7 +647,7 @@ void set_mdsteps(void)
   nmds = nall_steps(mds) + 1;
 }
 
-mdstep_t *mdsteps(int *nop, int *ismear, int *iunsmear, int *itu)
+mdstep_t *mdsteps(size_t *nop, int *ismear, int *iunsmear, int *itu)
 {
   (*nop) = nmds;
   (*ismear) = iend - 3;

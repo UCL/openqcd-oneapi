@@ -12,15 +12,10 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
+#include "forces.h"
 #include "random.h"
-#include "utils.h"
 #include "su3fcts.h"
 #include "sw_term.h"
-#include "forces.h"
 
 #define _re(z, w) ((z).re * (w).re + (z).im * (w).im)
 #define _im(z, w) ((z).im * (w).re - (z).re * (w).im)

@@ -12,20 +12,21 @@
  *
  * The externally accessible functions are
  *
- *   void det2xt(pauli_dble *m,u3_alg_dble *X)
+ *   void det2xt(pauli_dble const *m, u3_alg_dble *X)
  *     Computes the matrices X[0],..,X[5] associated to the SW term on a
  *     given lattice point (see the notes). The program expects that m[0]
  *     and m[1] contain the hermitian part of the inverse of the SW term
  *     at the chosen point.
  *
- *   void prod2xt(spinor_dble *r,spinor_dble *s,u3_alg_dble *X)
+ *   void prod2xt(spinor_dble const *r, spinor_dble const *s, u3_alg_dble *X)
  *     Computes the matrices X[0],..,X[5] associated to a pair of spinors
  *     r and s at a given lattice point (see the notes).
  *
  * The following is an array of functions indexed by the direction mu=0,..,3:
  *
- *   void (*prod2xv[])(spinor_dble *rx,spinor_dble *ry,
- *                      spinor_dble *sx,spinor_dble *sy,su3_dble *u)
+ *   void (*prod2xv[])(spinor_dble const *rx, spinor_dble const *ry,
+ *                      spinor_dble const *sx, spinor_dble const *sy,
+ *                      su3_dble *u)
  *     Computes the complex 3x3 matrix
  *
  *       u=tr{gamma_5*(1-gamma_mu)*[(sy x rx^dag)+(ry x sx^dag)]}
@@ -59,12 +60,8 @@
 
 #define FRCFCTS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
-#include "forces.h"
 #include "flags.h"
+#include "forces.h"
 
 #define _re(z, w) ((z).re * (w).re + (z).im * (w).im)
 #define _im(z, w) ((z).im * (w).re - (z).re * (w).im)
@@ -81,9 +78,10 @@ static su3_vector_dble chi1 ALIGNED16;
 static su3_vector_dble chi2 ALIGNED16;
 static pauli_dble ms[2] ALIGNED16;
 
-void det2xt(pauli_dble *m, u3_alg_dble *X)
+void det2xt(pauli_dble const *m, u3_alg_dble *X)
 {
-  double x, *up, *um;
+  double const *up, *um;
+  double x;
   u3_alg_dble *X0, *X1;
 
   up = m[0].u;
@@ -288,9 +286,10 @@ void det2xt(pauli_dble *m, u3_alg_dble *X)
   (*X1).c9 -= x;
 }
 
-static void det2xt5(pauli_dble *m, u3_alg_dble *X)
+static void det2xt5(pauli_dble const *m, u3_alg_dble *X)
 {
-  double x, *up, *um;
+  double const *up, *um;
+  double x;
   u3_alg_dble *X0, *X1;
 
   up = m[0].u;
@@ -495,10 +494,10 @@ static void det2xt5(pauli_dble *m, u3_alg_dble *X)
   (*X1).c9 += x;
 }
 
-static void vec2pauli(weyl_dble *r, weyl_dble *s, pauli_dble *m)
+static void vec2pauli(weyl_dble const *r, weyl_dble const *s, pauli_dble *m)
 {
   double *u;
-  su3_vector_dble *r1, *r2, *s1, *s2;
+  su3_vector_dble const *r1, *r2, *s1, *s2;
 
   u = (*m).u;
   r1 = &((*r).c1);
@@ -551,9 +550,9 @@ static void vec2pauli(weyl_dble *r, weyl_dble *s, pauli_dble *m)
   u[35] = _im((*s2).c2, (*r2).c3) + _im((*r2).c2, (*s2).c3);
 }
 
-void prod2xt(spinor_dble *r, spinor_dble *s, u3_alg_dble *X)
+void prod2xt(spinor_dble const *r, spinor_dble const *s, u3_alg_dble *X)
 {
-  spin_t *spr, *sps;
+  spin_t const *spr, *sps;
 
   spr = (spin_t *)(r);
   sps = (spin_t *)(s);
@@ -612,8 +611,8 @@ static void add2mat(su3_dble *u)
   (*u).c33.im += _im(psi1.c3, chi1.c3) + _im(psi2.c3, chi2.c3);
 }
 
-static void prod2xv0(spinor_dble *rx, spinor_dble *ry, spinor_dble *sx,
-                     spinor_dble *sy, su3_dble *u)
+static void prod2xv0(spinor_dble const *rx, spinor_dble const *ry,
+                     spinor_dble const *sx, spinor_dble const *sy, su3_dble *u)
 {
   _vector_add(psi1, (*ry).c1, (*ry).c3);
   _vector_add(psi2, (*ry).c2, (*ry).c4);
@@ -628,8 +627,8 @@ static void prod2xv0(spinor_dble *rx, spinor_dble *ry, spinor_dble *sx,
   add2mat(u);
 }
 
-static void prod2xv1(spinor_dble *rx, spinor_dble *ry, spinor_dble *sx,
-                     spinor_dble *sy, su3_dble *u)
+static void prod2xv1(spinor_dble const *rx, spinor_dble const *ry,
+                     spinor_dble const *sx, spinor_dble const *sy, su3_dble *u)
 {
   _vector_i_add(psi1, (*ry).c1, (*ry).c4);
   _vector_i_add(psi2, (*ry).c2, (*ry).c3);
@@ -644,8 +643,8 @@ static void prod2xv1(spinor_dble *rx, spinor_dble *ry, spinor_dble *sx,
   add2mat(u);
 }
 
-static void prod2xv2(spinor_dble *rx, spinor_dble *ry, spinor_dble *sx,
-                     spinor_dble *sy, su3_dble *u)
+static void prod2xv2(spinor_dble const *rx, spinor_dble const *ry,
+                     spinor_dble const *sx, spinor_dble const *sy, su3_dble *u)
 {
   _vector_add(psi1, (*ry).c1, (*ry).c4);
   _vector_sub(psi2, (*ry).c2, (*ry).c3);
@@ -660,8 +659,8 @@ static void prod2xv2(spinor_dble *rx, spinor_dble *ry, spinor_dble *sx,
   add2mat(u);
 }
 
-static void prod2xv3(spinor_dble *rx, spinor_dble *ry, spinor_dble *sx,
-                     spinor_dble *sy, su3_dble *u)
+static void prod2xv3(spinor_dble const *rx, spinor_dble const *ry,
+                     spinor_dble const *sx, spinor_dble const *sy, su3_dble *u)
 {
   _vector_i_add(psi1, (*ry).c1, (*ry).c3);
   _vector_i_sub(psi2, (*ry).c2, (*ry).c4);
@@ -676,6 +675,6 @@ static void prod2xv3(spinor_dble *rx, spinor_dble *ry, spinor_dble *sx,
   add2mat(u);
 }
 
-void (*prod2xv[4])(spinor_dble *rx, spinor_dble *ry, spinor_dble *sx,
-                   spinor_dble *sy,
+void (*prod2xv[4])(spinor_dble const *rx, spinor_dble const *ry,
+                   spinor_dble const *sx, spinor_dble const *sy,
                    su3_dble *u) = {prod2xv0, prod2xv1, prod2xv2, prod2xv3};

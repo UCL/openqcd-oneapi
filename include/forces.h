@@ -13,13 +13,8 @@
 #ifndef FORCES_H
 #define FORCES_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
-
-#ifndef UTILS_H
 #include "utils.h"
-#endif
 
 /* FORCE0_C */
 extern void plaq_frc(void);
@@ -40,10 +35,11 @@ extern double action2(double mu0, double mu1, int ipf, int isp, int icom,
                       int *status);
 
 /* FORCE3_C */
-extern double setpf3(int *irat, int ipf, int isw, int isp, int icom,
+extern double setpf3(int const *irat, int ipf, int isw, int isp, int icom,
                      int *status);
-extern void force3(int *irat, int ipf, int isw, int isp, double c, int *status);
-extern double action3(int *irat, int ipf, int isw, int isp, int icom,
+extern void force3(int const *irat, int ipf, int isw, int isp, double c,
+                   int *status);
+extern double action3(int const *irat, int ipf, int isw, int isp, int icom,
                       int *status);
 
 /* FORCE4_C */
@@ -62,10 +58,11 @@ extern double action5(double mu0, double mu1, int ipf, int isp, int icom,
                       int *status);
 
 /* FRCFCTS_C */
-extern void det2xt(pauli_dble *m, u3_alg_dble *X);
-extern void prod2xt(spinor_dble *r, spinor_dble *s, u3_alg_dble *X);
-extern void (*prod2xv[])(spinor_dble *rx, spinor_dble *ry, spinor_dble *sx,
-                         spinor_dble *sy, su3_dble *u);
+extern void det2xt(pauli_dble const *m, u3_alg_dble *X);
+extern void prod2xt(spinor_dble const *r, spinor_dble const *s, u3_alg_dble *X);
+extern void (*prod2xv[])(spinor_dble const *rx, spinor_dble const *ry,
+                         spinor_dble const *sx, spinor_dble const *sy,
+                         su3_dble *u);
 
 /* GENFRC_C */
 extern void sw_frc(double c);

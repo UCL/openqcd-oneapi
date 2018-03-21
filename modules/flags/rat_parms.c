@@ -12,7 +12,7 @@
  *
  * The externally accessible functions are
  *
- *   rat_parms_t set_rat_parms(int irp,int degree,double *range)
+ *   rat_parms_t set_rat_parms(int irp, int degree, double const *range)
  *     Sets the parameters in the rational function parameter set number
  *     irp and returns a structure containing them (see the notes).
  *
@@ -68,14 +68,9 @@
 
 #define RAT_PARMS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "mpi.h"
-#include "utils.h"
 #include "flags.h"
 #include "global.h"
+#include "mpi.h"
 
 #define IRPMAX 32
 
@@ -92,7 +87,7 @@ static void init_rp(void)
   init = 1;
 }
 
-rat_parms_t set_rat_parms(int irp, int degree, double *range)
+rat_parms_t set_rat_parms(int irp, int degree, double const *range)
 {
   int ie, iprms[2];
   double dprms[2];

@@ -13,12 +13,11 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <limits.h>
-#include <float.h>
-
-#ifndef SU3_H
 #include "su3.h"
-#endif
+#include <float.h>
+#include <limits.h>
+#include <math.h>
+#include <stdlib.h>
 
 #if ((DBL_MANT_DIG != 53) || (DBL_MIN_EXP != -1021) || (DBL_MAX_EXP != 1024))
 #error : Machine is not compliant with the IEEE-754 standard
@@ -56,32 +55,36 @@ extern void bswap_int(int n, void *a);
 extern void bswap_double(int n, void *a);
 
 /* ERROR_C */
-extern void set_error_file(char *path, int loc_flag);
-extern void error(int test, int no, char *name, char *format, ...);
-extern void error_root(int test, int no, char *name, char *format, ...);
-extern void error_loc(int test, int no, char *name, char *format, ...);
+extern void set_error_file(char const *path, int loc_flag);
+extern void error(int test, int no, char const *name, char const *format, ...);
+extern void error_root(int test, int no, char const *name, char const *format,
+                       ...);
+extern void error_loc(int test, int no, char const *name, char const *format,
+                      ...);
 
 /* HSUM_C */
 extern int init_hsum(int n);
 extern void reset_hsum(int id);
-extern void add_to_hsum(int id, double *x);
+extern void add_to_hsum(int id, double const *x);
 extern void local_hsum(int id, double *sx);
 extern void global_hsum(int id, double *sx);
 
 /* MUTILS_C */
-extern int find_opt(int argc, char *argv[], char *opt);
+extern int find_opt(int argc, char *argv[], char const *opt);
 extern int fdigits(double x);
-extern void check_dir(char *dir);
-extern void check_dir_root(char *dir);
-extern int name_size(char *format, ...);
-extern long find_section(char *title);
-extern long find_optional_section(char *title);
-extern long read_line(char *tag, char *format, ...);
-extern long read_optional_line(char *tag, char *format, ...);
-extern int count_tokens(char *tag);
-extern void read_iprms(char *tag, int n, int *iprms);
-extern void read_dprms(char *tag, int n, double *dprms);
-extern void copy_file(char *in, char *out);
+extern void check_dir(char const *dir);
+extern void check_dir_root(char const *dir);
+extern int name_size(char const *format, ...);
+extern long find_section(char const *title);
+extern long find_optional_section(char const *title);
+extern long read_line(char const *tag, char const *format, ...);
+extern long read_optional_line(char const *tag, char const *format, ...);
+extern int count_tokens(char const *tag);
+extern long read_iprms(char const *tag, int n, int *iprms);
+extern long read_optional_iprms(char const *tag, int n, int *iprms);
+extern long read_dprms(char const *tag, int n, double *dprms);
+extern long read_optional_dprms(char const *tag, int n, double *dprms);
+extern void copy_file(char const *in, char const *out);
 
 extern long const No_Section_Found;
 
@@ -93,11 +96,11 @@ extern double amem_use_mb(void);
 extern double amem_max_mb(void);
 extern int mpi_permanent_tag(void);
 extern int mpi_tag(void);
-extern void message(char *format, ...);
+extern void message(char const *format, ...);
 extern void mpc_bcast_c(char *buf, int num);
 extern void mpc_bcast_d(double *buf, int num);
 extern void mpc_bcast_i(int *buf, int num);
-extern void mpc_gsum_d(double *src, double *dst, int num);
+extern void mpc_gsum_d(double const *src, double *dst, int num);
 extern void mpc_print_info(void);
 extern double square_dble(double);
 extern double sinc_dble(double);
@@ -105,6 +108,10 @@ extern double smear_xi0_dble(double);
 extern double smear_xi1_dble(double);
 extern void mul_icomplex(complex_dble *);
 extern void mul_assign_scalar_complex(double, complex_dble *);
+extern int is_equal_f(float, float);
+extern int not_equal_f(float, float);
+extern int is_equal_d(double, double);
+extern int not_equal_d(double, double);
 
 /* WSPACE_C */
 extern void alloc_wud(int n);

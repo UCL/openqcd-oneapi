@@ -60,15 +60,10 @@
 
 #define GEOMETRY_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
 #include "flags.h"
-#include "utils.h"
-#include "lattice.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
 
 #define NPROC_BLK (NPROC0_BLK * NPROC1_BLK * NPROC2_BLK * NPROC3_BLK)
 #define NBLK0 (NPROC0 / NPROC0_BLK)
@@ -79,7 +74,7 @@
 static int cbs[4], cbn[4], *cbix = NULL;
 static int *tms = NULL;
 
-int ipr_global(int *n)
+int ipr_global(int const *n)
 {
   int ib, ip;
   int n0, n1, n2, n3;
@@ -114,7 +109,7 @@ int ipr_global(int *n)
   return ip + ib * NPROC_BLK;
 }
 
-void ipt_global(int *x, int *ip, int *ix)
+void ipt_global(int const *x, int *ip, int *ix)
 {
   int x0, x1, x2, x3;
   int n[4];

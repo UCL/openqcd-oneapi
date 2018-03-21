@@ -13,8 +13,11 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <limits.h>
 #include <float.h>
+#include <limits.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define NAME_SIZE 128
 
@@ -72,5 +75,9 @@ extern void error(int test, int no, char *name, char *format, ...);
 extern void error_root(int test, int no, char *name, char *format, ...);
 extern void error_loc(int test, int no, char *name, char *format, ...);
 extern void message(char *format, ...);
+extern int is_equal_f(float, float);
+extern int not_equal_f(float, float);
+extern int is_equal_d(double, double);
+extern int not_equal_d(double, double);
 
 #endif

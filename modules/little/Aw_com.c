@@ -43,19 +43,13 @@
 
 #define AW_COM_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "vflds.h"
 #include "dfl.h"
-#include "little.h"
 #include "global.h"
+#include "little.h"
+#include "mpi.h"
+#include "sflds.h"
+#include "uflds.h"
+#include "vflds.h"
 
 typedef struct
 {

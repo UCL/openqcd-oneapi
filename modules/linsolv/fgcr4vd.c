@@ -12,14 +12,16 @@
  *
  * The externally accessible function is
  *
- *   double fgcr4vd(int vol,int icom,
- *                  void (*Dop)(complex_dble *v,complex_dble *w),
- *                  void (*Mop)(int k,complex *rho,complex *phi,complex *chi),
- *                  complex *wv[],complex_dble *wvd[],int nkv,int nmx,double
- *res, complex_dble *eta,complex_dble *psi,int *status) Solution of the little
- *equation D*psi=eta for given source eta, using the preconditioned GCR
- *algorithm. See the notes for the explanation of the parameters of the
- *program.
+ *   double fgcr4vd(int vol, int icom,
+ *                  void (*Dop)(complex_dble *v, complex_dble *w),
+ *                  void (*Mop)(int k, complex *rho, complex *phi,
+ *                              complex *chi),
+ *                  complex *wv[], complex_dble *wvd[], int nkv, int nmx,
+ *                  double res, complex_dble *eta, complex_dble *psi,
+ *                  int *status)
+ *     Solution of the little equation D*psi=eta for given source eta, using the
+ *     preconditioned GCR algorithm. See the notes for the explanation of the
+ *     parameters of the program.
  *
  * Notes:
  *
@@ -82,21 +84,22 @@
  * Some debugging output is printed to stdout on process 0 if FGCR4VD_DBG is
  * defined at compilation time.
  *
+ * CONST_CORRECTNESS:
+ *   The algorithm should have a signature that represents its const-ness,
+ *   however this is currently not possible due to the fact that most callers of
+ *   this algorithm specifies Dop and Mop using Dw, which is currently not const
+ *   correct (and hard to make const correct). This algorithm will thus be left
+ *   until that has been fixed.
+ *
  *******************************************************************************/
 
 #define FGCR4VD_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "vflds.h"
+#include "global.h"
 #include "linalg.h"
 #include "linsolv.h"
-#include "global.h"
+#include "mpi.h"
+#include "vflds.h"
 
 #define PRECISION_LIMIT ((double)(100.0f * FLT_EPSILON))
 
@@ -196,7 +199,7 @@ static void gcr_step(int vol, int icom, int k, int nkv,
 
   b[k] = (float)(sqrt(cs2[0].re));
 
-  if (b[k] == 0.0f)
+  if (is_equal_f(b[k], 0.0f))
     return;
 
   r = 1.0f / b[k];

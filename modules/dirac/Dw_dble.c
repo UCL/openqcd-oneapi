@@ -88,23 +88,30 @@
  * The programs Dw_dble(),..,Dwhat_dble() perform global operations and must
  * be called simultaneously on all processes.
  *
+ * CONST_CORRECTNESS:
+ *   The functions here are the main culprints why the entire codebase cannot be
+ *   made to satisfy const correctness. All the functions should have the
+ *   signature:
+ *    
+ *   Dw..._dble(double mu, spinor_dble const *s, spinor_dble *r)
+ *   
+ *   However, due to the fact that these routines manipulate the boundary of the
+ *   field s this cannot be the case. The boundary storage is fairly ingrained
+ *   into the computation, so it will be a bit of work to decouple these. Any
+ *   future attempt at making the rest of the code const correct will have to
+ *   start here.
+ *
  *******************************************************************************/
 
 #define DW_DBLE_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "flags.h"
-#include "lattice.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "sw_term.h"
 #include "dirac.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "sflds.h"
+#include "sw_term.h"
+#include "uflds.h"
 
 #define N0 (NPROC0 * L0)
 
@@ -116,12 +123,23 @@ typedef union
 
 static double coe, ceo;
 static double gamma_f, one_over_gammaf;
-static double one_over_ut_fermion;
 static const spinor_dble sd0 = {{{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
                                 {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
                                 {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}},
                                 {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}}};
 static spin_t rs ALIGNED32;
+
+static void set_aniso_hopping_coeffs(void)
+{
+  ani_params_t ani;
+  ani = ani_parms();
+
+  gamma_f = ani.xi / ani.nu;
+  one_over_gammaf = ani.nu / ani.xi;
+
+  coe *= 1.0 / ani.ut_fermion;
+  ceo *= 1.0 / ani.ut_fermion;
+}
 
 #if (defined AVX512)
 
@@ -809,16 +827,16 @@ static void deo_dble(int *piup, int *pidn, su3_dble *u, spinor_dble *pl)
   __asm__ __volatile__("movddup %0, %%xmm15" : : "m"(c) : "xmm15")
 
 #define _mul_cst()                                                             \
-  __asm__ __volatile__("mulpd %%xmm15, %%xmm0 nt"                              \
-                       "mulpd %%xmm15, %%xmm1 nt"                              \
+  __asm__ __volatile__("mulpd %%xmm15, %%xmm0 \n\t"                            \
+                       "mulpd %%xmm15, %%xmm1 \n\t"                            \
                        "mulpd %%xmm15, %%xmm2"                                 \
                        :                                                       \
                        :                                                       \
                        : "xmm0", "xmm1", "xmm2")
 
 #define _mul_cst_up()                                                          \
-  __asm__ __volatile__("mulpd %%xmm15, %%xmm3 nt"                              \
-                       "mulpd %%xmm15, %%xmm4 nt"                              \
+  __asm__ __volatile__("mulpd %%xmm15, %%xmm3 \n\t"                            \
+                       "mulpd %%xmm15, %%xmm4 \n\t"                            \
                        "mulpd %%xmm15, %%xmm5"                                 \
                        :                                                       \
                        :                                                       \
@@ -2109,7 +2127,6 @@ void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
   pauli_dble *m;
   spin_t *so, *ro;
   tm_parms_t tm;
-  ani_params_t ani;
 
   cpsd_int_bnd(0x1, s);
   m = swdfld();
@@ -2117,19 +2134,12 @@ void Dw_dble(double mu, spinor_dble *s, spinor_dble *r)
   set_sd2zero(BNDRY / 2, r + VOLUME);
   tm = tm_parms();
 
-  ani = ani_parms();
-  gamma_f = ani.xi / ani.nu;
-  one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_fermion = 1.0 / ani.ut_fermion;
-
   if (tm.eoflg == 1)
     mu = 0.0;
 
   coe = -0.5;
   ceo = -0.5;
-
-  coe *= one_over_ut_fermion;
-  ceo *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   bc = bc_type();
   piup = iup[VOLUME / 2];
@@ -2314,17 +2324,11 @@ void Dwoe_dble(spinor_dble *s, spinor_dble *r)
   int *piup, *pidn;
   su3_dble *u, *um;
   spin_t *ro;
-  ani_params_t ani;
 
   cpsd_int_bnd(0x1, s);
 
-  ani = ani_parms();
-  gamma_f = ani.xi / ani.nu;
-  one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_fermion = 1.0 / ani.ut_fermion;
-
   coe = -0.5;
-  coe *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   bc = bc_type();
   piup = iup[VOLUME / 2];
@@ -2382,17 +2386,11 @@ void Dweo_dble(spinor_dble *s, spinor_dble *r)
   int *piup, *pidn;
   su3_dble *u, *um;
   spin_t *so;
-  ani_params_t ani;
 
   set_sd2zero(BNDRY / 2, r + VOLUME);
 
-  ani = ani_parms();
-  gamma_f = ani.xi / ani.nu;
-  one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_fermion = 1.0 / ani.ut_fermion;
-
   ceo = 0.5;
-  ceo *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   bc = bc_type();
   piup = iup[VOLUME / 2];
@@ -2452,23 +2450,15 @@ void Dwhat_dble(double mu, spinor_dble *s, spinor_dble *r)
   int *piup, *pidn;
   su3_dble *u, *um;
   pauli_dble *m;
-  ani_params_t ani;
 
   cpsd_int_bnd(0x1, s);
   m = swdfld();
   apply_sw_dble(VOLUME / 2, mu, m, s, r);
   set_sd2zero(BNDRY / 2, r + VOLUME);
 
-  ani = ani_parms();
-  gamma_f = ani.xi / ani.nu;
-  one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_fermion = 1.0 / ani.ut_fermion;
-
   coe = -0.5;
   ceo = 0.5;
-
-  coe *= one_over_ut_fermion;
-  ceo *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   bc = bc_type();
   piup = iup[VOLUME / 2];
@@ -2536,7 +2526,6 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   spin_t *so, *ro;
   block_t *b;
   tm_parms_t tm;
-  ani_params_t ani;
 
   b = blk_list(grid, &nb, &iswd);
 
@@ -2567,19 +2556,12 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   apply_sw_dble(volh, mu, m, s, r);
   tm = tm_parms();
 
-  ani = ani_parms();
-  gamma_f = ani.xi / ani.nu;
-  one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_fermion = 1.0 / ani.ut_fermion;
-
   if (tm.eoflg == 1)
     mu = 0.0;
 
   coe = -0.5;
   ceo = -0.5;
-
-  coe *= one_over_ut_fermion;
-  ceo *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
@@ -2817,7 +2799,6 @@ void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l)
   spinor_dble *s;
   spin_t *ro;
   block_t *b;
-  ani_params_t ani;
 
   b = blk_list(grid, &nb, &iswd);
 
@@ -2841,13 +2822,8 @@ void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l)
   ro = (spin_t *)((*b).sd[l] + volh);
   s[vol] = sd0;
 
-  ani = ani_parms();
-  gamma_f = ani.xi / ani.nu;
-  one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_fermion = 1.0 / ani.ut_fermion;
-
   coe = -0.5;
-  coe *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
@@ -2908,7 +2884,6 @@ void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l)
   spinor_dble *r;
   spin_t *so;
   block_t *b;
-  ani_params_t ani;
 
   b = blk_list(grid, &nb, &iswd);
 
@@ -2932,13 +2907,8 @@ void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l)
   r = (*b).sd[l];
   r[vol] = sd0;
 
-  ani = ani_parms();
-  gamma_f = ani.xi / ani.nu;
-  one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_fermion = 1.0 / ani.ut_fermion;
-
   ceo = 0.5;
-  ceo *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];
@@ -3000,7 +2970,6 @@ void Dwhat_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   pauli_dble *m;
   spinor_dble *s, *r;
   block_t *b;
-  ani_params_t ani;
 
   b = blk_list(grid, &nb, &iswd);
 
@@ -3028,16 +2997,9 @@ void Dwhat_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   m = (*b).swd;
   apply_sw_dble(volh, mu, m, s, r);
 
-  ani = ani_parms();
-  gamma_f = ani.xi / ani.nu;
-  one_over_gammaf = ani.nu / ani.xi;
-  one_over_ut_fermion = 1.0 / ani.ut_fermion;
-
   coe = -0.5;
   ceo = 0.5;
-
-  coe *= one_over_ut_fermion;
-  ceo *= one_over_ut_fermion;
+  set_aniso_hopping_coeffs();
 
   piup = (*b).iup[volh];
   pidn = (*b).idn[volh];

@@ -12,8 +12,8 @@
  *
  * The externally accessible functions are
  *
- *   lat_parms_t set_lat_parms(double beta,double c0,
- *                             int nk,double *kappa,double csw)
+ *   lat_parms_t set_lat_parms(double beta, double c0,
+ *                             int nk, double const *kappa, double csw)
  *     Sets the basic lattice parameters. The parameters are
  *
  *       beta           Inverse bare coupling (beta=6/g0^2).
@@ -49,8 +49,8 @@
  *   bc_parms_t set_bc_parms(int type,
  *                           double cG,double cG_prime,
  *                           double cF,double cF_prime,
- *                           double *phi,double *phi_prime,
- *                           double *theta)
+ *                           double const *phi, double const *phi_prime,
+ *                           double const *theta)
  *     Sets the boundary conditions and the associated parameters of the
  *     action. The parameters are
  *
@@ -157,14 +157,9 @@
 
 #define LAT_PARMS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "utils.h"
 #include "flags.h"
 #include "global.h"
+#include "mpi.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -180,9 +175,8 @@ static bc_parms_t bc = {0,
                         {0.0, 0.0, 0.0}};
 static sw_parms_t sw = {DBL_MAX, 1.0, {1.0, 1.0}};
 static tm_parms_t tm = {0};
-static ani_params_t ani = {0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-lat_parms_t set_lat_parms(double beta, double c0, int nk, double *kappa,
+lat_parms_t set_lat_parms(double beta, double c0, int nk, double const *kappa,
                           double csw)
 {
   int iprms[1], ik, ie;
@@ -194,6 +188,11 @@ lat_parms_t set_lat_parms(double beta, double c0, int nk, double *kappa,
 
   error(iup[0][0] != 0, 1, "set_lat_parms [lat_parms.c]",
         "Geometry arrays are already set");
+
+  ani = ani_parms();
+
+  error(!ani_params_initialised(), 1, "set_lat_parms [lat_parms.c]",
+        "Anisotropic parameters not set");
 
   if (NPROC > 1) {
     iprms[0] = nk;
@@ -208,6 +207,10 @@ lat_parms_t set_lat_parms(double beta, double c0, int nk, double *kappa,
               (dprms[2] != csw),
           1, "set_lat_parms [lat_parms.c]", "Parameters are not global");
   }
+
+  error(ani.has_ani && not_equal_d(csw, 1.0), 1, "set_lat_parms [lat_parms.c]",
+        "Setting csw to something other than 1.0 even though the anisotropy "
+        "parameters cR and cT have been specified.");
 
   error_root(nk < 0, 1, "set_lat_parms [lat_parms.c]",
              "Number of kappa values must be non-negative");
@@ -249,13 +252,8 @@ lat_parms_t set_lat_parms(double beta, double c0, int nk, double *kappa,
   lat.c1 = 0.125 * (1.0 - c0);
   lat.csw = csw;
 
-  ani = ani_parms();
-
-  error(ani.xi == 0.0, 1, "set_lat_parms [lat_parms.c]",
-        "Anisotropic parameters not set");
-
   for (ik = 0; ik < nk; ik++) {
-    if (lat.kappa[ik] != 0.0)
+    if (not_equal_d(lat.kappa[ik], 0.0))
       lat.m0[ik] = 1.0 / (2.0 * lat.kappa[ik]) - 1.0 - 3.0 * ani.nu / ani.xi;
     else
       lat.m0[ik] = DBL_MAX;
@@ -303,6 +301,9 @@ void write_lat_parms(FILE *fdat)
   int iw, ik;
   stdint_t istd[5];
   double dstd[4];
+
+  error(flg_lat != 1, 1, "write_lat_parms [lat_parms.c]",
+        "Attempt to write the lattice parameters without setting them first");
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
   endian = endianness();
@@ -392,8 +393,8 @@ void check_lat_parms(FILE *fdat)
 }
 
 bc_parms_t set_bc_parms(int type, double cG, double cG_prime, double cF,
-                        double cF_prime, double *phi, double *phi_prime,
-                        double *theta)
+                        double cF_prime, double const *phi,
+                        double const *phi_prime, double const *theta)
 {
   int iprms[1], ie;
   double dprms[9];
@@ -593,6 +594,9 @@ void write_bc_parms(FILE *fdat)
   stdint_t istd[1];
   double dstd[13];
 
+  error(flg_bc != 1, 1, "write_bc_parms [lat_parms.c]",
+        "Attempt to write the boundary conditions without setting them first");
+
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
   endian = endianness();
 
@@ -621,7 +625,7 @@ void write_bc_parms(FILE *fdat)
     iw = fwrite(istd, sizeof(stdint_t), 1, fdat);
     iw += fwrite(dstd, sizeof(double), 13, fdat);
 
-    error_root(iw != 14, 1, "write_bc_parms [bc_parms.c]",
+    error_root(iw != 14, 1, "write_bc_parms [lat_parms.c]",
                "Incorrect write count");
   }
 }
@@ -661,10 +665,10 @@ void check_bc_parms(FILE *fdat)
     ie |= (dstd[11] != bc.theta[1]);
     ie |= (dstd[12] != bc.theta[2]);
 
-    error_root(ir != 14, 1, "check_bc_parms [bc_parms.c]",
+    error_root(ir != 14, 1, "check_bc_parms [lat_parms.c]",
                "Incorrect read count");
 
-    error_root(ie != 0, 1, "check_bc_parms [bc_parms.c]",
+    error_root(ie != 0, 1, "check_bc_parms [lat_parms.c]",
                "Parameters do not match");
   }
 }
@@ -738,82 +742,3 @@ tm_parms_t set_tm_parms(int eoflg)
 }
 
 tm_parms_t tm_parms(void) { return tm; }
-
-ani_params_t set_ani_parms(int use_tts, double nu, double xi, double cR,
-                           double cT, double us_gauge, double ut_gauge,
-                           double us_fermion, double ut_fermion)
-{
-  int iprms[2];
-  double dprms[8];
-
-  if ((nu == 1.0) && (xi == 1.0) && (cR == 1.0) && (cT == 1.0) &&
-      (us_gauge == 1.0) && (ut_gauge == 1.0) && (us_fermion == 1.0) &&
-      (ut_fermion == 1.0)) {
-    iprms[0] = 0;
-  } else {
-    iprms[0] = 1;
-  }
-
-  if (use_tts) {
-    iprms[1] = 1;
-  } else {
-    iprms[1] = 0;
-  }
-
-  dprms[0] = nu;
-  dprms[1] = xi;
-  dprms[2] = cR;
-  dprms[3] = cT;
-  dprms[4] = us_gauge;
-  dprms[5] = ut_gauge;
-  dprms[6] = us_fermion;
-  dprms[7] = ut_fermion;
-
-  if (NPROC > 1) {
-    MPI_Bcast(iprms, 2, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast(dprms, 8, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  }
-
-  ani.has_ani = iprms[0];
-  ani.has_tts = iprms[1];
-  ani.nu = dprms[0];
-  ani.xi = dprms[1];
-  ani.cR = dprms[2];
-  ani.cT = dprms[3];
-  ani.us_gauge = dprms[4];
-  ani.ut_gauge = dprms[5];
-  ani.us_fermion = dprms[6];
-  ani.ut_fermion = dprms[7];
-
-  return ani;
-}
-
-ani_params_t ani_parms(void) { return ani; }
-
-void print_ani_parms(void)
-{
-  int my_rank, n;
-
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
-  if (my_rank == 0) {
-    printf("Anisotropy parameters:\n");
-    printf("use tts = %s\n", ani.has_tts ? "true" : "false");
-    n = fdigits(ani.nu);
-    printf("nu = %.*f\n", IMAX(n, 1), ani.nu);
-    n = fdigits(ani.xi);
-    printf("xi = %.*f\n", IMAX(n, 1), ani.xi);
-    n = fdigits(ani.cR);
-    printf("cR = %.*f\n", IMAX(n, 1), ani.cR);
-    n = fdigits(ani.cT);
-    printf("cT = %.*f\n", IMAX(n, 1), ani.cT);
-    n = fdigits(ani.ut_gauge);
-    printf("ut_gauge = %.*f\n", IMAX(n, 1), ani.ut_gauge);
-    n = fdigits(ani.us_gauge);
-    printf("us_gauge = %.*f\n", IMAX(n, 1), ani.us_gauge);
-    n = fdigits(ani.us_fermion);
-    printf("us_fermion = %.*f\n", IMAX(n, 1), ani.us_fermion);
-    n = fdigits(ani.ut_fermion);
-    printf("ut_fermion = %.*f\n\n", IMAX(n, 1), ani.ut_fermion);
-  }
-}

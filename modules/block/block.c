@@ -89,17 +89,12 @@
 
 #define BLOCK_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "sflds.h"
 #include "block.h"
+#include "flags.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "sflds.h"
 
 static const su3 u0 = {{0.0f}};
 static const su3_dble ud0 = {{0.0}};
@@ -110,13 +105,13 @@ static const weyl_dble wd0 = {{{0.0}}};
 
 struct ablk_t
 {
-  block_t *b;
+  block_t const *b;
   struct ablk_t *next;
 };
 
 static struct ablk_t *first = NULL;
 
-static int ins_blk(block_t *b)
+static int ins_blk(block_t const *b)
 {
   struct ablk_t *p;
 
@@ -132,7 +127,7 @@ static int ins_blk(block_t *b)
     return 1;
 }
 
-static void rmv_blk(block_t *b)
+static void rmv_blk(block_t const *b)
 {
   struct ablk_t *p, *q;
 
@@ -153,7 +148,7 @@ static void rmv_blk(block_t *b)
   }
 }
 
-static int fnd_blk(block_t *b)
+static int fnd_blk(block_t const *b)
 {
   struct ablk_t *p;
 
@@ -352,8 +347,8 @@ static void set_wd2zero(int vol, weyl_dble *wd)
     (*wd) = wd0;
 }
 
-static void new_blk(block_t *b, int *bo, int *bs, int iu, int iud, int ns,
-                    int nsd, int shf)
+static void new_blk(block_t *b, int const *bo, int const *bs, int iu, int iud,
+                    int ns, int nsd, int shf)
 {
   int n, mu;
 
@@ -474,7 +469,8 @@ static void new_blk(block_t *b, int *bo, int *bs, int iu, int iud, int ns,
         "Unable to register allocated block");
 }
 
-void alloc_blk(block_t *b, int *bo, int *bs, int iu, int iud, int ns, int nsd)
+void alloc_blk(block_t *b, int const *bo, int const *bs, int iu, int iud,
+               int ns, int nsd)
 {
   int iprms[12], mu, ie;
 
@@ -684,7 +680,7 @@ void alloc_bnd(block_t *b, int iu, int iud, int nw, int nwd)
   bnd_imbed(b);
 }
 
-void clone_blk(block_t *b, int shf, int *bo, block_t *c)
+void clone_blk(block_t const *b, int shf, int const *bo, block_t *c)
 {
   int iprms[23], mu, ie;
   int *bbo, *bs, bshf;
@@ -830,9 +826,10 @@ void clone_blk(block_t *b, int shf, int *bo, block_t *c)
   }
 }
 
-int ipt_blk(block_t *b, int *x)
+int ipt_blk(block_t const *b, int const *x)
 {
-  int *bs, n, ix;
+  int const *bs;
+  int n, ix;
 
   bs = (*b).bs;
 

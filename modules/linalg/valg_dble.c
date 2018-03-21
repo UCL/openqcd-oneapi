@@ -12,27 +12,29 @@
  *
  * The externally accessible functions are
  *
- *   complex_dble vprod_dble(int n,int icom,complex_dble *v,complex_dble *w)
+ *   complex_dble vprod_dble(int n, int icom, complex_dble const *v,
+ *                           complex_dble const *w)
  *     Computes the scalar product of the n-vectors v and w.
  *
- *   double vnorm_square_dble(int n,int icom,complex_dble *v)
+ *   double vnorm_square_dble(int n, int icom, complex_dble const *v)
  *     Computes the square of the norm of the n-vector v.
  *
- *   void mulc_vadd_dble(int n,complex_dble *v,complex_dble *w,complex_dble z)
+ *   void mulc_vadd_dble(int n, complex_dble *v, complex_dble const *w,
+ *                       complex_dble z)
  *     Replaces the n-vector v by v+z*w.
  *
- *   void vproject_dble(int n,int icom,complex_dble *v,complex_dble *w)
- *     Replaces the n-vector v by v-(w,v)*w.
+ *   void vproject_dble(int n, int icom, complex_dble *v, complex_dble const *w)
+ *     Replaces the n-vector v by v-(w, v)*w.
  *
- *   void vscale_dble(int n,double r,complex_dble *v)
+ *   void vscale_dble(int n, double r, complex_dble *v)
  *     Replaces the n-vector v by r*v.
  *
- *   double vnormalize_dble(int n,int icom,complex_dble *v)
+ *   double vnormalize_dble(int n, int icom, complex_dble *v)
  *     Normalizes the n-vector v to unity and returns the norm of the
  *     input vector.
  *
- *   void vrotate_dble(int n,int nv,complex_dble **pv,complex_dble *a)
- *     Replaces the n-vectors vk=pv[k], k=0,..,nv-1, by the linear
+ *   void vrotate_dble(int n, int nv, complex_dble **pv, complex_dble const *a)
+ *     Replaces the n-vectors vk=pv[k], k=0, .., nv-1, by the linear
  *     combinations sum_{j=0}^{nv-1} vj*a[n*j+k].
  *
  * Notes:
@@ -50,14 +52,10 @@
 
 #define VALG_DBLE_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "utils.h"
-#include "linalg.h"
-#include "vflds.h"
 #include "global.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "vflds.h"
 
 static int nrot = 0;
 static int isx, isz, init = 0;
@@ -77,9 +75,10 @@ static void alloc_wrotate(int n)
   nrot = n;
 }
 
-complex_dble vprod_dble(int n, int icom, complex_dble *v, complex_dble *w)
+complex_dble vprod_dble(int n, int icom, complex_dble const *v,
+                        complex_dble const *w)
 {
-  complex_dble *vm, *vb;
+  complex_dble const *vm, *vb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -114,9 +113,9 @@ complex_dble vprod_dble(int n, int icom, complex_dble *v, complex_dble *w)
   return smz;
 }
 
-double vnorm_square_dble(int n, int icom, complex_dble *v)
+double vnorm_square_dble(int n, int icom, complex_dble const *v)
 {
-  complex_dble *vm, *vb;
+  complex_dble const *vm, *vb;
 
   if (init == 0) {
     isx = init_hsum(1);
@@ -147,7 +146,8 @@ double vnorm_square_dble(int n, int icom, complex_dble *v)
   return smx;
 }
 
-void mulc_vadd_dble(int n, complex_dble *v, complex_dble *w, complex_dble z)
+void mulc_vadd_dble(int n, complex_dble *v, complex_dble const *w,
+                    complex_dble z)
 {
   complex_dble *vm;
 
@@ -160,7 +160,7 @@ void mulc_vadd_dble(int n, complex_dble *v, complex_dble *w, complex_dble z)
   }
 }
 
-void vproject_dble(int n, int icom, complex_dble *v, complex_dble *w)
+void vproject_dble(int n, int icom, complex_dble *v, complex_dble const *w)
 {
   complex_dble z;
 
@@ -189,7 +189,7 @@ double vnormalize_dble(int n, int icom, complex_dble *v)
   r = vnorm_square_dble(n, icom, v);
   r = sqrt(r);
 
-  if (r != 0.0)
+  if (not_equal_d(r, 0.0))
     vscale_dble(n, 1.0 / r, v);
   else
     error_loc(1, 1, "vnormalize_dble [valg_dble.c]",
@@ -198,10 +198,11 @@ double vnormalize_dble(int n, int icom, complex_dble *v)
   return r;
 }
 
-void vrotate_dble(int n, int nv, complex_dble **pv, complex_dble *a)
+void vrotate_dble(int n, int nv, complex_dble **pv, complex_dble const *a)
 {
   int i, k, j;
-  complex_dble s, *z, *vj;
+  complex_dble const *z;
+  complex_dble s, *vj;
 
   if (nv > nrot)
     alloc_wrotate(nv);

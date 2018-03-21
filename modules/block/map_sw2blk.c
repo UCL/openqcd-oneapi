@@ -48,15 +48,11 @@
 
 #define MAP_SW2BLK_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "utils.h"
-#include "flags.h"
-#include "sw_term.h"
 #include "block.h"
+#include "flags.h"
 #include "global.h"
+#include "mpi.h"
+#include "sw_term.h"
 
 static pauli_dble ms[2] ALIGNED16;
 

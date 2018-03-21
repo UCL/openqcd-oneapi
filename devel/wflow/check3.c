@@ -14,22 +14,16 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "random.h"
-#include "su3fcts.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
 #include "archive.h"
 #include "forces.h"
-#include "tcharge.h"
-#include "wflow.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "random.h"
+#include "su3fcts.h"
+#include "tcharge.h"
+#include "uflds.h"
+#include "wflow.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -39,6 +33,53 @@
 static int my_rank;
 static char cnfg_dir[NAME_SIZE], cnfg_file[NAME_SIZE];
 static char nbase[NAME_SIZE], end_file[NAME_SIZE];
+
+static void read_anisotropy_section(void)
+{
+  int has_tts, has_ani = 0;
+  long section_pos;
+  double nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion, ut_fermion;
+
+  if (my_rank == 0) {
+    section_pos = find_optional_section("Anisotropy parameters");
+
+    if (section_pos == No_Section_Found) {
+      has_ani = 0;
+    } else {
+      has_ani = 1;
+      read_line("use_tts", "%d", &has_tts);
+      read_line("nu", "%lf", &nu);
+      read_line("xi", "%lf", &xi);
+      read_line("cR", "%lf", &cR);
+      read_line("cT", "%lf", &cT);
+      read_optional_line("us_gauge", "%lf", &us_gauge, 1.0);
+      read_optional_line("ut_gauge", "%lf", &ut_gauge, 1.0);
+      read_optional_line("us_fermion", "%lf", &us_fermion, 1.0);
+      read_optional_line("ut_fermion", "%lf", &ut_fermion, 1.0);
+    }
+  }
+
+  MPI_Bcast(&has_ani, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (has_ani == 1) {
+    MPI_Bcast(&has_tts, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&nu, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&xi, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&cR, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&cT, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&us_gauge, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&ut_gauge, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&us_fermion, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&ut_fermion, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion, ut_fermion);
+    print_ani_parms();
+
+  } else {
+    set_no_ani_parms();
+  }
+
+}
 
 static void cmp_ud(su3_dble *u, su3_dble *v, double *dev)
 {
@@ -184,7 +225,6 @@ int main(int argc, char *argv[])
     read_line("n", "%d\n", &n);
     read_line("eps", "%lf\n", &eps);
     read_line("rule", "%d", &rule);
-    fclose(fin);
 
     error_root((rule < 0) || (rule > 3), 1, "main [check3.c]",
                "rule must be 1,2 or 3");
@@ -203,6 +243,12 @@ int main(int argc, char *argv[])
   MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&eps, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&rule, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  read_anisotropy_section();
+
+  if (my_rank == 0) {
+    fclose(fin);
+  }
 
   theta[0] = 0.0;
   theta[1] = 0.0;

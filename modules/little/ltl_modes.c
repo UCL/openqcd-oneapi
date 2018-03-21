@@ -37,21 +37,15 @@
 
 #define LTL_MODES_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "vflds.h"
-#include "linalg.h"
-#include "sw_term.h"
-#include "dirac.h"
-#include "block.h"
 #include "dfl.h"
-#include "little.h"
+#include "dirac.h"
+#include "flags.h"
 #include "global.h"
+#include "linalg.h"
+#include "little.h"
+#include "mpi.h"
+#include "sw_term.h"
+#include "vflds.h"
 
 #define MAX_FROBENIUS 1.0e6
 
@@ -138,7 +132,7 @@ int set_ltl_modes(void)
     r = vnorm_square_dble(nvh, 1, vds[k]);
     r = sqrt(r);
 
-    if (r != 0.0) {
+    if (not_equal_d(r, 0.0)) {
       vscale_dble(nvh, 1.0 / r, vds[k]);
       assign_vd2vd(nvh, vds[k], wvd[0]);
       Awhat_dble(wvd[0], wvd[1]);

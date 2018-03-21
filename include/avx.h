@@ -17,9 +17,7 @@
 #ifndef AVX_H
 #define AVX_H
 
-#ifndef SSE2_H
 #include "sse2.h"
-#endif
 
 typedef struct __attribute__((aligned(32)))
 {

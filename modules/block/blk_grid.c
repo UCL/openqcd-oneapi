@@ -53,15 +53,11 @@
 
 #define BLK_GRID_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "utils.h"
-#include "flags.h"
-#include "sap.h"
 #include "block.h"
+#include "flags.h"
 #include "global.h"
+#include "mpi.h"
+#include "sap.h"
 
 typedef struct
 {

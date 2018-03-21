@@ -29,9 +29,6 @@
 
 #define PCHI_SQUARE_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "extras.h"
 
 static int init = 0;

@@ -14,20 +14,14 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
 #include "flags.h"
-#include "random.h"
-#include "su3fcts.h"
-#include "utils.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "lattice.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "random.h"
+#include "sflds.h"
+#include "su3fcts.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -43,7 +37,6 @@ typedef union
 
 static double p[4];
 static spinor_dble rs ALIGNED16;
-static const spinor_dble sd0 = {{{0.0}}};
 
 static int is_zero_dble(spinor_dble *s)
 {

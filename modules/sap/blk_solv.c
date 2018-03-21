@@ -40,17 +40,10 @@
 
 #define BLK_SOLV_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "su3.h"
-#include "utils.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "block.h"
 #include "dirac.h"
+#include "linalg.h"
 #include "sap.h"
+#include "sflds.h"
 
 static int vol;
 static spinor **s;

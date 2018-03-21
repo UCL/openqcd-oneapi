@@ -63,25 +63,24 @@
  *
  * (see utils/wspace.c).
  *
+ * CONST_CORRECTNESS:
+ *   The methods here should have the eta argument be constant, however this is
+ *   currently not possible due to the implementation of the Dw and Dw_dble
+ *   functions.
+ *
  *******************************************************************************/
 
 #define TMCGM_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "sw_term.h"
 #include "dirac.h"
-#include "linsolv.h"
 #include "forces.h"
 #include "global.h"
+#include "linalg.h"
+#include "linsolv.h"
+#include "mpi.h"
+#include "sflds.h"
+#include "sw_term.h"
+#include "uflds.h"
 
 static int iop = 0;
 

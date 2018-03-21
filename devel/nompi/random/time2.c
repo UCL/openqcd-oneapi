@@ -12,10 +12,8 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
 #include "random.h"
+#include <time.h>
 
 #define NRLX 100
 #define NGSS 24

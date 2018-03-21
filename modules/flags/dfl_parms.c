@@ -12,7 +12,7 @@
  *
  * The externally accessible functions are
  *
- *   dfl_parms_t set_dfl_parms(int *bs,int Ns)
+ *   dfl_parms_t set_dfl_parms(int const *bs,int Ns)
  *     Sets the parameters of the deflation subspace. The parameters are
  *
  *       bs[4]          Sizes of the blocks in DFL_BLOCKS block grid.
@@ -112,21 +112,16 @@
 
 #define DFL_PARMS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "utils.h"
 #include "flags.h"
 #include "global.h"
+#include "mpi.h"
 
 static dfl_parms_t dfl = {{0, 0, 0, 0}, 0};
 static dfl_pro_parms_t dfl_pro = {0, 0, 1.0};
 static dfl_gen_parms_t dfl_gen = {0, 0, 0, 0.0, DBL_MAX, 0.0};
 static dfl_upd_parms_t dfl_upd = {0, 0.0};
 
-static void check_block_size(int *bs)
+static void check_block_size(int const *bs)
 {
   int n0, n1, n2, n3;
 
@@ -156,7 +151,7 @@ static void check_block_size(int *bs)
              "The number of blocks in the local lattice must be even");
 }
 
-dfl_parms_t set_dfl_parms(int *bs, int Ns)
+dfl_parms_t set_dfl_parms(int const *bs, int Ns)
 {
   int iprms[5];
 
@@ -260,10 +255,10 @@ dfl_gen_parms_t set_dfl_gen_parms(double kappa, double mu, int ninv, int nmr,
 
   ani = ani_parms();
 
-  error(ani.xi == 0.0, 1, "set_dfl_gen_parms [dfl_parms.c]",
+  error(!ani_params_initialised(), 1, "set_dfl_gen_parms [dfl_parms.c]",
         "Anisotropic parameters not set");
 
-  if (kappa != 0.0)
+  if (not_equal_d(kappa, 0.0))
     dfl_gen.m0 = 1.0 / (2.0 * kappa) - 1.0 - 3.0 * ani.nu / ani.xi;
   else
     dfl_gen.m0 = DBL_MAX;

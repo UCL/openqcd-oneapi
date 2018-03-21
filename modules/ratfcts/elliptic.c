@@ -55,11 +55,6 @@
 
 #define ELLIPTIC_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "utils.h"
 #include "ratfcts.h"
 
 static double agm(double x, double y)

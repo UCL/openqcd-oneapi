@@ -7,25 +7,22 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "lattice.h"
-#include "global.h"
 #include "archive.h"
-#include "flags.h"
-#include "uflds.h"
+#include "global.h"
+#include "lattice.h"
+#include "mpi.h"
 #include "stout_smearing.h"
+#include "uflds.h"
 
 #include <devel/testing_utilities/data_type_diffs.c>
+#include <devel/testing_utilities/test_counter.c>
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
 #define N2 (NPROC2 * L2)
 #define N3 (NPROC3 * L3)
+
+char test_text[512];
 
 int main(int argc, char *argv[])
 {
@@ -40,17 +37,19 @@ int main(int argc, char *argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
   if (my_rank == 0) {
-    printf("Checks of the programs in the module stout_smearing\n");
-    printf("-------------------------------------------\n\n");
+    printf("Test smearing against reference configuration \n");
+    printf("---------------------------------------------\n");
 
-    printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
+    printf("%dx%dx%dx%d lattice,\n", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
            NPROC3 * L3);
-    printf("%dx%dx%dx%d process grid, ", NPROC0, NPROC1, NPROC2, NPROC3);
-    printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
+    printf("%dx%dx%dx%d process grid,\n", NPROC0, NPROC1, NPROC2, NPROC3);
+    printf("%dx%dx%dx%d local lattice\n", L0, L1, L2, L3);
+    printf("---------------------------------------------\n\n");
   }
 
   set_bc_parms(3, 0., 0., 0., 0., NULL, NULL, theta);
   set_stout_smearing_parms(3, 0., 0.25, 1, 1);
+  stout_params = stout_smearing_parms();
 
   geometry();
   npl = (double)(6 * N0 * N1) * (double)(N2 * N3);
@@ -63,8 +62,7 @@ int main(int argc, char *argv[])
   MPI_Reduce(&plaq_temp_o, &plaq_total_o, 1, MPI_DOUBLE, MPI_SUM, 0,
              MPI_COMM_WORLD);
 
-  /* TODO: Replace with unsmear when that is done */
-  cm3x3_assign(4 * VOLUME + 7 * BNDRY / 4, udfld(), smeared_fields()[0]);
+  unsmear_fields();
 
   import_cnfg("configurations/smeared_conf_n3.conf");
   plaq_temp_r = plaq_wsum_dble(0) / (3. * npl);
@@ -78,23 +76,38 @@ int main(int argc, char *argv[])
   config_temp_diff = 0.;
   for (ix = 0; ix < (4 * VOLUME); ++ix) {
     config_temp_diff +=
-        norm_diff_su3(udfld() + ix, smeared_fields()[0] + ix) / nlinks;
+        norm_diff_su3(udfld() + ix,
+                      smeared_fields()[stout_params.num_smear - 1] + ix) /
+        nlinks;
   }
   MPI_Reduce(&config_temp_diff, &config_total_diff, 1, MPI_DOUBLE, MPI_SUM, 0,
              MPI_COMM_WORLD);
 
-  stout_params = stout_smearing_parms();
-
   if (my_rank == 0) {
-    printf("Check of smear_fields() with rho_t = %.2f, rho_s = %.2f, n = %d:\n",
-           stout_params.rho_temporal, stout_params.rho_spatial,
-           stout_params.num_smear);
+    sprintf(
+        test_text,
+        "Check of smear_fields() with rho_t = %.2f, rho_s = %.2f, n = %d",
+        stout_params.rho_temporal, stout_params.rho_spatial,
+        stout_params.num_smear);
+
+    register_test(1, test_text);
+    print_test_header(1);
+
     printf("|average plaquette - reference|  = %.1e (should be 0.0)\n",
            fabs(plaq_total_o - plaq_total_r));
+    fail_test_if(1, fabs(plaq_total_o - plaq_total_r) > 1e-12);
     printf("accumulated plaq errors          = %.1e (should be 0.0)\n",
            plaq_total_diff);
-    printf("|smeared links - referece| / vol = %.1e (should be 0.0)\n\n",
+    fail_test_if(1, plaq_total_diff > 1e-12);
+    printf("|smeared links - referece| / vol = %.1e (should be 0.0)\n",
            config_total_diff);
+    fail_test_if(1, config_total_diff > 1e-12);
+
+    printf("\n---------------------------------------------\n\n");
+  }
+
+  if (my_rank == 0) {
+    report_test_results();
   }
 
   MPI_Finalize();

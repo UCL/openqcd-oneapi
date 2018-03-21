@@ -1,11 +1,7 @@
 #define SMEARED_FIELDS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "stout_smearing.h"
-#include "flags.h"
 #include "global.h"
+#include "stout_smearing.h"
 
 static su3_dble **sfields = NULL;
 static ch_mat_coeff_pair_t **exp_ch_mat_coeff_pair_field = NULL;
@@ -43,18 +39,6 @@ void allocate_smeared_fields(void)
     for (i = 1; i < nsmear; i++)
       sfields[i] = sfields[i - 1] + nlinks;
   }
-}
-
-/* Summary:
- *   Free the memory allocated for the smeared field configurations.
- *   XXX: Have to make sure that we do not free the thin links, or that we at
- *        least do not double free the udfld
- */
-void free_smeared_fields(void)
-{
-  /* TODO: Test if is smeared */
-  if (sfields != NULL)
-    afree(sfields[0]);
 }
 
 /* Summary:
@@ -99,7 +83,6 @@ void allocate_smearing_ch_coeff_fields(void)
           "allocate_smearing_ch_coeff_fields [smeared_fields.c]",
           "Unable to allocate Cayley-Hamilton coefficient field pointer array");
 
-    /* TODO: Check and think about memory alignment for this type */
     exp_ch_mat_coeff_pair_field[0] =
         amalloc(nsmear * nlinks * sizeof(**exp_ch_mat_coeff_pair_field), ALIGN);
 

@@ -12,8 +12,9 @@
  *
  * The externally accessible functions are
  *
- *   rw_parms_t set_rw_parms(int irw,rwfact_t rwfact,int im0,int nsrc,
- *                           int irp,int nfct,double *mu,int *np,int *isp)
+ *   rw_parms_t set_rw_parms(int irw, rwfact_t rwfact, int im0, int nsrc,
+ *                           int irp, int nfct, double const *mu,
+ *                           int const *np, int const *isp)
  *     Sets the parameters in the reweighting factor parameter set number
  *     irw and returns a structure containing them (see the notes).
  *
@@ -135,14 +136,10 @@
 
 #define RW_PARMS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "mpi.h"
-#include "utils.h"
 #include "flags.h"
 #include "global.h"
+#include "mpi.h"
+#include <string.h>
 
 #define IRWMAX 32
 
@@ -161,7 +158,8 @@ static void init_rw(void)
 }
 
 rw_parms_t set_rw_parms(int irw, rwfact_t rwfact, int im0, int nsrc, int irp,
-                        int nfct, double *mu, int *np, int *isp)
+                        int nfct, double const *mu, int const *np,
+                        int const *isp)
 {
   int iprms[6], i, ie;
   double dprms[1];

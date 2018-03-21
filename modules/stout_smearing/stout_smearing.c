@@ -1,16 +1,12 @@
 #define STOUT_SMEARING_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "stout_smearing.h"
+#include "field_com.h"
 #include "global.h"
-#include "flags.h"
 #include "lattice.h"
-#include "uflds.h"
 #include "linalg.h"
+#include "uflds.h"
 
-static const int plns[6][2] = {{0, 1}, {0, 2}, {0, 3}, {2, 3}, {3, 1}, {1, 2}};
 static su3_dble w1, w2, w3;
 static su3_dble *omega_matrix = NULL;
 
@@ -109,21 +105,45 @@ static void compute_omega_field(su3_dble const *gfield)
                                    smear_params.rho_spatial);
   }
 
-  add_boundary_su3_field(omega_matrix);
+ if (smear_params.smear_temporal == 1) {
+    add_boundary_su3_field(omega_matrix);
+  } else {
+    add_spatial_boundary_su3_field(omega_matrix);
+  }
 }
 
 static void smear_single_field(su3_dble *gfield, ch_mat_coeff_pair_t *ch_coeffs)
 {
-  int ix;
+  int ix, iy, mu;
+  stout_smearing_params_t smear;
+
+  smear = stout_smearing_parms();
 
   compute_omega_field(gfield);
 
-  for (ix = 0; ix < 4 * VOLUME; ix++) {
-    project_to_su3alg(omega_matrix + ix, &ch_coeffs[ix].X);
-    expXsu3_w_factors(1., &ch_coeffs[ix].X, gfield + ix, &ch_coeffs[ix].coeff);
+  for (ix = 0; ix < VOLUME / 2; ++ix) {
+    if (smear.smear_temporal == 1) {
+      for (mu = 0; mu < 2; ++mu) {
+        iy = 8*ix + mu;
+        project_to_su3alg(omega_matrix + iy, &ch_coeffs[iy].X);
+        expXsu3_w_factors(1., &ch_coeffs[iy].X, gfield + iy, &ch_coeffs[iy].coeff);
+      }
+    }
+
+    if (smear.smear_spatial == 1) {
+      for (mu = 2; mu < 8; ++mu) {
+        iy = 8*ix + mu;
+        project_to_su3alg(omega_matrix + iy, &ch_coeffs[iy].X);
+        expXsu3_w_factors(1., &ch_coeffs[iy].X, gfield + iy, &ch_coeffs[iy].coeff);
+      }
+    }
   }
 
-  copy_boundaries_udfield(gfield);
+  if (smear.smear_temporal == 1) {
+    copy_boundary_su3_field(gfield);
+  } else {
+    copy_spatial_boundary_su3_field(gfield);
+  }
 }
 
 /* Summary:
@@ -238,15 +258,16 @@ static void compute_and_apply_smearing(void)
  * Effects:
  *   * udfld will be the smeared fields
  *   * the event SMEARED_UD is called
- *
- * TODO:
- *   * add a check for boundary condition type
- *   * only works for periodic boundaries, however, if the smearing does not
- *     smear using temporal links, it should work for other BC types as well
- *   * also need to inquire how using block structures could affect anything
  */
 void smear_fields(void)
 {
+  stout_smearing_params_t smear_params;
+  smear_params = stout_smearing_parms();
+
+  if (smear_params.num_smear == 0) {
+    return;
+  }
+
   error(bc_type() != 3, 1, "smear fields [stout_smearing.c]",
         "Stout smearing is only implemented for periodic boundaries");
 

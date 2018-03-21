@@ -13,9 +13,7 @@
 #ifndef VFLDS_H
 #define VFLDS_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
 
 /* VCOM_C */
 extern void cpv_int_bnd(complex *v);
@@ -34,11 +32,12 @@ extern void set_v2zero(int n, complex *v);
 extern void set_vd2zero(int n, complex_dble *vd);
 extern void random_v(int n, complex *v, float sigma);
 extern void random_vd(int n, complex_dble *vd, double sigma);
-extern void assign_v2v(int n, complex *v, complex *w);
-extern void assign_v2vd(int n, complex *v, complex_dble *wd);
-extern void assign_vd2v(int n, complex_dble *vd, complex *w);
-extern void assign_vd2vd(int n, complex_dble *vd, complex_dble *wd);
-extern void add_v2vd(int n, complex *v, complex_dble *wd);
-extern void diff_vd2v(int n, complex_dble *vd, complex_dble *wd, complex *w);
+extern void assign_v2v(int n, complex const *v, complex *w);
+extern void assign_v2vd(int n, complex const *v, complex_dble *wd);
+extern void assign_vd2v(int n, complex_dble const *vd, complex *w);
+extern void assign_vd2vd(int n, complex_dble const *vd, complex_dble *wd);
+extern void add_v2vd(int n, complex const *v, complex_dble *wd);
+extern void diff_vd2v(int n, complex_dble const *vd, complex_dble const *wd,
+                      complex *w);
 
 #endif

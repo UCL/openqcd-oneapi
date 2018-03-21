@@ -97,12 +97,8 @@
 
 #define STAT_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "utils.h"
 #include "extras.h"
+#include "utils.h"
 
 double average(int n, double *a)
 {
@@ -180,7 +176,7 @@ static void sigma_corr(int n, int tmax, int lambda, double *g, double *eg)
   int k, t;
   double sm, r;
 
-  if (g[0] == 0.0) {
+  if (is_equal_d(g[0], 0.0)) {
     for (t = 0; t < tmax; t++)
       eg[t] = 0.0;
   } else {
@@ -244,7 +240,7 @@ double tauint(int n, double *a, int tmax, int lambda, int *w, double *sigma)
   (*w) = 1;
   (*sigma) = 0.0;
 
-  if (g0 != 0.0) {
+  if (not_equal_d(g0, 0.0)) {
     for (t = 1; t < tmax; t++) {
       tau += g[t];
 
@@ -286,7 +282,7 @@ double print_auto(int n, double *a)
   abar = average(n, a);
   g0 = auto_corr(n, a, tmax, ga);
 
-  if (g0 == 0.0)
+  if (is_equal_d(g0, 0.0))
     printf("Statistical error is negligible, no data to print\n");
   else {
     ta[0] = 0.5;

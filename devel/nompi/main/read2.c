@@ -19,12 +19,9 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "utils.h"
 #include "extras.h"
+#include "utils.h"
+#include <string.h>
 
 static struct
 {
@@ -217,20 +214,24 @@ static void cnfg_range(FILE *fdat, int *fst, int *lst, int *stp)
 static void select_cnfg_range(FILE *fdat)
 {
   int fst, lst, stp;
+  int res;
 
   cnfg_range(fdat, &fst, &lst, &stp);
 
   printf("Available configuration range: %d - %d by %d\n", fst, lst, stp);
   printf("Select first,last,step: ");
-  scanf("%d", &first);
-  scanf(",");
-  scanf("%d", &last);
-  scanf(",");
-  scanf("%d", &step);
+  res = scanf("%d", &first);
+  res = scanf(",");
+  res = scanf("%d", &last);
+  res = scanf(",");
+  res = scanf("%d", &step);
+
+  error(res == 0, 1, "select_cnfg_range [read2.c]", "scanf failed");
+
   printf("\n");
 
   error((step % stp) != 0, 1, "select_cnfg_range [read2.c]",
-        "Step must be a multiple of the configuration separation");
+        "step must be a multiple of the configuration separation");
 
   if (first < fst) {
     first = first + ((fst - first) / step) * step;

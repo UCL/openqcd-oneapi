@@ -13,20 +13,17 @@
 #ifndef UFLDS_H
 #define UFLDS_H
 
-#ifndef SU3_H
-#include "su3.h"
-#endif
-
-#ifndef FLAGS_H
 #include "flags.h"
-#endif
+#include "su3.h"
 
 /* BSTAP_C */
 extern su3_dble *bstap(void);
 extern void set_bstap(void);
 
 /* PLAQ_SUM_C */
+extern void plaq_sum_split_dble(int icom, double *result);
 extern double plaq_sum_dble(int icom);
+extern void plaq_wsum_split_dble(int icom, double *result);
 extern double plaq_wsum_dble(int icom);
 extern double plaq_action_slices(double *asl);
 extern double spatial_link_sum(int icom);
@@ -50,9 +47,6 @@ extern void unset_ud_phase(void);
 extern void renormalize_ud(void);
 extern void assign_ud2u(void);
 extern void swap_udfld(su3_dble **new_field);
-
-/* UDCOM_C */
 extern void copy_bnd_ud(void);
-extern void copy_boundaries_udfield(su3_dble *ud_field);
 
 #endif

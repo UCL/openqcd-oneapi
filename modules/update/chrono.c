@@ -70,18 +70,11 @@
 
 #define CHRONO_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "update.h"
 #include "global.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "sflds.h"
+#include "update.h"
 
 typedef struct
 {

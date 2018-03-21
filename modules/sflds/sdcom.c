@@ -46,16 +46,11 @@
 
 #define SDCOM_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
 #include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "sflds.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "sflds.h"
 
 static int bc, np, nmu[8], nbf[8], ofs[8];
 static int ns, sfc[8], rfc[8], sflg[8];

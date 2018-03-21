@@ -51,19 +51,11 @@
 
 #define YM_ACTION_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
 #include "flags.h"
-#include "su3fcts.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
-#include "linalg.h"
-#include "tcharge.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "tcharge.h"
 
 #define N0 (NPROC0 * L0)
 

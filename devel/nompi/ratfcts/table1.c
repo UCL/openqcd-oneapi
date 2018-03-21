@@ -15,9 +15,6 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "utils.h"
 #include "ratfcts.h"
 

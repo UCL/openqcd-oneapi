@@ -14,19 +14,13 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "random.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
-#include "sw_term.h"
 #include "block.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "random.h"
+#include "sw_term.h"
+#include "uflds.h"
 
 static int cmp_sw(pauli *r, pauli *s)
 {
@@ -175,7 +169,10 @@ int main(int argc, char *argv[])
                  "Syntax: check4 [-bc <type>]");
   }
 
-  set_lat_parms(5.5, 1.0, 0, NULL, 1.978);
+  set_ani_parms(1, 1.5, 4.3, 1.5, 0.9, 0.7, 0.9, 0.91, 0.81);
+  print_ani_parms();
+
+  set_lat_parms(5.5, 1.0, 0, NULL, 1.0);
   print_lat_parms();
 
   MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);

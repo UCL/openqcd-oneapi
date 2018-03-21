@@ -78,21 +78,22 @@
 * Some debugging output is printed to stdout on process 0 if CGNE_DBG is
 * defined at compilation time.
 *
+* CONST_CORRECTNESS:
+*   The algorithm should have a signature that represents its const-ness,
+*   however this is currently not possible due to the fact that most callers of
+*   this algorithm specifies Dop using Dw, which is currently not const correct
+*   (and hard to make const correct). This algorithm will thus be left until
+*   that has been fixed.
+*
 *******************************************************************************/
 
 #define CGNE_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "sflds.h"
+#include "global.h"
 #include "linalg.h"
 #include "linsolv.h"
-#include "global.h"
+#include "mpi.h"
+#include "sflds.h"
 
 #define PRECISION_LIMIT ((double)(100.0f * FLT_EPSILON))
 

@@ -12,12 +12,9 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
 #include "random.h"
 #include "su3fcts.h"
+#include <time.h>
 
 static su3 u[4] ALIGNED16;
 static su3_vector s[8] ALIGNED16;

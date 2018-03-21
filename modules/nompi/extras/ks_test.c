@@ -33,9 +33,6 @@
 
 #define KS_TEST_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "extras.h"
 
 void ks_test(int n, double f[], double *pkp, double *pkm)

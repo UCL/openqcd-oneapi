@@ -53,14 +53,9 @@
 
 #define UIDX_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
 #include "flags.h"
-#include "utils.h"
-#include "lattice.h"
 #include "global.h"
+#include "lattice.h"
 
 #define N0 (NPROC0 * L0)
 
@@ -187,6 +182,12 @@ uidx_t *uidx(void)
     set_idx();
 
   return idx;
+}
+
+void alloc_uidx(void)
+{
+  if (init == 0)
+    set_idx();
 }
 
 void plaq_uidx(int n, int ix, int *ip)

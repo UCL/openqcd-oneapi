@@ -13,13 +13,8 @@
 #ifndef DIRAC_H
 #define DIRAC_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
-
-#ifndef BLOCK_H
 #include "block.h"
-#endif
 
 /* DW_BND_C */
 extern void Dw_bnd(blk_grid_t grid, int n, int k, int l);

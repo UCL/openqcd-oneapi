@@ -13,9 +13,7 @@
 #ifndef SU3FCTS_H
 #define SU3FCTS_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
 
 typedef struct
 {
@@ -47,8 +45,8 @@ extern void ch2mat(complex_dble const *p, su3_alg_dble const *X, su3_dble *u);
 extern void chexp_drv0(su3_alg_dble const *X, ch_drv0_t *s);
 extern void chexp_drv1(su3_alg_dble const *X, ch_drv1_t *s);
 extern void chexp_drv2(su3_alg_dble const *X, ch_drv2_t *s);
-extern void expXsu3(double eps, su3_alg_dble *X, su3_dble *u);
-extern void expXsu3_w_factors(double eps, su3_alg_dble *X, su3_dble *u,
+extern void expXsu3(double eps, su3_alg_dble const *X, su3_dble *u);
+extern void expXsu3_w_factors(double eps, su3_alg_dble const *X, su3_dble *u,
                               ch_drv0_t *s_in);
 
 /* CM3X3_C */

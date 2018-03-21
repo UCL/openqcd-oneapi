@@ -76,13 +76,10 @@
 
 #define DFL_GEOMETRY_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "flags.h"
-#include "utils.h"
 #include "dfl.h"
+#include "flags.h"
 #include "global.h"
+#include "utils.h"
 
 static int isw, init = 0;
 static int nbl[4], nbb[4];

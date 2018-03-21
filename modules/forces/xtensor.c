@@ -83,21 +83,22 @@
  * The programs in this module may perform global operations and must be
  * called simultaneously on all MPI processes.
  *
+ * CONST_CORRECTNESS:
+ *   The methods here should have the spinor argument be constant, however this
+ *   is currently not possible due to the implementation of the Dw and Dw_dble
+ *   as well as the fact that these methods also directly manipulate the
+ *   boundary of these "constant input fields".
+ *
  *******************************************************************************/
 
 #define XTENSOR_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
-#include "utils.h"
-#include "lattice.h"
-#include "sw_term.h"
-#include "sflds.h"
-#include "linalg.h"
 #include "forces.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "sflds.h"
+#include "sw_term.h"
 
 #define _u3_alg_mul_add_assign(r, c, s)                                        \
   (r).c1 += (c) * (s).c1;                                                      \

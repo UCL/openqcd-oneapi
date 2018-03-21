@@ -15,19 +15,12 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
+#include "global.h"
+#include "lattice.h"
 #include "mpi.h"
-#include "su3.h"
 #include "random.h"
 #include "su3fcts.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
 #include "uflds.h"
-#include "global.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)

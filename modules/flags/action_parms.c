@@ -12,8 +12,9 @@
  *
  * The externally accessible functions are
  *
- *   action_parms_t set_action_parms(int iact,action_t action,int ipf,
- *                                   int im0,int *irat,int *imu,int *isp)
+ *   action_parms_t set_action_parms(int iact, action_t action, int ipf,
+ *                                   int im0, int const *irat, int const *imu,
+ *                                   int const *isp)
  *     Sets the parameters in the action parameter set number iact and returns
  *     a structure containing them (see the notes).
  *
@@ -111,14 +112,10 @@
 
 #define ACTION_PARMS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "mpi.h"
-#include "utils.h"
 #include "flags.h"
 #include "global.h"
+#include "mpi.h"
+#include <string.h>
 
 #define IACMAX 32
 
@@ -139,7 +136,8 @@ static void init_ap(void)
 }
 
 action_parms_t set_action_parms(int iact, action_t action, int ipf, int im0,
-                                int *irat, int *imu, int *isp, int smear)
+                                int const *irat, int const *imu, int const *isp,
+                                int smear)
 {
   int iprms[16], i, ie;
   int rat[3], mu[4], sp[4];
