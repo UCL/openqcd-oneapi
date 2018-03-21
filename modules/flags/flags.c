@@ -58,15 +58,9 @@
 
 #define FLAGS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include <limits.h>
-#include "mpi.h"
-#include "utils.h"
 #include "flags.h"
 #include "global.h"
+#include "mpi.h"
 
 #define NFLGS (10 + 4 * (int)(BLK_GRIDS))
 
@@ -233,8 +227,8 @@ static int check_bit_state(int bitmap, int state_bit)
 
 #include "flags/events.h"
 #include "flags/grid_events.h"
-#include "flags/queries.h"
 #include "flags/grid_queries.h"
+#include "flags/queries.h"
 
 static void set_arrays(void)
 {

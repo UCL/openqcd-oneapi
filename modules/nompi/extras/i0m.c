@@ -28,12 +28,8 @@
 
 #define I0M_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "utils.h"
 #include "extras.h"
+#include "utils.h"
 
 static double pi, xs;
 
@@ -62,7 +58,7 @@ double i0m(double x)
 {
   double a, b;
 
-  if (x == 0.0)
+  if (is_equal_d(x, 0.0))
     return 1.0;
 
   error(x < 0.0, 1, "i0m [i0.c]", "The argument x must be non-negative");
@@ -71,7 +67,7 @@ double i0m(double x)
   b = maxt(x);
   xs = x;
 
-  if (b == 0.0)
+  if (is_equal_d(b, 0.0))
     return (1.0 / sqrt(2.0 * pi * x)) * (1.0 + 1.0 / (8.0 * x));
 
   return cheby_int(a, b, f, 512, 10.0 * DBL_EPSILON) / pi;

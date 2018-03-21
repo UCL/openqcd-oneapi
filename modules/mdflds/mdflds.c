@@ -61,17 +61,13 @@
 
 #define MDFLDS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "sflds.h"
-#include "linalg.h"
 #include "mdflds.h"
+#include "field_com.h"
+#include "flags.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "sflds.h"
 
 static const su3_alg_dble md0 = {0.0};
 static mdflds_t *mdfs = NULL;
@@ -184,3 +180,7 @@ double momentum_action(int icom)
 {
   return 0.5 * norm_square_alg(4 * VOLUME, icom, (*mdfs).mom);
 }
+
+void copy_bnd_frc(void) { copy_boundary_su3_alg_field((*mdflds()).frc); }
+
+void add_bnd_frc(void) { add_boundary_su3_alg_field((*mdflds()).frc); }

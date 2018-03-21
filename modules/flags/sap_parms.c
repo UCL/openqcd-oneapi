@@ -12,7 +12,7 @@
  *
  * The externally accessible functions are
  *
- *   sap_parms_t set_sap_parms(int *bs,int isolv,int nmr,int ncy)
+ *   sap_parms_t set_sap_parms(int const *bs, int isolv, int nmr, int ncy)
  *     Sets the parameters of the SAP preconditioner. The parameters are
  *
  *       bs[4]         Sizes of the blocks in SAP_BLOCKS block grid.
@@ -55,18 +55,13 @@
 
 #define SAP_PARMS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "utils.h"
 #include "flags.h"
 #include "global.h"
+#include "mpi.h"
 
 static sap_parms_t sap = {{0, 0, 0, 0}, 0, 0, 0};
 
-static void check_block_size(int *bs)
+static void check_block_size(int const *bs)
 {
   int n0, n1, n2, n3;
 
@@ -96,7 +91,7 @@ static void check_block_size(int *bs)
              "The number of blocks in the local lattice must be even");
 }
 
-sap_parms_t set_sap_parms(int *bs, int isolv, int nmr, int ncy)
+sap_parms_t set_sap_parms(int const *bs, int isolv, int nmr, int ncy)
 {
   int iprms[7];
 

@@ -12,7 +12,7 @@
  *
  * The externally accessible functions are
  *
- *   int find_opt(int argc,char *argv[],char *opt)
+ *   int find_opt(int argc,char *argv[],char const *opt)
  *     On process 0, this program compares the string opt with the arguments
  *     argv[1],..,argv[argc-1] and returns the position of the first argument
  *     that matches the string. If there is no matching argument, or if the
@@ -23,20 +23,20 @@
  *     print format %.nf coincides with x up to a relative error at most a
  *     few times the machine precision DBL_EPSILON.
  *
- *   void check_dir(char* dir)
+ *   void check_dir(char const *dir)
  *     This program checks whether the directory dir is locally accessible,
  *     from each process, and aborts the main program with an informative
  *     error message if this is not the case. The program must be called
  *     simultaneously on all processes, but the argument may depend on the
  *     process.
  *
- *   void check_dir_root(char* dir)
+ *   void check_dir_root(char const *dir)
  *     On process 0, this program checks whether the directory dir is
  *     accessible and aborts the main program with an informative error
  *     message if this is not the case. When called on other processes,
  *     the program does nothing.
  *
- *   int name_size(char *format,...)
+ *   int name_size(char const *format, ...)
  *     On process 0, this program returns the length of the string that
  *     would be printed by calling sprintf(*,format,...). The format
  *     string can be any combination of literal text and the conversion
@@ -44,16 +44,21 @@
  *     called on other processes, the program does nothing and returns
  *     the value of NAME_SIZE.
  *
- *   long find_section(char *title)
+ *   long find_section(char const *title)
  *     On process 0, this program scans stdin for a line starting with
  *     the string "[title]" (after any number of blanks). It terminates
  *     with an error message if no such line is found or if there are
  *     several of them. The program returns the offset of the line from
  *     the beginning of the file and positions the file pointer to the
  *     next line. On processes other than 0, the program does nothing
- *     and returns -1L.
+ *     and returns No_Section_Found.
  *
- *   long read_line(char *tag,char *format,...)
+ *   long find_optional_section(char const *title)
+ *     Same behaviour as find_section, however it does not throw an error if no
+ *     section is found, rather, it returns No_Section_Found as the current
+ *     location.
+ *
+ *   long read_line(char const *tag, char const *format,...)
  *     On process 0, this program reads a line of text and data from stdin
  *     in a controlled manner, as described in the notes below. The tag can
  *     be the empty string "" and must otherwise be an alpha-numeric word
@@ -61,14 +66,15 @@
  *     for the tag in the current section. An error occurs if the tag is not
  *     found. The program returns the offset of the line from the beginning
  *     of the file and positions the file pointer to the next line. On
- *     processes other than 0, the program does nothing and returns -1L.
+ *     processes other than 0, the program does nothing and returns
+ *     No_Section_Found.
  *
- *   long read_optional_line(char *tag, char *format, ...)
+ *   long read_optional_line(char const *tag, char const *format, ...)
  *     Same behaviour as read_line(), however you may specify a second argument
  *     for every argument that gives an optional value which will be used if the
  *     tag cannot be found.
  *
- *   int count_tokens(char *tag)
+ *   int count_tokens(char const *tag)
  *     On process 0, this program finds and reads a line from stdin, exactly
  *     as read_line(tag,..) does, and returns the number of tokens found on
  *     that line after the tag. Tokens are separated by white space (blanks,
@@ -76,25 +82,37 @@
  *     ignored. On exit, the file pointer is positioned at the next line. If
  *     called on other processes, the program does nothing and returns 0.
  *
- *   void read_iprms(char *tag,int n,int *iprms)
+ *   long read_iprms(char const *tag, int n, int *iprms)
  *     On process 0, this program finds and reads a line from stdin, exactly
  *     as read_line(tag,..) does, reads n integer values from that line after
  *     the tag and assigns them to the elements of the array iprms. An error
  *     occurs if less than n values are found on the line. The values must be
- *     separated by white space (blanks, tabs or newline characters). On exit,
- *     the file pointer is positioned at the next line. When called on other
+ *     separated by white space (blanks, tabs or newline characters). The
+ *     program returns the offset of the line from the beginning of the file and
+ *     positions the file pointer to the next line. When called on other
  *     processes, the program does nothing.
  *
- *   void read_dprms(char *tag,int n,double *dprms)
+ *   long read_optional_iprms(char const *tag, int n, int *iprms)
+ *     Same behaviour as read_iprms, however it does not throw an error if no
+ *     section is found, rather, it returns No_Section_Found as the current
+ *     location.
+ *
+ *   long read_dprms(char const *tag, int n, double *dprms)
  *     On process 0, this program finds and reads a line from stdin, exactly
  *     as read_line(tag,..) does, reads n double values from that line after
  *     the tag and assigns them to the elements of the array dprms. An error
  *     occurs if less than n values are found on the line. The values must be
- *     separated by white space (blanks, tabs or newline characters). On exit,
- *     the file pointer is positioned at the next line. When called on other
+ *     separated by white space (blanks, tabs or newline characters). The
+ *     program returns the offset of the line from the beginning of the file and
+ *     positions the file pointer to the next line. When called on other
  *     processes, the program does nothing.
  *
- *   void copy_file(char *in,char *out)
+ *   long read_optional_dprms(char const *tag, int n, double *dprms)
+ *     Same behaviour as read_dprms, however it does not throw an error if no
+ *     section is found, rather, it returns No_Section_Found as the current
+ *     location.
+ *
+ *   void copy_file(char const *in, char const *out)
  *     Copies the file "in" to the file "out" in binary mode. An error occurs
  *     if the file copy is not successful.
  *
@@ -135,14 +153,12 @@
 
 #define MUTILS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include <math.h>
+#include "global.h"
 #include "mpi.h"
 #include "utils.h"
-#include "global.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
 
 long const No_Section_Found = -1L;
 
@@ -150,7 +166,7 @@ static char text[512];
 static char line[NAME_SIZE + 1];
 static char inum[3 * sizeof(int) + 4];
 
-int find_opt(int argc, char *argv[], char *opt)
+int find_opt(int argc, char *argv[], char const *opt)
 {
   int my_rank, k;
 
@@ -170,7 +186,7 @@ int fdigits(double x)
   int m, n, ne, k;
   double y, z;
 
-  if (x == 0.0)
+  if (is_equal_d(x, 0.0))
     return 0;
 
   y = fabs(x);
@@ -193,7 +209,7 @@ int fdigits(double x)
   return n;
 }
 
-void check_dir(char *dir)
+void check_dir(char const *dir)
 {
   int my_rank, nc, n;
   char *tmp_file;
@@ -226,7 +242,7 @@ void check_dir(char *dir)
   free(tmp_file);
 }
 
-void check_dir_root(char *dir)
+void check_dir_root(char const *dir)
 {
   int my_rank, nc, n;
   char *tmp_file;
@@ -259,11 +275,11 @@ void check_dir_root(char *dir)
   }
 }
 
-int name_size(char *format, ...)
+int name_size(char const *format, ...)
 {
   int my_rank, nlen, ie, n;
   double dmy;
-  char *pp, *pc;
+  char const *pp, *pc;
   va_list args;
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
@@ -321,10 +337,10 @@ int name_size(char *format, ...)
   return NAME_SIZE;
 }
 
-static int cmp_text(char *text1, char *text2)
+static int cmp_text(char const *text1, char const *text2)
 {
   size_t n1, n2;
-  char *p1, *p2;
+  char const *p1, *p2;
 
   p1 = text1;
   p2 = text2;
@@ -365,7 +381,7 @@ static char *get_line(void)
   return s;
 }
 
-static long find_section_impl(char *title, int optional)
+static long find_section_impl(char const *title, int optional)
 {
   int my_rank, ie;
   long ofs, sofs;
@@ -375,7 +391,7 @@ static long find_section_impl(char *title, int optional)
 
   if (my_rank == 0) {
     rewind(stdin);
-    sofs = -1L;
+    sofs = No_Section_Found;
     ofs = ftell(stdin);
     s = get_line();
 
@@ -398,10 +414,10 @@ static long find_section_impl(char *title, int optional)
       s = get_line();
     }
 
-    error_root(!optional && (sofs == -1L), 1, "find_section [mutils.c]",
-               "Section [%s] not found", title);
+    error_root(!optional && (sofs == No_Section_Found), 1,
+               "find_section [mutils.c]", "Section [%s] not found", title);
 
-    if (sofs != -1L) {
+    if (sofs != No_Section_Found) {
       ie = fseek(stdin, sofs, SEEK_SET);
       error_root(ie != 0, 1, "find_section [mutils.c]",
                  "Unable to go to section [%s]", title);
@@ -412,15 +428,18 @@ static long find_section_impl(char *title, int optional)
 
     return sofs;
   } else {
-    return -1L;
+    return No_Section_Found;
   }
 }
 
-long find_section(char *title) { return find_section_impl(title, 0); }
+long find_section(char const *title) { return find_section_impl(title, 0); }
 
-long find_optional_section(char *title) { return find_section_impl(title, 1); }
+long find_optional_section(char const *title)
+{
+  return find_section_impl(title, 1);
+}
 
-static void check_tag(char *tag)
+static void check_tag(char const *tag)
 {
   if (tag[0] == '\0')
     return;
@@ -430,14 +449,14 @@ static void check_tag(char *tag)
              1, "check_tag [mutils.c]", "Improper tag %s", tag);
 }
 
-static long find_tag_impl(char *tag, int optional)
+static long find_tag_impl(char const *tag, int optional)
 {
   int ie;
   long tofs, lofs, ofs;
   char *s, *pl, *pr;
 
   ie = 0;
-  tofs = -1L;
+  tofs = No_Section_Found;
   lofs = ftell(stdin);
   rewind(stdin);
   ofs = ftell(stdin);
@@ -450,7 +469,7 @@ static long find_tag_impl(char *tag, int optional)
     if ((pl == (line + strspn(line, " \t"))) && (pr > pl)) {
       if (ofs < lofs) {
         ie = 0;
-        tofs = -1L;
+        tofs = No_Section_Found;
       } else {
         break;
       }
@@ -460,7 +479,7 @@ static long find_tag_impl(char *tag, int optional)
       pr[0] = '\0';
 
       if (strcmp(pl, tag) == 0) {
-        if (tofs != -1L)
+        if (tofs != No_Section_Found)
           ie = 1;
         tofs = ofs;
       }
@@ -470,13 +489,13 @@ static long find_tag_impl(char *tag, int optional)
     s = get_line();
   }
 
-  error_root(!optional && (tofs == -1L), 1, "find_tag [mutils.c]",
+  error_root(!optional && (tofs == No_Section_Found), 1, "find_tag [mutils.c]",
              "Tag %s not found", tag);
 
   error_root(ie != 0, 1, "find_tag [mutils.c]",
              "Tag %s occurs more than once in the current section", tag);
 
-  if (tofs != -1L) {
+  if (tofs != No_Section_Found) {
     ie = fseek(stdin, tofs, SEEK_SET);
     error_root(ie != 0, 1, "find_tag [mutils.c]",
                "Unable to go to line with tag %s", tag);
@@ -487,13 +506,15 @@ static long find_tag_impl(char *tag, int optional)
   return tofs;
 }
 
-static long find_tag(char *tag) { return find_tag_impl(tag, 0); }
+static long find_tag(char const *tag) { return find_tag_impl(tag, 0); }
 
-static long read_line_impl(int optional, char *tag, char *format, va_list args)
+static long read_line_impl(int optional, char const *tag, char const *format,
+                           va_list args)
 {
   int is, ic, use_optional;
   long tofs;
-  char *pl, *p, *str_src;
+  char const *pl, *p;
+  char *str_src;
 
   check_tag(tag);
 
@@ -502,7 +523,7 @@ static long read_line_impl(int optional, char *tag, char *format, va_list args)
   if (tag[0] != '\0') {
     tofs = find_tag_impl(tag, optional);
 
-    if (tofs == -1L) {
+    if (tofs == No_Section_Found) {
       use_optional = 1;
       pl = NULL;
     } else {
@@ -568,7 +589,7 @@ static long read_line_impl(int optional, char *tag, char *format, va_list args)
   return tofs;
 }
 
-long read_line(char *tag, char *format, ...)
+long read_line(char const *tag, char const *format, ...)
 {
   int my_rank;
   long tofs;
@@ -583,10 +604,10 @@ long read_line(char *tag, char *format, ...)
 
     return tofs;
   } else
-    return -1L;
+    return No_Section_Found;
 }
 
-long read_optional_line(char *tag, char *format, ...)
+long read_optional_line(char const *tag, char const *format, ...)
 {
   int my_rank;
   long tofs;
@@ -601,10 +622,10 @@ long read_optional_line(char *tag, char *format, ...)
 
     return tofs;
   } else
-    return -1L;
+    return No_Section_Found;
 }
 
-int count_tokens(char *tag)
+int count_tokens(char const *tag)
 {
   int my_rank, n;
   char *s;
@@ -636,18 +657,24 @@ int count_tokens(char *tag)
     return 0;
 }
 
-void read_iprms(char *tag, int n, int *iprms)
+static long read_iprms_impl(char const *tag, int n, int *iprms, int optional)
 {
   int my_rank, nc, ic, i;
+  long loc;
   char *s;
 
+  loc = No_Section_Found;
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
   if (my_rank == 0) {
     check_tag(tag);
 
     if (tag[0] != '\0') {
-      find_tag(tag);
+      loc = find_tag_impl(tag, optional);
+
+      if (loc == No_Section_Found)
+        return loc;
+
       s = get_line();
       s += strspn(s, " \t");
       s += strcspn(s, " \t\n");
@@ -671,21 +698,39 @@ void read_iprms(char *tag, int n, int *iprms)
 
     error_root(nc != n, 1, "read_iprms [mutils.c]", "Incorrect read count");
   }
+
+  return loc;
 }
 
-void read_dprms(char *tag, int n, double *dprms)
+long read_iprms(char const *tag, int n, int *iprms)
+{
+  return read_iprms_impl(tag, n, iprms, 0);
+}
+
+long read_optional_iprms(char const *tag, int n, int *iprms)
+{
+  return read_iprms_impl(tag, n, iprms, 1);
+}
+
+static long read_dprms_impl(char const *tag, int n, double *dprms, int optional)
 {
   int my_rank, nc, ic;
+  long loc;
   double d;
   char *s;
 
+  loc = No_Section_Found;
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
   if (my_rank == 0) {
     check_tag(tag);
 
     if (tag[0] != '\0') {
-      find_tag(tag);
+      loc = find_tag_impl(tag, optional);
+
+      if (loc == No_Section_Found)
+        return loc;
+
       s = get_line();
       s += strspn(s, " \t");
       s += strcspn(s, " \t\n");
@@ -709,9 +754,21 @@ void read_dprms(char *tag, int n, double *dprms)
 
     error_root(nc != n, 1, "read_dprms [mutils.c]", "Incorrect read count");
   }
+
+  return loc;
 }
 
-void copy_file(char *in, char *out)
+long read_dprms(char const *tag, int n, double *dprms)
+{
+  return read_dprms_impl(tag, n, dprms, 0);
+}
+
+long read_optional_dprms(char const *tag, int n, double *dprms)
+{
+  return read_dprms_impl(tag, n, dprms, 1);
+}
+
+void copy_file(char const *in, char const *out)
 {
   int c;
   FILE *fin, *fout;

@@ -12,13 +12,9 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "random.h"
-#include "utils.h"
-#include "su3fcts.h"
 #include "extras.h"
+#include "random.h"
+#include "su3fcts.h"
 
 static void dev(su3 *u, double *d1, double *d2)
 {

@@ -22,18 +22,18 @@
 *   void clear_counters(void)
 *     Sets all counters to zero.
 *
-*   void add2counter(char *type,int idx,int *status)
+*   void add2counter(char const *type, int idx, int const *status)
 *     Adds the status numbers "status" to the counter characterized by
 *     "type" and index "idx" (see the notes).
 *
-*   int get_count(char *type,int idx,int *status)
+*   int get_count(char const *type, int idx, int *status)
 *     Returns the number of times add2counter(type,idx,status) has been
 *     called since the counter was last cleared. On exit the program
 *     assigns the sum of the accumulated status values to the argument
 *     status [the meaning of the arguments is otherwise the same is in
 *     the case of add2counter()].
 *
-*   void print_avgstat(char *type,int idx)
+*   void print_avgstat(char const *type, int idx)
 *     Prints the average status values of the counter specified by "type"
 *     and "idx" [as in add2counter()] to stdout on MPI process 0.
 *
@@ -72,15 +72,10 @@
 
 #define COUNTERS_C
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include "mpi.h"
-#include "utils.h"
-#include "flags.h"
-#include "update.h"
 #include "global.h"
+#include "mpi.h"
+#include "update.h"
+#include <string.h>
 
 typedef struct
 {
@@ -348,7 +343,7 @@ void clear_counters(void)
   set_cnt2zero(nmd, mds);
 }
 
-void add2counter(char *type, int idx, int *status)
+void add2counter(char const *type, int idx, int const *status)
 {
   int i, nc, ns, *stat;
   counter_t *cnt;
@@ -381,7 +376,7 @@ void add2counter(char *type, int idx, int *status)
     error_loc(1, 1, "add2counter [counters.c]", "Counter index out of range");
 }
 
-int get_count(char *type, int idx, int *status)
+int get_count(char const *type, int idx, int *status)
 {
   int i, nc, n, ns, *stat;
   counter_t *cnt;
@@ -418,7 +413,7 @@ int get_count(char *type, int idx, int *status)
   return 0;
 }
 
-void print_avgstat(char *type, int idx)
+void print_avgstat(char const *type, int idx)
 {
   int my_rank;
   int i, n, ns, *stat;

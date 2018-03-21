@@ -145,14 +145,10 @@
 
 #define WSPACE_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
 #include "flags.h"
-#include "utils.h"
 #include "global.h"
+#include "mpi.h"
+#include "utils.h"
 
 static int nudt = 0, iwud = 0, nwudt = 0, *nwud;
 static su3_dble **wud0, **wud, ud0 = {{0.0}};

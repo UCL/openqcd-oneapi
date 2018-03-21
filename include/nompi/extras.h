@@ -13,6 +13,11 @@
 #ifndef EXTRAS_H
 #define EXTRAS_H
 
+#include <float.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 /* CHEBYSHEV_C */
 extern int cheby_fit(double a, double b, double (*f)(double x), int dmax,
                      double eps, double c[]);

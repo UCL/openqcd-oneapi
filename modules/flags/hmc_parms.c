@@ -12,8 +12,8 @@
  *
  * The externally accessible functions are
  *
- *   hmc_parms_t set_hmc_parms(int nact,int *iact,int npf,int nmu,
- *                             double *mu,int nlv,double tau)
+ *   hmc_parms_t set_hmc_parms(int nact, int const *iact, int npf, int nmu,
+ *                             double const *mu, int nlv, double tau)
  *     Sets some basic parameters of the HMC algorithm. The parameters are
  *
  *       nact        Number of terms in the total action
@@ -62,19 +62,14 @@
 
 #define HMC_PARMS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "utils.h"
 #include "flags.h"
 #include "global.h"
+#include "mpi.h"
 
 static hmc_parms_t hmc = {0, 0, 0, 0, NULL, 0.0, NULL};
 
-hmc_parms_t set_hmc_parms(int nact, int *iact, int npf, int nmu, double *mu,
-                          int nlv, double tau)
+hmc_parms_t set_hmc_parms(int nact, int const *iact, int npf, int nmu,
+                          double const *mu, int nlv, double tau)
 {
   int iprms[4], i, ie;
   double dprms[1];

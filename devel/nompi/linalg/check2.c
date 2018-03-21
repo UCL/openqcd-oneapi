@@ -12,13 +12,8 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
-#include "random.h"
-#include "utils.h"
 #include "linalg.h"
+#include "random.h"
 
 #define NMAX 32
 

@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  *
  * File Dw_bnd.c
@@ -43,16 +44,683 @@
 
 #define DW_BND_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "block.h"
 #include "dirac.h"
+#include "flags.h"
 #include "global.h"
+#include "utils.h"
+
+#if (defined AVX)
+#include "avx.h"
+
+#define _load_cst(c)                                                           \
+  __asm__ __volatile__("vbroadcastss %0, %%ymm15 \n\t" : : "m"(c) : "xmm15")
+
+#define _mul_cst()                                                             \
+  __asm__ __volatile__("vmulps %%ymm15, %%ymm0, %%ymm0 \n\t"                   \
+                       "vmulps %%ymm15, %%ymm1, %%ymm1 \n\t"                   \
+                       "vmulps %%ymm15, %%ymm2, %%ymm2"                        \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2")
+
+#define _load_zero()                                                           \
+  __asm__ __volatile__("vxorps %%ymm0, %%ymm0, %%ymm0 \n\t"                    \
+                       "vxorps %%ymm1, %%ymm1, %%ymm1 \n\t"                    \
+                       "vxorps %%ymm2, %%ymm2, %%ymm2"                         \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2")
+
+#define _set_s2zero(s)                                                         \
+  __asm__ __volatile__("vmovaps %%ymm0, %0"                                    \
+                       : "=m"((*s).c1.c1), "=m"((*s).c1.c2), "=m"((*s).c1.c3), \
+                         "=m"((*s).c2.c1));                                    \
+  __asm__ __volatile__("vmovaps %%ymm1, %0"                                    \
+                       : "=m"((*s).c2.c2), "=m"((*s).c2.c3), "=m"((*s).c3.c1), \
+                         "=m"((*s).c3.c2));                                    \
+  __asm__ __volatile__("vmovaps %%ymm2, %0"                                    \
+                       : "=m"((*s).c3.c3), "=m"((*s).c4.c1), "=m"((*s).c4.c2), \
+                         "=m"((*s).c4.c3))
+
+#define _set_w2zero(w)                                                         \
+  __asm__ __volatile__("vmovaps %%ymm0, %0"                                    \
+                       : "=m"((w[0]).c1.c1), "=m"((w[0]).c1.c2),               \
+                         "=m"((w[0]).c1.c3), "=m"((w[0]).c2.c1));              \
+  __asm__ __volatile__("vmovaps %%ymm1, %0"                                    \
+                       : "=m"((w[0]).c2.c2), "=m"((w[0]).c2.c3),               \
+                         "=m"((w[1]).c1.c1), "=m"((w[1]).c1.c2));              \
+  __asm__ __volatile__("vmovaps %%ymm2, %0"                                    \
+                       : "=m"((w[1]).c1.c3), "=m"((w[1]).c2.c1),               \
+                         "=m"((w[1]).c2.c2), "=m"((w[1]).c2.c3))
+
+#define _weyl_pair_store(rl, rh)                                               \
+  __asm__ __volatile__("vshufps $0x44, %%ymm4, %%ymm3, %%ymm6 \n\t"            \
+                       "vshufps $0xe4, %%ymm3, %%ymm5, %%ymm7 \n\t"            \
+                       "vshufps $0xee, %%ymm5, %%ymm4, %%ymm8"                 \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm6", "xmm7", "xmm8");                              \
+  __asm__ __volatile__("vmovaps %%xmm6, %0 \n\t"                               \
+                       "vmovaps %%xmm7, %2 \n\t"                               \
+                       "vmovaps %%xmm8, %4"                                    \
+                       : "=m"((rl).c1.c1), "=m"((rl).c1.c2), "=m"((rl).c1.c3), \
+                         "=m"((rl).c2.c1), "=m"((rl).c2.c2),                   \
+                         "=m"((rl).c2.c3));                                    \
+  __asm__ __volatile__("vextractf128 $0x1, %%ymm6, %0 \n\t"                    \
+                       "vextractf128 $0x1, %%ymm7, %2 \n\t"                    \
+                       "vextractf128 $0x1, %%ymm8, %4"                         \
+                       : "=m"((rh).c1.c1), "=m"((rh).c1.c2), "=m"((rh).c1.c3), \
+                         "=m"((rh).c2.c1), "=m"((rh).c2.c2), "=m"((rh).c2.c3))
+
+static void mul_umat(su3 *u) { _avx_su3_pair_multiply(u[0], u[1]); }
+
+static void mul_uinv(su3 *u) { _avx_su3_pair_inverse_multiply(u[0], u[1]); }
+
+void Dw_bnd(blk_grid_t grid, int n, int k, int l)
+{
+  int bc, nb, isw, *ipp;
+  float moh;
+  su3 *u;
+  weyl *w, *wm;
+  spinor *s, *sl, *sh;
+  block_t *b;
+  bndry_t *bb;
+  ani_params_t ani;
+  float ut_fermion, one_over_gammaf;
+
+  ani = ani_parms();
+  one_over_gammaf = (float)(ani.nu / ani.xi);
+  ut_fermion = (float)(1.0 / ani.ut_fermion);
+
+  b = blk_list(grid, &nb, &isw);
+
+  if ((n < 0) || (n >= nb)) {
+    error_loc(1, 1, "Dw_bnd [Dw_bnd.c]",
+              "Block grid is not allocated or block number out of range");
+    return;
+  }
+
+  b += n;
+  bb = (*b).bb;
+
+  if ((k < 0) || (k >= (*b).ns) || ((*b).u == NULL) || (bb == NULL) ||
+      (l >= (*bb).nw)) {
+    error_loc(1, 1, "Dw_bnd [Dw_bnd.c]",
+              "Attempt to access unallocated memory space");
+    return;
+  }
+
+  bc = bc_type();
+  s = (*b).s[k];
+
+  /********************************* face -0 **********************************/
+
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+
+  moh = -0.5f * ut_fermion;
+  _load_cst(moh);
+
+  if ((cpr[0] == 0) && ((*b).bo[0] == 0) && (bc != 3)) {
+    _load_zero();
+
+    for (; w < wm; w += 2) {
+      sl = s + ipp[0];
+      sh = s + ipp[1];
+      ipp += 2;
+      _set_s2zero(sl);
+      _set_s2zero(sh);
+      _set_w2zero(w);
+    }
+  } else {
+    u = (*bb).u;
+
+    for (; w < wm; w += 2) {
+      sl = s + ipp[0];
+      sh = s + ipp[1];
+      ipp += 2;
+      _avx_spinor_pair_load34(*sl, *sh);
+
+      _avx_spinor_add();
+      _mul_cst();
+      mul_umat(u);
+      _weyl_pair_store(w[0], w[1]);
+
+      u += 2;
+    }
+  }
+
+  /********************************* face +0 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+
+  if ((cpr[0] == (NPROC0 - 1)) && (((*b).bo[0] + (*b).bs[0]) == L0) &&
+      (bc != 3)) {
+    _load_zero();
+
+    if (bc == 0) {
+      for (; w < wm; w += 2) {
+        sl = s + ipp[0];
+        sh = s + ipp[1];
+        ipp += 2;
+        _set_s2zero(sl);
+        _set_s2zero(sh);
+        _set_w2zero(w);
+      }
+    } else {
+      for (; w < wm; w += 2) {
+        _set_w2zero(w);
+      }
+    }
+  } else {
+    u = (*bb).u;
+
+    for (; w < wm; w += 2) {
+      sl = s + ipp[0];
+      sh = s + ipp[1];
+      ipp += 2;
+      _avx_spinor_pair_load34(*sl, *sh);
+
+      _avx_spinor_sub();
+      _mul_cst();
+      mul_uinv(u);
+      _weyl_pair_store(w[0], w[1]);
+
+      u += 2;
+    }
+  }
+
+  /********************************* face -1 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+  u = (*bb).u;
+
+  moh = -0.5f * ut_fermion * one_over_gammaf;
+  _load_cst(moh);
+
+  for (; w < wm; w += 2) {
+    sl = s + ipp[0];
+    sh = s + ipp[1];
+    ipp += 2;
+    _avx_spinor_pair_load43(*sl, *sh);
+
+    _avx_spinor_i_add();
+    _mul_cst();
+    mul_umat(u);
+    _weyl_pair_store(w[0], w[1]);
+
+    u += 2;
+  }
+
+  /********************************* face +1 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+  u = (*bb).u;
+
+  for (; w < wm; w += 2) {
+    sl = s + ipp[0];
+    sh = s + ipp[1];
+    ipp += 2;
+    _avx_spinor_pair_load43(*sl, *sh);
+
+    _avx_spinor_i_sub();
+    _mul_cst();
+    mul_uinv(u);
+    _weyl_pair_store(w[0], w[1]);
+
+    u += 2;
+  }
+
+  /********************************* face -2 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+  u = (*bb).u;
+
+  for (; w < wm; w += 2) {
+    sl = s + ipp[0];
+    sh = s + ipp[1];
+    ipp += 2;
+    _avx_spinor_pair_load43(*sl, *sh);
+
+    _avx_spinor_addsub();
+    _mul_cst();
+    mul_umat(u);
+    _weyl_pair_store(w[0], w[1]);
+
+    u += 2;
+  }
+
+  /********************************* face +2 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+  u = (*bb).u;
+
+  for (; w < wm; w += 2) {
+    sl = s + ipp[0];
+    sh = s + ipp[1];
+    ipp += 2;
+    _avx_spinor_pair_load43(*sl, *sh);
+
+    _avx_spinor_subadd();
+    _mul_cst();
+    mul_uinv(u);
+    _weyl_pair_store(w[0], w[1]);
+
+    u += 2;
+  }
+
+  /********************************* face -3 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+  u = (*bb).u;
+
+  for (; w < wm; w += 2) {
+    sl = s + ipp[0];
+    sh = s + ipp[1];
+    ipp += 2;
+    _avx_spinor_pair_load34(*sl, *sh);
+
+    _avx_spinor_i_addsub();
+    _mul_cst();
+    mul_umat(u);
+    _weyl_pair_store(w[0], w[1]);
+
+    u += 2;
+  }
+
+  /********************************* face +3 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+  u = (*bb).u;
+
+  for (; w < wm; w += 2) {
+    sl = s + ipp[0];
+    sh = s + ipp[1];
+    ipp += 2;
+    _avx_spinor_pair_load34(*sl, *sh);
+
+    _avx_spinor_i_subadd();
+    _mul_cst();
+    mul_uinv(u);
+    _weyl_pair_store(w[0], w[1]);
+
+    u += 2;
+  }
+
+  _avx_zeroupper();
+}
+
+#elif (defined x64)
+#include "sse2.h"
+
+#define _load_cst(c)                                                           \
+  __asm__ __volatile__("movss %0, %%xmm15 \n\t"                                \
+                       "shufps $0x0, %%xmm15, %%xmm15"                         \
+                       :                                                       \
+                       : "m"(c)                                                \
+                       : "xmm15")
+
+#define _mul_cst()                                                             \
+  __asm__ __volatile__("mulps %%xmm15, %%xmm0 \n\t"                            \
+                       "mulps %%xmm15, %%xmm1 \n\t"                            \
+                       "mulps %%xmm15, %%xmm2"                                 \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2")
+
+#define _load_zero()                                                           \
+  __asm__ __volatile__("xorps %%xmm0, %%xmm0 \n\t"                             \
+                       "xorps %%xmm1, %%xmm1 \n\t"                             \
+                       "xorps %%xmm2, %%xmm2 \n\t"                             \
+                       "xorps %%xmm3, %%xmm3 \n\t"                             \
+                       "xorps %%xmm4, %%xmm4 \n\t"                             \
+                       "xorps %%xmm5, %%xmm5"                                  \
+                       :                                                       \
+                       :                                                       \
+                       : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5")
+
+#define _set_s2zero(s)                                                         \
+  __asm__ __volatile__("movaps %%xmm0, %0 \n\t"                                \
+                       "movaps %%xmm1, %2 \n\t"                                \
+                       "movaps %%xmm2, %4"                                     \
+                       : "=m"((s).c1.c1), "=m"((s).c1.c2), "=m"((s).c1.c3),    \
+                         "=m"((s).c2.c1), "=m"((s).c2.c2), "=m"((s).c2.c3));   \
+  __asm__ __volatile__("movaps %%xmm3, %0 \n\t"                                \
+                       "movaps %%xmm4, %2 \n\t"                                \
+                       "movaps %%xmm5, %4"                                     \
+                       : "=m"((s).c3.c1), "=m"((s).c3.c2), "=m"((s).c3.c3),    \
+                         "=m"((s).c4.c1), "=m"((s).c4.c2), "=m"((s).c4.c3))
+
+#define _set_w2zero(w)                                                         \
+  __asm__ __volatile__("movaps %%xmm0, %0 \n\t"                                \
+                       "movaps %%xmm1, %2 \n\t"                                \
+                       "movaps %%xmm2, %4"                                     \
+                       : "=m"((w).c1.c1), "=m"((w).c1.c2), "=m"((w).c1.c3),    \
+                         "=m"((w).c2.c1), "=m"((w).c2.c2), "=m"((w).c2.c3))
+
+static void mul_umat(su3 *u) { _sse_su3_multiply(*u); }
+
+static void mul_uinv(su3 *u) { _sse_su3_inverse_multiply(*u); }
+
+void Dw_bnd(blk_grid_t grid, int n, int k, int l)
+{
+  int bc, nb, isw, *ipp;
+  float moh;
+  su3 *u;
+  weyl *w, *wm;
+  spinor *s, *sn;
+  block_t *b;
+  bndry_t *bb;
+  ani_params_t ani;
+  float ut_fermion, one_over_gammaf;
+
+  ani = ani_parms();
+  one_over_gammaf = (float)(ani.nu / ani.xi);
+  ut_fermion = (float)(1.0 / ani.ut_fermion);
+
+  b = blk_list(grid, &nb, &isw);
+
+  if ((n < 0) || (n >= nb)) {
+    error_loc(1, 1, "Dw_bnd [Dw_bnd.c]",
+              "Block grid is not allocated or block number out of range");
+    return;
+  }
+
+  b += n;
+  bb = (*b).bb;
+
+  if ((k < 0) || (k >= (*b).ns) || ((*b).u == NULL) || (bb == NULL) ||
+      (l >= (*bb).nw)) {
+    error_loc(1, 1, "Dw_bnd [Dw_bnd.c]",
+              "Attempt to access unallocated memory space");
+    return;
+  }
+
+  bc = bc_type();
+  s = (*b).s[k];
+
+  /********************************* face -0 **********************************/
+
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+
+  moh = -0.5f * ut_fermion;
+  _load_cst(moh);
+
+  if ((cpr[0] == 0) && ((*b).bo[0] == 0) && (bc != 3)) {
+    _load_zero();
+
+    for (; w < wm; w++) {
+      sn = s + (*(ipp++));
+      _set_s2zero(*sn);
+      _set_w2zero(*w);
+    }
+  } else {
+    u = (*bb).u;
+    sn = s + (*(ipp++));
+
+    for (; w < wm; w++) {
+      _sse_pair_load((*sn).c1, (*sn).c2);
+      _sse_pair_load_up((*sn).c3, (*sn).c4);
+
+      sn = s + (*(ipp++));
+      _prefetch_spinor(sn);
+
+      _sse_vector_add();
+      _mul_cst();
+
+      u += 3;
+      _prefetch_su3(u);
+      u -= 3;
+      mul_umat(u);
+
+      _sse_pair_store_up((*w).c1, (*w).c2);
+      u += 1;
+    }
+  }
+
+  /********************************* face +0 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+
+  if ((cpr[0] == (NPROC0 - 1)) && (((*b).bo[0] + (*b).bs[0]) == L0) &&
+      (bc != 3)) {
+    _load_zero();
+
+    if (bc == 0) {
+      for (; w < wm; w++) {
+        sn = s + (*(ipp++));
+        _set_s2zero(*sn);
+        _set_w2zero(*w);
+      }
+    } else {
+      for (; w < wm; w++) {
+        _set_w2zero(*w);
+      }
+    }
+  } else {
+    u = (*bb).u;
+    sn = s + (*(ipp++));
+
+    for (; w < wm; w++) {
+      _sse_pair_load((*sn).c1, (*sn).c2);
+      _sse_pair_load_up((*sn).c3, (*sn).c4);
+
+      sn = s + (*(ipp++));
+      _prefetch_spinor(sn);
+
+      _sse_vector_sub();
+      _mul_cst();
+
+      u += 3;
+      _prefetch_su3(u);
+      u -= 3;
+      mul_uinv(u);
+
+      _sse_pair_store_up((*w).c1, (*w).c2);
+      u += 1;
+    }
+  }
+
+  /********************************* face -1 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+  u = (*bb).u;
+  sn = s + (*(ipp++));
+
+  moh = -0.5f * one_over_gammaf * ut_fermion;
+  _load_cst(moh);
+
+  for (; w < wm; w++) {
+    _sse_pair_load((*sn).c1, (*sn).c2);
+    _sse_pair_load_up((*sn).c4, (*sn).c3);
+
+    sn = s + (*(ipp++));
+    _prefetch_spinor(sn);
+
+    _sse_vector_i_add();
+    _mul_cst();
+
+    u += 3;
+    _prefetch_su3(u);
+    u -= 3;
+    mul_umat(u);
+
+    _sse_pair_store_up((*w).c1, (*w).c2);
+    u += 1;
+  }
+
+  /********************************* face +1 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+  u = (*bb).u;
+  sn = s + (*(ipp++));
+
+  for (; w < wm; w++) {
+    _sse_pair_load((*sn).c1, (*sn).c2);
+    _sse_pair_load_up((*sn).c4, (*sn).c3);
+
+    sn = s + (*(ipp++));
+    _prefetch_spinor(sn);
+
+    _sse_vector_i_sub();
+    _mul_cst();
+
+    u += 3;
+    _prefetch_su3(u);
+    u -= 3;
+    mul_uinv(u);
+
+    _sse_pair_store_up((*w).c1, (*w).c2);
+    u += 1;
+  }
+
+  /********************************* face -2 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+  u = (*bb).u;
+  sn = s + (*(ipp++));
+
+  for (; w < wm; w++) {
+    _sse_pair_load((*sn).c1, (*sn).c2);
+    _sse_pair_load_up((*sn).c4, (*sn).c3);
+
+    sn = s + (*(ipp++));
+    _prefetch_spinor(sn);
+
+    _sse_vector_addsub();
+    _mul_cst();
+
+    u += 3;
+    _prefetch_su3(u);
+    u -= 3;
+    mul_umat(u);
+
+    _sse_pair_store_up((*w).c1, (*w).c2);
+    u += 1;
+  }
+
+  /********************************* face +2 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+  u = (*bb).u;
+  sn = s + (*(ipp++));
+
+  for (; w < wm; w++) {
+    _sse_pair_load((*sn).c1, (*sn).c2);
+    _sse_pair_load_up((*sn).c4, (*sn).c3);
+
+    sn = s + (*(ipp++));
+    _prefetch_spinor(sn);
+
+    _sse_vector_subadd();
+    _mul_cst();
+
+    u += 3;
+    _prefetch_su3(u);
+    u -= 3;
+    mul_uinv(u);
+
+    _sse_pair_store_up((*w).c1, (*w).c2);
+    u += 1;
+  }
+
+  /********************************* face -3 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+  u = (*bb).u;
+  sn = s + (*(ipp++));
+
+  for (; w < wm; w++) {
+    _sse_pair_load((*sn).c1, (*sn).c2);
+    _sse_pair_load_up((*sn).c3, (*sn).c4);
+
+    sn = s + (*(ipp++));
+    _prefetch_spinor(sn);
+
+    _sse_vector_i_addsub();
+    _mul_cst();
+
+    u += 3;
+    _prefetch_su3(u);
+    u -= 3;
+    mul_umat(u);
+
+    _sse_pair_store_up((*w).c1, (*w).c2);
+    u += 1;
+  }
+
+  /********************************* face +3 **********************************/
+
+  bb += 1;
+  ipp = (*bb).ipp;
+  w = (*bb).w[l];
+  wm = w + (*bb).vol;
+  u = (*bb).u;
+  sn = s + (*(ipp++));
+
+  for (; w < wm; w++) {
+    _sse_pair_load((*sn).c1, (*sn).c2);
+    _sse_pair_load_up((*sn).c3, (*sn).c4);
+
+    sn = s + (*(ipp++));
+    _prefetch_spinor(sn);
+
+    _sse_vector_i_subadd();
+    _mul_cst();
+
+    u += 3;
+    _prefetch_su3(u);
+    u -= 3;
+    mul_uinv(u);
+
+    _sse_pair_store_up((*w).c1, (*w).c2);
+    u += 1;
+  }
+}
+
+#else
 
 static weyl chi;
 static const weyl w0 = {{{0.0f}}};
@@ -111,8 +779,7 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
 
   s = (*b).s[k];
 
-  /********************************** face -0
-   * ***********************************/
+  /********************************* face -0 **********************************/
 
   ipp = (*bb).ipp;
   w = (*bb).w[l];
@@ -140,8 +807,7 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
     }
   }
 
-  /********************************** face +0
-   * ***********************************/
+  /********************************* face +0 **********************************/
 
   bb += 1;
   ipp = (*bb).ipp;
@@ -176,8 +842,7 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
     }
   }
 
-  /********************************** face -1
-   * ***********************************/
+  /********************************* face -1 **********************************/
 
   bb += 1;
   ipp = (*bb).ipp;
@@ -200,8 +865,7 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
     u += 1;
   }
 
-  /********************************** face +1
-   * ***********************************/
+  /********************************* face +1 **********************************/
 
   bb += 1;
   ipp = (*bb).ipp;
@@ -224,8 +888,7 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
     u += 1;
   }
 
-  /********************************** face -2
-   * ***********************************/
+  /********************************* face -2 **********************************/
 
   bb += 1;
   ipp = (*bb).ipp;
@@ -248,8 +911,7 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
     u += 1;
   }
 
-  /********************************** face +2
-   * ***********************************/
+  /********************************* face +2 **********************************/
 
   bb += 1;
   ipp = (*bb).ipp;
@@ -272,8 +934,7 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
     u += 1;
   }
 
-  /********************************** face -3
-   * ***********************************/
+  /********************************* face -3 **********************************/
 
   bb += 1;
   ipp = (*bb).ipp;
@@ -296,8 +957,7 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
     u += 1;
   }
 
-  /********************************** face +3
-   * ***********************************/
+  /********************************* face +3 **********************************/
 
   bb += 1;
   ipp = (*bb).ipp;
@@ -320,3 +980,5 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
     u += 1;
   }
 }
+
+#endif

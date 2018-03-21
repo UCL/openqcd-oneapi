@@ -25,7 +25,7 @@
  *     process 0. The state of the generators is retrieved from all processes
  *     and written to the file in the order specified in the notes.
  *
- *   int import_ranlux(char *in)
+ *   int import_ranlux(char const *in)
  *     Reads the state of the random number generators ranlxs and ranlxd from
  *     the file "in". The file is read from process 0 only and the data on
  *     the file are expected in the form written by export_ranlux(). An error
@@ -63,14 +63,10 @@
 
 #define RANLUX_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <limits.h>
-#include "mpi.h"
-#include "utils.h"
-#include "lattice.h"
-#include "random.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "random.h"
 
 static int *rlxs_state = NULL, *rlxd_state;
 static stdint_t *state;
@@ -245,7 +241,7 @@ void export_ranlux(int tag, char *out)
   }
 }
 
-int import_ranlux(char *in)
+int import_ranlux(char const *in)
 {
   int my_rank, ie, ir;
   int dmy, tag0, tag1;

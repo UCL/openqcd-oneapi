@@ -14,20 +14,14 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "su3fcts.h"
 #include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
 #include "forces.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "random.h"
+#include "su3fcts.h"
+#include "uflds.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -281,7 +275,7 @@ static void random_vec(int *svec)
 
 int main(int argc, char *argv[])
 {
-  int my_rank, n, s[4];
+  int my_rank, n, s[4], no_tts;
   double phi[2], phi_prime[2], theta[3], p1, p2;
   FILE *flog = NULL;
 
@@ -305,6 +299,26 @@ int main(int argc, char *argv[])
     if (bc != 0)
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check1.c]",
                  "Syntax: check1 [-bc <type>]");
+
+    no_tts = find_opt(argc, argv, "-no-tts");
+
+    if (no_tts != 0) {
+      no_tts = 1;
+
+      error_root(bc != 3, 1, "main [check2.c]",
+                 "Can only specify the -no-tts option with periodic boundary "
+                 "conditions");
+    }
+  }
+
+  MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&no_tts, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (bc == 3) {
+    set_ani_parms(!no_tts, 1.5, 4.3, 1.0, 1.0, 0.87, 1.23, 1.0, 1.0);
+    print_ani_parms();
+  } else {
+    set_no_ani_parms();
   }
 
   set_lat_parms(3.5, 0.33, 0, NULL, 1.0);
@@ -319,7 +333,6 @@ int main(int argc, char *argv[])
   theta[1] = 0.0;
   theta[2] = 0.0;
   set_bc_parms(bc, 0.9012, 1.2034, 1.0, 1.0, phi, phi_prime, theta);
-  set_ani_parms(1, 1.2, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
   print_bc_parms(1);
 
   start_ranlux(0, 12345);

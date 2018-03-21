@@ -56,17 +56,12 @@
 
 #define SW_TERM_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "tcharge.h"
 #include "sw_term.h"
+#include "flags.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "tcharge.h"
 
 #define N0 (NPROC0 * L0)
 

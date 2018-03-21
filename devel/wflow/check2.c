@@ -14,20 +14,14 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "su3fcts.h"
-#include "random.h"
-#include "utils.h"
+#include "global.h"
 #include "lattice.h"
+#include "mpi.h"
+#include "random.h"
+#include "su3fcts.h"
 #include "uflds.h"
 #include "update.h"
 #include "wflow.h"
-#include "global.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)

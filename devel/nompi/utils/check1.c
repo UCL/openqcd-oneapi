@@ -12,12 +12,7 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
 #include "random.h"
-#include "utils.h"
 
 #define N 18000
 

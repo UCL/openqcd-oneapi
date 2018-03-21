@@ -45,21 +45,16 @@
 
 #define GENFRC_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "su3fcts.h"
-#include "flags.h"
-#include "lattice.h"
-#include "mdflds.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "tcharge.h"
 #include "forces.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mdflds.h"
+#include "mpi.h"
+#include "sflds.h"
+#include "su3fcts.h"
+#include "tcharge.h"
+#include "uflds.h"
 
 #define N0 (NPROC0 * L0)
 

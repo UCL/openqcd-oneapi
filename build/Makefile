@@ -57,8 +57,10 @@ SIZE_FLAGS := -DNPROC0=$(NPROC0) -DNPROC1=$(NPROC1)\
               -DNPROC0_BLK=$(NPROC0_BLK) -DNPROC1_BLK=$(NPROC1_BLK)\
               -DNPROC2_BLK=$(NPROC2_BLK) -DNPROC3_BLK=$(NPROC3_BLK)
 
+CORRECTNESS := -pedantic -fstrict-aliasing -Wno-long-long -Wstrict-prototypes
+
 CFLAGS     += -I$(code_dir)/include -I$(code_dir) -isystem $(MPI_INCLUDE)\
-              $(SIZE_FLAGS) $(USR_CFLAGS)
+              $(SIZE_FLAGS) $(USR_CFLAGS) $(CORRECTNESS)
 
 LDFLAGS    += $(USR_LDFLAGS) -lm
 
@@ -88,9 +90,9 @@ $(dep_dir)/nompi/%: \
 #                   executable we set the targets as the folder containing them
 
 # All the modules in openQCD
-module_names := archive block dfl dirac flags forces lattice linalg linsolv\
-                little mdflds random ratfcts sap sflds stout_smearing su3fcts\
-                sw_term tcharge uflds update utils vflds wflow
+module_names := archive block dfl dirac field_com flags forces lattice linalg\
+                linsolv little mdflds random ratfcts sap sflds stout_smearing\
+                su3fcts sw_term tcharge uflds update utils vflds wflow
 
 module_libs  := $(patsubst %,$(target_module_dir)/%.a,$(module_names))
 
@@ -99,7 +101,7 @@ main_sources  := $(wildcard $(source_main_dir)/*.c)
 main_programs := $(patsubst $(source_main_dir)/%.c,%,$(main_sources))
 
 # Collect all the tests
-test_module_names := archive block dfl dirac flags forces lattice linalg\
+test_module_names := archive block dfl dirac field_com flags forces lattice linalg little\
                      random ratfcts sap sflds stout_smearing su3fcts sw_term\
                      tcharge uflds update utils vflds wflow
 
@@ -136,7 +138,7 @@ nompi_module_libs  := \
 test_nompi_module_names := extras forces linalg main random ratfcts su3fcts\
                            sw_term utils
 
-test_nompi_module_dirs  := $(patsubst %,$(target_devel_dir)/nompi/%,$(test_module_names))
+test_nompi_module_dirs  := $(patsubst %,$(target_devel_dir)/nompi/%,$(test_nompi_module_names))
 
 ## }}}
 # }}}
@@ -291,6 +293,9 @@ $(target_module_dir)/utils.a: $(target_module_dir)/utils/version.o
 
 $(test_nompi_module_dirs): $(nompi_module_libs)
 
+# The version.c should always be rebuilt to have up to date information
+.PHONY: $(target_module_dir)/utils/version.c
+
 ## }}}
 # }}}
 #
@@ -341,7 +346,7 @@ $(target_module_dir)/%.o: $(source_module_dir)/%.c $(settings_file) Makefile
 	$(mkdir-target)
 	$(call compile-and-print,\
 		$(CC) $(CFLAGS) -c $< -o $@,\
-		"modules/$(notdir $<)")
+		"modules/$(subst $(source_module_dir)/,,$<)")
 
 # Creating a dependency file from a source file
 $(dep_dir)/%.d: $(source_module_dir)/%.c
@@ -361,6 +366,7 @@ $(dep_dir)/%.d: $(source_main_dir)/%.c
 
 # Copy the test infiles
 $(target_devel_dir)/%.in: $(source_devel_dir)/%.in
+	$(mkdir-target)
 	@cp -f $< $@
 
 ## Specialised targets
@@ -370,6 +376,7 @@ $(target_devel_dir)/%.in: $(source_devel_dir)/%.in
 # Link the configs for the stout_smearing tests
 $(target_devel_dir)/stout_smearing/configurations: \
 		$(source_devel_dir)/stout_smearing/configurations
+	${mkdir-target}
 	@rm -f $@
 	@ln -s $$(readlink -e $<) $@
 
@@ -449,17 +456,15 @@ endef
 
 # Pretty print a linking command and run it
 define link-and-print
-	@$(clear-last-line)
 	@echo "$(LINK_COLOR)(LINK.c)$(NO_COLOR) $2"
-	@echo
 	@$1
 endef
 
 # Pretty print a compilation command and run it
 define compile-and-print
-	@$(clear-last-line)
 	@echo "$(COMPILE_COLOR)(COMPILE.c)$(NO_COLOR) $2"
 	@$1
+	@$(clear-last-line)
 endef
 
 ## }}}

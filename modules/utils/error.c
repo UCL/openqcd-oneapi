@@ -10,24 +10,26 @@
  *
  * Error handling functions.
  *
- *   void set_error_file(char *path,int loc_flag)
+ *   void set_error_file(char const *path, int loc_flag)
  *     Sets the path of the file to which error messages are written. If
  *     loc_flag!=0, the number of the local MPI process is appended to the
  *     file name when the error_loc() function writes a message. Otherwise
  *     the same file is used for all error messages.
  *
- *   void error(int test,int no,char *name,char *format,...)
+ *   void error(int test, int no, char const *name, char const *format, ...)
  *     Checks whether "test"=0 on all processes and, if not, aborts the
  *     program gracefully with error number "no" after printing the "name"
  *     of the calling program and an error message to the error file from
  *     process 0. The message is formed using the "format" string and any
  *     additional arguments, exactly as in a printf() statement.
  *
- *   void error_root(int test,int no,char *name,char *format,...)
- *     Same as the error() function except that "test" is examined on
- *     process 0 only.
+ *   void error_root(int test, int no, char const *name, char const *format,
+ *                   ...)
+ *     Same as the error() function except that "test" is examined on process 0
+ *     only.
  *
- *   void error_loc(int test,int no,char *name,char *message)
+ *   void error_loc(int test, int no, char const *name, char const *message,
+ *                  ...)
  *     Checks whether "test"=0 on the local process and, if not, aborts the
  *     program gracefully with error number "no" after printing the "name"
  *     of the calling program and an error message to the local error file.
@@ -53,14 +55,13 @@
 
 #define ERROR_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-#include <time.h>
+#include "global.h"
 #include "mpi.h"
 #include "utils.h"
-#include "global.h"
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
 
 static int iset = 0, iloc = 0;
 static char fname[NAME_SIZE + 1], fname_loc[NAME_SIZE];
@@ -84,7 +85,7 @@ static void wait(int s)
   }
 }
 
-void set_error_file(char *path, int loc_flag)
+void set_error_file(char const *path, int loc_flag)
 {
   int my_rank, nlen;
 
@@ -110,7 +111,7 @@ void set_error_file(char *path, int loc_flag)
   iset = 1;
 }
 
-void error(int test, int no, char *name, char *format, ...)
+void error(int test, int no, char const *name, char const *format, ...)
 {
   int i, all, my_rank;
   va_list args;
@@ -150,7 +151,7 @@ void error(int test, int no, char *name, char *format, ...)
     wait(60);
 }
 
-void error_root(int test, int no, char *name, char *format, ...)
+void error_root(int test, int no, char const *name, char const *format, ...)
 {
   int my_rank;
   va_list args;
@@ -183,7 +184,7 @@ void error_root(int test, int no, char *name, char *format, ...)
   }
 }
 
-void error_loc(int test, int no, char *name, char *format, ...)
+void error_loc(int test, int no, char const *name, char const *format, ...)
 {
   int my_rank;
   va_list args;

@@ -7,12 +7,9 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "global.h"
 #include "flags.h"
+#include "global.h"
+#include "mpi.h"
 
 #include <devel/testing_utilities/data_type_diffs.c>
 #include <devel/testing_utilities/test_counter.c>

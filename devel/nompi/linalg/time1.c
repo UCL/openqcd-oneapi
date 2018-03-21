@@ -12,14 +12,9 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
-#include "random.h"
-#include "su3.h"
-#include "utils.h"
 #include "linalg.h"
+#include "random.h"
+#include <time.h>
 
 int main(void)
 {

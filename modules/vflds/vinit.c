@@ -29,27 +29,28 @@
  *     (complex) random values z with distribution proportional to
  *     exp{-|z|^2/sigma^2}.
  *
- *   void assign_v2v(int n,complex *v,complex *w)
+ *   void assign_v2v(int n, complex const *v, complex *w)
  *     Assigns the single-precision field v to the single-precision
  *     field w.
  *
- *   void assign_v2vd(int n,complex *v,complex_dble *wd)
+ *   void assign_v2vd(int n, complex const *v, complex_dble *wd)
  *     Assigns the single-precision field v to the double-precision
  *     field wd.
  *
- *   void assign_vd2v(int n,complex_dble *vd,complex *w)
+ *   void assign_vd2v(int n, complex_dble const *vd, complex *w)
  *     Assigns the double-precision field vd to the single-precision
  *     field w.
  *
- *   void assign_vd2vd(int n,complex_dble *vd,complex_dble *wd)
+ *   void assign_vd2vd(int n, complex_dble const *vd, complex_dble *wd)
  *     Assigns the double-precision field vd to the double-precision
  *     field wd.
  *
- *   void add_v2vd(int n,complex *v,complex_dble *wd)
+ *   void add_v2vd(int n, complex const *v, complex_dble *wd)
  *     Adds the single-precision field v to the double-precision field
  *     wd.
  *
- *   void diff_vd2v(int n,complex_dble *vd,complex_dble *wd,complex *w)
+ *   void diff_vd2v(int n, complex_dble const *vd, complex_dble const *wd,
+ *                  complex *w)
  *     Assigns the difference vd-wd of the double-precision fields vd
  *     and wd to the single-precision field w.
  *
@@ -66,11 +67,8 @@
 
 #define VINIT_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
 #include "random.h"
+#include "su3.h"
 #include "vflds.h"
 
 static const complex v0 = {0.0f, 0.0f};
@@ -176,9 +174,9 @@ void random_vd(int n, complex_dble *vd, double sigma)
   }
 }
 
-void assign_v2v(int n, complex *v, complex *w)
+void assign_v2v(int n, complex const *v, complex *w)
 {
-  complex *vm;
+  complex const *vm;
 
   vm = v + n;
 
@@ -189,9 +187,9 @@ void assign_v2v(int n, complex *v, complex *w)
   }
 }
 
-void assign_v2vd(int n, complex *v, complex_dble *wd)
+void assign_v2vd(int n, complex const *v, complex_dble *wd)
 {
-  complex *vm;
+  complex const *vm;
 
   vm = v + n;
 
@@ -202,9 +200,9 @@ void assign_v2vd(int n, complex *v, complex_dble *wd)
   }
 }
 
-void assign_vd2v(int n, complex_dble *vd, complex *w)
+void assign_vd2v(int n, complex_dble const *vd, complex *w)
 {
-  complex_dble *vm;
+  complex_dble const *vm;
 
   vm = vd + n;
 
@@ -215,9 +213,9 @@ void assign_vd2v(int n, complex_dble *vd, complex *w)
   }
 }
 
-void assign_vd2vd(int n, complex_dble *vd, complex_dble *wd)
+void assign_vd2vd(int n, complex_dble const *vd, complex_dble *wd)
 {
-  complex_dble *vm;
+  complex_dble const *vm;
 
   vm = vd + n;
 
@@ -228,9 +226,9 @@ void assign_vd2vd(int n, complex_dble *vd, complex_dble *wd)
   }
 }
 
-void add_v2vd(int n, complex *v, complex_dble *wd)
+void add_v2vd(int n, complex const *v, complex_dble *wd)
 {
-  complex *vm;
+  complex const *vm;
 
   vm = v + n;
 
@@ -241,9 +239,10 @@ void add_v2vd(int n, complex *v, complex_dble *wd)
   }
 }
 
-void diff_vd2v(int n, complex_dble *vd, complex_dble *wd, complex *w)
+void diff_vd2v(int n, complex_dble const *vd, complex_dble const *wd,
+               complex *w)
 {
-  complex_dble *vm;
+  complex_dble const *vm;
 
   vm = vd + n;
 

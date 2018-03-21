@@ -13,9 +13,7 @@
 #ifndef MDFLDS_H
 #define MDFLDS_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
 
 typedef struct
 {
@@ -24,18 +22,13 @@ typedef struct
   spinor_dble **pf;
 } mdflds_t;
 
-/* FCOM_C */
-extern void copy_boundaries_forces(su3_alg_dble *force);
-extern void copy_bnd_frc(void);
-extern void add_boundaries_force(su3_alg_dble *force);
-extern void add_bnd_frc(void);
-extern void free_fcom_bufs(void);
-
 /* MDFLDS_C */
 extern mdflds_t *mdflds(void);
 extern void set_frc2zero(void);
 extern void bnd_mom2zero(void);
 extern void random_mom(void);
 extern double momentum_action(int icom);
+extern void copy_bnd_frc(void);
+extern void add_bnd_frc(void);
 
 #endif

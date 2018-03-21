@@ -12,26 +12,30 @@
  *
  * The externally accessible functions are
  *
- *   void cmat_vec_dble(int n,complex_dble *a,complex_dble *v,complex_dble *w)
+ *   void cmat_vec_dble(int n, complex_dble const *a, complex_dble const *v,
+ *                      complex_dble *w)
  *     Computes w=a*v, where v and w are n-vectors and a an nxn matrix.
  *
- *   void cmat_vec_assign_dble(int n,complex_dble *a,complex_dble *v,
- *                             complex_dble *w)
+ *   void cmat_vec_assign_dble(int n, complex_dble const *a, complex_dble const
+ *                             *v, complex_dble *w)
  *     Adds a*v to w, where v and w are n-vectors and a an nxn matrix.
  *
- *   void cmat_add_dble(int n,complex_dble *a,complex_dble *b,complex_dble *c)
+ *   void cmat_add_dble(int n, complex_dble const *a, complex_dble const *b,
+ *                      complex_dble *c)
  *     Computes the sum c=a+b of two nxn matrices a and b.
  *
- *   void cmat_sub_dble(int n,complex_dble *a,complex_dble *b,complex_dble *c)
+ *   void cmat_sub_dble(int n, complex_dble const *a, complex_dble const *b,
+ *                      complex_dble *c)
  *     Computes the difference c=a-b of two nxn matrices a and b.
  *
- *   void cmat_mul_dble(int n,complex_dble *a,complex_dble *b,complex_dble *c)
+ *   void cmat_mul_dble(int n, complex_dble const *a, complex_dble const *b,
+ *                      complex_dble *c)
  *     Computes the product c=a*b of two nxn matrices a and b.
  *
- *   void cmat_dag_dble(int n,complex_dble *a,complex_dble *b)
+ *   void cmat_dag_dble(int n, complex_dble const *a, complex_dble *b)
  *     Assigns the hermitian conjugate of a to b.
  *
- *   int cmat_inv_dble(int n,complex_dble *a,complex_dble *b,double *k)
+ *   int cmat_inv_dble(int n, complex_dble const *a, complex_dble *b, double *k)
  *     Computes the inverse b of the nxn matrix a, using Householder
  *     reflections. The Frobenius condition number k of a is also computed.
  *     A non-zero return value indicates that the input matrix was found to
@@ -60,12 +64,6 @@
 
 #define CMATRIX_DBLE_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "su3.h"
-#include "utils.h"
 #include "linalg.h"
 
 #ifndef ALIGN
@@ -81,10 +79,12 @@ static complex_dble *dsv;
 
 #if (defined FMA3)
 
-void cmat_vec_dble(int n, complex_dble *a, complex_dble *v, complex_dble *w)
+void cmat_vec_dble(int n, complex_dble const *a, complex_dble const *v,
+                   complex_dble *w)
 {
-  complex_dble *vv, *vm, *wm;
-  complex_dble *b[4];
+  complex_dble *wm;
+  complex_dble const *vv, *vm;
+  complex_dble const *b[4];
 
   wm = w + n;
 
@@ -277,11 +277,12 @@ void cmat_vec_dble(int n, complex_dble *a, complex_dble *v, complex_dble *w)
   _avx_zeroupper();
 }
 
-void cmat_vec_assign_dble(int n, complex_dble *a, complex_dble *v,
+void cmat_vec_assign_dble(int n, complex_dble const *a, complex_dble const *v,
                           complex_dble *w)
 {
-  complex_dble *vv, *vm, *wm;
-  complex_dble *b[4];
+  complex_dble *wm;
+  complex_dble const *vv, *vm;
+  complex_dble const *b[4];
 
   wm = w + n;
 
@@ -476,9 +477,11 @@ void cmat_vec_assign_dble(int n, complex_dble *a, complex_dble *v,
 
 #else
 
-void cmat_vec_dble(int n, complex_dble *a, complex_dble *v, complex_dble *w)
+void cmat_vec_dble(int n, complex_dble const *a, complex_dble const *v,
+                   complex_dble *w)
 {
-  complex_dble *vv, *vm, *wm;
+  complex_dble *wm;
+  complex_dble const *vv, *vm;
 
   if ((n & 0x3) == 0x0) {
     vm = v + n;
@@ -621,10 +624,11 @@ void cmat_vec_dble(int n, complex_dble *a, complex_dble *v, complex_dble *w)
   _avx_zeroupper();
 }
 
-void cmat_vec_assign_dble(int n, complex_dble *a, complex_dble *v,
+void cmat_vec_assign_dble(int n, complex_dble const *a, complex_dble const *v,
                           complex_dble *w)
 {
-  complex_dble *vv, *vm, *wm;
+  complex_dble *wm;
+  complex_dble const *vv, *vm;
 
   if ((n & 0x3) == 0x0) {
     vm = v + n;
@@ -772,9 +776,11 @@ void cmat_vec_assign_dble(int n, complex_dble *a, complex_dble *v,
 #elif (defined x64)
 #include "sse2.h"
 
-void cmat_vec_dble(int n, complex_dble *a, complex_dble *v, complex_dble *w)
+void cmat_vec_dble(int n, complex_dble const *a, complex_dble const *v,
+                   complex_dble *w)
 {
-  complex_dble *vv, *vm, *wm;
+  complex_dble *wm;
+  complex_dble const *vv, *vm;
 
   if ((n & 0x1) == 0x0) {
     vm = v + n;
@@ -892,10 +898,11 @@ void cmat_vec_dble(int n, complex_dble *a, complex_dble *v, complex_dble *w)
   }
 }
 
-void cmat_vec_assign_dble(int n, complex_dble *a, complex_dble *v,
+void cmat_vec_assign_dble(int n, complex_dble const *a, complex_dble const *v,
                           complex_dble *w)
 {
-  complex_dble *vv, *vm, *wm;
+  complex_dble *wm;
+  complex_dble const *vv, *vm;
 
   if ((n & 0x1) == 0x0) {
     vm = v + n;
@@ -1015,9 +1022,11 @@ void cmat_vec_assign_dble(int n, complex_dble *a, complex_dble *v,
 
 #else
 
-void cmat_vec_dble(int n, complex_dble *a, complex_dble *v, complex_dble *w)
+void cmat_vec_dble(int n, complex_dble const *a, complex_dble const *v,
+                   complex_dble *w)
 {
-  complex_dble *vv, *vm, *wm;
+  complex_dble *wm;
+  complex_dble const *vv, *vm;
 
   vm = v + n;
   wm = w + n;
@@ -1034,10 +1043,11 @@ void cmat_vec_dble(int n, complex_dble *a, complex_dble *v, complex_dble *w)
   }
 }
 
-void cmat_vec_assign_dble(int n, complex_dble *a, complex_dble *v,
+void cmat_vec_assign_dble(int n, complex_dble const *a, complex_dble const *v,
                           complex_dble *w)
 {
-  complex_dble *vv, *vm, *wm;
+  complex_dble *wm;
+  complex_dble const *vv, *vm;
 
   vm = v + n;
   wm = w + n;
@@ -1053,9 +1063,10 @@ void cmat_vec_assign_dble(int n, complex_dble *a, complex_dble *v,
 
 #endif
 
-void cmat_add_dble(int n, complex_dble *a, complex_dble *b, complex_dble *c)
+void cmat_add_dble(int n, complex_dble const *a, complex_dble const *b,
+                   complex_dble *c)
 {
-  complex_dble *am;
+  complex_dble const *am;
 
   am = a + n * n;
 
@@ -1067,9 +1078,10 @@ void cmat_add_dble(int n, complex_dble *a, complex_dble *b, complex_dble *c)
   }
 }
 
-void cmat_sub_dble(int n, complex_dble *a, complex_dble *b, complex_dble *c)
+void cmat_sub_dble(int n, complex_dble const *a, complex_dble const *b,
+                   complex_dble *c)
 {
-  complex_dble *am;
+  complex_dble const *am;
 
   am = a + n * n;
 
@@ -1081,9 +1093,10 @@ void cmat_sub_dble(int n, complex_dble *a, complex_dble *b, complex_dble *c)
   }
 }
 
-void cmat_mul_dble(int n, complex_dble *a, complex_dble *b, complex_dble *c)
+void cmat_mul_dble(int n, complex_dble const *a, complex_dble const *b,
+                   complex_dble *c)
 {
-  complex_dble *aa, *bb, *am, *bm, *bbm;
+  complex_dble const *aa, *bb, *am, *bm, *bbm;
 
   am = a + n * n;
   bm = b + n;
@@ -1108,9 +1121,10 @@ void cmat_mul_dble(int n, complex_dble *a, complex_dble *b, complex_dble *c)
   }
 }
 
-void cmat_dag_dble(int n, complex_dble *a, complex_dble *b)
+void cmat_dag_dble(int n, complex_dble const *a, complex_dble *b)
 {
-  complex_dble *bb, *am, *bbm;
+  complex_dble const *am;
+  complex_dble *bb, *bbm;
 
   am = a + n * n;
   bbm = b + n * n;
@@ -1146,7 +1160,8 @@ static void alloc_arrays(int n)
   }
 }
 
-static int fwd_house(int n, complex_dble *a, complex_dble *b, double *fnsq)
+static int fwd_house(int n, complex_dble const *a, complex_dble *b,
+                     double *fnsq)
 {
   int i, j, k;
   double eps, r1, r2, r3;
@@ -1313,7 +1328,7 @@ static void bck_house(int n, complex_dble *b)
   }
 }
 
-int cmat_inv_dble(int n, complex_dble *a, complex_dble *b, double *k)
+int cmat_inv_dble(int n, complex_dble const *a, complex_dble *b, double *k)
 {
   int ie;
   double fnsq, fnsqi;

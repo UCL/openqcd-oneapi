@@ -13,9 +13,7 @@
 #ifndef SAP_H
 #define SAP_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
 
 /* BLK_SOLV_C */
 extern void blk_mres(int n, float mu, int nmr);

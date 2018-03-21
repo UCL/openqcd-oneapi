@@ -44,10 +44,6 @@
 
 #define PAULI_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
 #include "sw_term.h"
 
 typedef union
@@ -59,7 +55,7 @@ typedef union
 #if (defined x64)
 #include "sse2.h"
 
-void mul_pauli(float mu, pauli *m, weyl *s, weyl *r)
+void mul_pauli(float mu, pauli const *m, weyl const *s, weyl *r)
 {
   m += 4;
   _prefetch_pauli(m);
@@ -397,7 +393,7 @@ void mul_pauli_qpx(pauli *m, vector4double *im1[3], vector4double *im2[3])
   *(im2[2]) = vec_xmadd(v100, s10, r15);
 }
 
-void mul_pauli(float mu, pauli *m, weyl *s, weyl *r)
+void mul_pauli(float mu, pauli const *m, weyl const *s, weyl *r)
 {
   vector4double s1, s2, s3, s4, s5, s6, s10, s11;
   vector4double v1, v2, v3, v4, v5, v6, v7, v71, v8, v9, v10, v11, v12, v13,
@@ -471,9 +467,9 @@ void mul_pauli(float mu, pauli *m, weyl *s, weyl *r)
 
 static weyl rs;
 
-void mul_pauli(float mu, pauli *m, weyl *s, weyl *r)
+void mul_pauli(float mu, pauli const *m, weyl const *s, weyl *r)
 {
-  float *u;
+  float const *u;
 
   u = (*m).u;
 
@@ -559,20 +555,21 @@ void mul_pauli(float mu, pauli *m, weyl *s, weyl *r)
 #include "avx512.h"
 #include "sse.h"
 
-void mul_pauli2(float mu, pauli *m, spinor *source, spinor *res)
+void mul_pauli2(float mu, pauli const *m, spinor const *source, spinor *res)
 {
-  spin_t *ps, *pr;
+  spin_t const *ps;
+  spin_t *pr;
 
-  ps = (spin_t *)(source);
+  ps = (spin_t const *)(source);
   pr = (spin_t *)(res);
 
-  float *u, *u2;
+  float const *u, *u2;
   u = (*m).u;
   u2 = (m + 1)->u;
 
-  weyl *s = (*ps).w;
+  weyl const *s = (*ps).w;
   weyl *r = (*pr).w;
-  weyl *s2 = (*ps).w + 1;
+  weyl const *s2 = (*ps).w + 1;
   weyl *r2 = (*pr).w + 1;
 
   register __m512 r512_1, r512_2, r512_3;
@@ -702,7 +699,7 @@ void mul_pauli2(float mu, pauli *m, spinor *source, spinor *res)
 #elif (defined AVX)
 #include "avx.h"
 
-void mul_pauli2(float mu, pauli *m, spinor *s, spinor *r)
+void mul_pauli2(float mu, pauli const *m, spinor const *s, spinor *r)
 {
   m += 4;
   _prefetch_pauli_dble(m);
@@ -1066,11 +1063,12 @@ void mul_pauli2(float mu, pauli *m, spinor *s, spinor *r)
 
 #else
 
-void mul_pauli2(float mu, pauli *m, spinor *s, spinor *r)
+void mul_pauli2(float mu, pauli const *m, spinor const *s, spinor *r)
 {
-  spin_t *ps, *pr;
+  spin_t const *ps;
+  spin_t *pr;
 
-  ps = (spin_t *)(s);
+  ps = (spin_t const *)(s);
   pr = (spin_t *)(r);
 
   mul_pauli(mu, m, (*ps).w, (*pr).w);
@@ -1079,11 +1077,11 @@ void mul_pauli2(float mu, pauli *m, spinor *s, spinor *r)
 
 #endif
 
-void assign_pauli(int vol, pauli_dble *md, pauli *m)
+void assign_pauli(int vol, pauli_dble const *md, pauli *m)
 {
   float *u;
-  double *ud, *um;
-  pauli_dble *mm;
+  double const *ud, *um;
+  pauli_dble const *mm;
 
   mm = md + vol;
 
@@ -1110,9 +1108,9 @@ void assign_pauli(int vol, pauli_dble *md, pauli *m)
   }
 }
 
-void apply_sw(int vol, float mu, pauli *m, spinor *s, spinor *r)
+void apply_sw(int vol, float mu, pauli const *m, spinor const *s, spinor *r)
 {
-  spinor *sm;
+  spinor const *sm;
 
   sm = s + vol;
 

@@ -12,39 +12,39 @@
  *
  * The externally accessible functions are
  *
- *   complex spinor_prod(int vol,int icom,spinor *s,spinor *r)
+ *   complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r)
  *     Computes the scalar product of the fields s and r.
  *
- *   float spinor_prod_re(int vol,int icom,spinor *s,spinor *r)
+ *   float spinor_prod_re(int vol, int icom, spinor const *s, spinor const *r)
  *     Computes the real part of the scalar product of the fields
  *     s and r.
  *
- *   float norm_square(int vol,int icom,spinor *s)
+ *   float norm_square(int vol, int icom, spinor const *s)
  *     Computes the square of the norm of the field s.
  *
- *   void mulc_spinor_add(int vol,spinor *s,spinor *r,complex z)
+ *   void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
  *     Replaces the field s by s+z*r.
  *
- *   void mulr_spinor_add(int vol,spinor *s,spinor *r,float c)
+ *   void mulr_spinor_add(int vol, spinor *s, spinor const *r, float c)
  *     Replaces the field s by s+c*r.
  *
- *   void project(int vol,int icom,spinor *s,spinor *r)
- *     Replaces the field s by s-(r,s)*r.
+ *   void project(int vol, int icom, spinor *s, spinor const *r)
+ *     Replaces the field s by s-(r, s)*r.
  *
- *   void scale(int vol,float c,spinor *s)
+ *   void scale(int vol, float c, spinor *s)
  *     Replaces the field s by c*s.
  *
- *   float normalize(int vol,int icom,spinor *s)
+ *   float normalize(int vol, int icom, spinor *s)
  *     Replaces the field s by s/||s|| and returns the norm ||s||.
  *
- *   void rotate(int vol,int n,spinor **ppk,complex *v)
- *     Replaces the fields pk[] by sum_j pj*v[n*j+k] where 0<=k,j<n
+ *   void rotate(int vol, int n, spinor **ppk, complex const *v)
+ *     Replaces the fields pk[] by sum_j pj*v[n*j+k] where 0<=k, j<n
  *     and pk=ppk[k].
  *
- *   void mulg5(int vol,spinor *s)
+ *   void mulg5(int vol, spinor *s)
  *     Multiplies the field s with gamma_5.
  *
- *   void mulmg5(int vol,spinor *s)
+ *   void mulmg5(int vol, spinor *s)
  *     Multiplies the field s with -gamma_5.
  *
  * Notes:
@@ -63,15 +63,10 @@
 
 #define SALG_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "sflds.h"
-#include "linalg.h"
 #include "global.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "sflds.h"
 
 static int nrot = 0;
 static spinor *psi;
@@ -93,11 +88,11 @@ static void alloc_wrotate(int n)
 
 #if (defined FMA3)
 
-complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
+complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r)
 {
   complex z;
   complex_dble v, w;
-  spinor *sm;
+  spinor const *sm;
 
   __asm__ __volatile__("vxorpd %%ymm12, %%ymm12, %%ymm12 \n\t"
                        "vxorpd %%ymm13, %%ymm13, %%ymm13 \n\t"
@@ -193,11 +188,11 @@ complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
 
 #else
 
-complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
+complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r)
 {
   complex z;
   complex_dble v, w;
-  spinor *sm;
+  spinor const *sm;
 
   __asm__ __volatile__("vxorpd %%ymm9, %%ymm9, %%ymm9 \n\t"
                        "vxorpd %%ymm10, %%ymm10, %%ymm10 \n\t"
@@ -280,10 +275,10 @@ complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
 
 #endif
 
-float spinor_prod_re(int vol, int icom, spinor *s, spinor *r)
+float spinor_prod_re(int vol, int icom, spinor const *s, spinor const *r)
 {
   double x, y;
-  spinor *sm;
+  spinor const *sm;
 
   __asm__ __volatile__("vxorpd %%ymm9, %%ymm9, %%ymm9 \n\t"
                        "vxorpd %%ymm10, %%ymm10, %%ymm10 \n\t"
@@ -344,10 +339,10 @@ float spinor_prod_re(int vol, int icom, spinor *s, spinor *r)
     return (float)(x);
 }
 
-float norm_square(int vol, int icom, spinor *s)
+float norm_square(int vol, int icom, spinor const *s)
 {
   double x, y;
-  spinor *sm;
+  spinor const *sm;
 
   __asm__ __volatile__("vxorpd %%ymm9, %%ymm9, %%ymm9 \n\t"
                        "vxorpd %%ymm10, %%ymm10, %%ymm10 \n\t"
@@ -405,7 +400,7 @@ float norm_square(int vol, int icom, spinor *s)
     return (float)(x);
 }
 
-void mulc_spinor_add(int vol, spinor *s, spinor *r, complex z)
+void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
 {
   spinor *sm;
 
@@ -423,7 +418,7 @@ void mulc_spinor_add(int vol, spinor *s, spinor *r, complex z)
   _avx_zeroupper();
 }
 
-void mulr_spinor_add(int vol, spinor *s, spinor *r, float c)
+void mulr_spinor_add(int vol, spinor *s, spinor const *r, float c)
 {
   spinor *sm;
 
@@ -456,10 +451,10 @@ void scale(int vol, float c, spinor *s)
   _avx_zeroupper();
 }
 
-void rotate(int vol, int n, spinor **ppk, complex *v)
+void rotate(int vol, int n, spinor **ppk, complex const *v)
 {
   int k, j, ix;
-  complex *z;
+  complex const *z;
   spinor *pk, *pj;
 
   if (n > nrot)
@@ -562,12 +557,12 @@ void mulmg5(int vol, spinor *s)
 #elif (defined x64)
 #include "sse2.h"
 
-complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
+complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r)
 {
   double x, y;
   complex z;
   complex_dble v, w;
-  spinor *sm;
+  spinor const *sm;
 
   __asm__ __volatile__("xorpd %%xmm10, %%xmm10 \n\t"
                        "xorpd %%xmm11, %%xmm11 \n\t"
@@ -705,10 +700,10 @@ complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
   return z;
 }
 
-float spinor_prod_re(int vol, int icom, spinor *s, spinor *r)
+float spinor_prod_re(int vol, int icom, spinor const *s, spinor const *r)
 {
   double x, y;
-  spinor *sm;
+  spinor const *sm;
 
   __asm__ __volatile__("xorpd %%xmm10, %%xmm10 \n\t"
                        "xorpd %%xmm11, %%xmm11 \n\t"
@@ -779,10 +774,10 @@ float spinor_prod_re(int vol, int icom, spinor *s, spinor *r)
     return (float)(x);
 }
 
-float norm_square(int vol, int icom, spinor *s)
+float norm_square(int vol, int icom, spinor const *s)
 {
   double x, y;
-  spinor *sm;
+  spinor const *sm;
 
   __asm__ __volatile__("xorpd %%xmm10, %%xmm10 \n\t"
                        "xorpd %%xmm11, %%xmm11 \n\t"
@@ -845,9 +840,9 @@ float norm_square(int vol, int icom, spinor *s)
     return (float)(x);
 }
 
-void mulc_spinor_add(int vol, spinor *s, spinor *r, complex z)
+void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
 {
-  spinor *sm;
+  spinor const *sm;
 
   _sse_load_cmplx(z);
   sm = s + vol;
@@ -861,9 +856,9 @@ void mulc_spinor_add(int vol, spinor *s, spinor *r, complex z)
   }
 }
 
-void mulr_spinor_add(int vol, spinor *s, spinor *r, float c)
+void mulr_spinor_add(int vol, spinor *s, spinor const *r, float c)
 {
-  spinor *sm;
+  spinor const *sm;
 
   _sse_load_real(c);
   sm = s + vol;
@@ -890,10 +885,10 @@ void scale(int vol, float c, spinor *s)
   }
 }
 
-void rotate(int vol, int n, spinor **ppk, complex *v)
+void rotate(int vol, int n, spinor **ppk, complex const *v)
 {
   int k, j, ix;
-  complex *z;
+  complex const *z;
   spinor *pk, *pj;
 
   if (n > nrot)
@@ -1007,12 +1002,12 @@ void mulmg5(int vol, spinor *s)
 
 #include "qpx.h"
 
-complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
+complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r)
 {
   double x, y;
   complex z;
   complex_dble v, w;
-  spinor *sm;
+  spinor const *sm;
   vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
   vector4double res11, res12, res13;
 
@@ -1054,10 +1049,10 @@ complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
   return z;
 }
 
-float spinor_prod_re(int vol, int icom, spinor *s, spinor *r)
+float spinor_prod_re(int vol, int icom, spinor const *s, spinor const *r)
 {
   double x, y;
-  spinor *sm;
+  spinor const *sm;
   double __attribute((aligned(32))) res[4];
   vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
   vector4double res11, res12, res13;
@@ -1094,10 +1089,10 @@ float spinor_prod_re(int vol, int icom, spinor *s, spinor *r)
   }
 }
 
-float norm_square(int vol, int icom, spinor *s)
+float norm_square(int vol, int icom, spinor const *s)
 {
   double x, y;
-  spinor *sm;
+  spinor const *sm;
   vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
   vector4double res11, res12, res13;
 
@@ -1130,7 +1125,7 @@ float norm_square(int vol, int icom, spinor *s)
   }
 }
 
-void mulc_spinor_add(int vol, spinor *s, spinor *r, complex z)
+void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
 {
   spinor *sm;
   vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
@@ -1158,7 +1153,7 @@ void mulc_spinor_add(int vol, spinor *s, spinor *r, complex z)
   }
 }
 
-void mulr_spinor_add(int vol, spinor *s, spinor *r, float c)
+void mulr_spinor_add(int vol, spinor *s, spinor const *r, float c)
 {
   spinor *sm;
   vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
@@ -1211,10 +1206,10 @@ void scale(int vol, float c, spinor *s)
   }
 }
 
-void rotate(int vol, int n, spinor **ppk, complex *v)
+void rotate(int vol, int n, spinor **ppk, complex const *v)
 {
   int k, j, ix;
-  complex *z;
+  complex const *z;
   spinor *pk, *pj;
   vector4double v11, v12, v13, v21, v22, v23, v31, v32, v33, v41, v42, v43;
   vector4double z11, z12;
@@ -1302,12 +1297,12 @@ void mulmg5(int vol, spinor *s)
 
 #else
 
-complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
+complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r)
 {
   double x, y;
   complex z;
   complex_dble v, w;
-  spinor *sm;
+  spinor const *sm;
 
   x = 0.0;
   y = 0.0;
@@ -1343,10 +1338,10 @@ complex spinor_prod(int vol, int icom, spinor *s, spinor *r)
   return z;
 }
 
-float spinor_prod_re(int vol, int icom, spinor *s, spinor *r)
+float spinor_prod_re(int vol, int icom, spinor const *s, spinor const *r)
 {
   double x, y;
-  spinor *sm;
+  spinor const *sm;
 
   x = 0.0;
   sm = s + vol;
@@ -1368,10 +1363,10 @@ float spinor_prod_re(int vol, int icom, spinor *s, spinor *r)
   }
 }
 
-float norm_square(int vol, int icom, spinor *s)
+float norm_square(int vol, int icom, spinor const *s)
 {
   double x, y;
-  spinor *sm;
+  spinor const *sm;
 
   x = 0.0;
   sm = s + vol;
@@ -1391,7 +1386,7 @@ float norm_square(int vol, int icom, spinor *s)
   }
 }
 
-void mulc_spinor_add(int vol, spinor *s, spinor *r, complex z)
+void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
 {
   spinor *sm;
 
@@ -1407,7 +1402,7 @@ void mulc_spinor_add(int vol, spinor *s, spinor *r, complex z)
   }
 }
 
-void mulr_spinor_add(int vol, spinor *s, spinor *r, float c)
+void mulr_spinor_add(int vol, spinor *s, spinor const *r, float c)
 {
   spinor *sm;
 
@@ -1437,10 +1432,10 @@ void scale(int vol, float c, spinor *s)
   }
 }
 
-void rotate(int vol, int n, spinor **ppk, complex *v)
+void rotate(int vol, int n, spinor **ppk, complex const *v)
 {
   int k, j, ix;
-  complex *z;
+  complex const *z;
   spinor *pk, *pj;
 
   if (n > nrot)
@@ -1519,7 +1514,7 @@ void mulmg5(int vol, spinor *s)
 
 #endif
 
-void project(int vol, int icom, spinor *s, spinor *r)
+void project(int vol, int icom, spinor *s, spinor const *r)
 {
   complex z;
 
@@ -1536,7 +1531,7 @@ float normalize(int vol, int icom, spinor *s)
   r = norm_square(vol, icom, s);
   r = (float)(sqrt((double)(r)));
 
-  if (r != 0.0f)
+  if (not_equal_f(r, 0.0f))
     scale(vol, 1.0f / r, s);
   else
     error_loc(1, 1, "normalize [salg.c]", "Vector has vanishing norm");

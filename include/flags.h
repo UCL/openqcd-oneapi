@@ -13,9 +13,8 @@
 #ifndef FLAGS_H
 #define FLAGS_H
 
-#ifndef BLOCK_H
 #include "block.h"
-#endif
+#include <stdio.h>
 
 typedef enum {
   UPDATED_U,
@@ -260,8 +259,9 @@ extern void print_grid_flags(blk_grid_t grid);
 
 /* ACTION_PARMS_C */
 extern action_parms_t set_action_parms(int iact, action_t action, int ipf,
-                                       int im0, int *irat, int *imu, int *isp,
-                                       int smear);
+                                       int im0, int const *irat, int const *imu,
+                                       int const *isp, int smear);
+
 extern action_parms_t action_parms(int iact);
 extern void read_action_parms(int iact);
 extern void print_action_parms(void);
@@ -269,7 +269,7 @@ extern void write_action_parms(FILE *fdat);
 extern void check_action_parms(FILE *fdat);
 
 /* DFL_PARMS_C */
-extern dfl_parms_t set_dfl_parms(int *bs, int Ns);
+extern dfl_parms_t set_dfl_parms(int const *bs, int Ns);
 extern dfl_parms_t dfl_parms(void);
 extern dfl_pro_parms_t set_dfl_pro_parms(int nkv, int nmx, double res);
 extern dfl_pro_parms_t dfl_pro_parms(void);
@@ -284,7 +284,9 @@ extern void check_dfl_parms(FILE *fdat);
 
 /* FORCE_PARMS_C */
 extern force_parms_t set_force_parms(int ifr, force_t force, int ipf, int im0,
-                                     int *irat, int *imu, int *isp, int *ncr);
+                                     int const *irat, int const *imu,
+                                     int const *isp, int const *ncr);
+
 extern force_parms_t force_parms(int ifr);
 extern void read_force_parms(int ifr);
 extern void read_force_parms2(int ifr);
@@ -294,23 +296,26 @@ extern void write_force_parms(FILE *fdat);
 extern void check_force_parms(FILE *fdat);
 
 /* HMC_PARMS_C */
-extern hmc_parms_t set_hmc_parms(int nact, int *iact, int npf, int nmu,
-                                 double *mu, int nlv, double tau);
+extern hmc_parms_t set_hmc_parms(int nact, int const *iact, int npf, int nmu,
+                                 double const *mu, int nlv, double tau);
 extern hmc_parms_t hmc_parms(void);
 extern void print_hmc_parms(void);
 extern void write_hmc_parms(FILE *fdat);
 extern void check_hmc_parms(FILE *fdat);
 
 /* LAT_PARMS_C */
-extern lat_parms_t set_lat_parms(double beta, double c0, int nk, double *kappa,
-                                 double csw);
+extern lat_parms_t set_lat_parms(double beta, double c0, int nk,
+                                 double const *kappa, double csw);
+
 extern lat_parms_t lat_parms(void);
 extern void print_lat_parms(void);
 extern void write_lat_parms(FILE *fdat);
 extern void check_lat_parms(FILE *fdat);
+
 extern bc_parms_t set_bc_parms(int type, double cG, double cG_prime, double cF,
-                               double cF_prime, double *phi, double *phi_prime,
-                               double *theta);
+                               double cF_prime, double const *phi,
+                               double const *phi_prime, double const *theta);
+
 extern bc_parms_t bc_parms(void);
 extern void print_bc_parms(int ipr);
 extern void write_bc_parms(FILE *fdat);
@@ -321,16 +326,11 @@ extern sw_parms_t set_sw_parms(double m0);
 extern sw_parms_t sw_parms(void);
 extern tm_parms_t set_tm_parms(int eoflg);
 extern tm_parms_t tm_parms(void);
-extern ani_params_t set_ani_parms(int use_tts, double nu, double xi, double cR,
-                                  double cT, double us, double ut, double ust,
-                                  double utt);
-extern ani_params_t ani_parms(void);
-extern void print_ani_parms(void);
 
 /* MDINT_PARMS_C */
 extern mdint_parms_t set_mdint_parms(int ilv, integrator_t integrator,
                                      double lambda, int nstep, int nfr,
-                                     int *ifr);
+                                     int const *ifr);
 extern mdint_parms_t mdint_parms(int ilv);
 extern void read_mdint_parms(int ilv);
 extern void print_mdint_parms(void);
@@ -338,7 +338,7 @@ extern void write_mdint_parms(FILE *fdat);
 extern void check_mdint_parms(FILE *fdat);
 
 /* RAT_PARMS_C */
-extern rat_parms_t set_rat_parms(int irp, int degree, double *range);
+extern rat_parms_t set_rat_parms(int irp, int degree, double const *range);
 extern rat_parms_t rat_parms(int irp);
 extern void read_rat_parms(int irp);
 extern void print_rat_parms(void);
@@ -347,8 +347,9 @@ extern void check_rat_parms(FILE *fdat);
 
 /* RW_PARMS_C */
 extern rw_parms_t set_rw_parms(int irw, rwfact_t rwfact, int im0, int nsrc,
-                               int irp, int nfct, double *mu, int *np,
-                               int *isp);
+                               int irp, int nfct, double const *mu,
+                               int const *np, int const *isp);
+
 extern rw_parms_t rw_parms(int irw);
 extern void read_rw_parms(int irw);
 extern void print_rw_parms(void);
@@ -356,7 +357,7 @@ extern void write_rw_parms(FILE *fdat);
 extern void check_rw_parms(FILE *fdat);
 
 /* SAP_PARMS_C */
-extern sap_parms_t set_sap_parms(int *bs, int isolv, int nmr, int ncy);
+extern sap_parms_t set_sap_parms(int const *bs, int isolv, int nmr, int ncy);
 extern sap_parms_t sap_parms(void);
 extern void print_sap_parms(int ipr);
 extern void write_sap_parms(FILE *fdat);
@@ -376,12 +377,29 @@ extern void check_solver_parms(FILE *fdat);
 extern wflow_parms_t set_wflow_parms(int n, double eps);
 extern wflow_parms_t wflow_parms(void);
 
+/* ANISOTROPY_PARMS_C */
+extern ani_params_t set_ani_parms(int use_tts, double nu, double xi, double cR,
+                                  double cT, double us, double ut, double ust,
+                                  double utt);
+
+extern ani_params_t set_no_ani_parms(void);
+extern ani_params_t ani_parms(void);
+extern void print_ani_parms(void);
+extern int ani_params_initialised(void);
+extern void write_ani_parms(FILE *fdat);
+extern void check_ani_parms(FILE *fdat);
+
 /* SMEARING_PARMS_C */
 extern stout_smearing_params_t set_stout_smearing_parms(int n, double pt,
                                                         double ps,
                                                         int smear_gauge,
                                                         int smear_fermion);
+
+extern stout_smearing_params_t set_no_stout_smearing_parms(void);
+extern void reset_stout_smearing(void);
 extern stout_smearing_params_t stout_smearing_parms(void);
-extern void print_smearing_parms(void);
+extern void print_stout_smearing_parms(void);
+extern void write_stout_smearing_parms(FILE *fdat);
+extern void check_stout_smearing_parms(FILE *fdat);
 
 #endif

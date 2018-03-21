@@ -13,13 +13,8 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
-
-#ifndef UTILS_H
 #include "utils.h"
-#endif
 
 typedef struct
 {
@@ -48,12 +43,12 @@ typedef struct
 typedef enum { SAP_BLOCKS, DFL_BLOCKS, BLK_GRIDS } blk_grid_t;
 
 /* BLOCK_C */
-extern void alloc_blk(block_t *b, int *bo, int *bs, int iu, int iud, int ns,
-                      int nsd);
+extern void alloc_blk(block_t *b, int const *bo, int const *bs, int iu, int iud,
+                      int ns, int nsd);
 extern void alloc_bnd(block_t *b, int iu, int iud, int nw, int nwd);
-extern void clone_blk(block_t *b, int shf, int *bo, block_t *c);
+extern void clone_blk(block_t const *b, int shf, int const *bo, block_t *c);
 extern void free_blk(block_t *b);
-extern int ipt_blk(block_t *b, int *x);
+extern int ipt_blk(block_t const *b, int const *x);
 
 /* BLK_GRID_C */
 extern void alloc_bgr(blk_grid_t grid);
@@ -68,14 +63,14 @@ extern int assign_swd2swbgr(blk_grid_t grid, ptset_t set);
 extern int assign_swd2swdblk(blk_grid_t grid, int n, ptset_t set);
 
 /* MAP_S2BLK_C */
-extern void assign_s2sblk(blk_grid_t grid, int n, ptset_t set, spinor *s,
+extern void assign_s2sblk(blk_grid_t grid, int n, ptset_t set, spinor const *s,
                           int k);
 extern void assign_sblk2s(blk_grid_t grid, int n, ptset_t set, int k,
                           spinor *s);
-extern void assign_s2sdblk(blk_grid_t grid, int n, ptset_t set, spinor *s,
+extern void assign_s2sdblk(blk_grid_t grid, int n, ptset_t set, spinor const *s,
                            int k);
 extern void assign_sd2sdblk(blk_grid_t grid, int n, ptset_t set,
-                            spinor_dble *sd, int k);
+                            spinor_dble const *sd, int k);
 extern void assign_sdblk2sd(blk_grid_t grid, int n, ptset_t set, int k,
                             spinor_dble *sd);
 

@@ -46,17 +46,12 @@
 
 #define MAP_U2BLK_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
 #include "block.h"
+#include "flags.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "uflds.h"
 
 static int bc, np, nmu[8], nbf[8], ofs[8];
 static int sflg[8], rflg[8], tags[8], init = 0;

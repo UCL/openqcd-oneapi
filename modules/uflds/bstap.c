@@ -49,16 +49,11 @@
 
 #define BSTAP_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include "global.h"
+#include "lattice.h"
 #include "mpi.h"
 #include "su3fcts.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
 #include "uflds.h"
-#include "global.h"
 
 static const int plns[6][2] = {{0, 1}, {0, 2}, {0, 3}, {2, 3}, {3, 1}, {1, 2}};
 static int bc, np, nfc[8], ofs[8], hofs[8], tags[8], nmu[8];

@@ -12,14 +12,9 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
-#include <float.h>
-#include "utils.h"
 #include "random.h"
 #include "su3fcts.h"
+#include <time.h>
 
 static double mu[3];
 static su3_alg_dble *X;

@@ -14,23 +14,17 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "vflds.h"
-#include "linalg.h"
-#include "dirac.h"
 #include "dfl.h"
-#include "little.h"
+#include "dirac.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "little.h"
+#include "mpi.h"
+#include "random.h"
+#include "sflds.h"
+#include "uflds.h"
+#include "vflds.h"
 
 static int bc, Ns;
 
@@ -158,12 +152,21 @@ int main(int argc, char *argv[])
                  "Syntax: check4 [-bc <type>]");
   }
 
-  set_lat_parms(5.5, 1.0, 0, NULL, 1.978);
+  MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (bc == 3) {
+    set_ani_parms(1, 1.5, 4.3, 1.5, 0.9, 1.0, 1.0, 0.9, 1.1);
+    print_ani_parms();
+    set_lat_parms(5.5, 1.0, 0, NULL, 1.0);
+  } else {
+    set_no_ani_parms();
+    set_lat_parms(5.5, 1.0, 0, NULL, 1.978);
+  }
+
   print_lat_parms();
 
   MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&Ns, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
   phi[0] = 0.123;
   phi[1] = -0.534;
   phi_prime[0] = 0.912;

@@ -14,21 +14,14 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "su3fcts.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
 #include "forces.h"
-#include "wflow.h"
-#include "tcharge.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "random.h"
+#include "tcharge.h"
+#include "uflds.h"
+#include "wflow.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -82,6 +75,7 @@ int main(int argc, char *argv[])
   MPI_Bcast(&dn, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&eps, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
+  set_no_ani_parms();
   set_lat_parms(6.0, 1.0, 0, NULL, 1.0);
 
   phi[0] = 0.123;
@@ -92,7 +86,6 @@ int main(int argc, char *argv[])
   theta[1] = 0.0;
   theta[2] = 0.0;
   set_bc_parms(bc, 1.0, 1.0, 1.0, 1.0, phi, phi_prime, theta);
-  set_ani_parms(1, 1.1, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
   print_bc_parms(0);
 
   start_ranlux(0, 123456);

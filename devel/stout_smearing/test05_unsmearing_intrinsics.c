@@ -7,14 +7,9 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "lattice.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
 #include "stout_smearing.h"
 
 #include <devel/testing_utilities/data_type_diffs.c>
@@ -196,13 +191,14 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf("Checks of the programs in the module stout_smearing\n");
-    printf("-------------------------------------------\n\n");
+    printf("Checks of the unsmearing intrinsic functions\n");
+    printf("--------------------------------------------\n");
 
-    printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
+    printf("%dx%dx%dx%d lattice,\n", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
            NPROC3 * L3);
-    printf("%dx%dx%dx%d process grid, ", NPROC0, NPROC1, NPROC2, NPROC3);
-    printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
+    printf("%dx%dx%dx%d process grid,\n", NPROC0, NPROC1, NPROC2, NPROC3);
+    printf("%dx%dx%dx%d local lattice\n", L0, L1, L2, L3);
+    printf("--------------------------------------------\n\n");
   }
 
   get_inputs(&input_exp_matrix, &input_link, &input_force);

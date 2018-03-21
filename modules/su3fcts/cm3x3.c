@@ -80,9 +80,6 @@
 
 #define CM3X3_C
 
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
 #include "su3fcts.h"
 
 #if (defined x64)

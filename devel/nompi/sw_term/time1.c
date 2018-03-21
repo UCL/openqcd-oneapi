@@ -12,14 +12,9 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <time.h>
-#include "utils.h"
 #include "random.h"
-#include "linalg.h"
 #include "sw_term.h"
+#include <time.h>
 
 typedef union
 {

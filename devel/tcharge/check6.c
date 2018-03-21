@@ -14,20 +14,14 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
 #include "flags.h"
-#include "random.h"
-#include "su3fcts.h"
-#include "utils.h"
+#include "global.h"
 #include "lattice.h"
+#include "mpi.h"
+#include "random.h"
+#include "tcharge.h"
 #include "uflds.h"
 #include "wflow.h"
-#include "tcharge.h"
-#include "global.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -80,6 +74,8 @@ int main(int argc, char *argv[])
   MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&dn, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&eps, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  set_no_ani_parms();
 
   phi[0] = 0.123;
   phi[1] = -0.534;

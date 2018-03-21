@@ -105,14 +105,10 @@
 
 #define SOLVER_PARMS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "mpi.h"
-#include "utils.h"
 #include "flags.h"
 #include "global.h"
+#include "mpi.h"
+#include <string.h>
 
 #define ISPMAX 32
 

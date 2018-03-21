@@ -71,21 +71,22 @@
  * the program Dop_dble() acts correctly on them. Some debugging output is
  * printed to stdout on process 0 if the macro MSCG_DBG is defined.
  *
+ * CONST_CORRECTNESS:
+ *   The algorithm should have a signature that represents its const-ness,
+ *   however this is currently not possible due to the fact that most callers of
+ *   this algorithm specifies Dop using Dw, which is currently not const correct
+ *   (and hard to make const correct). This algorithm will thus be left until
+ *   that has been fixed.
+ *
  *******************************************************************************/
 
 #define MSCG_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "sflds.h"
+#include "global.h"
 #include "linalg.h"
 #include "linsolv.h"
-#include "global.h"
+#include "mpi.h"
+#include "sflds.h"
 
 typedef struct
 {

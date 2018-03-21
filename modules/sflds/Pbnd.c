@@ -14,22 +14,22 @@
  * The following are arrays of functions indexed by the face number
  * ifc=0,..,7
  *
- *   void (*assign_s2w[8])(int *imb,int vol,spinor *s,weyl *r)
+ *   void (*assign_s2w[8])(int const *imb,int vol,spinor const *s,weyl *r)
  *     Applies the projector theta[ifc] to the spinor s[imb[ix]],
  *     ix=0,..,vol-1, and assigns the result to the weyl spinor r[ix].
  *
- *   void (*add_assign_w2s[8])(int *imb,int vol,weyl *s,spinor *r)
+ *   void (*add_assign_w2s[8])(int const *imb,int vol,weyl const *s,spinor *r)
  *     Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor
  *     psi satisfying theta[ifc]*psi=psi and adds psi to r[imb[ix]].
  *
- *   void (*sub_assign_w2s[8])(int *imb,int vol,weyl *s,spinor *r)
+ *   void (*sub_assign_w2s[8])(int const *imb,int vol,weyl const *s,spinor *r)
  *     Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor
  *     psi satisfying theta[ifc]*psi=psi and subtracts psi from r[imb[ix]].
  *
- *   void (*mulg5_sub_assign_w2s[8])(int *imb,int vol,weyl *s,spinor *r)
- *     Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor
- *     psi satisfying theta[ifc]*psi=psi and subtracts gamma5*psi from
- *     r[imb[ix]].
+ *   void (*mulg5_sub_assign_w2s[8])(int const *imb,int vol,weyl const *s,
+ *                                   spinor *r)
+ *    Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor psi
+ *    satisfying theta[ifc]*psi=psi and subtracts gamma5*psi from r[imb[ix]].
  *
  * Notes:
  *
@@ -61,11 +61,6 @@
 
 #define PBND_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "su3.h"
 #include "sflds.h"
 
 #if (defined x64)
@@ -88,10 +83,10 @@
 
 static const float poh = 0.5f;
 
-static void assign_s2w0(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w0(int const *imb, int vol, spinor const *s, weyl *r)
 {
   weyl *rm;
-  spinor *si, *sin;
+  spinor const *si, *sin;
 
   _load_cst(poh);
   rm = r + vol;
@@ -114,10 +109,10 @@ static void assign_s2w0(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w1(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w1(int const *imb, int vol, spinor const *s, weyl *r)
 {
   weyl *rm;
-  spinor *si, *sin;
+  spinor const *si, *sin;
 
   _load_cst(poh);
   rm = r + vol;
@@ -140,10 +135,10 @@ static void assign_s2w1(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w2(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w2(int const *imb, int vol, spinor const *s, weyl *r)
 {
   weyl *rm;
-  spinor *si, *sin;
+  spinor const *si, *sin;
 
   _load_cst(poh);
   rm = r + vol;
@@ -166,10 +161,10 @@ static void assign_s2w2(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w3(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w3(int const *imb, int vol, spinor const *s, weyl *r)
 {
   weyl *rm;
-  spinor *si, *sin;
+  spinor const *si, *sin;
 
   _load_cst(poh);
   rm = r + vol;
@@ -192,10 +187,10 @@ static void assign_s2w3(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w4(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w4(int const *imb, int vol, spinor const *s, weyl *r)
 {
   weyl *rm;
-  spinor *si, *sin;
+  spinor const *si, *sin;
 
   _load_cst(poh);
   rm = r + vol;
@@ -218,10 +213,10 @@ static void assign_s2w4(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w5(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w5(int const *imb, int vol, spinor const *s, weyl *r)
 {
   weyl *rm;
-  spinor *si, *sin;
+  spinor const *si, *sin;
 
   _load_cst(poh);
   rm = r + vol;
@@ -244,10 +239,10 @@ static void assign_s2w5(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w6(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w6(int const *imb, int vol, spinor const *s, weyl *r)
 {
   weyl *rm;
-  spinor *si, *sin;
+  spinor const *si, *sin;
 
   _load_cst(poh);
   rm = r + vol;
@@ -270,10 +265,10 @@ static void assign_s2w6(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w7(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w7(int const *imb, int vol, spinor const *s, weyl *r)
 {
   weyl *rm;
-  spinor *si, *sin;
+  spinor const *si, *sin;
 
   _load_cst(poh);
   rm = r + vol;
@@ -296,9 +291,9 @@ static void assign_s2w7(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void add_assign_w2s0(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s0(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -329,9 +324,9 @@ static void add_assign_w2s0(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s1(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s1(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -362,9 +357,9 @@ static void add_assign_w2s1(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s2(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s2(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -395,9 +390,9 @@ static void add_assign_w2s2(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s3(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s3(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -428,9 +423,9 @@ static void add_assign_w2s3(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s4(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s4(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -461,9 +456,9 @@ static void add_assign_w2s4(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s5(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s5(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -494,9 +489,9 @@ static void add_assign_w2s5(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s6(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s6(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -527,9 +522,9 @@ static void add_assign_w2s6(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s7(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s7(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -560,9 +555,9 @@ static void add_assign_w2s7(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s0(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s0(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -593,9 +588,9 @@ static void sub_assign_w2s0(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s1(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s1(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -626,9 +621,9 @@ static void sub_assign_w2s1(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s2(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s2(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -659,9 +654,9 @@ static void sub_assign_w2s2(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s3(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s3(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -692,9 +687,9 @@ static void sub_assign_w2s3(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s4(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s4(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -725,9 +720,9 @@ static void sub_assign_w2s4(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s5(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s5(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -758,9 +753,9 @@ static void sub_assign_w2s5(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s6(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s6(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -791,9 +786,9 @@ static void sub_assign_w2s6(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s7(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s7(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -824,9 +819,9 @@ static void sub_assign_w2s7(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s0(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s0(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -857,9 +852,9 @@ static void mulg5_sub_assign_w2s0(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s1(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s1(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -890,9 +885,9 @@ static void mulg5_sub_assign_w2s1(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s2(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s2(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -923,9 +918,9 @@ static void mulg5_sub_assign_w2s2(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s3(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s3(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -956,9 +951,9 @@ static void mulg5_sub_assign_w2s3(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s4(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s4(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -989,9 +984,9 @@ static void mulg5_sub_assign_w2s4(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s5(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s5(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -1022,9 +1017,9 @@ static void mulg5_sub_assign_w2s5(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s6(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s6(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -1055,9 +1050,9 @@ static void mulg5_sub_assign_w2s6(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s7(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s7(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri, *rin, *rim;
 
   sm = s + vol;
@@ -1090,11 +1085,11 @@ static void mulg5_sub_assign_w2s7(int *imb, int vol, weyl *s, spinor *r)
 
 #else
 
-static void assign_s2w0(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w0(int const *imb, int vol, spinor const *s, weyl *r)
 {
   float r1;
   weyl *rm;
-  spinor *si;
+  spinor const *si;
 
   r1 = 0.5f;
   rm = r + vol;
@@ -1109,11 +1104,11 @@ static void assign_s2w0(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w1(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w1(int const *imb, int vol, spinor const *s, weyl *r)
 {
   float r1;
   weyl *rm;
-  spinor *si;
+  spinor const *si;
 
   r1 = 0.5f;
   rm = r + vol;
@@ -1129,11 +1124,11 @@ static void assign_s2w1(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w2(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w2(int const *imb, int vol, spinor const *s, weyl *r)
 {
   float r1;
   weyl *rm;
-  spinor *si;
+  spinor const *si;
 
   r1 = 0.5f;
   rm = r + vol;
@@ -1149,11 +1144,11 @@ static void assign_s2w2(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w3(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w3(int const *imb, int vol, spinor const *s, weyl *r)
 {
   float r1;
   weyl *rm;
-  spinor *si;
+  spinor const *si;
 
   r1 = 0.5f;
   rm = r + vol;
@@ -1169,11 +1164,11 @@ static void assign_s2w3(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w4(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w4(int const *imb, int vol, spinor const *s, weyl *r)
 {
   float r1;
   weyl *rm;
-  spinor *si;
+  spinor const *si;
 
   r1 = 0.5f;
   rm = r + vol;
@@ -1189,11 +1184,11 @@ static void assign_s2w4(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w5(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w5(int const *imb, int vol, spinor const *s, weyl *r)
 {
   float r1;
   weyl *rm;
-  spinor *si;
+  spinor const *si;
 
   r1 = 0.5f;
   rm = r + vol;
@@ -1209,11 +1204,11 @@ static void assign_s2w5(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w6(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w6(int const *imb, int vol, spinor const *s, weyl *r)
 {
   float r1;
   weyl *rm;
-  spinor *si;
+  spinor const *si;
 
   r1 = 0.5f;
   rm = r + vol;
@@ -1229,11 +1224,11 @@ static void assign_s2w6(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void assign_s2w7(int *imb, int vol, spinor *s, weyl *r)
+static void assign_s2w7(int const *imb, int vol, spinor const *s, weyl *r)
 {
   float r1;
   weyl *rm;
-  spinor *si;
+  spinor const *si;
 
   r1 = 0.5f;
   rm = r + vol;
@@ -1249,9 +1244,9 @@ static void assign_s2w7(int *imb, int vol, spinor *s, weyl *r)
   }
 }
 
-static void add_assign_w2s0(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s0(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1266,9 +1261,9 @@ static void add_assign_w2s0(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s1(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s1(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1284,9 +1279,9 @@ static void add_assign_w2s1(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s2(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s2(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1302,9 +1297,9 @@ static void add_assign_w2s2(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s3(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s3(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1320,9 +1315,9 @@ static void add_assign_w2s3(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s4(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s4(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1338,9 +1333,9 @@ static void add_assign_w2s4(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s5(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s5(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1356,9 +1351,9 @@ static void add_assign_w2s5(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s6(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s6(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1374,9 +1369,9 @@ static void add_assign_w2s6(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void add_assign_w2s7(int *imb, int vol, weyl *s, spinor *r)
+static void add_assign_w2s7(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1392,9 +1387,9 @@ static void add_assign_w2s7(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s0(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s0(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1409,9 +1404,9 @@ static void sub_assign_w2s0(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s1(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s1(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1427,9 +1422,9 @@ static void sub_assign_w2s1(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s2(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s2(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1445,9 +1440,9 @@ static void sub_assign_w2s2(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s3(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s3(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1463,9 +1458,9 @@ static void sub_assign_w2s3(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s4(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s4(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1481,9 +1476,9 @@ static void sub_assign_w2s4(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s5(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s5(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1499,9 +1494,9 @@ static void sub_assign_w2s5(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s6(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s6(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1517,9 +1512,9 @@ static void sub_assign_w2s6(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void sub_assign_w2s7(int *imb, int vol, weyl *s, spinor *r)
+static void sub_assign_w2s7(int const *imb, int vol, weyl const *s, spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1535,9 +1530,10 @@ static void sub_assign_w2s7(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s0(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s0(int const *imb, int vol, weyl const *s,
+                                  spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1552,9 +1548,10 @@ static void mulg5_sub_assign_w2s0(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s1(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s1(int const *imb, int vol, weyl const *s,
+                                  spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1570,9 +1567,10 @@ static void mulg5_sub_assign_w2s1(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s2(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s2(int const *imb, int vol, weyl const *s,
+                                  spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1588,9 +1586,10 @@ static void mulg5_sub_assign_w2s2(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s3(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s3(int const *imb, int vol, weyl const *s,
+                                  spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1606,9 +1605,10 @@ static void mulg5_sub_assign_w2s3(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s4(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s4(int const *imb, int vol, weyl const *s,
+                                  spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1624,9 +1624,10 @@ static void mulg5_sub_assign_w2s4(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s5(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s5(int const *imb, int vol, weyl const *s,
+                                  spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1642,9 +1643,10 @@ static void mulg5_sub_assign_w2s5(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s6(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s6(int const *imb, int vol, weyl const *s,
+                                  spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1660,9 +1662,10 @@ static void mulg5_sub_assign_w2s6(int *imb, int vol, weyl *s, spinor *r)
   }
 }
 
-static void mulg5_sub_assign_w2s7(int *imb, int vol, weyl *s, spinor *r)
+static void mulg5_sub_assign_w2s7(int const *imb, int vol, weyl const *s,
+                                  spinor *r)
 {
-  weyl *sm;
+  weyl const *sm;
   spinor *ri;
 
   sm = s + vol;
@@ -1680,19 +1683,20 @@ static void mulg5_sub_assign_w2s7(int *imb, int vol, weyl *s, spinor *r)
 
 #endif
 
-void (*assign_s2w[8])(int *imb, int vol, spinor *s, weyl *r) = {
+void (*assign_s2w[8])(int const *imb, int vol, spinor const *s, weyl *r) = {
     assign_s2w0, assign_s2w1, assign_s2w2, assign_s2w3,
     assign_s2w4, assign_s2w5, assign_s2w6, assign_s2w7};
 
-void (*add_assign_w2s[8])(int *imb, int vol, weyl *s, spinor *r) = {
+void (*add_assign_w2s[8])(int const *imb, int vol, weyl const *s, spinor *r) = {
     add_assign_w2s0, add_assign_w2s1, add_assign_w2s2, add_assign_w2s3,
     add_assign_w2s4, add_assign_w2s5, add_assign_w2s6, add_assign_w2s7};
 
-void (*sub_assign_w2s[8])(int *imb, int vol, weyl *s, spinor *r) = {
+void (*sub_assign_w2s[8])(int const *imb, int vol, weyl const *s, spinor *r) = {
     sub_assign_w2s0, sub_assign_w2s1, sub_assign_w2s2, sub_assign_w2s3,
     sub_assign_w2s4, sub_assign_w2s5, sub_assign_w2s6, sub_assign_w2s7};
 
-void (*mulg5_sub_assign_w2s[8])(int *imb, int vol, weyl *s, spinor *r) = {
+void (*mulg5_sub_assign_w2s[8])(int const *imb, int vol, weyl const *s,
+                                spinor *r) = {
     mulg5_sub_assign_w2s0, mulg5_sub_assign_w2s1, mulg5_sub_assign_w2s2,
     mulg5_sub_assign_w2s3, mulg5_sub_assign_w2s4, mulg5_sub_assign_w2s5,
     mulg5_sub_assign_w2s6, mulg5_sub_assign_w2s7};

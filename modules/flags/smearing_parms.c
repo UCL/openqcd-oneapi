@@ -1,14 +1,13 @@
 #define SMEARING_PARMS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "utils.h"
 #include "flags.h"
 #include "global.h"
+#include "mpi.h"
 
+#define NUM_INT_PARMS 5
+#define NUM_DOUBLE_PARMS 2
+
+static int flg_smearing = 0;
 static stout_smearing_params_t ssp = {0, 0, 0., 0, 0., 0, 0};
 
 stout_smearing_params_t set_stout_smearing_parms(int n, double pt, double ps,
@@ -17,6 +16,9 @@ stout_smearing_params_t set_stout_smearing_parms(int n, double pt, double ps,
 {
   int nprm[5];
   double ssprms[2];
+
+  error(flg_smearing != 0, 1, "set_stout_smearing_parms [smearing_parms.c]",
+        "Attempt to reset the stout smearing parameters");
 
   nprm[0] = n;
   nprm[1] = !(pt == 0.);
@@ -58,12 +60,26 @@ stout_smearing_params_t set_stout_smearing_parms(int n, double pt, double ps,
   ssp.smear_gauge = nprm[3];
   ssp.smear_fermion = nprm[4];
 
+  flg_smearing = 1;
+
   return ssp;
+}
+
+stout_smearing_params_t set_no_stout_smearing_parms(void)
+{
+  return set_stout_smearing_parms(0, 0.0, 0.0, 0, 0);
+}
+
+void reset_stout_smearing(void)
+{
+  flg_smearing = 0;
+  set_no_stout_smearing_parms();
+  flg_smearing = 0;
 }
 
 stout_smearing_params_t stout_smearing_parms() { return ssp; }
 
-void print_smearing_parms(void)
+void print_stout_smearing_parms(void)
 {
   int my_rank, n;
 
@@ -78,5 +94,80 @@ void print_smearing_parms(void)
     printf("rho_s = %.*f\n", IMAX(n, 1), ssp.rho_spatial);
     printf("gauge = %s\n", (ssp.smear_gauge == 1) ? "true" : "false");
     printf("fermion = %s\n\n", (ssp.smear_fermion == 1) ? "true" : "false");
+  }
+}
+
+void write_stout_smearing_parms(FILE *fdat)
+{
+  int my_rank, endian, iw;
+  stdint_t istd[NUM_INT_PARMS];
+  double dstd[NUM_DOUBLE_PARMS];
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+  endian = endianness();
+
+  error(flg_smearing != 1, 1, "write_stout_smearing_parms [smearing_parms.c]",
+        "Attempt to write the stout smearing parameters without setting them "
+        "first");
+
+  if (my_rank == 0) {
+
+    istd[0] = ssp.num_smear;
+    istd[1] = ssp.smear_temporal;
+    istd[2] = ssp.smear_spatial;
+    istd[3] = ssp.smear_gauge;
+    istd[4] = ssp.smear_fermion;
+
+    dstd[0] = ssp.rho_temporal;
+    dstd[1] = ssp.rho_spatial;
+
+    if (endian == BIG_ENDIAN) {
+      bswap_int(NUM_INT_PARMS, istd);
+      bswap_double(NUM_DOUBLE_PARMS, dstd);
+    }
+
+    iw = fwrite(istd, sizeof(stdint_t), NUM_INT_PARMS, fdat);
+    iw += fwrite(dstd, sizeof(double), NUM_DOUBLE_PARMS, fdat);
+
+    error_root(iw != (NUM_INT_PARMS + NUM_DOUBLE_PARMS), 1,
+               "write_stout_smearing_parms [smearing_parms.c]",
+               "Incorrect write count");
+  }
+}
+
+void check_stout_smearing_parms(FILE *fdat)
+{
+  int my_rank, endian, ir, ie;
+  stdint_t istd[NUM_INT_PARMS];
+  double dstd[NUM_DOUBLE_PARMS];
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+  endian = endianness();
+
+  if (my_rank == 0) {
+    ir = fread(istd, sizeof(stdint_t), NUM_INT_PARMS, fdat);
+    ir += fread(dstd, sizeof(double), NUM_DOUBLE_PARMS, fdat);
+
+    if (endian == BIG_ENDIAN) {
+      bswap_int(NUM_INT_PARMS, istd);
+      bswap_double(NUM_DOUBLE_PARMS, dstd);
+    }
+
+    ie = 0;
+    ie |= (istd[0] != (stdint_t)(ssp.num_smear));
+    ie |= (istd[1] != (stdint_t)(ssp.smear_temporal));
+    ie |= (istd[2] != (stdint_t)(ssp.smear_spatial));
+    ie |= (istd[3] != (stdint_t)(ssp.smear_gauge));
+    ie |= (istd[4] != (stdint_t)(ssp.smear_fermion));
+
+    ie |= (dstd[0] != ssp.rho_temporal);
+    ie |= (dstd[1] != ssp.rho_spatial);
+
+    error_root(ir != (NUM_INT_PARMS + NUM_DOUBLE_PARMS), 1,
+               "check_stout_smearing_parms [smearing_parms.c]",
+               "Incorrect read count");
+
+    error_root(ie != 0, 1, "check_stout_smearing_parms [smearing_parms.c]",
+               "Parameters do not match");
   }
 }

@@ -12,12 +12,7 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
 #include "random.h"
-#include "utils.h"
 #include "su3fcts.h"
 
 static double max_dev(su3_dble *u, su3_dble *v)

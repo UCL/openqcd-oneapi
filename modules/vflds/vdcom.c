@@ -43,16 +43,11 @@
 
 #define VDCOM_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
 #include "dfl.h"
-#include "vflds.h"
+#include "flags.h"
 #include "global.h"
+#include "mpi.h"
+#include "vflds.h"
 
 static int bc, np, nmu[8];
 static int Ns, nb, nbb;

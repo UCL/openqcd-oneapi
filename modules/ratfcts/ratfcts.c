@@ -12,7 +12,7 @@
  *
  * The externally accessible functions are
  *
- *   ratfct_t ratfct(int *irat)
+ *   ratfct_t ratfct(int const *irat)
  *     Returns a structure containing the coefficients of the rational
  *     function specified by the integers irat[3] (see the notes).
  *
@@ -104,13 +104,9 @@
 
 #define RATFCTS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "flags.h"
-#include "utils.h"
 #include "ratfcts.h"
+#include "flags.h"
+#include "mpi.h"
 
 #define IRMAX 32
 
@@ -137,7 +133,7 @@ static void init_rat(void)
   init = 1;
 }
 
-static int fnd_rat(int *irat)
+static int fnd_rat(int const *irat)
 {
   int ir;
 
@@ -150,7 +146,7 @@ static int fnd_rat(int *irat)
   return irs;
 }
 
-static void alloc_rat(int *irat)
+static void alloc_rat(int const *irat)
 {
   int n, np, k, l;
   double *mu;
@@ -191,7 +187,7 @@ static void alloc_rat(int *irat)
   irats[irs][2] = irat[2];
 }
 
-static void set_rat(int *irat)
+static void set_rat(int const *irat)
 {
   int n, np, k, l, i, j;
   double ra, rb, pmu, pnu;
@@ -243,7 +239,7 @@ static void set_rat(int *irat)
   irs += 1;
 }
 
-ratfct_t ratfct(int *irat)
+ratfct_t ratfct(int const *irat)
 {
   int ir;
 

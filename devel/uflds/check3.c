@@ -14,17 +14,11 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "random.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "random.h"
+#include "uflds.h"
 
 static int my_rank, ipsnd, iprcv, *isnd;
 static su3_dble *uold, *unew, *ubuf;

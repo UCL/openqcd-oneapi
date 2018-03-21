@@ -50,19 +50,15 @@
 
 #define FORCE0_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "flags.h"
-#include "su3fcts.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
-#include "mdflds.h"
+#include "field_com.h"
 #include "forces.h"
-#include "linalg.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mdflds.h"
+#include "mpi.h"
+#include "su3fcts.h"
+#include "uflds.h"
 
 #define N0 (NPROC0 * L0)
 
@@ -209,7 +205,6 @@ static void set_staples(int n, int ix, int ia)
   }
 }
 
-/* XXX: This does not use the buffer when computing the force, is that OK? */
 void plaq_frc(void)
 {
   int bc, n, ix, t, ip[4];
@@ -298,10 +293,10 @@ void force0(double c)
 {
   int bc, n, ix, t, ip[4];
   double c0, c1, *cG;
-  double r0, r1;
+  double r0, r1, r1tts;
   double gamma_g, one_over_gamma_g;
   double aniso_plaq_weight = 1.0;
-  double ut2, us2, us4, us6;
+  double ut2, ut4, us2, us4, us6;
 
   su3_alg_dble *fdb;
   mdflds_t *mdfs;
@@ -322,9 +317,10 @@ void force0(double c)
   gamma_g = ani.xi;
   one_over_gamma_g = 1.0 / gamma_g;
   ut2 = 1.0 / (ani.ut_gauge * ani.ut_gauge);
+  ut4 = ut2 * ut2;
   us2 = 1.0 / (ani.us_gauge * ani.us_gauge);
-  us4 = us2 * 1.0 / (ani.us_gauge * ani.us_gauge);
-  us6 = us4 * 1.0 / (ani.us_gauge * ani.us_gauge);
+  us4 = us2 * us2;
+  us6 = us4 * us2;
 
   if (query_flags(UDBUF_UP2DATE) != 1)
     copy_bnd_ud();
@@ -339,14 +335,14 @@ void force0(double c)
   set_alg2zero(4 * VOLUME + 7 * (BNDRY / 4), fdb);
 
   /* No rectangulars */
-  if (c0 == 1.0) {
+  if (is_equal_d(c0, 1.0)) {
     hdb = NULL;
 
     /* has rectangular */
   } else {
 
     if (!ani.has_tts) {
-      aniso_plaq_weight = (1.0 - 4 * c1) / c0;
+      aniso_plaq_weight = (c0 + 4 * c1) / c0;
     }
 
     if ((init & 0x2) == 0)
@@ -364,6 +360,7 @@ void force0(double c)
     if ((t < (N0 - 1)) || (bc != 0)) {
       r0 = c * c0 * gamma_g * aniso_plaq_weight * ut2 * us2;
       r1 = c * c1 * gamma_g * ut2 * us4;
+      r1tts = c * c1 * gamma_g * ut4 * us2;
 
       if ((t == 0) && (bc == 1))
         r0 *= cG[0];
@@ -392,7 +389,7 @@ void force0(double c)
           _su3_alg_mul_sub_assign(*(fdb + ip[2]), r0, X);
         }
 
-        if (c0 != 1.0) {
+        if (not_equal_d(c0, 1.0)) {
           set_staples(n, ix, 0);
 
           if ((t == 0) && (bc == 1)) {
@@ -448,29 +445,29 @@ void force0(double c)
               su3xsu3dag(udb + ip[3], vd + 1, wd + 1);
               su3xsu3dag(wd + 1, udb + ip[0], wd + 2);
               prod2su3alg(udb + ip[2], wd + 2, &X);
-              _su3_alg_mul_sub_assign(*(fdb + ip[0]), r1, X);
+              _su3_alg_mul_sub_assign(*(fdb + ip[0]), r1tts, X);
 
               if ((t > 0) || (bc != 1)) {
-                _su3_alg_mul_add_assign(*(fdb + ip[2]), r1, X);
+                _su3_alg_mul_add_assign(*(fdb + ip[2]), r1tts, X);
               }
 
               prod2su3alg(wd + 2, udb + ip[2], &X);
-              _su3_alg_mul_add_assign(*(fdb + ip[3]), r1, X);
+              _su3_alg_mul_add_assign(*(fdb + ip[3]), r1tts, X);
             }
 
             if ((t > 0) || (bc == 3)) {
               su3xsu3dag(wd, vd + 2, wd + 1);
               prod2su3alg(udb + ip[0], wd + 1, &X);
-              _su3_alg_mul_add_assign(*(fdb + ip[0]), r1, X);
+              _su3_alg_mul_add_assign(*(fdb + ip[0]), r1tts, X);
 
               if ((t < (N0 - 1)) || (bc == 3)) {
                 prod2su3alg(wd + 1, udb + ip[0], &X);
-                _su3_alg_mul_add_assign(*(fdb + ip[1]), r1, X);
+                _su3_alg_mul_add_assign(*(fdb + ip[1]), r1tts, X);
               }
 
               su3dagxsu3(vd + 2, udb + ip[0], wd + 1);
               prod2su3alg(wd + 1, wd, &X);
-              _su3_alg_mul_sub_assign(*(fdb + ip[3]), r1, X);
+              _su3_alg_mul_sub_assign(*(fdb + ip[3]), r1tts, X);
             }
           }
           /* End of TTS */
@@ -520,7 +517,7 @@ void force0(double c)
         _su3_alg_mul_add_assign(*(fdb + ip[0]), r0, X);
         _su3_alg_mul_sub_assign(*(fdb + ip[2]), r0, X);
 
-        if (c0 != 1.0) {
+        if (not_equal_d(c0, 1.0)) {
           set_staples(n, ix, 0);
 
           prod2su3alg(wd + 1, vd, &X);
@@ -566,8 +563,7 @@ void force0(double c)
     }
   }
 
-  /*add_bnd_frc();*/
-  add_boundaries_force(force_buffer);
+  add_boundary_su3_alg_field(force_buffer);
 
   add_alg(4 * VOLUME, force_buffer, (*mdfs).frc);
 }
@@ -591,7 +587,7 @@ static void wloops(int n, int ix, int t, double c0, double *trU)
     trU[0] = 3.0 - trU[0];
   }
 
-  if (c0 != 1.0) {
+  if (not_equal_d(c0, 1.0)) {
     set_staples(n, ix, 1);
 
     if ((n < 3) && (((t == 0) && (bc == 1)) ||
@@ -656,7 +652,7 @@ double action0(int icom)
   udb = udfld();
 
   /* No rectangulars */
-  if (c0 == 1.0) {
+  if (is_equal_d(c0, 1.0)) {
     hdb = NULL;
 
     /* has rectangular */
@@ -664,7 +660,7 @@ double action0(int icom)
     /* If no TTS rectangles are computed, the plaquette must be weighted by a
      * factor of (1 - 4*c1) / c0 if we want to retrieve the continuum limit */
     if (!ani.has_tts) {
-      aniso_plaq_weight = (1.0 - 4 * c1) / c0;
+      aniso_plaq_weight = (c0 + 4 * c1) / c0;
     }
 
     if ((init & 0x2) == 0)

@@ -57,21 +57,15 @@
 
 #define AW_OPS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "vflds.h"
-#include "linalg.h"
-#include "sw_term.h"
-#include "dirac.h"
-#include "block.h"
 #include "dfl.h"
-#include "little.h"
+#include "dirac.h"
+#include "flags.h"
 #include "global.h"
+#include "linalg.h"
+#include "little.h"
+#include "mpi.h"
+#include "sw_term.h"
+#include "vflds.h"
 
 #define MAX_FROBENIUS 1.0e6
 #define MAX_UPDATE 128
@@ -264,7 +258,7 @@ static void update_Awdiag(double m0, double mu, int eo)
       for (k = 0; k < Ns; k++) {
         z[Ns * k + k].re += dm0;
 
-        if (dme != 0.0) {
+        if (not_equal_d(dme, 0.0)) {
           for (l = k; l < Ns; l++) {
             w = spinor_prod5_dble(volh, 0, sd[k + 1], sd[l + 1]);
 
@@ -278,7 +272,7 @@ static void update_Awdiag(double m0, double mu, int eo)
           }
         }
 
-        if (dmo != 0.0) {
+        if (not_equal_d(dmo, 0.0)) {
           for (l = k; l < Ns; l++) {
             w = spinor_prod5_dble(volh, 0, sd[k + 1] + volh, sd[l + 1] + volh);
 
@@ -361,8 +355,10 @@ void set_Aw(double mu)
   ani = ani_parms();
 
   if (query_flags(AW_UP2DATE) == 1) {
-    if ((m0 != old_m0[0]) || (mu != old_mu[0]) || (eo != old_eo[0]))
+    if (not_equal_d(m0, old_m0[0]) || not_equal_d(mu, old_mu[0]) ||
+        (eo != old_eo[0])) {
       update_Awdiag(m0, mu, eo);
+    }
     return;
   }
 

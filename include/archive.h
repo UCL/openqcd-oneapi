@@ -13,26 +13,19 @@
 #ifndef ARCHIVE_H
 #define ARCHIVE_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
+#include <stdio.h>
 
 /* ARCHIVE_C */
-extern void write_cnfg(char *out);
-extern void read_cnfg(char *in);
-extern void export_cnfg(char *out);
-extern void import_cnfg(char *in);
-
-/* MARCHIVE_C */
-extern void write_mfld(char *out);
-extern void read_mfld(char *in);
-extern void export_mfld(char *out);
-extern void import_mfld(char *in);
+extern void write_cnfg(char const *out);
+extern void read_cnfg(char const *in);
+extern void export_cnfg(char const *out);
+extern void import_cnfg(char const *in);
 
 /* SARCHIVE_C */
-extern void write_sfld(char *out, spinor_dble *sd);
-extern void read_sfld(char *in, spinor_dble *sd);
-extern void export_sfld(char *out, spinor_dble *sd);
-extern void import_sfld(char *in, spinor_dble *sd);
+extern void write_sfld(char const *out, spinor_dble const *sd);
+extern void read_sfld(char const *in, spinor_dble *sd);
+extern void export_sfld(char const *out, spinor_dble const *sd);
+extern void import_sfld(char const *in, spinor_dble *sd);
 
 #endif

@@ -21,12 +21,9 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "utils.h"
 #include "extras.h"
+#include "utils.h"
+#include <string.h>
 
 typedef struct
 {
@@ -102,12 +99,14 @@ static void read_file(char *fin)
 static void select_range(void)
 {
   int n, no, nf, nl;
-  int np, dn, ie;
+  int np, dn, ie, res;
 
   printf("There are %d measurements (trajectories no %d - %d).\n", nms,
          adat[0].nt, adat[nms - 1].nt);
   printf("Range [nfirst,nlast] of trajectories to analyse: ");
-  scanf("%d %d", &nfirst, &nlast);
+
+  res = scanf("%d %d", &nfirst, &nlast);
+  error(res == 0, 1, "select_range [read1.c]", "scanf failed");
 
   nf = 0;
   nl = 0;

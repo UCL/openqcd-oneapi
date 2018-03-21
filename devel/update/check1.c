@@ -14,19 +14,13 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "flags.h"
-#include "utils.h"
+#include "global.h"
 #include "lattice.h"
 #include "mdflds.h"
+#include "mpi.h"
+#include "random.h"
 #include "update.h"
-#include "global.h"
+#include <string.h>
 
 static int my_rank;
 static force_t force[] = {FRG,     FRF_TM1,    FRF_TM1_EO, FRF_TM1_EO_SDET,
@@ -114,7 +108,8 @@ static void read_integrator(void)
 int main(int argc, char *argv[])
 {
   int i, ie;
-  int nop, ismear, iunsmear, itu, *iop;
+  size_t nop;
+  int ismear, iunsmear, itu, *iop;
   double phi[2], phi_prime[2], theta[3];
   double kappa, *eps;
   mdstep_t *mds;
@@ -138,7 +133,10 @@ int main(int argc, char *argv[])
   }
 
   kappa = 0.1365;
+  set_no_ani_parms();
   set_lat_parms(5.3, 1.6667, 1, &kappa, 1.789);
+  set_no_stout_smearing_parms();
+
   phi[0] = 0.0;
   phi[1] = 0.0;
   phi_prime[0] = 0.0;

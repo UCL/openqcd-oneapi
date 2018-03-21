@@ -35,24 +35,16 @@
 
 #define MDINT_C
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include <float.h>
-#include "mpi.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
-#include "mdflds.h"
-#include "su3fcts.h"
-#include "linalg.h"
 #include "dfl.h"
 #include "forces.h"
-#include "update.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mdflds.h"
+#include "mpi.h"
 #include "stout_smearing.h"
+#include "uflds.h"
+#include "update.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -235,13 +227,15 @@ static void dfl_upd(int isp)
 
 void run_mdint(void)
 {
-  int my_rank, nop, itu, ismear, iunsmear;
+  size_t nop;
+  int my_rank, itu, ismear, iunsmear;
   int iop, status[6];
   double *mu, eps, nlk, nrm;
   mdflds_t *mdfs;
   mdstep_t *s, *sm;
   hmc_parms_t hmc;
   force_parms_t fp;
+  action_parms_t ap;
   double wt1, wt2;
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
@@ -260,8 +254,6 @@ void run_mdint(void)
   s = mdsteps(&nop, &ismear, &iunsmear, &itu);
   sm = s + nop;
 
-  set_frc2zero();
-
   for (; s < sm; s++) {
     iop = (*s).iop;
     eps = (*s).eps;
@@ -272,12 +264,13 @@ void run_mdint(void)
       MPI_Barrier(MPI_COMM_WORLD);
       wt1 = MPI_Wtime();
 
+      set_frc2zero();
+
       if (fp.force == FRG) {
         force0(eps);
       } else {
         dfl_upd(fp.isp[0]);
         set_sw_parms(sea_quark_mass(fp.im0));
-        set_frc2zero();
         status[2] = 0;
         status[5] = 0;
 
@@ -305,36 +298,48 @@ void run_mdint(void)
       MPI_Barrier(MPI_COMM_WORLD);
       wt2 = MPI_Wtime();
 
+      ap = action_parms(iop);
+
+      if (ap.smear == 1)
+        unsmear_mdforce();
+
       update_mom();
       nrm = norm_square_alg(4 * VOLUME, 1, (*mdfs).frc);
       nrm = sqrt(nrm / nlk);
 
       if (my_rank == 0) {
+        printf("Force %d ", iop);
+
         if (fp.force == FRG)
-          printf("Force FRG:              ");
+          printf("FRG:              ");
         else if (fp.force == FRF_TM1)
-          printf("Force FRF_TM1:          ");
+          printf("FRF_TM1:          ");
         else if (fp.force == FRF_TM1_EO)
-          printf("Force FRF_TM1_EO:       ");
+          printf("FRF_TM1_EO:       ");
         else if (fp.force == FRF_TM1_EO_SDET)
-          printf("Force FRF_TM1_EO_SDET:  ");
+          printf("FRF_TM1_EO_SDET:  ");
         else if (fp.force == FRF_TM2)
-          printf("Force FRF_TM2:          ");
+          printf("FRF_TM2:          ");
         else if (fp.force == FRF_TM2_EO)
-          printf("Force FRF_TM2_EO:       ");
+          printf("FRF_TM2_EO:       ");
         else if (fp.force == FRF_RAT)
-          printf("Force FRF_RAT:          ");
+          printf("FRF_RAT:          ");
         else if (fp.force == FRF_RAT_SDET)
-          printf("Force FRF_RAT_SDET:     ");
+          printf("FRF_RAT_SDET:     ");
 
         printf("nrm = %.2e, eps = % .2e, nrm*|eps| = %.2e, "
                "time = %.2e sec\n",
                nrm / fabs(eps), eps, nrm, wt2 - wt1);
       }
     } else if (iop == ismear) {
+      if (my_rank == 0)
+        printf("Smearing fields\n");
+
       smear_fields();
     } else if (iop == iunsmear) {
-      unsmear_mdforce();
+      if (my_rank == 0)
+        printf("Unsmearing fields\n");
+
       unsmear_fields();
     } else if (iop == itu) {
       update_ud(eps);
@@ -349,7 +354,8 @@ void run_mdint(void)
 
 void run_mdint(void)
 {
-  int nop, ismear, iunsmear, itu;
+  size_t nop;
+  int ismear, iunsmear, itu;
   int iop, status[6];
   double *mu, eps;
   mdstep_t *s, *sm;

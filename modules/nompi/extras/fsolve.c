@@ -64,12 +64,8 @@
 
 #define FSOLVE_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "utils.h"
 #include "extras.h"
+#include "utils.h"
 
 static int nsv = 0, isv;
 static double *osv, *psv, **vsv, *xsv;

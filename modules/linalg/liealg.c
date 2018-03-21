@@ -12,32 +12,34 @@
  *
  * The externally accessible functions are
  *
- *   void random_alg(int vol,su3_alg_dble *X)
+ *   void random_alg(int vol, su3_alg_dble *X)
  *     Initializes the Lie algebra elements X to random values
  *     with distribution proportional to exp{tr[X^2]}.
  *
- *   double norm_square_alg(int vol,int icom,su3_alg_dble *X)
+ *   double norm_square_alg(int vol, int icom, su3_alg_dble const *X)
  *     Computes the square of the norm of the norm squared of the field X.
  *
- *   double scalar_prod_alg(int vol,int icom,su3_alg_dble *X,su3_alg_dble *Y)
+ *   double scalar_prod_alg(int vol, int icom, su3_alg_dble const *X,
+ *                          su3_alg_dble const *Y)
  *     Computes the scalar product of the fields X and Y.
  *
- *   void set_alg2zero(int vol,su3_alg_dble *X)
+ *   void set_alg2zero(int vol, su3_alg_dble *X)
  *     Sets the array elements X to zero.
  *
- *   void set_ualg2zero(int vol,u3_alg_dble *X)
+ *   void set_ualg2zero(int vol, u3_alg_dble *X)
  *     Sets the array elements X to zero.
  *
- *   void assign_alg2alg(int vol,su3_alg_dble *X,su3_alg_dble *Y)
+ *   void assign_alg2alg(int vol, su3_alg_dble const *X, su3_alg_dble *Y)
  *     Assigns the field X to the field Y.
  *
- *   void swap_alg(int vol,su3_alg_dble *X,su3_alg_dble *Y)
+ *   void swap_alg(int vol, su3_alg_dble *X, su3_alg_dble *Y)
  *     Swaps the fields X and Y.
  *
- *   void muladd_assign_alg(int vol,double r,su3_alg_dble *X,su3_alg_dble *Y)
+ *   void muladd_assign_alg(int vol, double r, su3_alg_dble const *X,
+ *                          su3_alg_dble *Y)
  *     Adds r*X to Y.
  *
- *   void project_to_su3alg(const su3_dble *u, su3_alg_dble *X)
+ *   void project_to_su3alg(su3_dble const *u, su3_alg_dble *X)
  *     Projects an arbitrary 3x3 complex matrix in u to the su3 algebra and
  *     stores the result in X. The projection formula is
  *
@@ -72,15 +74,10 @@
 
 #define LIEALG_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "random.h"
-#include "linalg.h"
 #include "global.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "random.h"
 
 static int ism, init = 0;
 static double c1 = 0.0, c2, c3, rb[8];
@@ -93,7 +90,7 @@ void random_alg(int vol, su3_alg_dble *X)
   int divide_by = vol / (VOLUME / 2);
 #endif
 
-  if (c1 == 0.0) {
+  if (is_equal_d(c1, 0.0)) {
     c1 = (sqrt(3.0) + 1.0) / 6.0;
     c2 = (sqrt(3.0) - 1.0) / 6.0;
     c3 = 1.0 / sqrt(2.0);
@@ -119,10 +116,10 @@ void random_alg(int vol, su3_alg_dble *X)
   }
 }
 
-double norm_square_alg(int vol, int icom, su3_alg_dble *X)
+double norm_square_alg(int vol, int icom, su3_alg_dble const *X)
 {
   double sm;
-  su3_alg_dble *Xm;
+  su3_alg_dble const *Xm;
 
   if (init == 0) {
     ism = init_hsum(1);
@@ -148,10 +145,11 @@ double norm_square_alg(int vol, int icom, su3_alg_dble *X)
   return 4.0 * sm;
 }
 
-double scalar_prod_alg(int vol, int icom, su3_alg_dble *X, su3_alg_dble *Y)
+double scalar_prod_alg(int vol, int icom, su3_alg_dble const *X,
+                       su3_alg_dble const *Y)
 {
   double sm;
-  su3_alg_dble *Xm;
+  su3_alg_dble const *Xm;
 
   if (init == 0) {
     ism = init_hsum(1);

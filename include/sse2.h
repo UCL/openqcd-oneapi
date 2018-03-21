@@ -17,9 +17,7 @@
 #ifndef SSE2_H
 #define SSE2_H
 
-#ifndef SSE_H
 #include "sse.h"
-#endif
 
 typedef struct __attribute__((aligned(16)))
 {

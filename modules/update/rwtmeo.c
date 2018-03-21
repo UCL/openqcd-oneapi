@@ -76,21 +76,15 @@
 
 #define RWTMEO_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "sap.h"
 #include "dfl.h"
 #include "forces.h"
-#include "update.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "sap.h"
+#include "sflds.h"
+#include "update.h"
 
 static void check_parms(double mu1, double mu2, int isp)
 {

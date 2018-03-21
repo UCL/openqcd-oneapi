@@ -29,33 +29,34 @@
  *     to (complex) random values z with distribution proportional
  *     to exp{-|z|^2/sigma^2}.
  *
- *   void assign_s2s(int vol,spinor *s,spinor *r)
+ *   void assign_s2s(int vol,spinor const *s,spinor *r)
  *     Assigns the single-precision field s to the single-precision
  *     field r.
  *
- *   void assign_s2sd(int vol,spinor *s,spinor_dble *rd)
+ *   void assign_s2sd(int vol,spinor const *s,spinor_dble *rd)
  *     Assigns the single-precision field s to the double-precision
  *     field rd.
  *
- *   void assign_sd2s(int vol,spinor_dble *sd,spinor *r)
+ *   void assign_sd2s(int vol,spinor_dble const *sd,spinor *r)
  *     Assigns the double-precision field sd to the single-precision
  *     field r.
  *
- *   void assign_sd2sd(int vol,spinor_dble *sd,spinor_dble *rd)
+ *   void assign_sd2sd(int vol,spinor_dble const *sd,spinor_dble *rd)
  *     Assigns the double-precision field sd to the double-precision
  *     field rd.
  *
- *   void diff_s2s(int vol,spinor *s,spinor *r)
+ *   void diff_s2s(int vol,spinor const *s,spinor *r)
  *     Assigns the difference s-r of the single-precision fields s and
  *     r to r.
  *
- *   void add_s2sd(int vol,spinor *s,spinor_dble *rd)
+ *   void add_s2sd(int vol,spinor const *s,spinor_dble *rd)
  *     Adds the single-precision field s to the double-precision field
  *     rd.
  *
- *   void diff_sd2s(int vol,spinor_dble *sd,spinor_dble *rd,spinor *r)
- *     Assigns the difference sd-rd of the double-precision fields sd
- *     and rd to the single-precision field r.
+ *   void diff_sd2s(int vol, spinor_dble const *sd, spinor_dble const *rd,
+ *                  spinor *r)
+ *     Assigns the difference sd-rd of the double-precision fields sd and rd to
+ *     the single-precision field r.
  *
  * Notes:
  *
@@ -71,13 +72,9 @@
 
 #define SFLDS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
-#include "random.h"
-#include "global.h"
 #include "sflds.h"
+#include "global.h"
+#include "random.h"
 
 #if (defined x64)
 #include "sse2.h"
@@ -148,7 +145,7 @@ void set_sd2zero(int vol, spinor_dble *sd)
   }
 }
 
-void assign_s2s(int vol, spinor *s, spinor *r)
+void assign_s2s(int vol, spinor const *s, spinor *r)
 {
   spinor *rm;
 
@@ -163,7 +160,7 @@ void assign_s2s(int vol, spinor *s, spinor *r)
   }
 }
 
-void assign_s2sd(int vol, spinor *s, spinor_dble *rd)
+void assign_s2sd(int vol, spinor const *s, spinor_dble *rd)
 {
   spinor_dble *rm;
 
@@ -239,7 +236,7 @@ void assign_s2sd(int vol, spinor *s, spinor_dble *rd)
   }
 }
 
-void assign_sd2s(int vol, spinor_dble *sd, spinor *r)
+void assign_sd2s(int vol, spinor_dble const *sd, spinor *r)
 {
   spinor *rm;
 
@@ -315,7 +312,7 @@ void assign_sd2s(int vol, spinor_dble *sd, spinor *r)
   }
 }
 
-void assign_sd2sd(int vol, spinor_dble *sd, spinor_dble *rd)
+void assign_sd2sd(int vol, spinor_dble const *sd, spinor_dble *rd)
 {
   spinor_dble *rm;
 
@@ -370,9 +367,9 @@ void assign_sd2sd(int vol, spinor_dble *sd, spinor_dble *rd)
   }
 }
 
-void diff_s2s(int vol, spinor *s, spinor *r)
+void diff_s2s(int vol, spinor const *s, spinor *r)
 {
-  spinor *sm;
+  spinor const *sm;
 
   sm = s + vol;
 
@@ -407,7 +404,7 @@ void diff_s2s(int vol, spinor *s, spinor *r)
   }
 }
 
-void add_s2sd(int vol, spinor *s, spinor_dble *rd)
+void add_s2sd(int vol, spinor const *s, spinor_dble *rd)
 {
   spinor_dble *rm;
 
@@ -509,7 +506,7 @@ void add_s2sd(int vol, spinor *s, spinor_dble *rd)
   }
 }
 
-void diff_sd2s(int vol, spinor_dble *sd, spinor_dble *rd, spinor *r)
+void diff_sd2s(int vol, spinor_dble const *sd, spinor_dble const *rd, spinor *r)
 {
   spinor *rm;
 
@@ -636,9 +633,9 @@ void set_sd2zero(int vol, spinor_dble *sd)
     (*sd) = sd0;
 }
 
-void assign_s2s(int vol, spinor *s, spinor *r)
+void assign_s2s(int vol, spinor const *s, spinor *r)
 {
-  spinor *sm;
+  spinor const *sm;
 
   sm = s + vol;
 
@@ -648,9 +645,9 @@ void assign_s2s(int vol, spinor *s, spinor *r)
   }
 }
 
-void assign_s2sd(int vol, spinor *s, spinor_dble *rd)
+void assign_s2sd(int vol, spinor const *s, spinor_dble *rd)
 {
-  spinor *sm;
+  spinor const *sm;
 
   sm = s + vol;
 
@@ -687,9 +684,9 @@ void assign_s2sd(int vol, spinor *s, spinor_dble *rd)
   }
 }
 
-void assign_sd2s(int vol, spinor_dble *sd, spinor *r)
+void assign_sd2s(int vol, spinor_dble const *sd, spinor *r)
 {
-  spinor_dble *sm;
+  spinor_dble const *sm;
 
   sm = sd + vol;
 
@@ -726,9 +723,9 @@ void assign_sd2s(int vol, spinor_dble *sd, spinor *r)
   }
 }
 
-void assign_sd2sd(int vol, spinor_dble *sd, spinor_dble *rd)
+void assign_sd2sd(int vol, spinor_dble const *sd, spinor_dble *rd)
 {
-  spinor_dble *sm;
+  spinor_dble const *sm;
 
   sm = sd + vol;
 
@@ -738,9 +735,9 @@ void assign_sd2sd(int vol, spinor_dble *sd, spinor_dble *rd)
   }
 }
 
-void diff_s2s(int vol, spinor *s, spinor *r)
+void diff_s2s(int vol, spinor const *s, spinor *r)
 {
-  spinor *sm;
+  spinor const *sm;
 
   sm = s + vol;
 
@@ -754,9 +751,9 @@ void diff_s2s(int vol, spinor *s, spinor *r)
   }
 }
 
-void add_s2sd(int vol, spinor *s, spinor_dble *rd)
+void add_s2sd(int vol, spinor const *s, spinor_dble *rd)
 {
-  spinor *sm;
+  spinor const *sm;
 
   sm = s + vol;
 
@@ -793,9 +790,9 @@ void add_s2sd(int vol, spinor *s, spinor_dble *rd)
   }
 }
 
-void diff_sd2s(int vol, spinor_dble *sd, spinor_dble *rd, spinor *r)
+void diff_sd2s(int vol, spinor_dble const *sd, spinor_dble const *rd, spinor *r)
 {
-  spinor_dble *sm;
+  spinor_dble const *sm;
 
   sm = sd + vol;
 

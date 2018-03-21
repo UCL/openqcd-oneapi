@@ -12,14 +12,11 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "utils.h"
 
 int main(void)
 {
-  int n;
+  int n, ret;
   double x;
 
   printf("\n");
@@ -28,7 +25,13 @@ int main(void)
 
   while (1) {
     printf("x = ");
-    scanf("%lf", &x);
+    ret = scanf("%lf", &x);
+
+    if (ret != 1) {
+      printf("Scanf failed\n");
+      exit(1);
+    }
+
     n = fdigits(x);
     printf("    %.*f\n\n", n, x);
   }

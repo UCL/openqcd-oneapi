@@ -12,11 +12,7 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "random.h"
-#include "utils.h"
 #include "su3fcts.h"
 
 static su3_dble Q ALIGNED16;

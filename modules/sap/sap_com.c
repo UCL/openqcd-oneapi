@@ -47,18 +47,11 @@
 
 #define SAP_COM_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
 #include "flags.h"
-#include "utils.h"
-#include "sflds.h"
-#include "block.h"
-#include "sap.h"
 #include "global.h"
+#include "mpi.h"
+#include "sap.h"
+#include "sflds.h"
 
 static int nb, nbh, isw, init = 0;
 static int bc, np, nmu[8], sflg[8];

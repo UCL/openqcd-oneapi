@@ -51,10 +51,6 @@
 
 #define ZOLOTAREV_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "utils.h"
 #include "ratfcts.h"
 
 void zolotarev(int n, double eps, double *A, double *ar, double *delta)

@@ -43,15 +43,10 @@
 
 #define VFLDS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
 #include "vflds.h"
+#include "flags.h"
 #include "global.h"
+#include "mpi.h"
 
 static int Ns, nv = 0;
 static complex **vs = NULL, **v;

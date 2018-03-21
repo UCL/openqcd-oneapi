@@ -52,14 +52,9 @@
 
 #define AW_GEN_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "little.h"
 #include "flags.h"
+#include "little.h"
+#include "mpi.h"
 
 #define MAX_LEVELS 8
 #define BLK_LENGTH 8
@@ -114,9 +109,9 @@ static void sum_sm(void)
   }
 }
 
-void gather_ud(int vol, int *imb, su3_dble *ud, su3_dble *vd)
+void gather_ud(int vol, int const *imb, su3_dble const *ud, su3_dble *vd)
 {
-  int *imm;
+  int const *imm;
 
   imm = imb + vol;
 
@@ -126,9 +121,9 @@ void gather_ud(int vol, int *imb, su3_dble *ud, su3_dble *vd)
   }
 }
 
-void gather_sd(int vol, int *imb, spinor_dble *sd, spinor_dble *rd)
+void gather_sd(int vol, int const *imb, spinor_dble const *sd, spinor_dble *rd)
 {
-  int *imm;
+  int const *imm;
 
   imm = imb + vol;
 
@@ -242,11 +237,11 @@ void gather_sd(int vol, int *imb, spinor_dble *sd, spinor_dble *rd)
                        : "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",       \
                          "xmm12", "xmm13", "xmm14", "xmm15")
 
-void apply_u2sd(int vol, int *imb, su3_dble *ud, spinor_dble *sd,
-                spinor_dble *rd)
+void apply_u2sd(int vol, int const *imb, su3_dble const *ud,
+                spinor_dble const *sd, spinor_dble *rd)
 {
-  int *imm;
-  spinor_dble *si;
+  int const *imm;
+  spinor_dble const *si;
 
   imm = imb + vol;
 
@@ -278,11 +273,11 @@ void apply_u2sd(int vol, int *imb, su3_dble *ud, spinor_dble *sd,
   }
 }
 
-void apply_udag2sd(int vol, int *imb, su3_dble *ud, spinor_dble *sd,
-                   spinor_dble *rd)
+void apply_udag2sd(int vol, int const *imb, su3_dble const *ud,
+                   spinor_dble const *sd, spinor_dble *rd)
 {
-  int *imm;
-  spinor_dble *si;
+  int const *imm;
+  spinor_dble const *si;
 
   imm = imb + vol;
 
@@ -314,10 +309,10 @@ void apply_udag2sd(int vol, int *imb, su3_dble *ud, spinor_dble *sd,
   }
 }
 
-static void spinor_prod_gamma0(int vol, spinor_dble *sd, spinor_dble *rd,
-                               complex_dble *sp)
+static void spinor_prod_gamma0(int vol, spinor_dble const *sd,
+                               spinor_dble const *rd, complex_dble *sp)
 {
-  spinor_dble *rt, *rm;
+  spinor_dble const *rt, *rm;
 
   init_sm();
   rt = rd + vol;
@@ -361,10 +356,10 @@ static void spinor_prod_gamma0(int vol, spinor_dble *sd, spinor_dble *rd,
   sp[1].im = -sm1[0].im;
 }
 
-static void spinor_prod_gamma1(int vol, spinor_dble *sd, spinor_dble *rd,
-                               complex_dble *sp)
+static void spinor_prod_gamma1(int vol, spinor_dble const *sd,
+                               spinor_dble const *rd, complex_dble *sp)
 {
-  spinor_dble *rt, *rm;
+  spinor_dble const *rt, *rm;
 
   init_sm();
   rt = rd + vol;
@@ -408,10 +403,10 @@ static void spinor_prod_gamma1(int vol, spinor_dble *sd, spinor_dble *rd,
   sp[1].im = -sm1[0].re;
 }
 
-static void spinor_prod_gamma2(int vol, spinor_dble *sd, spinor_dble *rd,
-                               complex_dble *sp)
+static void spinor_prod_gamma2(int vol, spinor_dble const *sd,
+                               spinor_dble const *rd, complex_dble *sp)
 {
-  spinor_dble *rt, *rm;
+  spinor_dble const *rt, *rm;
 
   init_sm();
   rt = rd + vol;
@@ -455,10 +450,10 @@ static void spinor_prod_gamma2(int vol, spinor_dble *sd, spinor_dble *rd,
   sp[1].im = -sm1[0].im;
 }
 
-static void spinor_prod_gamma3(int vol, spinor_dble *sd, spinor_dble *rd,
-                               complex_dble *sp)
+static void spinor_prod_gamma3(int vol, spinor_dble const *sd,
+                               spinor_dble const *rd, complex_dble *sp)
 {
-  spinor_dble *rt, *rm;
+  spinor_dble const *rt, *rm;
 
   init_sm();
   rt = rd + vol;
@@ -504,11 +499,11 @@ static void spinor_prod_gamma3(int vol, spinor_dble *sd, spinor_dble *rd,
 
 #else
 
-void apply_u2sd(int vol, int *imb, su3_dble *ud, spinor_dble *sd,
-                spinor_dble *rd)
+void apply_u2sd(int vol, int const *imb, su3_dble const *ud,
+                spinor_dble const *sd, spinor_dble *rd)
 {
-  int *imm;
-  spinor_dble *si;
+  int const *imm;
+  spinor_dble const *si;
 
   imm = imb + vol;
 
@@ -525,11 +520,11 @@ void apply_u2sd(int vol, int *imb, su3_dble *ud, spinor_dble *sd,
   }
 }
 
-void apply_udag2sd(int vol, int *imb, su3_dble *ud, spinor_dble *sd,
-                   spinor_dble *rd)
+void apply_udag2sd(int vol, int const *imb, su3_dble const *ud,
+                   spinor_dble const *sd, spinor_dble *rd)
 {
-  int *imm;
-  spinor_dble *si;
+  int const *imm;
+  spinor_dble const *si;
 
   imm = imb + vol;
 
@@ -546,11 +541,11 @@ void apply_udag2sd(int vol, int *imb, su3_dble *ud, spinor_dble *sd,
   }
 }
 
-static void spinor_prod_gamma0(int vol, spinor_dble *sd, spinor_dble *rd,
-                               complex_dble *sp)
+static void spinor_prod_gamma0(int vol, spinor_dble const *sd,
+                               spinor_dble const *rd, complex_dble *sp)
 {
   complex_dble z0, z1;
-  spinor_dble *rt, *rm;
+  spinor_dble const *rt, *rm;
 
   init_sm();
   rt = rd + vol;
@@ -604,11 +599,11 @@ static void spinor_prod_gamma0(int vol, spinor_dble *sd, spinor_dble *rd,
   sp[1].im = -sm1[0].im;
 }
 
-static void spinor_prod_gamma1(int vol, spinor_dble *sd, spinor_dble *rd,
-                               complex_dble *sp)
+static void spinor_prod_gamma1(int vol, spinor_dble const *sd,
+                               spinor_dble const *rd, complex_dble *sp)
 {
   complex_dble z0, z1;
-  spinor_dble *rt, *rm;
+  spinor_dble const *rt, *rm;
 
   init_sm();
   rt = rd + vol;
@@ -664,11 +659,11 @@ static void spinor_prod_gamma1(int vol, spinor_dble *sd, spinor_dble *rd,
   sp[1].im = -sm1[0].re;
 }
 
-static void spinor_prod_gamma2(int vol, spinor_dble *sd, spinor_dble *rd,
-                               complex_dble *sp)
+static void spinor_prod_gamma2(int vol, spinor_dble const *sd,
+                               spinor_dble const *rd, complex_dble *sp)
 {
   complex_dble z0, z1;
-  spinor_dble *rt, *rm;
+  spinor_dble const *rt, *rm;
 
   init_sm();
   rt = rd + vol;
@@ -724,11 +719,11 @@ static void spinor_prod_gamma2(int vol, spinor_dble *sd, spinor_dble *rd,
   sp[1].im = -sm1[0].im;
 }
 
-static void spinor_prod_gamma3(int vol, spinor_dble *sd, spinor_dble *rd,
-                               complex_dble *sp)
+static void spinor_prod_gamma3(int vol, spinor_dble const *sd,
+                               spinor_dble const *rd, complex_dble *sp)
 {
   complex_dble z0, z1;
-  spinor_dble *rt, *rm;
+  spinor_dble const *rt, *rm;
 
   init_sm();
   rt = rd + vol;
@@ -787,7 +782,7 @@ static void spinor_prod_gamma3(int vol, spinor_dble *sd, spinor_dble *rd,
 
 #endif
 
-void (*spinor_prod_gamma[4])(int vol, spinor_dble *sd, spinor_dble *rd,
-                             complex_dble *sp) = {
+void (*spinor_prod_gamma[4])(int vol, spinor_dble const *sd,
+                             spinor_dble const *rd, complex_dble *sp) = {
     spinor_prod_gamma0, spinor_prod_gamma1, spinor_prod_gamma2,
     spinor_prod_gamma3};

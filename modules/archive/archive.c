@@ -85,19 +85,13 @@
 
 #define ARCHIVE_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "random.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
 #include "archive.h"
+#include "flags.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "random.h"
+#include "uflds.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -124,7 +118,7 @@ static void alloc_state(void)
         "Unable to allocate auxiliary array");
 }
 
-void write_cnfg(char *out)
+void write_cnfg(char const *out)
 {
   int ldat[16], iw;
   double plaq;
@@ -176,7 +170,7 @@ void write_cnfg(char *out)
   fclose(fout);
 }
 
-void read_cnfg(char *in)
+void read_cnfg(char const *in)
 {
   int ldat[16], ir, ie;
   double nplaq, plaq0, plaq1, eps;
@@ -303,7 +297,7 @@ static void set_links(int iy)
   }
 }
 
-void export_cnfg(char *out)
+void export_cnfg(char const *out)
 {
   int my_rank, np[4], n, iw;
   int iwa, dmy, tag0, tag1;
@@ -399,7 +393,7 @@ void export_cnfg(char *out)
   }
 }
 
-void import_cnfg(char *in)
+void import_cnfg(char const *in)
 {
   int my_rank, np[4], ir, ie;
   int ira, dmy, tag0, tag1;

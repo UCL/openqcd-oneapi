@@ -15,27 +15,65 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
+#include "archive.h"
+#include "dfl.h"
+#include "forces.h"
+#include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mdflds.h"
 #include "mpi.h"
-#include "su3.h"
 #include "random.h"
 #include "su3fcts.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
 #include "uflds.h"
-#include "mdflds.h"
-#include "linalg.h"
-#include "archive.h"
-#include "forces.h"
-#include "dfl.h"
 #include "update.h"
-#include "global.h"
 
 static int my_rank;
+
+static void read_anisotropy_section(void)
+{
+  int has_tts, has_ani = 0;
+  long section_pos;
+  double nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion, ut_fermion;
+
+  if (my_rank == 0) {
+    section_pos = find_optional_section("Anisotropy parameters");
+
+    if (section_pos == No_Section_Found) {
+      has_ani = 0;
+    } else {
+      has_ani = 1;
+      read_line("use_tts", "%d", &has_tts);
+      read_line("nu", "%lf", &nu);
+      read_line("xi", "%lf", &xi);
+      read_line("cR", "%lf", &cR);
+      read_line("cT", "%lf", &cT);
+      read_optional_line("us_gauge", "%lf", &us_gauge, 1.0);
+      read_optional_line("ut_gauge", "%lf", &ut_gauge, 1.0);
+      read_optional_line("us_fermion", "%lf", &us_fermion, 1.0);
+      read_optional_line("ut_fermion", "%lf", &ut_fermion, 1.0);
+    }
+  }
+
+  MPI_Bcast(&has_ani, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (has_ani == 1) {
+    MPI_Bcast(&has_tts, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&nu, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&xi, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&cR, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&cT, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&us_gauge, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&ut_gauge, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&us_fermion, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&ut_fermion, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion, ut_fermion);
+
+  } else {
+    set_no_ani_parms();
+  }
+}
 
 static void read_lat_parms(void)
 {
@@ -69,6 +107,42 @@ static void read_lat_parms(void)
 
   if (nk > 0)
     free(kappa);
+}
+
+static void read_smearing_section(void)
+{
+  int n_smear, has_smearing = 0, smear_gauge, smear_fermion;
+  long section_pos;
+  static double rho_s, rho_t;
+
+  if (my_rank == 0) {
+    section_pos = find_optional_section("Smearing parameters");
+
+    if (section_pos == No_Section_Found) {
+      has_smearing = 0;
+    } else {
+      has_smearing = 1;
+      read_line("n_smear", "%d", &n_smear);
+      read_line("rho_t", "%lf", &rho_t);
+      read_line("rho_s", "%lf", &rho_s);
+      read_line("gauge", "%d", &smear_gauge);
+      read_line("fermion", "%d", &smear_fermion);
+    }
+  }
+
+  MPI_Bcast(&has_smearing, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (has_smearing == 1) {
+    MPI_Bcast(&n_smear, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&rho_t, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&rho_s, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&smear_gauge, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&smear_fermion, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    set_stout_smearing_parms(n_smear, rho_t, rho_s, smear_gauge, smear_fermion);
+  } else {
+    set_no_stout_smearing_parms();
+  }
 }
 
 static void read_bc_parms(void)
@@ -599,7 +673,9 @@ int main(int argc, char *argv[])
   MPI_Bcast(&last, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&step, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+  read_anisotropy_section();
   read_lat_parms();
+  read_smearing_section();
   read_bc_parms();
   read_hmc_parms();
   read_actions();
@@ -629,7 +705,9 @@ int main(int argc, char *argv[])
   for (i = 1; i < 4; i++)
     tau[i] = tau[i - 1] / pow(4.0, 1.0 / 3.0);
 
+  print_ani_parms();
   print_lat_parms();
+  print_stout_smearing_parms();
   print_bc_parms(3);
   print_hmc_parms();
   print_action_parms();
@@ -637,6 +715,7 @@ int main(int argc, char *argv[])
   print_mdint_parms();
   print_force_parms2();
   print_solver_parms(&isap, &idfl);
+
   if (isap)
     print_sap_parms(0);
   if (idfl)

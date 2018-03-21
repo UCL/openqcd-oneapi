@@ -14,21 +14,16 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include "forces.h"
+#include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mdflds.h"
 #include "mpi.h"
-#include "flags.h"
 #include "random.h"
 #include "su3fcts.h"
-#include "utils.h"
-#include "lattice.h"
 #include "uflds.h"
-#include "mdflds.h"
-#include "linalg.h"
-#include "forces.h"
 #include "wflow.h"
-#include "global.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -162,14 +157,14 @@ static int is_zero(su3_alg_dble *X)
 {
   int ie;
 
-  ie = ((*X).c1 == 0.0);
-  ie &= ((*X).c2 == 0.0);
-  ie &= ((*X).c3 == 0.0);
-  ie &= ((*X).c4 == 0.0);
-  ie &= ((*X).c5 == 0.0);
-  ie &= ((*X).c6 == 0.0);
-  ie &= ((*X).c7 == 0.0);
-  ie &= ((*X).c8 == 0.0);
+  ie = is_equal_d((*X).c1, 0.0);
+  ie &= is_equal_d((*X).c2, 0.0);
+  ie &= is_equal_d((*X).c3, 0.0);
+  ie &= is_equal_d((*X).c4, 0.0);
+  ie &= is_equal_d((*X).c5, 0.0);
+  ie &= is_equal_d((*X).c6, 0.0);
+  ie &= is_equal_d((*X).c7, 0.0);
+  ie &= is_equal_d((*X).c8, 0.0);
 
   return ie;
 }
@@ -236,13 +231,21 @@ static double chkfrc(void)
 {
   int x0, x1, x2, x3;
   int ix, iy, iz, iw, mu, nu;
-  double d, dmax;
+  double d, dmax, r;
+  double gamma_g, ut2, us2;
   su3_alg_dble *frc;
   su3_dble *udb;
   mdflds_t *mdfs;
+  ani_params_t ani;
 
   udb = udfld();
   mdfs = mdflds();
+  ani = ani_parms();
+
+  gamma_g = ani.xi;
+  ut2 = 1.0 / (ani.ut_gauge * ani.ut_gauge);
+  us2 = 1.0 / (ani.us_gauge * ani.us_gauge);
+
   dmax = 0.0;
 
   for (x0 = 1; x0 < (L0 - 2); x0++) {
@@ -257,18 +260,25 @@ static double chkfrc(void)
 
             for (nu = 0; nu < 4; nu++) {
               if (nu != mu) {
+
+                if ((mu == 0) || (nu == 0)) {
+                  r = gamma_g * ut2 * us2;
+                } else {
+                  r = us2 * us2 / gamma_g;
+                }
+
                 iz = iup[ix][nu];
 
                 su3xsu3dag(udb + ofs(iy, nu), udb + ofs(iz, mu), &uu);
                 su3xsu3dag(&uu, udb + ofs(ix, nu), &vv);
-                cm3x3_add(&vv, &mm);
+                cm3x3_mulr_add(&r, &vv, &mm);
 
                 iz = idn[ix][nu];
                 iw = idn[iy][nu];
 
                 su3dagxsu3(udb + ofs(iz, mu), udb + ofs(iz, nu), &uu);
                 su3dagxsu3(udb + ofs(iw, nu), &uu, &vv);
-                cm3x3_add(&vv, &mm);
+                cm3x3_mulr_add(&r, &vv, &mm);
               }
             }
 
@@ -323,11 +333,14 @@ static void scale_bnd_frc(su3_alg_dble *frc)
 int main(int argc, char *argv[])
 {
   int my_rank, bc, n, k, ie;
+  double plaqs[2];
   double phi[2], phi_prime[2], theta[3];
   double eps, nplaq, act0, act1, dev0, dev1;
   su3_dble *udb, *u, *um, **usv;
   su3_alg_dble *frc, **fsv;
   mdflds_t *mdfs;
+  ani_params_t ani;
+  double ts_plaq_factor, ss_plaq_factor;
   FILE *flog = NULL, *fin = NULL;
 
   MPI_Init(&argc, &argv);
@@ -362,9 +375,18 @@ int main(int argc, char *argv[])
 
   MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&eps, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-  set_lat_parms(6.0, 1.0, 0, NULL, 1.0);
+  if (bc == 3) {
+    set_ani_parms(1, 4.5, 1.5, 1.0, 1.0, 0.87, 1.23, 1.0, 1.0);
+    print_ani_parms();
+    set_lat_parms(6.0, 1.0, 0, NULL, 1.0);
+  } else {
+    set_no_ani_parms();
+    set_lat_parms(6.0, 1.0, 0, NULL, 1.0);
+  }
+
   print_lat_parms();
 
   phi[0] = 0.123;
@@ -391,15 +413,27 @@ int main(int argc, char *argv[])
   else
     nplaq = (double)(6 * N0) * (double)(N1 * N2 * N3);
 
+  ani = ani_parms();
+
   random_ud();
   act0 = action0(1);
-  act1 = 3.0 * nplaq - plaq_wsum_dble(1);
+
+  ts_plaq_factor =
+      ani.xi / (ani.ut_gauge * ani.ut_gauge * ani.us_gauge * ani.us_gauge);
+
+  ss_plaq_factor = 1.0 / (ani.xi * ani.us_gauge * ani.us_gauge * ani.us_gauge *
+                          ani.us_gauge);
+
+  plaq_wsum_split_dble(1, plaqs);
+  act1 = 3.0 * nplaq * 0.5 * (ts_plaq_factor + ss_plaq_factor) -
+         ts_plaq_factor * plaqs[0] - ss_plaq_factor * plaqs[1];
 
   plaq_frc();
   ie = check_bnd_fld((*mdfs).frc);
   error(ie != 0, 1, "main [check1.c]",
         "Force vanishes on an incorrect subset of links");
   assign_alg2alg(4 * VOLUME, (*mdfs).frc, fsv[0]);
+  set_alg2zero(4 * VOLUME, (*mdfs).frc);
   force0(1.0);
   ie = check_bnd_fld((*mdfs).frc);
   error(ie != 0, 1, "main [check1.c]",

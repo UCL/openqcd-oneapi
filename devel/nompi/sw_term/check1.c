@@ -12,13 +12,8 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "random.h"
-#include "utils.h"
-#include "random.h"
 #include "linalg.h"
+#include "random.h"
 #include "sw_term.h"
 
 typedef union

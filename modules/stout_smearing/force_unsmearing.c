@@ -1,18 +1,13 @@
 #define FORCE_UNSMEARING_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "stout_smearing.h"
+#include "field_com.h"
 #include "global.h"
-#include "flags.h"
 #include "lattice.h"
-#include "uflds.h"
 #include "linalg.h"
-#include "utils.h"
 #include "mdflds.h"
+#include "stout_smearing.h"
+#include "uflds.h"
 
-static const int plns[6][2] = {{0, 1}, {0, 2}, {0, 3}, {2, 3}, {3, 1}, {1, 2}};
 static su3_dble w[4];
 
 static su3_alg_dble *lambda_field = NULL;
@@ -258,24 +253,43 @@ static void compute_lambda_field(su3_alg_dble const *force,
                                  su3_dble const *sgfield,
                                  ch_mat_coeff_pair_t const *ch_coeffs)
 {
-  int num_links, i;
+  size_t ix, iy, mu;
+  stout_smearing_params_t smear;
   su3_dble gamma_tmp;
   su3_dble g_force;
 
   if (lambda_field == NULL)
     alloc_lambda_field();
 
-  num_links = 4 * VOLUME;
+  smear = stout_smearing_parms();
 
-  /* TODO: only loop over necessary links */
-  for (i = 0; i < num_links; ++i) {
-    su3dagxsu3alg(sgfield + i, force + i, &g_force);
-    compute_unsmearing_gamma_matrix(&g_force, gfield + i, ch_coeffs + i,
-                                    &gamma_tmp);
-    project_to_su3alg(&gamma_tmp, lambda_field + i);
+  for (ix = 0; ix < VOLUME / 2; ++ix) {
+    if (smear.smear_temporal == 1) {
+      for (mu = 0; mu < 2; ++mu) {
+        iy = 8 * ix + mu;
+        su3dagxsu3alg(sgfield + iy, force + iy, &g_force);
+        compute_unsmearing_gamma_matrix(&g_force, gfield + iy, ch_coeffs + iy,
+                                        &gamma_tmp);
+        project_to_su3alg(&gamma_tmp, lambda_field + iy);
+      }
+    }
+
+    if (smear.smear_spatial == 1) {
+      for (mu = 2; mu < 8; ++mu) {
+        iy = 8 * ix + mu;
+        su3dagxsu3alg(sgfield + iy, force + iy, &g_force);
+        compute_unsmearing_gamma_matrix(&g_force, gfield + iy, ch_coeffs + iy,
+                                        &gamma_tmp);
+        project_to_su3alg(&gamma_tmp, lambda_field + iy);
+      }
+    }
   }
 
-  communicate_boundary_su3_alg_field(lambda_field);
+  if (smear.smear_temporal == 1) {
+    copy_boundary_su3_alg_field(lambda_field);
+  } else {
+    copy_spatial_boundary_su3_alg_field(lambda_field);
+  }
 }
 
 static void compute_xi_single_plaquette(su3_dble const *gfield, int plane_id,
@@ -464,39 +478,56 @@ static void compute_xi_field(su3_alg_dble const *force, su3_dble const *gfield,
     }
   }
 
-  add_boundary_su3_field(xi_field);
+  if (smear_params.smear_temporal == 1) {
+    add_boundary_su3_field(xi_field);
+  } else {
+    add_spatial_boundary_su3_field(xi_field);
+  }
 }
 
 static void unsmear_single_force(su3_alg_dble *force, su3_dble const *gfield,
                                  su3_dble const *sgfield,
                                  ch_mat_coeff_pair_t const *ch_coeffs)
 {
-  int ix, num_links;
+  size_t ix, iy, mu;
   su3_dble w[2];
   su3_dble exp_X;
+  stout_smearing_params_t smear;
 
   compute_xi_field(force, gfield, sgfield, ch_coeffs);
 
-  num_links = 4 * VOLUME;
+  smear = stout_smearing_parms();
 
-  for (ix = 0; ix < num_links; ++ix) {
-    ch2mat(ch_coeffs[ix].coeff.p, &ch_coeffs[ix].X, &exp_X);
-    su3dagxsu3alg(sgfield + ix, force + ix, w);
-    su3xsu3(w, &exp_X, w + 1);
+  for (ix = 0; ix < VOLUME / 2; ++ix) {
+    if (smear.smear_temporal == 1) {
+      for (mu = 0; mu < 2; ++mu) {
+        iy = 8 * ix + mu;
+        ch2mat(ch_coeffs[iy].coeff.p, &ch_coeffs[iy].X, &exp_X);
+        su3dagxsu3alg(sgfield + iy, force + iy, w);
+        su3xsu3(w, &exp_X, w + 1);
 
-    cm3x3_add(xi_field + ix, w + 1);
-    prod2su3alg(gfield + ix, w + 1, force + ix);
+        cm3x3_add(xi_field + iy, w + 1);
+        prod2su3alg(gfield + iy, w + 1, force + iy);
+      }
+    }
+
+    if (smear.smear_spatial == 1) {
+      for (mu = 2; mu < 8; ++mu) {
+        iy = 8 * ix + mu;
+        ch2mat(ch_coeffs[iy].coeff.p, &ch_coeffs[iy].X, &exp_X);
+        su3dagxsu3alg(sgfield + iy, force + iy, w);
+        su3xsu3(w, &exp_X, w + 1);
+
+        cm3x3_add(xi_field + iy, w + 1);
+        prod2su3alg(gfield + iy, w + 1, force + iy);
+      }
+    }
   }
 }
 
 /* Summary:
  *   Takes a force term computed with smeared links and applies the recursive
  *   unsmearing formula to get the correct force term.
- *
- * TODO:
- *   * this procedure leaves the force in a state where the boundaries of
- *     mdfrc.frc isn't updated, if this is necessary I'll need to change the
- *     order in which I do things
  */
 void unsmear_force(su3_alg_dble *force)
 {
@@ -513,7 +544,7 @@ void unsmear_force(su3_alg_dble *force)
 
   error(query_flags(SMEARED_UD_UP2DATE) != 1, 1,
         "unsmear_force [force_unsmearing.c]",
-        "The stout links are not up to date with the think links");
+        "The stout links are not up to date with the thin links");
 
   /* Make sure that the fields are in a smeared state, this will not compute a
    * new set of smeared fields as we have already checked that the smeared

@@ -12,10 +12,10 @@
  *
  * The externally accessible functions are
  *
- *   mdint_parms_t set_mdint_parms(int ilv,integrator_t integrator,double
- *lambda, int nstep,int nfr,int *ifr) Sets the parameters of the
- *molecular-dynamics integrator at level ilv and returns a structure
- *containing them (see the notes).
+ *   mdint_parms_t set_mdint_parms(int ilv,integrator_t integrator,
+ *                                 double lambda, int nstep,int nfr,int *ifr)
+ *     Sets the parameters of the molecular-dynamics integrator at level ilv and
+ *     returns a structure containing them (see the notes).
  *
  *   mdint_parms_t mdint_parms(int ilv)
  *     Returns a structure containing the parameters of the integrator at
@@ -98,14 +98,10 @@
 
 #define MDINT_PARMS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "mpi.h"
-#include "utils.h"
 #include "flags.h"
 #include "global.h"
+#include "mpi.h"
+#include <string.h>
 
 #define ILVMAX 32
 
@@ -142,7 +138,7 @@ static void alloc_ifr(int ilv, int nfr)
 }
 
 mdint_parms_t set_mdint_parms(int ilv, integrator_t integrator, double lambda,
-                              int nstep, int nfr, int *ifr)
+                              int nstep, int nfr, int const *ifr)
 {
   int iprms[4], i, j, ie;
   double dprms[1];

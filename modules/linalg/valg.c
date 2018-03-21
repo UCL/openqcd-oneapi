@@ -12,27 +12,27 @@
  *
  * The externally accessible functions are
  *
- *   complex vprod(int n,int icom,complex *v,complex *w)
+ *   complex vprod(int n, int icom, complex const *v, complex const *w)
  *     Computes the scalar product of the n-vectors v and w.
  *
- *   float vnorm_square(int n,int icom,complex *v)
+ *   float vnorm_square(int n, int icom, complex const *v)
  *     Computes the square of the norm of the n-vector v.
  *
- *   void mulc_vadd(int n,complex *v,complex *w,complex z)
+ *   void mulc_vadd(int n, complex *v, complex const *w, complex z)
  *     Replaces the n-vector v by v+z*w.
  *
- *   void vproject(int n,int icom,complex *v,complex *w)
- *     Replaces the n-vector v by v-(w,v)*w.
+ *   void vproject(int n, int icom, complex *v, complex const *w)
+ *     Replaces the n-vector v by v-(w, v)*w.
  *
- *   void vscale(int n,float r,complex_dble *v)
+ *   void vscale(int n, float r, complex_dble *v)
  *     Replaces the n-vector v by r*v.
  *
- *   float vnormalize(int n,int icom,complex *v)
+ *   float vnormalize(int n, int icom, complex *v)
  *     Normalizes the n-vector v to unity and returns the norm of the
  *     input vector.
  *
- *   void vrotate(int n,int nv,complex **pv,complex *a)
- *     Replaces the n-vectors vk=pv[k], k=0,..,nv-1, by the linear
+ *   void vrotate(int n, int nv, complex **pv, complex const *a)
+ *     Replaces the n-vectors vk=pv[k], k=0, .., nv-1, by the linear
  *     combinations sum_{j=0}^{nv-1} vj*a[n*j+k].
  *
  * Notes:
@@ -50,14 +50,10 @@
 
 #define VALG_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "utils.h"
-#include "linalg.h"
-#include "vflds.h"
 #include "global.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "vflds.h"
 
 static int nrot = 0;
 static complex *psi;
@@ -74,9 +70,10 @@ static void alloc_wrotate(int n)
   set_v2zero(n, psi);
 }
 
-complex vprod(int n, int icom, complex *v, complex *w)
+complex vprod(int n, int icom, complex const *v, complex const *w)
 {
-  complex z, *vm;
+  complex const *vm;
+  complex z;
   complex_dble vd, wd;
 
   vd.re = 0.0;
@@ -103,9 +100,9 @@ complex vprod(int n, int icom, complex *v, complex *w)
   return z;
 }
 
-float vnorm_square(int n, int icom, complex *v)
+float vnorm_square(int n, int icom, complex const *v)
 {
-  complex *vm;
+  complex const *vm;
   double x, y;
 
   x = 0.0;
@@ -123,7 +120,7 @@ float vnorm_square(int n, int icom, complex *v)
   }
 }
 
-void mulc_vadd(int n, complex *v, complex *w, complex z)
+void mulc_vadd(int n, complex *v, complex const *w, complex z)
 {
   complex *vm;
 
@@ -136,7 +133,7 @@ void mulc_vadd(int n, complex *v, complex *w, complex z)
   }
 }
 
-void vproject(int n, int icom, complex *v, complex *w)
+void vproject(int n, int icom, complex *v, complex const *w)
 {
   complex z;
 
@@ -165,7 +162,7 @@ float vnormalize(int n, int icom, complex *v)
   r = vnorm_square(n, icom, v);
   r = (float)(sqrt((double)(r)));
 
-  if (r != 0.0f)
+  if (not_equal_f(r, 0.0f))
     vscale(n, 1.0f / r, v);
   else
     error_loc(1, 1, "vnormalize [valg.c]", "Vector field has vanishing norm");
@@ -173,10 +170,11 @@ float vnormalize(int n, int icom, complex *v)
   return r;
 }
 
-void vrotate(int n, int nv, complex **pv, complex *a)
+void vrotate(int n, int nv, complex **pv, complex const *a)
 {
   int i, k, j;
-  complex s, *z, *vj;
+  complex const *z;
+  complex s, *vj;
 
   if (nv > nrot)
     alloc_wrotate(nv);

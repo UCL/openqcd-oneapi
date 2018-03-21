@@ -14,28 +14,209 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
 #include "archive.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "linalg.h"
 #include "dirac.h"
-#include "sap.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "random.h"
+#include "sap.h"
+#include "sflds.h"
+#include "stout_smearing.h"
+#include "uflds.h"
 
 int my_rank, id, first, last, step;
-int bs[4], nmr, ncy, nkv, nmx, eoflg, bc;
-double kappa, csw, mu, cF, cF_prime;
-double phi[2], phi_prime[2], theta[3], m0, res;
+int bs[4], nmr, ncy, nmx, nkv, eoflg, bc;
+double mu, res, m0;
 char cnfg_dir[NAME_SIZE], cnfg_file[NAME_SIZE], nbase[NAME_SIZE];
+
+static void read_configurations_section(FILE *fin)
+{
+  if (my_rank == 0) {
+    find_section("Configurations");
+    read_line("name", "%s", nbase);
+    read_line("cnfg_dir", "%s", cnfg_dir);
+    read_line("first", "%d", &first);
+    read_line("last", "%d", &last);
+    read_line("step", "%d", &step);
+  }
+
+  MPI_Bcast(nbase, NAME_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);
+  MPI_Bcast(cnfg_dir, NAME_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&first, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&last, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&step, 1, MPI_INT, 0, MPI_COMM_WORLD);
+}
+
+static void read_anisotropy_section(FILE *fin)
+{
+  int has_tts, has_ani = 0;
+  long section_pos;
+  double nu, xi, cR, cT, us_gauge, ut_gauge;
+
+  if (my_rank == 0) {
+    section_pos = find_optional_section("Anisotropy parameters");
+
+    if (section_pos == No_Section_Found) {
+      has_ani = 0;
+    } else {
+      has_ani = 1;
+      read_line("use_tts", "%d", &has_tts);
+      read_line("nu", "%lf", &nu);
+      read_line("xi", "%lf", &xi);
+      read_line("cR", "%lf", &cR);
+      read_line("cT", "%lf", &cT);
+      read_optional_line("us_gauge", "%lf", &us_gauge, 1.0);
+      read_optional_line("ut_gauge", "%lf", &ut_gauge, 1.0);
+    }
+  }
+
+  MPI_Bcast(&has_ani, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (has_ani == 1) {
+    MPI_Bcast(&has_tts, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&nu, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&xi, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&cR, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&cT, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&us_gauge, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&ut_gauge, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, 1.0, 1.0);
+    print_ani_parms();
+  } else {
+    set_no_ani_parms();
+  }
+}
+
+static void read_lattice_section(FILE *fin)
+{
+  double kappa, csw;
+
+  if (my_rank == 0) {
+    find_section("Lattice parameters");
+    read_line("kappa", "%lf", &kappa);
+    read_line("csw", "%lf", &csw);
+    read_line("mu", "%lf", &mu);
+    read_line("eoflg", "%d", &eoflg);
+  }
+
+  MPI_Bcast(&kappa, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&csw, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&mu, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&eoflg, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  set_lat_parms(5.5, 1.0, 1, &kappa, csw);
+  print_lat_parms();
+}
+
+static void read_smearing_section(FILE *fin)
+{
+  int n_smear, has_smearing = 0;
+  long section_pos;
+  static double rho_s, rho_t;
+
+  if (my_rank == 0) {
+    section_pos = find_optional_section("Smearing parameters");
+
+    if (section_pos == No_Section_Found) {
+      has_smearing = 0;
+    } else {
+      has_smearing = 1;
+      read_line("n_smear", "%d", &n_smear);
+      read_line("rho_t", "%lf", &rho_t);
+      read_line("rho_s", "%lf", &rho_s);
+    }
+  }
+
+  MPI_Bcast(&has_smearing, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (has_smearing == 1) {
+    MPI_Bcast(&n_smear, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&rho_t, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&rho_s, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+    set_stout_smearing_parms(n_smear, rho_t, rho_s, 0, 1);
+    print_stout_smearing_parms();
+  } else {
+    set_no_stout_smearing_parms();
+  }
+}
+
+static void read_bc_section(FILE *fin)
+{
+  double cF, cF_prime;
+  double phi[2], phi_prime[2], theta[3];
+
+  if (my_rank == 0) {
+    find_section("Boundary conditions");
+    read_line("type", "%d", &bc);
+
+    phi[0] = 0.0;
+    phi[1] = 0.0;
+    phi_prime[0] = 0.0;
+    phi_prime[1] = 0.0;
+    cF = 1.0;
+    cF_prime = 1.0;
+
+    if (bc == 1)
+      read_dprms("phi", 2, phi);
+
+    if ((bc == 1) || (bc == 2))
+      read_dprms("phi'", 2, phi_prime);
+
+    if (bc != 3)
+      read_line("cF", "%lf", &cF);
+
+    if (bc == 2)
+      read_line("cF'", "%lf", &cF_prime);
+    else
+      cF_prime = cF;
+
+    read_dprms("theta", 3, theta);
+  }
+
+  MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(phi, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(phi_prime, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&cF, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&cF_prime, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(theta, 3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime, theta);
+  print_bc_parms(2);
+}
+
+static void read_gcr_section(FILE *fin)
+{
+  if (my_rank == 0) {
+    find_section("GCR");
+    read_line("nkv", "%d", &nkv);
+    read_line("nmx", "%d", &nmx);
+    read_line("res", "%lf", &res);
+  }
+
+  MPI_Bcast(&nkv, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&nmx, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&res, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+}
+
+static void read_sap_section(FILE *fin)
+{
+  if (my_rank == 0) {
+    find_section("SAP");
+    read_iprms("bs", 4, bs);
+    read_line("nmr", "%d", &nmr);
+    read_line("ncy", "%d", &ncy);
+  }
+
+  MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&nmr, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&ncy, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  set_sap_parms(bs, 0, nmr, ncy);
+}
 
 int main(int argc, char *argv[])
 {
@@ -64,91 +245,23 @@ int main(int argc, char *argv[])
     printf("%dx%dx%dx%d process grid, ", NPROC0, NPROC1, NPROC2, NPROC3);
     printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
 
-    find_section("Configurations");
-    read_line("name", "%s", nbase);
-    read_line("cnfg_dir", "%s", cnfg_dir);
-    read_line("first", "%d", &first);
-    read_line("last", "%d", &last);
-    read_line("step", "%d", &step);
+  }
 
-    find_section("Lattice parameters");
-    read_line("kappa", "%lf", &kappa);
-    read_line("csw", "%lf", &csw);
-    read_line("mu", "%lf", &mu);
-    read_line("eoflg", "%d", &eoflg);
+  read_configurations_section(fin);
+  read_anisotropy_section(fin);
+  read_lattice_section(fin);
+  read_smearing_section(fin);
+  read_bc_section(fin);
+  read_gcr_section(fin);
+  read_sap_section(fin);
 
-    find_section("Boundary conditions");
-    read_line("type", "%d", &bc);
-
-    phi[0] = 0.0;
-    phi[1] = 0.0;
-    phi_prime[0] = 0.0;
-    phi_prime[1] = 0.0;
-    cF = 1.0;
-    cF_prime = 1.0;
-
-    if (bc == 1)
-      read_dprms("phi", 2, phi);
-
-    if ((bc == 1) || (bc == 2))
-      read_dprms("phi'", 2, phi_prime);
-
-    if (bc != 3)
-      read_line("cF", "%lf", &cF);
-
-    if (bc == 2)
-      read_line("cF'", "%lf", &cF_prime);
-    else
-      cF_prime = cF;
-
-    read_dprms("theta", 3, theta);
-
-    find_section("SAP");
-    read_iprms("bs", 4, bs);
-    read_line("nmr", "%d", &nmr);
-    read_line("ncy", "%d", &ncy);
-
-    find_section("GCR");
-    read_line("nkv", "%d", &nkv);
-    read_line("nmx", "%d", &nmx);
-    read_line("res", "%lf", &res);
-
+  if (my_rank == 0) {
     fclose(fin);
   }
 
-  MPI_Bcast(nbase, NAME_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);
-  MPI_Bcast(cnfg_dir, NAME_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&first, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&last, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&step, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  lat = lat_parms();
+  sap = sap_parms();
 
-  MPI_Bcast(&kappa, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&csw, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&mu, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&eoflg, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
-  MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(phi, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(phi_prime, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&cF, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&cF_prime, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(theta, 3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-  MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&nmr, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&ncy, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
-  MPI_Bcast(&nkv, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&nmx, 1, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(&res, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-  lat = set_lat_parms(5.5, 1.0, 1, &kappa, csw);
-  print_lat_parms();
-
-  set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime, theta);
-  print_bc_parms(2);
-
-  sap = set_sap_parms(bs, 0, nmr, ncy);
   m0 = lat.m0[0];
   (void)set_sw_parms(m0);
   tm = set_tm_parms(eoflg);
@@ -193,6 +306,7 @@ int main(int argc, char *argv[])
     }
 
     set_ud_phase();
+    smear_fields();
     random_sd(VOLUME, psd[0], 1.0);
     bnd_sd2zero(ALL_PTS, psd[0]);
     nrm = sqrt(norm_square_dble(VOLUME, 1, psd[0]));
@@ -244,6 +358,8 @@ int main(int argc, char *argv[])
       error_root(del != 0.0, 1, "main [check3.c]",
                  "Incorrect result when the input and "
                  "output fields coincide");
+
+      unsmear_fields();
     }
   }
 

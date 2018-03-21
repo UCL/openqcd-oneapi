@@ -14,21 +14,15 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "utils.h"
+#include "dfl.h"
 #include "flags.h"
+#include "global.h"
 #include "lattice.h"
-#include "block.h"
 #include "linalg.h"
+#include "mpi.h"
+#include "random.h"
 #include "sflds.h"
 #include "vflds.h"
-#include "dfl.h"
-#include "global.h"
 
 static void check_basis(int Ns, double *dev0, double *dev1)
 {

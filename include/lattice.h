@@ -13,9 +13,7 @@
 #ifndef LATTICE_H
 #define LATTICE_H
 
-#ifndef BLOCK_H
 #include "block.h"
-#endif
 
 typedef struct
 {
@@ -43,8 +41,8 @@ extern ftidx_t *ftidx(void);
 extern void plaq_ftidx(int n, int ix, int *ip);
 
 /* GEOMETRY_C */
-extern int ipr_global(int *n);
-extern void ipt_global(int *x, int *ip, int *ix);
+extern int ipr_global(int const *n);
+extern void ipt_global(int const *x, int *ip, int *ix);
 extern int global_time(int ix);
 extern void geometry(void);
 #if ((defined GEOMETRY_C) || (defined BLOCK_C))
@@ -56,6 +54,7 @@ extern void bnd_imbed(block_t *b);
 
 /* UIDX_C */
 extern uidx_t *uidx(void);
+void alloc_uidx(void);
 extern void plaq_uidx(int n, int ix, int *ip);
 
 #endif

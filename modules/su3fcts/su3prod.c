@@ -72,10 +72,6 @@
 
 #define SU3PROD_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
 #include "su3fcts.h"
 
 #if (defined AVX)

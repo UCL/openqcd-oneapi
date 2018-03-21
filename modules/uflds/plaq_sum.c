@@ -48,21 +48,15 @@
 
 #define PLAQ_SUM_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
-#include "flags.h"
-#include "su3fcts.h"
-#include "lattice.h"
-#include "uflds.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "su3fcts.h"
+#include "uflds.h"
 
 #define N0 (NPROC0 * L0)
 
-static int isA, isE[L0], isB[L0], init = 0;
+static int isA[2], isE[L0], isB[L0], init = 0;
 static double aslE[N0], aslB[N0];
 static su3_dble *udb;
 static su3_dble wd1 ALIGNED16;
@@ -90,10 +84,11 @@ static double plaq_dble(int n, int ix)
 static void local_plaq_sum_dble(int iw)
 {
   int bc, ix, t, n;
-  double wp, pa;
+  double wp, pat, pas;
 
   if (init < 1) {
-    isA = init_hsum(1);
+    isA[0] = init_hsum(1);
+    isA[1] = init_hsum(1);
     init = 1;
   }
 
@@ -105,65 +100,90 @@ static void local_plaq_sum_dble(int iw)
     wp = 0.5;
 
   udb = udfld();
-  reset_hsum(isA);
+  reset_hsum(isA[0]);
+  reset_hsum(isA[1]);
 
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
-    pa = 0.0;
+    pat = 0.0;
+    pas = 0.0;
 
     if ((t < (N0 - 1)) || (bc != 0)) {
       for (n = 0; n < 3; n++)
-        pa += plaq_dble(n, ix);
+        pat += plaq_dble(n, ix);
     }
 
     if (((t > 0) || (bc == 3)) && ((t < (N0 - 1)) || (bc != 0))) {
       for (n = 3; n < 6; n++)
-        pa += plaq_dble(n, ix);
+        pas += plaq_dble(n, ix);
     } else {
       for (n = 3; n < 6; n++)
-        pa += wp * plaq_dble(n, ix);
+        pas += wp * plaq_dble(n, ix);
     }
 
     if ((t == (N0 - 1)) && ((bc == 1) || (bc == 2)))
-      pa += 9.0 * wp;
+      pat += 9.0 * wp;
 
-    if (pa != 0.0)
-      add_to_hsum(isA, &pa);
+    if (not_equal_d(pat, 0.0)) {
+      add_to_hsum(isA[0], &pat);
+    }
+
+    if (not_equal_d(pas, 0.0)) {
+      add_to_hsum(isA[1], &pas);
+    }
+  }
+}
+
+void plaq_sum_split_dble(int icom, double *result)
+{
+  if (query_flags(UDBUF_UP2DATE) != 1) {
+    copy_bnd_ud();
+  }
+
+  local_plaq_sum_dble(0);
+
+  if ((icom == 1) && (NPROC > 1)) {
+    global_hsum(isA[0], result);
+    global_hsum(isA[1], result + 1);
+  } else {
+    local_hsum(isA[0], result);
+    local_hsum(isA[1], result + 1);
   }
 }
 
 double plaq_sum_dble(int icom)
 {
-  double p;
+  double p[2];
 
-  if (query_flags(UDBUF_UP2DATE) != 1)
+  plaq_sum_split_dble(icom, p);
+
+  return p[0] + p[1];
+}
+
+void plaq_wsum_split_dble(int icom, double *result)
+{
+  if (query_flags(UDBUF_UP2DATE) != 1) {
     copy_bnd_ud();
+  }
 
-  local_plaq_sum_dble(0);
+  local_plaq_sum_dble(1);
 
-  if ((icom == 1) && (NPROC > 1))
-    global_hsum(isA, &p);
-  else
-    local_hsum(isA, &p);
-
-  return p;
+  if ((icom == 1) && (NPROC > 1)) {
+    global_hsum(isA[0], result);
+    global_hsum(isA[1], result + 1);
+  } else {
+    local_hsum(isA[0], result);
+    local_hsum(isA[1], result + 1);
+  }
 }
 
 double plaq_wsum_dble(int icom)
 {
-  double p;
+  double p[2];
 
-  if (query_flags(UDBUF_UP2DATE) != 1)
-    copy_bnd_ud();
+  plaq_wsum_split_dble(icom, p);
 
-  local_plaq_sum_dble(1);
-
-  if ((icom == 1) && (NPROC > 1))
-    global_hsum(isA, &p);
-  else
-    local_hsum(isA, &p);
-
-  return p;
+  return p[0] + p[1];
 }
 
 double plaq_action_slices(double *asl)
@@ -173,7 +193,7 @@ double plaq_action_slices(double *asl)
 
   if (init < 2) {
     if (init < 1)
-      isA = init_hsum(1);
+      isA[0] = init_hsum(1);
 
     for (t = 0; t < L0; t++) {
       isE[t] = init_hsum(1);
@@ -212,9 +232,9 @@ double plaq_action_slices(double *asl)
 
     t -= t0;
 
-    if (smE != 0.0)
+    if (not_equal_d(smE, 0.0))
       add_to_hsum(isE[t], &smE);
-    if (smB != 0.0)
+    if (not_equal_d(smB, 0.0))
       add_to_hsum(isB[t], &smB);
   }
 
@@ -265,15 +285,15 @@ double plaq_action_slices(double *asl)
       asl[t] = aslE[t - 1] + aslE[t] + 2.0 * aslB[t];
   }
 
-  reset_hsum(isA);
+  reset_hsum(isA[0]);
 
   if ((bc == 1) || (bc == 2))
-    add_to_hsum(isA, aslE + N0 - 1);
+    add_to_hsum(isA[0], aslE + N0 - 1);
 
   for (t = 0; t < N0; t++)
-    add_to_hsum(isA, asl + t);
+    add_to_hsum(isA[0], asl + t);
 
-  local_hsum(isA, &A);
+  local_hsum(isA[0], &A);
 
   return A;
 }

@@ -14,21 +14,14 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "su3fcts.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "sw_term.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "random.h"
+#include "sflds.h"
+#include "sw_term.h"
+#include "uflds.h"
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -392,18 +385,35 @@ static void muladd_pauli(double csw, int mu, int nu, spinor_dble *pk,
 static void mul_swd(double m0, double csw, spinor_dble *pk, spinor_dble *pl)
 {
   int mu, nu;
-  double c;
+  double c, ct, cs;
   spinor_dble *pm;
+  ani_params_t ani;
 
   set_sd2zero(VOLUME, pl);
+  ani = ani_parms();
+
+  ct = 2.0 * csw;
+  cs = 2.0 * csw;
+
+  if (ani.has_ani) {
+    ct *= ani.cT /
+          (ani.us_fermion * ani.us_fermion * ani.ut_fermion * ani.ut_fermion);
+    cs *= ani.cR / (ani.xi * ani.us_fermion * ani.us_fermion * ani.us_fermion *
+                    ani.ut_fermion);
+  }
 
   for (mu = 0; mu < 3; mu++) {
-    for (nu = (mu + 1); nu < 4; nu++)
-      muladd_pauli(2.0 * csw, mu, nu, pk, pl);
+    for (nu = (mu + 1); nu < 4; nu++) {
+      if (mu == 0) {
+        muladd_pauli(ct, mu, nu, pk, pl);
+      } else {
+        muladd_pauli(cs, mu, nu, pk, pl);
+      }
+    }
   }
 
   pm = pk + VOLUME;
-  c = 4.0 + m0;
+  c = 1.0 + 3.0 * ani.nu / ani.xi + m0;
 
   for (; pk < pm; pk++) {
     _vector_mulr_assign((*pl).c1, c, (*pk).c1);
@@ -476,10 +486,18 @@ int main(int argc, char *argv[])
                  "Syntax: check3 [-bc <type>]");
   }
 
-  set_lat_parms(5.5, 1.0, 0, NULL, 1.978);
-  print_lat_parms();
-
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (bc == 3) {
+    set_ani_parms(1, 1.5, 4.3, 1.5, 0.9, 1.0, 1.0, 0.9, 1.1);
+    print_ani_parms();
+    set_lat_parms(5.5, 1.0, 0, NULL, 1.0);
+  } else {
+    set_no_ani_parms();
+    set_lat_parms(5.5, 1.0, 0, NULL, 1.978);
+  }
+
+  print_lat_parms();
   phi[0] = 0.123;
   phi[1] = -0.534;
   phi_prime[0] = 0.912;

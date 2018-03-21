@@ -12,12 +12,7 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
 #include "random.h"
-#include "utils.h"
 #include "ratfcts.h"
 
 static void sncndn_smallk(double u, double rk, double *sn, double *cn,

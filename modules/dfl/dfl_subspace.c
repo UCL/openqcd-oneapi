@@ -12,32 +12,32 @@
  *
  * The externally accessible functions are
  *
- *   void dfl_sd2vd(spinor_dble *sd,complex_dble *vd)
+ *   void dfl_sd2vd(spinor_dble const *sd,complex_dble *vd)
  *     Assigns the components of the global double-precision spinor field
  *     sd along the deflation subspace to the double-precision vector
  *     field vd.
  *
- *   void dfl_vd2sd(complex_dble *vd,spinor_dble *sd)
+ *   void dfl_vd2sd(complex_dble const *vd,spinor_dble *sd)
  *     Assigns the element of the deflation subspace corresponding to the
  *     double-precision vector field vd to the global double-precision spinor
  *     field sd.
  *
- *   void dfl_sub_vd2sd(complex_dble *vd,spinor_dble *sd)
+ *   void dfl_sub_vd2sd(complex_dble const *vd,spinor_dble *sd)
  *     Subtracts the element of the deflation subspace corresponding to the
  *     double-precision vector field vd from the global double-precision
  *     spinor field sd.
  *
- *   void dfl_s2v(spinor *s,complex *v)
+ *   void dfl_s2v(spinor const *s,complex *v)
  *     Assigns the components of the global single-precision spinor field
  *     s along the deflation subspace to the single-precision vector
  *     field v.
  *
- *   void dfl_v2s(complex *v,spinor *s)
+ *   void dfl_v2s(complex const *v,spinor *s)
  *     Assigns the element of the deflation subspace corresponding to the
  *     single-precision vector field v to the global single-precision spinor
  *     field s.
  *
- *   void dfl_sub_v2s(complex *v,spinor *s)
+ *   void dfl_sub_v2s(complex const *v,spinor *s)
  *     Subtracts the element of the deflation subspace corresponding to the
  *     double-precision vector field v from the global single-precision spinor
  *     field s.
@@ -74,21 +74,16 @@
 
 #define DFL_SUBSPACE_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "linalg.h"
-#include "sflds.h"
 #include "block.h"
-#include "vflds.h"
 #include "dfl.h"
+#include "flags.h"
 #include "global.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "sflds.h"
+#include "vflds.h"
 
-void dfl_sd2vd(spinor_dble *sd, complex_dble *vd)
+void dfl_sd2vd(spinor_dble const *sd, complex_dble *vd)
 {
   int Ns, nb, nbh, isw;
   int n, m, i, vol;
@@ -118,7 +113,7 @@ void dfl_sd2vd(spinor_dble *sd, complex_dble *vd)
   }
 }
 
-void dfl_vd2sd(complex_dble *vd, spinor_dble *sd)
+void dfl_vd2sd(complex_dble const *vd, spinor_dble *sd)
 {
   int Ns, nb, nbh, isw;
   int n, m, i, vol;
@@ -150,7 +145,7 @@ void dfl_vd2sd(complex_dble *vd, spinor_dble *sd)
   }
 }
 
-void dfl_sub_vd2sd(complex_dble *vd, spinor_dble *sd)
+void dfl_sub_vd2sd(complex_dble const *vd, spinor_dble *sd)
 {
   int Ns, nb, nbh, isw;
   int n, m, i, vol;
@@ -185,7 +180,7 @@ void dfl_sub_vd2sd(complex_dble *vd, spinor_dble *sd)
   }
 }
 
-void dfl_s2v(spinor *s, complex *v)
+void dfl_s2v(spinor const *s, complex *v)
 {
   int Ns, nb, nbh, isw;
   int n, m, i, vol;
@@ -215,7 +210,7 @@ void dfl_s2v(spinor *s, complex *v)
   }
 }
 
-void dfl_v2s(complex *v, spinor *s)
+void dfl_v2s(complex const *v, spinor *s)
 {
   int Ns, nb, nbh, isw;
   int n, m, i, vol;
@@ -247,7 +242,7 @@ void dfl_v2s(complex *v, spinor *s)
   }
 }
 
-void dfl_sub_v2s(complex *v, spinor *s)
+void dfl_sub_v2s(complex const *v, spinor *s)
 {
   int Ns, nb, nbh, isw;
   int n, m, i, vol;

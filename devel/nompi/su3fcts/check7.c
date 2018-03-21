@@ -12,10 +12,6 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "utils.h"
 #include "random.h"
 #include "su3fcts.h"
 

@@ -39,16 +39,11 @@
 
 #define FTCOM_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
 #include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "tcharge.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "tcharge.h"
 
 static const int plns[6][2] = {{0, 1}, {0, 2}, {0, 3}, {2, 3}, {3, 1}, {1, 2}};
 static u3_alg_dble *ftbuf;

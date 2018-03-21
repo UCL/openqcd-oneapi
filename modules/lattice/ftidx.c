@@ -46,13 +46,8 @@
 
 #define FTIDX_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "su3.h"
-#include "utils.h"
-#include "lattice.h"
 #include "global.h"
+#include "lattice.h"
 
 static const int plns[6][2] = {{0, 1}, {0, 2}, {0, 3}, {2, 3}, {3, 1}, {1, 2}};
 static int nfc[4], ofs[4], *cn[6][2], init = 0;

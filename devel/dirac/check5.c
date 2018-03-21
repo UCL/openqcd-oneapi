@@ -14,22 +14,15 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "su3fcts.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "sw_term.h"
 #include "dirac.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "random.h"
+#include "sflds.h"
+#include "sw_term.h"
+#include "uflds.h"
 
 static spinor_dble rs ALIGNED16;
 static const spinor_dble sd0 = {{{0.0}}};
@@ -101,9 +94,11 @@ int main(int argc, char *argv[])
   double phi[2], phi_prime[2], theta[3];
   double mu, pi, d, dmax;
   double mp, pt, pv, p[4], sp[4];
+  double one_over_ut, one_over_gamma_f;
   complex_dble z;
   spinor_dble **psd, s0, s1, s2, s3, s4;
   sw_parms_t swp;
+  ani_params_t ani;
   FILE *flog = NULL;
 
   MPI_Init(&argc, &argv);
@@ -130,11 +125,20 @@ int main(int argc, char *argv[])
                  "Syntax: check5 [-bc <type>]");
   }
 
-  set_ani_parms(1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
-  set_lat_parms(5.5, 1.0, 0, NULL, 1.978);
+  MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (bc == 3) {
+    set_ani_parms(1, 1.5, 4.3, 1.5, 0.9, 1.0, 1.0, 0.87, 1.23);
+    print_ani_parms();
+    set_lat_parms(5.5, 1.0, 0, NULL, 1.0);
+  } else {
+    set_no_ani_parms();
+    set_lat_parms(5.5, 1.0, 0, NULL, 1.978);
+  }
+
+  ani = ani_parms();
   print_lat_parms();
 
-  MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
   phi[0] = 0.0;
   phi[1] = 0.0;
   phi_prime[0] = 0.0;
@@ -143,7 +147,6 @@ int main(int argc, char *argv[])
   theta[1] = 0.0;
   theta[2] = 0.0;
   set_bc_parms(bc, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime, theta);
-  set_ani_parms(1, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
   print_bc_parms(2);
 
   geometry();
@@ -157,6 +160,9 @@ int main(int argc, char *argv[])
 
   swp = set_sw_parms(-0.0123);
   mu = 0.0876;
+
+  one_over_ut = 1.0 / ani.ut_fermion;
+  one_over_gamma_f = ani.nu / ani.xi;
 
   if (my_rank == 0)
     printf("m0 = %.4e, csw = %.4e, cF = %.4e, cF' = %.4e\n\n", swp.m0, swp.csw,
@@ -193,6 +199,7 @@ int main(int argc, char *argv[])
       p[0] = ((double)(np[0]) * 2.0 * pi + pi) / (double)(NPROC0 * L0);
     else
       p[0] = (double)(np[0]) * pi / (double)(NPROC0 * L0);
+
     p[1] = (double)(np[1]) * 2.0 * pi / (double)(NPROC1 * L1);
     p[2] = (double)(np[2]) * 2.0 * pi / (double)(NPROC2 * L2);
     p[3] = (double)(np[3]) * 2.0 * pi / (double)(NPROC3 * L3);
@@ -208,10 +215,10 @@ int main(int argc, char *argv[])
     sp[3] = sin(p[3]);
 
     mp = swp.m0;
-    mp += (1.0 - cos(p[0]));
-    mp += (1.0 - cos(p[1]));
-    mp += (1.0 - cos(p[2]));
-    mp += (1.0 - cos(p[3]));
+    mp += (1.0 - cos(p[0]) * one_over_ut);
+    mp += (1.0 - cos(p[1]) * one_over_ut) * one_over_gamma_f;
+    mp += (1.0 - cos(p[2]) * one_over_ut) * one_over_gamma_f;
+    mp += (1.0 - cos(p[3]) * one_over_ut) * one_over_gamma_f;
 
     for (x0 = 0; x0 < L0; x0++) {
       for (x1 = 0; x1 < L1; x1++) {
@@ -273,10 +280,14 @@ int main(int argc, char *argv[])
                 s3 = mul_gamma(4, s0);
                 z.re = 0.0;
                 z.im = mu;
+              } else if ((nu == 0) && (bc == 3)) {
+                s3 = mul_gamma(nu, s0);
+                z.re = 0.0;
+                z.im = one_over_ut * sp[nu];
               } else {
                 s3 = mul_gamma(nu, s0);
                 z.re = 0.0;
-                z.im = sp[nu];
+                z.im = one_over_gamma_f * one_over_ut * sp[nu];
               }
 
               s4.c1 = mul_cplx(z, s3.c1);

@@ -14,24 +14,16 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "su3fcts.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
-#include "mdflds.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "sw_term.h"
 #include "dfl.h"
 #include "forces.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mdflds.h"
+#include "mpi.h"
+#include "random.h"
+#include "su3fcts.h"
+#include "uflds.h"
 
 #define N0 (NPROC0 * L0)
 
@@ -94,14 +86,14 @@ static int is_frc_zero(su3_alg_dble *f)
   int ie;
 
   ie = 1;
-  ie &= ((*f).c1 == 0.0);
-  ie &= ((*f).c2 == 0.0);
-  ie &= ((*f).c3 == 0.0);
-  ie &= ((*f).c4 == 0.0);
-  ie &= ((*f).c5 == 0.0);
-  ie &= ((*f).c6 == 0.0);
-  ie &= ((*f).c7 == 0.0);
-  ie &= ((*f).c8 == 0.0);
+  ie &= is_equal_d((*f).c1, 0.0);
+  ie &= is_equal_d((*f).c2, 0.0);
+  ie &= is_equal_d((*f).c3, 0.0);
+  ie &= is_equal_d((*f).c4, 0.0);
+  ie &= is_equal_d((*f).c5, 0.0);
+  ie &= is_equal_d((*f).c6, 0.0);
+  ie &= is_equal_d((*f).c7, 0.0);
+  ie &= is_equal_d((*f).c8, 0.0);
 
   return ie;
 }
@@ -210,10 +202,19 @@ int main(int argc, char *argv[])
                  "Syntax: check9 [-bc <type>]");
   }
 
-  set_lat_parms(5.5, 1.0, 0, NULL, 1.782);
+  MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (bc == 3) {
+    set_ani_parms(1, 1.5, 4.3, 1.5, 0.9, 1.0, 1.0, 0.87, 1.23);
+    print_ani_parms();
+    set_lat_parms(5.5, 1.0, 0, NULL, 1.0);
+  } else {
+    set_no_ani_parms();
+    set_lat_parms(5.5, 1.0, 0, NULL, 1.782);
+  }
+
   print_lat_parms();
 
-  MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
   chi[0] = 0.123;
   chi[1] = -0.534;
   chi_prime[0] = 0.912;

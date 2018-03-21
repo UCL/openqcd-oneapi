@@ -103,24 +103,19 @@
 
 #define FORCE4_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
-#include "mdflds.h"
-#include "sw_term.h"
-#include "sflds.h"
-#include "dirac.h"
-#include "linalg.h"
-#include "sap.h"
 #include "dfl.h"
-#include "update.h"
+#include "dirac.h"
+#include "flags.h"
 #include "forces.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mdflds.h"
+#include "mpi.h"
+#include "sap.h"
+#include "sflds.h"
+#include "sw_term.h"
+#include "update.h"
 
 #define N0 (NPROC0 * L0)
 
@@ -183,7 +178,7 @@ static double sdet(void)
       m += 2;
     }
 
-    if (p != 0.0) {
+    if (not_equal_d(p, 0.0)) {
       smx = -2.0 * log(p);
       add_to_hsum(isx, &smx);
     } else

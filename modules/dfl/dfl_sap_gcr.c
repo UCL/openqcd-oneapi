@@ -124,28 +124,27 @@
 * generated before the GCR solver of the little Dirac equation is restarted,
 * is a parameter set by dfl_pro_parms().
 *
+* CONST_CORRECTNESS:
+*   dfl_sap_gcr should have a const eta argument. This is blocked by the
+*   constness of the fgcr algorithm.
+*
 *******************************************************************************/
 
 #define DFL_SAP_GCR_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "utils.h"
-#include "flags.h"
 #include "block.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "sw_term.h"
-#include "dirac.h"
-#include "linsolv.h"
-#include "sap.h"
-#include "vflds.h"
-#include "little.h"
 #include "dfl.h"
+#include "dirac.h"
 #include "global.h"
+#include "linalg.h"
+#include "linsolv.h"
+#include "little.h"
+#include "mpi.h"
+#include "sap.h"
+#include "sflds.h"
+#include "sw_term.h"
+#include "uflds.h"
+#include "vflds.h"
 
 static int nit, stat, nv;
 static float mus;
@@ -291,7 +290,7 @@ double dfl_sap_gcr(int nkv, int nmx, double res, double mu, spinor_dble *eta,
 
       fact = rho0 / sqrt((double)(VOLUME) * (double)(24 * NPROC));
 
-      if (fact != 0.0) {
+      if (not_equal_d(fact, 0.0)) {
         assign_sd2sd(VOLUME, eta, rsd[0]);
         scale_dble(VOLUME, 1.0 / fact, rsd[0]);
 

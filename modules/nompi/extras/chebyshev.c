@@ -49,10 +49,6 @@
 
 #define CHEBYSHEV_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
 #include "extras.h"
 
 static int max_degree;

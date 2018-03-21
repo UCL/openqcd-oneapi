@@ -69,19 +69,14 @@
 
 #define LTL_GCR_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "mpi.h"
-#include "su3.h"
-#include "utils.h"
+#include "dfl.h"
 #include "flags.h"
-#include "vflds.h"
+#include "global.h"
 #include "linalg.h"
 #include "linsolv.h"
 #include "little.h"
-#include "dfl.h"
-#include "global.h"
+#include "mpi.h"
+#include "vflds.h"
 
 static int Ns = 0, nv, nvh;
 static double rvol;
@@ -227,7 +222,7 @@ double ltl_gcr(int nkv, int nmx, double res, double mu, complex_dble *eta,
     Aweeinv_dble(wvd[0], wvd[1]);
     fact = rvol * rho0;
 
-    if (fact != 0.0) {
+    if (not_equal_d(fact, 0.0)) {
       vscale_dble(nvh, 1.0 / fact, wvd[1]);
       Lvd(wvd[1], wvd[2]);
 

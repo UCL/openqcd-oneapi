@@ -12,8 +12,9 @@
  *
  * The externally accessible functions are
  *
- *   force_parms_t set_force_parms(int ifr,force_t force,int ipf,int im0,
- *                                 int *irat,int *imu,int *isp,int *ncr)
+ *   force_parms_t set_force_parms(int ifr, force_t force, int ipf, int im0,
+ *                                 int const *irat, int const *imu,
+ *                                 int const *isp, int const *ncr)
  *     Sets the parameters in the force parameter set number ifr and returns
  *     a structure containing them (see the notes).
  *
@@ -133,14 +134,10 @@
 
 #define FORCE_PARMS_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "mpi.h"
-#include "utils.h"
 #include "flags.h"
 #include "global.h"
+#include "mpi.h"
+#include <string.h>
 
 #define IFRMAX 32
 
@@ -167,7 +164,8 @@ static void init_fp(void)
 }
 
 force_parms_t set_force_parms(int ifr, force_t force, int ipf, int im0,
-                              int *irat, int *imu, int *isp, int *ncr)
+                              int const *irat, int const *imu, int const *isp,
+                              int const *ncr)
 {
   int iprms[23], i, ie;
   int rat[3], mu[4], sp[4], nc[4], ic[4];

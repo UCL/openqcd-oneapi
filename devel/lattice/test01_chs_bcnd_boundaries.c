@@ -7,15 +7,10 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include "mpi.h"
-#include "su3.h"
-#include "su3fcts.h"
-#include "lattice.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "su3fcts.h"
 #include "uflds.h"
 
 #include <devel/testing_utilities/data_type_diffs.c>
@@ -24,6 +19,7 @@
 int main(int argc, char *argv[])
 {
   int my_rank, ix, num_links_bnd;
+  double phi[2], phi_prime[2];
   double theta[3] = {0.0, 0.0, 0.0};
   double diff, total_diff;
   su3_dble *udb, *boundary_copy;
@@ -44,14 +40,25 @@ int main(int argc, char *argv[])
     printf("\n-------------------------------------------\n\n");
   }
 
-  num_links_bnd = 7 * (BNDRY / 4);
-  boundary_copy = malloc(num_links_bnd * sizeof(*boundary_copy));
-
+  /* Eventually allow other bc's if I implement this in the set_ud_phase
+   * function */
+  phi[0] = 0.123;
+  phi[1] = -0.534;
+  phi_prime[0] = 0.912;
+  phi_prime[1] = 0.078;
   theta[0] = 0.35;
   theta[1] = -1.25;
   theta[2] = 0.78;
+  set_bc_parms(3, 0.55, 0.78, 0.9012, 1.2034, phi, phi_prime, theta);
 
-  set_bc_parms(3, 0., 0., 0., 0., NULL, NULL, theta);
+  print_bc_parms(2);
+  if (my_rank == 0) {
+    printf("-------------------------------------------\n\n");
+  }
+
+  num_links_bnd = 7 * (BNDRY / 4);
+  boundary_copy = malloc(num_links_bnd * sizeof(*boundary_copy));
+
   geometry();
 
   random_ud();
