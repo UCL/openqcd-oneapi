@@ -89,14 +89,16 @@ int main(int argc, char *argv[])
     local_diff += diff_identity(omega_matrix + ix, expected_value);
   }
 
-  MPI_Reduce(&local_diff, &total_diff, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&local_diff, &total_diff, 1, MPI_DOUBLE, MPI_SUM, 0,
+             MPI_COMM_WORLD);
 
   if (my_rank == 0) {
     register_test(1, "Check of compute_omega_field() with rho = 1.0");
     print_test_header(1);
 
     printf("Total diff: %.1e (should be 0.0)\n", total_diff);
-    printf("Average total diff: %.1e (should be 0.0)\n", total_diff * volume_inv);
+    printf("Average total diff: %.1e (should be 0.0)\n",
+           total_diff * volume_inv);
 
     fail_test_if(1, total_diff * volume_inv > 1e-12);
 
@@ -132,14 +134,17 @@ int main(int argc, char *argv[])
     local_diff += diff_identity(omega_matrix + ix, expected_value);
   }
 
-  MPI_Reduce(&local_diff, &total_diff, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&local_diff, &total_diff, 1, MPI_DOUBLE, MPI_SUM, 0,
+             MPI_COMM_WORLD);
 
   if (my_rank == 0) {
-    register_test(2, "Check of compute_omega_field() with rho_t:  0.24, rho_s:  0.79");
+    register_test(
+        2, "Check of compute_omega_field() with rho_t:  0.24, rho_s:  0.79");
     print_test_header(2);
 
     printf("Total diff: %.1e (should be < 1e-8)\n", total_diff);
-    printf("Average total diff: %.1e (should be < 1e-12)\n", total_diff * volume_inv);
+    printf("Average total diff: %.1e (should be < 1e-12)\n",
+           total_diff * volume_inv);
 
     fail_test_if(2, total_diff * volume_inv > 1e-12);
 

@@ -46,20 +46,23 @@ static void rot_ud(double eps)
       mom += 1;
       u += 1;
 
-      if (bc != 0)
+      if (bc != 0) {
         expXsu3(eps, mom, u);
+      }
       mom += 1;
       u += 1;
 
       for (ifc = 2; ifc < 8; ifc++) {
-        if (bc != 1)
+        if (bc != 1) {
           expXsu3(eps, mom, u);
+        }
         mom += 1;
         u += 1;
       }
     } else if (t == (N0 - 1)) {
-      if (bc != 0)
+      if (bc != 0) {
         expXsu3(eps, mom, u);
+      }
       mom += 1;
       u += 1;
 
@@ -218,9 +221,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check3.c]",
                  "Syntax: check3 [-bc <type>]");
+    }
 
     no_tts = find_opt(argc, argv, "-no-tts");
 
@@ -263,8 +267,9 @@ int main(int argc, char *argv[])
   c = 0.789;
   dev_frc = chk_chs(c);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Deviation of gauge force after a phase change = %.1e\n\n", dev_frc);
+  }
 
   for (k = 0; k < 4; k++) {
     random_ud();

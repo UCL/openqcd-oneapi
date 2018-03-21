@@ -93,18 +93,20 @@ double tcharge(void)
   double pi, Q;
 
   if (init == 0) {
-    for (t = 0; t < L0; t++)
+    for (t = 0; t < L0; t++) {
       isx[t] = init_hsum(1);
+    }
 
     init = 1;
   }
 
   ft = ftensor();
   bc = bc_type();
-  if (bc == 0)
+  if (bc == 0) {
     tmx = N0 - 1;
-  else
+  } else {
     tmx = N0;
+  }
   reset_hsum(isx[0]);
 
   for (ix = 0; ix < VOLUME; ix++) {
@@ -116,10 +118,11 @@ double tcharge(void)
     }
   }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     global_hsum(isx[0], &Q);
-  else
+  } else {
     local_hsum(isx[0], &Q);
+  }
 
   pi = 4.0 * atan(1.0);
 
@@ -132,22 +135,25 @@ double tcharge_slices(double *qsl)
   double pi, fact, Q;
 
   if (init == 0) {
-    for (t = 0; t < L0; t++)
+    for (t = 0; t < L0; t++) {
       isx[t] = init_hsum(1);
+    }
 
     init = 1;
   }
 
   ft = ftensor();
   bc = bc_type();
-  if (bc == 0)
+  if (bc == 0) {
     tmx = N0 - 1;
-  else
+  } else {
     tmx = N0;
+  }
   t0 = cpr[0] * L0;
 
-  for (t = 0; t < L0; t++)
+  for (t = 0; t < L0; t++) {
     reset_hsum(isx[t]);
+  }
 
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
@@ -159,8 +165,9 @@ double tcharge_slices(double *qsl)
     }
   }
 
-  for (t = 0; t < N0; t++)
+  for (t = 0; t < N0; t++) {
     qsl0[t] = 0.0;
+  }
 
   pi = 4.0 * atan(1.0);
   fact = 1.0 / (8.0 * pi * pi);
@@ -174,14 +181,16 @@ double tcharge_slices(double *qsl)
     MPI_Reduce(qsl0, qsl, N0, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Bcast(qsl, N0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   } else {
-    for (t = 0; t < N0; t++)
+    for (t = 0; t < N0; t++) {
       qsl[t] = qsl0[t];
+    }
   }
 
   Q = 0.0;
 
-  for (t = 0; t < N0; t++)
+  for (t = 0; t < N0; t++) {
     Q += qsl[t];
+  }
 
   return Q;
 }

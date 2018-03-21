@@ -50,8 +50,9 @@ static void random_Xu(void)
     mu[1] = 2.0 * mu[1] - 1.0;
     mu[2] = -mu[0] - mu[1];
 
-    if (fabs(mu[2]) <= 1.0)
+    if (fabs(mu[2]) <= 1.0) {
       break;
+    }
   }
 
   cm3x3_zero(1, u);
@@ -90,8 +91,9 @@ static double dev_sp(void)
 
   for (i = 0; i < 8; i++) {
     dev = fabs(r[i]);
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   return dmax;
@@ -120,8 +122,9 @@ static double dev_sg(void)
 
   for (i = 0; i < 20; i++) {
     dev = fabs(r[i]);
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   return dmax;
@@ -163,8 +166,9 @@ static double dev_sf(void)
 
   for (i = 0; i < 38; i++) {
     dev = fabs(r[i]);
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   return dmax;
@@ -195,20 +199,23 @@ int main(void)
     chexp_drv2(X, sf);
 
     dev = dev_sp();
-    if (dev > dmax1)
+    if (dev > dmax1) {
       dmax1 = dev;
+    }
 
     dev = dev_sg();
-    if (dev > dmax2)
+    if (dev > dmax2) {
       dmax2 = dev;
+    }
 
     random_su3_dble(r);
     rotate_su3alg(r, X);
     chexp_drv2(X, sf + 1);
 
     dev = dev_sf();
-    if (dev > dmax3)
+    if (dev > dmax3) {
       dmax3 = dev;
+    }
   }
 
   printf("Comparision of chexp_drv0 and chexp_drv2 = %.1e\n", dmax1);

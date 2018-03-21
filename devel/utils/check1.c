@@ -56,8 +56,9 @@ int main(int argc, char *argv[])
     fdat = fopen("test.log", "w");
     error_root(fdat == NULL, 1, "main [check1.c]", "Unable to open file");
     iw = 0;
-    for (n = 0; n < 10; n++)
+    for (n = 0; n < 10; n++) {
       iw |= (fprintf(fdat, "r[%d] = %.6e\n", n, r[n]) < 0);
+    }
     error_root(iw != 0, 1, "main [check1.c]", "Incorrect write count");
     fclose(fdat);
 
@@ -74,8 +75,9 @@ int main(int argc, char *argv[])
     copy_file("test.dat", "test.dat~");
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

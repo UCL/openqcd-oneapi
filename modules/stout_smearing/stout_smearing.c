@@ -87,25 +87,30 @@ static void compute_omega_field(su3_dble const *gfield)
 
   smear_params = stout_smearing_parms();
 
-  if (omega_matrix == NULL)
+  if (omega_matrix == NULL) {
     alloc_omega_field();
+  }
 
   num_links = 4 * VOLUME + 7 * (BNDRY / 4);
   cm3x3_zero(num_links, omega_matrix);
 
   for (ix = 0; ix < VOLUME; ix++) {
-    if (smear_params.smear_temporal == 1)
-      for (plane_id = 0; plane_id < 3; plane_id++)
+    if (smear_params.smear_temporal == 1) {
+      for (plane_id = 0; plane_id < 3; plane_id++) {
         compute_omega_contribution(gfield, plane_id, ix,
                                    smear_params.rho_temporal);
+      }
+    }
 
-    if (smear_params.smear_spatial == 1)
-      for (plane_id = 3; plane_id < 6; plane_id++)
+    if (smear_params.smear_spatial == 1) {
+      for (plane_id = 3; plane_id < 6; plane_id++) {
         compute_omega_contribution(gfield, plane_id, ix,
                                    smear_params.rho_spatial);
+      }
+    }
   }
 
- if (smear_params.smear_temporal == 1) {
+  if (smear_params.smear_temporal == 1) {
     add_boundary_su3_field(omega_matrix);
   } else {
     add_spatial_boundary_su3_field(omega_matrix);
@@ -124,17 +129,19 @@ static void smear_single_field(su3_dble *gfield, ch_mat_coeff_pair_t *ch_coeffs)
   for (ix = 0; ix < VOLUME / 2; ++ix) {
     if (smear.smear_temporal == 1) {
       for (mu = 0; mu < 2; ++mu) {
-        iy = 8*ix + mu;
+        iy = 8 * ix + mu;
         project_to_su3alg(omega_matrix + iy, &ch_coeffs[iy].X);
-        expXsu3_w_factors(1., &ch_coeffs[iy].X, gfield + iy, &ch_coeffs[iy].coeff);
+        expXsu3_w_factors(1., &ch_coeffs[iy].X, gfield + iy,
+                          &ch_coeffs[iy].coeff);
       }
     }
 
     if (smear.smear_spatial == 1) {
       for (mu = 2; mu < 8; ++mu) {
-        iy = 8*ix + mu;
+        iy = 8 * ix + mu;
         project_to_su3alg(omega_matrix + iy, &ch_coeffs[iy].X);
-        expXsu3_w_factors(1., &ch_coeffs[iy].X, gfield + iy, &ch_coeffs[iy].coeff);
+        expXsu3_w_factors(1., &ch_coeffs[iy].X, gfield + iy,
+                          &ch_coeffs[iy].coeff);
       }
     }
   }
@@ -183,20 +190,24 @@ static void cycle_smeared_fields(int direction)
   }
 
   /* Return early if there is no smearing */
-  if (begin == end)
+  if (begin == end) {
     return;
+  }
 
   sfields = smeared_fields();
 
   sign_flipped_q = query_flags(UD_PHASE_SET);
-  if (sign_flipped_q == 1)
+  if (sign_flipped_q == 1) {
     unset_ud_phase();
+  }
 
-  for (; begin != end; begin += dir)
+  for (; begin != end; begin += dir) {
     swap_udfld(sfields + begin);
+  }
 
-  if (sign_flipped_q == 1)
+  if (sign_flipped_q == 1) {
     set_ud_phase();
+  }
 }
 
 /* Summary:
@@ -218,13 +229,15 @@ static void compute_and_apply_smearing(void)
   num_links = 4 * VOLUME + 7 * BNDRY / 4;
 
   if (nsmear > 0) {
-    if (query_flags(UDBUF_UP2DATE) != 1)
+    if (query_flags(UDBUF_UP2DATE) != 1) {
       copy_bnd_ud();
+    }
 
     /* Default boundaries before smearing */
     sign_flipped_q = query_flags(UD_PHASE_SET);
-    if (sign_flipped_q == 1)
+    if (sign_flipped_q == 1) {
       unset_ud_phase();
+    }
 
     sfields = smeared_fields();
     ch_coeffs = smearing_ch_coeff_fields();
@@ -236,8 +249,9 @@ static void compute_and_apply_smearing(void)
     }
 
     /* Reapply boundaries after smearing */
-    if (sign_flipped_q != 0)
+    if (sign_flipped_q != 0) {
       set_ud_phase();
+    }
   }
 
   set_flags(SMEARED_UD);
@@ -301,8 +315,9 @@ void smear_fields(void)
  */
 void unsmear_fields(void)
 {
-  if (query_flags(UD_IS_SMEARED) != 1)
+  if (query_flags(UD_IS_SMEARED) != 1) {
     return;
+  }
 
   cycle_smeared_fields(dir_unapply_smearing);
   set_flags(UNSMEARED_UD);

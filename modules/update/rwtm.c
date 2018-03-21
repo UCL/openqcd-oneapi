@@ -203,10 +203,11 @@ double rwtm2(double mu1, double mu2, int isp, double *sqn, int *status)
                sqrt(2.0) * mu2, isp, stat[0]);
     status[0] = (status[0] + stat[0] + 1) / 2;
 
-    if (mu1 > 0.0)
+    if (mu1 > 0.0) {
       lnr1 = norm_square_dble(VOLUME, 1, phi);
-    else
+    } else {
       lnr1 = 0.0;
+    }
 
     lnr2 = spinor_prod_re_dble(VOLUME, 1, eta, phi);
   } else if (sp.solver == SAP_GCR) {

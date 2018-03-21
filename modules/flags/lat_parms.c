@@ -222,25 +222,29 @@ lat_parms_t set_lat_parms(double beta, double c0, int nk, double const *kappa,
     k = malloc(2 * nk * sizeof(*k));
     error(k == NULL, 1, "set_lat_parms [lat_parms.c]",
           "Unable to allocate parameter array");
-  } else
+  } else {
     k = NULL;
+  }
 
   lat.kappa = k;
   lat.m0 = k + nk;
 
-  for (ik = 0; ik < nk; ik++)
+  for (ik = 0; ik < nk; ik++) {
     lat.kappa[ik] = kappa[ik];
+  }
 
   if ((NPROC > 1) && (nk > 0)) {
-    for (ik = 0; ik < nk; ik++)
+    for (ik = 0; ik < nk; ik++) {
       lat.m0[ik] = lat.kappa[ik];
+    }
 
     MPI_Bcast(lat.m0, nk, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     ie = 0;
 
-    for (ik = 0; ik < nk; ik++)
+    for (ik = 0; ik < nk; ik++) {
       ie |= (lat.m0[ik] != lat.kappa[ik]);
+    }
 
     error(ie != 0, 1, "set_lat_parms [lat_parms.c]",
           "Hopping parameters are not global");
@@ -253,10 +257,11 @@ lat_parms_t set_lat_parms(double beta, double c0, int nk, double const *kappa,
   lat.csw = csw;
 
   for (ik = 0; ik < nk; ik++) {
-    if (not_equal_d(lat.kappa[ik], 0.0))
+    if (not_equal_d(lat.kappa[ik], 0.0)) {
       lat.m0[ik] = 1.0 / (2.0 * lat.kappa[ik]) - 1.0 - 3.0 * ani.nu / ani.xi;
-    else
+    } else {
       lat.m0[ik] = DBL_MAX;
+    }
   }
 
   flg_lat = 1;
@@ -264,7 +269,10 @@ lat_parms_t set_lat_parms(double beta, double c0, int nk, double const *kappa,
   return lat;
 }
 
-lat_parms_t lat_parms(void) { return lat; }
+lat_parms_t lat_parms(void)
+{
+  return lat;
+}
 
 void print_lat_parms(void)
 {
@@ -284,10 +292,11 @@ void print_lat_parms(void)
     for (ik = 0; ik < lat.nk; ik++) {
       n = fdigits(lat.kappa[ik]);
 
-      if (lat.nk >= 11)
+      if (lat.nk >= 11) {
         printf("kappa[%2d] = %.*f\n", ik, IMAX(n, 6), lat.kappa[ik]);
-      else
+      } else {
         printf("kappa[%1d] = %.*f\n", ik, IMAX(n, 6), lat.kappa[ik]);
+      }
     }
 
     n = fdigits(lat.csw);
@@ -332,8 +341,9 @@ void write_lat_parms(FILE *fdat)
       dstd[0] = lat.kappa[ik];
       dstd[1] = lat.m0[ik];
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_double(2, dstd);
+      }
 
       iw += fwrite(dstd, sizeof(double), 2, fdat);
     }
@@ -377,8 +387,9 @@ void check_lat_parms(FILE *fdat)
     for (ik = 0; ik < lat.nk; ik++) {
       ir += fread(dstd, sizeof(double), 2, fdat);
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_double(2, dstd);
+      }
 
       ie |= (dstd[0] != lat.kappa[ik]);
       ie |= (dstd[1] != lat.m0[ik]);
@@ -500,7 +511,10 @@ bc_parms_t set_bc_parms(int type, double cG, double cG_prime, double cF,
   return bc;
 }
 
-bc_parms_t bc_parms(void) { return bc; }
+bc_parms_t bc_parms(void)
+{
+  return bc;
+}
 
 void print_bc_parms(int ipr)
 {
@@ -573,8 +587,9 @@ void print_bc_parms(int ipr)
       n[2] = fdigits(bc.phi[1][2]);
       printf("phi' = %.*f,%.*f,%.*f\n", IMAX(n[0], 1), bc.phi[1][0],
              IMAX(n[1], 1), bc.phi[1][1], IMAX(n[2], 1), bc.phi[1][2]);
-    } else
+    } else {
       printf("Periodic boundary conditions\n");
+    }
 
     if (ipr & 0x2) {
       n[0] = fdigits(bc.theta[0]);
@@ -675,13 +690,17 @@ void check_bc_parms(FILE *fdat)
 
 double sea_quark_mass(int im0)
 {
-  if ((im0 >= 0) && (im0 < lat.nk))
+  if ((im0 >= 0) && (im0 < lat.nk)) {
     return lat.m0[im0];
-  else
+  } else {
     return DBL_MAX;
+  }
 }
 
-int bc_type(void) { return bc.type; }
+int bc_type(void)
+{
+  return bc.type;
+}
 
 sw_parms_t set_sw_parms(double m0)
 {
@@ -733,12 +752,16 @@ tm_parms_t set_tm_parms(int eoflg)
           "Parameter is not global");
   }
 
-  if (eoflg != tm.eoflg)
+  if (eoflg != tm.eoflg) {
     set_flags(ERASED_AWHAT);
+  }
 
   tm.eoflg = eoflg;
 
   return tm;
 }
 
-tm_parms_t tm_parms(void) { return tm; }
+tm_parms_t tm_parms(void)
+{
+  return tm;
+}

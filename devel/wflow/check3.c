@@ -72,13 +72,13 @@ static void read_anisotropy_section(void)
     MPI_Bcast(&us_fermion, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&ut_fermion, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion, ut_fermion);
+    set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion,
+                  ut_fermion);
     print_ani_parms();
 
   } else {
     set_no_ani_parms();
   }
-
 }
 
 static void cmp_ud(su3_dble *u, su3_dble *v, double *dev)
@@ -113,8 +113,9 @@ static void cmp_ud(su3_dble *u, su3_dble *v, double *dev)
   for (i = 0; i < 18; i += 2) {
     d = sqrt(r[i] * r[i] + r[i + 1] * r[i + 1]);
 
-    if (d > dev[0])
+    if (d > dev[0]) {
       dev[0] = d;
+    }
 
     dev[1] += d;
   }
@@ -133,8 +134,9 @@ static void dev_ud(su3_dble *v, double *dev)
   for (; u < um; u++) {
     cmp_ud(u, v, d);
 
-    if (d[0] > dev[0])
+    if (d[0] > dev[0]) {
       dev[0] = d[0];
+    }
 
     dev[1] += d[1];
     v += 1;
@@ -215,11 +217,13 @@ int main(int argc, char *argv[])
     phi_prime[0] = 0.0;
     phi_prime[1] = 0.0;
 
-    if (bc == 1)
+    if (bc == 1) {
       read_dprms("phi", 2, phi);
+    }
 
-    if ((bc == 1) || (bc == 2))
+    if ((bc == 1) || (bc == 2)) {
       read_dprms("phi'", 2, phi_prime);
+    }
 
     find_section("Wilson flow");
     read_line("n", "%d\n", &n);
@@ -267,12 +271,13 @@ int main(int argc, char *argv[])
     printf("n = %d\n", n);
     printf("eps = %.3e\n", eps);
 
-    if (rule == 1)
+    if (rule == 1) {
       printf("Using the Euler integrator\n\n");
-    else if (rule == 2)
+    } else if (rule == 2) {
       printf("Using the 2nd order RK integrator\n\n");
-    else
+    } else {
       printf("Using the 3rd order RK integrator\n\n");
+    }
 
     printf("Configurations %sn%d -> %sn%d in steps of %d\n\n", nbase, first,
            nbase, last, step);
@@ -296,10 +301,11 @@ int main(int argc, char *argv[])
 
   sprintf(end_file, "check3.end");
 
-  if (bc == 0)
+  if (bc == 0) {
     nplaq = (double)(6 * N0 - 6) * (double)(N1 * N2 * N3);
-  else
+  } else {
     nplaq = (double)(6 * N0) * (double)(N1 * N2 * N3);
+  }
 
   dE[0] = 0.0;
   dE[1] = 0.0;
@@ -324,12 +330,13 @@ int main(int argc, char *argv[])
     import_cnfg(cnfg_file);
     cm3x3_assign(4 * VOLUME, udb, usv[0]);
 
-    if (rule == 1)
+    if (rule == 1) {
       fwd_euler(10 * n, eps / 10.0);
-    else if (rule == 2)
+    } else if (rule == 2) {
       fwd_rk2(4 * n, eps / 4.0);
-    else
+    } else {
       fwd_rk3(3 * n, eps / 3.0);
+    }
 
     cm3x3_assign(4 * VOLUME, udb, usv[1]);
     act[0] = 2.0 * (3.0 * nplaq - plaq_wsum_dble(1));
@@ -338,31 +345,35 @@ int main(int argc, char *argv[])
     cm3x3_assign(4 * VOLUME, usv[0], udb);
     set_flags(UPDATED_UD);
 
-    if (rule == 1)
+    if (rule == 1) {
       fwd_euler(n, eps);
-    else if (rule == 2)
+    } else if (rule == 2) {
       fwd_rk2(n, eps);
-    else
+    } else {
       fwd_rk3(n, eps);
+    }
 
     act[1] = 2.0 * (3.0 * nplaq - plaq_wsum_dble(1));
     qtop[1] = tcharge();
 
     dev[0] = fabs(act[1] - act[0]);
-    if (dev[0] > dE[0])
+    if (dev[0] > dE[0]) {
       dE[0] = dev[0];
+    }
     dE[1] += dev[0];
     dE[2] += act[0];
 
     dev[0] = fabs(qtop[1] - qtop[0]);
-    if (dev[0] > dQ[0])
+    if (dev[0] > dQ[0]) {
       dQ[0] = dev[0];
+    }
     dQ[1] += dev[0];
     dQ[2] += fabs(qtop[0]);
 
     dev_ud(usv[1], dev);
-    if (dev[0] > dU[0])
+    if (dev[0] > dU[0]) {
       dU[0] = dev[0];
+    }
     dU[1] += dev[1];
 
     MPI_Barrier(MPI_COMM_WORLD);
@@ -380,8 +391,9 @@ int main(int argc, char *argv[])
       fflush(flog);
     }
 
-    if (check_end())
+    if (check_end()) {
       break;
+    }
   }
 
   ncnfg = (last - first) / step + 1;

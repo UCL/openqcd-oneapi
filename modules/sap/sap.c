@@ -626,17 +626,19 @@ void sap(float mu, int isolv, int nmr, spinor *psi, spinor *rho)
 
   b = blk_list(SAP_BLOCKS, &nb, &isw);
   nbh = nb / 2;
-  if (isolv)
+  if (isolv) {
     vol = (*b).vol / 2;
-  else
+  } else {
     vol = (*b).vol;
+  }
   s = (*b).s;
 
   for (ic = 0; ic < 2; ic++) {
-    if (ic ^ isw)
+    if (ic ^ isw) {
       n = nbh;
-    else
+    } else {
       n = 0;
+    }
     nm = n + nbh;
 
     if (isolv) {
@@ -648,10 +650,11 @@ void sap(float mu, int isolv, int nmr, spinor *psi, spinor *rho)
         Dwoe_blk(SAP_BLOCKS, n, 0, 0);
         Dwoo_blk(SAP_BLOCKS, n, 0.0f, 0, 0);
 
-        if (eoflg == 1)
+        if (eoflg == 1) {
           update_flds2(b[n].imb, psi, rho);
-        else
+        } else {
           update_flds1(b[n].imb, mu, psi, rho);
+        }
         Dw_bnd(SAP_BLOCKS, n, 0, 0);
       }
     } else {

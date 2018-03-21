@@ -188,7 +188,10 @@ dfl_parms_t set_dfl_parms(int const *bs, int Ns)
   return dfl;
 }
 
-dfl_parms_t dfl_parms(void) { return dfl; }
+dfl_parms_t dfl_parms(void)
+{
+  return dfl;
+}
 
 dfl_pro_parms_t set_dfl_pro_parms(int nkv, int nmx, double res)
 {
@@ -218,7 +221,10 @@ dfl_pro_parms_t set_dfl_pro_parms(int nkv, int nmx, double res)
   return dfl_pro;
 }
 
-dfl_pro_parms_t dfl_pro_parms(void) { return dfl_pro; }
+dfl_pro_parms_t dfl_pro_parms(void)
+{
+  return dfl_pro;
+}
 
 dfl_gen_parms_t set_dfl_gen_parms(double kappa, double mu, int ninv, int nmr,
                                   int ncy)
@@ -258,15 +264,19 @@ dfl_gen_parms_t set_dfl_gen_parms(double kappa, double mu, int ninv, int nmr,
   error(!ani_params_initialised(), 1, "set_dfl_gen_parms [dfl_parms.c]",
         "Anisotropic parameters not set");
 
-  if (not_equal_d(kappa, 0.0))
+  if (not_equal_d(kappa, 0.0)) {
     dfl_gen.m0 = 1.0 / (2.0 * kappa) - 1.0 - 3.0 * ani.nu / ani.xi;
-  else
+  } else {
     dfl_gen.m0 = DBL_MAX;
+  }
 
   return dfl_gen;
 }
 
-dfl_gen_parms_t dfl_gen_parms(void) { return dfl_gen; }
+dfl_gen_parms_t dfl_gen_parms(void)
+{
+  return dfl_gen;
+}
 
 dfl_upd_parms_t set_dfl_upd_parms(double dtau, int nsm)
 {
@@ -293,7 +303,10 @@ dfl_upd_parms_t set_dfl_upd_parms(double dtau, int nsm)
   return dfl_upd;
 }
 
-dfl_upd_parms_t dfl_upd_parms(void) { return dfl_upd; }
+dfl_upd_parms_t dfl_upd_parms(void)
+{
+  return dfl_upd;
+}
 
 void print_dfl_parms(int ipr)
 {
@@ -340,8 +353,9 @@ void write_dfl_parms(FILE *fdat)
   endian = endianness();
 
   if (my_rank == 0) {
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++) {
       istd[i] = (stdint_t)(dfl.bs[i]);
+    }
 
     istd[4] = (stdint_t)(dfl.Ns);
     istd[5] = (stdint_t)(dfl_pro.nkv);
@@ -391,8 +405,9 @@ void check_dfl_parms(FILE *fdat)
 
     ie = 0;
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++) {
       ie |= (istd[i] != (stdint_t)(dfl.bs[i]));
+    }
 
     ie |= (istd[4] != (stdint_t)(dfl.Ns));
     ie |= (istd[5] != (stdint_t)(dfl_pro.nkv));

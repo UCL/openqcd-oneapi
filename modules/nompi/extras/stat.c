@@ -110,8 +110,9 @@ double average(int n, double *a)
 
   abar = 0.0;
 
-  for (i = 0; i < n; i++)
+  for (i = 0; i < n; i++) {
     abar += a[i];
+  }
 
   abar /= (double)(n);
 
@@ -129,8 +130,9 @@ double sigma0(int n, double *a)
   abar = average(n, a);
   var = 0.0;
 
-  for (i = 0; i < n; i++)
+  for (i = 0; i < n; i++) {
     var += ((a[i] - abar) * (a[i] - abar));
+  }
 
   xn = (double)(n);
   var /= (xn * (xn - 1.0));
@@ -152,8 +154,9 @@ double auto_corr(int n, double *a, int tmax, double *g)
   if (g0 <= (10.0 * DBL_EPSILON * fabs(abar))) {
     g0 = 0.0;
 
-    for (t = 0; t < tmax; t++)
+    for (t = 0; t < tmax; t++) {
       g[t] = 0.0;
+    }
   } else {
     g0 = g0 * g0 * (double)(n - 1);
     g[0] = 1.0;
@@ -161,8 +164,9 @@ double auto_corr(int n, double *a, int tmax, double *g)
     for (t = 1; t < tmax; t++) {
       var = 0.0;
 
-      for (k = 0; k < (n - t); k++)
+      for (k = 0; k < (n - t); k++) {
         var += ((a[k] - abar) * (a[k + t] - abar));
+      }
 
       g[t] = var / (g0 * (double)(n - t));
     }
@@ -177,8 +181,9 @@ static void sigma_corr(int n, int tmax, int lambda, double *g, double *eg)
   double sm, r;
 
   if (is_equal_d(g[0], 0.0)) {
-    for (t = 0; t < tmax; t++)
+    for (t = 0; t < tmax; t++) {
       eg[t] = 0.0;
+    }
   } else {
     eg[0] = 0.0;
 
@@ -244,8 +249,9 @@ double tauint(int n, double *a, int tmax, int lambda, int *w, double *sigma)
     for (t = 1; t < tmax; t++) {
       tau += g[t];
 
-      if (g[t] <= eg[t])
+      if (g[t] <= eg[t]) {
         break;
+      }
     }
 
     error_root(t == tmax, 1, "tauint [stat.c]",
@@ -267,10 +273,11 @@ double print_auto(int n, double *a)
   int w, dw, iw, tmax;
   double *ga, *ta, sig0, abar, sig, err, g0;
 
-  if (n < 30)
+  if (n < 30) {
     tmax = n / 10 + 1;
-  else
+  } else {
     tmax = n / 30 + 3;
+  }
 
   ga = amalloc(tmax * sizeof(double), 3);
   ta = amalloc(tmax * sizeof(double), 3);
@@ -282,16 +289,17 @@ double print_auto(int n, double *a)
   abar = average(n, a);
   g0 = auto_corr(n, a, tmax, ga);
 
-  if (is_equal_d(g0, 0.0))
+  if (is_equal_d(g0, 0.0)) {
     printf("Statistical error is negligible, no data to print\n");
-  else {
+  } else {
     ta[0] = 0.5;
 
     for (w = 1; w < tmax; w++) {
       ta[w] = ta[w - 1] + ga[w];
 
-      if (ta[w] <= 0.0)
+      if (ta[w] <= 0.0) {
         tmax = w;
+      }
     }
 
     printf(" window w       tau_int             sigma\n\n");
@@ -299,10 +307,11 @@ double print_auto(int n, double *a)
     iw = 0;
 
     for (w = 0; w < tmax;) {
-      if (w == 0)
+      if (w == 0) {
         err = 0.0;
-      else
+      } else {
         err = sqrt((4.0 * (double)(w) + 2.0) / (double)(n));
+      }
 
       sig = sig0 * sqrt(2.0 * ta[w]);
 
@@ -335,8 +344,9 @@ static double javg(int nx, int n, double **a, double (*f)(int nx, double *x))
   error_root(x == NULL, 1, "javg [stat.c]",
              "Unable to allocate auxiliary array");
 
-  for (i = 0; i < nx; i++)
+  for (i = 0; i < nx; i++) {
     x[i] = average(n, a[i]);
+  }
 
   fbar = f(nx, x);
   afree(x);
@@ -355,8 +365,9 @@ static void jbin(int n, int bs, double *a, double *b)
   for (i = 0; i < nbin; i++) {
     sm = 0.0;
 
-    for (j = 0; j < bs; j++)
+    for (j = 0; j < bs; j++) {
       sm += a[i * bs + j];
+    }
 
     b[i] = r * sm;
   }
@@ -365,8 +376,9 @@ static void jbin(int n, int bs, double *a, double *b)
   r = (double)(nbin);
   r = 1.0 / sqrt(r * (r - 1.0));
 
-  for (i = 0; i < nbin; i++)
+  for (i = 0; i < nbin; i++) {
     b[i] = abar + r * (abar - b[i]);
+  }
 }
 
 static double jerr(int nx, int nbin, double **b, double (*f)(int nx, double *x),
@@ -382,8 +394,9 @@ static double jerr(int nx, int nbin, double **b, double (*f)(int nx, double *x),
   var = 0.0;
 
   for (i = 0; i < nbin; i++) {
-    for (j = 0; j < nx; j++)
+    for (j = 0; j < nx; j++) {
       x[j] = b[j][i];
+    }
 
     r = f(nx, x) - fbar;
     var += (r * r);
@@ -417,8 +430,9 @@ double jack_err(int nx, int n, double **a, double (*f)(int nx, double *x),
   fbar = javg(nx, n, a, f);
 
   for (bs = 1; bs <= bmax; bs++) {
-    for (i = 0; i < nx; i++)
+    for (i = 0; i < nx; i++) {
       jbin(n, bs, a[i], b[i]);
+    }
 
     nbin = n / bs;
     sig[bs - 1] = jerr(nx, nbin, b, f, fbar);
@@ -435,10 +449,11 @@ double print_jack(int nx, int n, double **a, double (*f)(int nx, double *x))
   int bs, dbs, ibs, bmax;
   double fbar, tau, *sig;
 
-  if (n < 30)
+  if (n < 30) {
     bmax = n / 10 + 1;
-  else
+  } else {
     bmax = n / 30 + 3;
+  }
 
   sig = amalloc(bmax * sizeof(*sig), 3);
   error_root(sig == NULL, 1, "print_jack [stat.c]",

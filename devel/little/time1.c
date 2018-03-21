@@ -76,9 +76,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [time1.c]",
                  "Syntax: time1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -139,28 +140,33 @@ int main(int argc, char *argv[])
   }
 
   nflds = (int)(1.0e6 / (double)(sizeof(complex) * nv));
-  if ((nflds % 2) != 0)
+  if ((nflds % 2) != 0) {
     nflds += 1;
-  if (nflds == 0)
+  }
+  if (nflds == 0) {
     nflds = 2;
+  }
 
   alloc_wv(nflds);
   wv = reserve_wv(nflds);
 
-  for (i = 0; i < nflds; i++)
+  for (i = 0; i < nflds; i++) {
     random_v(nv, wv[i], 1.0f);
+  }
 
   nt = (int)(1.0e3 / (double)(8 * Ns));
-  if (nt < 1)
+  if (nt < 1) {
     nt = 1;
+  }
   wdt = 0.0;
 
   while (wdt < 5.0) {
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
     for (count = 0; count < nt; count++) {
-      for (i = 0; i < nflds; i += 2)
+      for (i = 0; i < nflds; i += 2) {
         Awhat(wv[i], wv[i + 1]);
+      }
     }
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();
@@ -184,13 +190,15 @@ int main(int argc, char *argv[])
 
   if (NPROC > 1) {
     nt /= 2;
-    if (nt == 0)
+    if (nt == 0) {
       nt = 1;
+    }
     wdt = 0.0;
 
     while (wdt < 5.0) {
-      for (i = 0; i < nflds; i += 2)
+      for (i = 0; i < nflds; i += 2) {
         set_v2zero((nbb / 2) * Ns, wv[i + 1] + nv);
+      }
 
       MPI_Barrier(MPI_COMM_WORLD);
       wt1 = MPI_Wtime();
@@ -218,8 +226,9 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

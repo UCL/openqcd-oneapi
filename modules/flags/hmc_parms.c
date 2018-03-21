@@ -145,16 +145,21 @@ hmc_parms_t set_hmc_parms(int nact, int const *iact, int npf, int nmu,
   hmc.nlv = nlv;
   hmc.tau = tau;
 
-  for (i = 0; i < nact; i++)
+  for (i = 0; i < nact; i++) {
     hmc.iact[i] = iact[i];
+  }
 
-  for (i = 0; i < nmu; i++)
+  for (i = 0; i < nmu; i++) {
     hmc.mu[i] = mu[i];
+  }
 
   return hmc;
 }
 
-hmc_parms_t hmc_parms(void) { return hmc; }
+hmc_parms_t hmc_parms(void)
+{
+  return hmc;
+}
 
 void print_hmc_parms(void)
 {
@@ -165,8 +170,9 @@ void print_hmc_parms(void)
   if (my_rank == 0) {
     printf("HMC parameters:\n");
     printf("actions =");
-    for (i = 0; i < hmc.nact; i++)
+    for (i = 0; i < hmc.nact; i++) {
       printf(" %d", hmc.iact[i]);
+    }
     printf("\n");
     printf("npf = %d\n", hmc.npf);
     if (hmc.nmu > 0) {
@@ -209,11 +215,13 @@ void write_hmc_parms(FILE *fdat)
     istd[3] = (stdint_t)(hmc.nlv);
     dstd[0] = hmc.tau;
 
-    for (i = 0; i < nact; i++)
+    for (i = 0; i < nact; i++) {
       istd[4 + i] = (stdint_t)(hmc.iact[i]);
+    }
 
-    for (i = 0; i < nmu; i++)
+    for (i = 0; i < nmu; i++) {
       dstd[1 + i] = hmc.mu[i];
+    }
 
     if (endian == BIG_ENDIAN) {
       bswap_int(nact + 4, istd);
@@ -267,11 +275,13 @@ void check_hmc_parms(FILE *fdat)
     ie |= (istd[3] != (stdint_t)(hmc.nlv));
     ie |= (dstd[0] != hmc.tau);
 
-    for (i = 0; i < nact; i++)
+    for (i = 0; i < nact; i++) {
       ie |= (istd[4 + i] != (stdint_t)(hmc.iact[i]));
+    }
 
-    for (i = 0; i < nmu; i++)
+    for (i = 0; i < nmu; i++) {
       ie |= (dstd[1 + i] != hmc.mu[i]);
+    }
 
     error_root(ie != 0, 1, "check_hmc_parms [hmc_parms.c]",
                "Parameters do not match");

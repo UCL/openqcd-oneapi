@@ -108,10 +108,11 @@ static void alloc_state(void)
   ns = rlxs_size();
   nd = rlxd_size();
 
-  if (ns < nd)
+  if (ns < nd) {
     n = nd;
-  else
+  } else {
     n = ns;
+  }
 
   state = malloc(n * sizeof(int));
   error(state == NULL, 1, "alloc_state [archive.c]",
@@ -131,8 +132,9 @@ void write_cnfg(char const *out)
   error_loc(fout == NULL, 1, "write_cnfg [archive.c]",
             "Unable to open output file");
 
-  if (state == NULL)
+  if (state == NULL) {
     alloc_state();
+  }
 
   udb = udfld();
   plaq = plaq_sum_dble(0);
@@ -176,8 +178,9 @@ void read_cnfg(char const *in)
   double nplaq, plaq0, plaq1, eps;
   FILE *fin;
 
-  if (state == NULL)
+  if (state == NULL) {
     alloc_state();
+  }
 
   udb = udfld();
   unset_ud_phase();
@@ -261,8 +264,9 @@ static void get_links(int iy)
   v = ubuf;
   iy *= L3;
 
-  if (ipt[iy] < (VOLUME / 2))
+  if (ipt[iy] < (VOLUME / 2)) {
     iy += 1;
+  }
 
   for (y3 = 0; y3 < L3; y3 += 2) {
     u = udb + 8 * (ipt[iy + y3] - (VOLUME / 2));
@@ -283,8 +287,9 @@ static void set_links(int iy)
   v = ubuf;
   iy *= L3;
 
-  if (ipt[iy] < (VOLUME / 2))
+  if (ipt[iy] < (VOLUME / 2)) {
     iy += 1;
+  }
 
   for (y3 = 0; y3 < L3; y3 += 2) {
     u = udb + 8 * (ipt[iy + y3] - (VOLUME / 2));
@@ -364,8 +369,9 @@ void export_cnfg(char const *out)
     for (x3 = 0; x3 < N3; x3 += L3) {
       np[3] = x3 / L3;
       n = ipr_global(np);
-      if (my_rank == n)
+      if (my_rank == n) {
         get_links(iy);
+      }
 
       if (n > 0) {
         if (my_rank == 0) {
@@ -379,8 +385,9 @@ void export_cnfg(char const *out)
       }
 
       if (my_rank == 0) {
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_double(4 * L3 * 18, ubuf);
+        }
         iw = fwrite(ubuf, sizeof(su3_dble), 4 * L3, fout);
         iwa |= (iw != (4 * L3));
       }
@@ -478,12 +485,14 @@ void import_cnfg(char const *in)
       ir = fread(vbuf, sizeof(su3_dble), n, fin);
       ira |= (ir != n);
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_double(n * 18, vbuf);
+      }
 
       for (k = 1; k < nc3; k++) {
-        for (l = 0; l < n; l++)
+        for (l = 0; l < n; l++) {
           vbuf[k * n + l] = vbuf[l];
+        }
       }
     }
 
@@ -515,12 +524,15 @@ void import_cnfg(char const *in)
                      &stat);
             MPI_Send(&dmy, 1, MPI_INT, 0, tag0, MPI_COMM_WORLD);
           }
-        } else if (my_rank == 0)
-          for (l = 0; l < (4 * L3); l++)
+        } else if (my_rank == 0) {
+          for (l = 0; l < (4 * L3); l++) {
             ubuf[l] = vbuf[4 * y3 + l];
+          }
+        }
 
-        if (my_rank == n)
+        if (my_rank == n) {
           set_links(iy);
+        }
       }
     }
   }

@@ -111,12 +111,13 @@ static void check_Xtbnd(ptset_t set)
   ia = 0;
   ib = VOLUME;
 
-  if (set == EVEN_PTS)
+  if (set == EVEN_PTS) {
     ib = (VOLUME / 2);
-  else if (set == ODD_PTS)
+  } else if (set == ODD_PTS) {
     ia = (VOLUME / 2);
-  else if (set == NO_PTS)
+  } else if (set == NO_PTS) {
     ia = VOLUME;
+  }
 
   for (ix = 0; ix < VOLUME; ix++) {
     if ((ix >= ia) && (ix < ib)) {
@@ -270,20 +271,23 @@ static void rot_ud(double eps)
       mom += 1;
       u += 1;
 
-      if (bc != 0)
+      if (bc != 0) {
         expXsu3(eps, mom, u);
+      }
       mom += 1;
       u += 1;
 
       for (ifc = 2; ifc < 8; ifc++) {
-        if (bc != 1)
+        if (bc != 1) {
           expXsu3(eps, mom, u);
+        }
         mom += 1;
         u += 1;
       }
     } else if (t == (N0 - 1)) {
-      if (bc != 0)
+      if (bc != 0) {
         expXsu3(eps, mom, u);
+      }
       mom += 1;
       u += 1;
 
@@ -302,7 +306,6 @@ static void rot_ud(double eps)
   }
 
   set_flags(UPDATED_UD);
-  
 }
 
 static double action(int k, spinor_dble **phi)
@@ -375,50 +378,56 @@ static double action_det(ptset_t set)
   pauli_dble *m;
   sw_parms_t swp;
 
-  if (set == NO_PTS)
+  if (set == NO_PTS) {
     return 0.0;
+  }
 
   bc = bc_type();
   swp = sw_parms();
 
-  if ((4.0 + swp.m0) > 1.0)
+  if ((4.0 + swp.m0) > 1.0) {
     c = pow(4.0 + swp.m0, -6.0);
-  else
+  } else {
     c = 1.0;
+  }
 
   for (n = 0; n < MAX_LEVELS; n++) {
     cnt[n] = 0;
     smx[n] = 0.0;
   }
 
-  if (query_flags(SWD_UP2DATE) != 1)
+  if (query_flags(SWD_UP2DATE) != 1) {
     sw_term(NO_PTS);
-  else {
+  } else {
     ie = query_flags(SWD_E_INVERTED);
     io = query_flags(SWD_O_INVERTED);
 
     if (((ie == 1) && ((set == ALL_PTS) || (set == EVEN_PTS))) ||
-        ((io == 1) && ((set == ALL_PTS) || (set == ODD_PTS))))
+        ((io == 1) && ((set == ALL_PTS) || (set == ODD_PTS)))) {
       sw_term(NO_PTS);
+    }
   }
 
-  if (set == ODD_PTS)
+  if (set == ODD_PTS) {
     ofs = (VOLUME / 2);
-  else
+  } else {
     ofs = 0;
+  }
 
-  if (set == EVEN_PTS)
+  if (set == EVEN_PTS) {
     vol = (VOLUME / 2);
-  else
+  } else {
     vol = VOLUME;
+  }
 
   ix = ofs;
   m = swdfld() + 2 * ofs;
 
   while (ix < vol) {
     im = ix + BLK_LENGTH;
-    if (im > vol)
+    if (im > vol) {
       im = vol;
+    }
     p = 1.0;
 
     for (; ix < im; ix++) {
@@ -446,8 +455,9 @@ static double action_det(ptset_t set)
     }
   }
 
-  for (n = 1; n < MAX_LEVELS; n++)
+  for (n = 1; n < MAX_LEVELS; n++) {
     smx[0] += smx[n];
+  }
 
   return 2.0 * smx[0];
 }
@@ -466,8 +476,9 @@ static double dSdt_det(ptset_t set)
   set_frc2zero();
   sw_frc(1.0);
 
-  if (set == ALL_PTS)
+  if (set == ALL_PTS) {
     check_bnd_frc();
+  }
 
   mdfs = mdflds();
 
@@ -501,9 +512,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check4.c]",
                  "Syntax: check4 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -582,18 +594,20 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Calculation of the force for S=-2*Tr{ln(SW term)}:\n");
+  }
 
   for (k = 0; k < 4; k++) {
-    if (k == 0)
+    if (k == 0) {
       set = NO_PTS;
-    else if (k == 1)
+    } else if (k == 1) {
       set = EVEN_PTS;
-    else if (k == 2)
+    } else if (k == 2) {
       set = ODD_PTS;
-    else
+    } else {
       set = ALL_PTS;
+    }
 
     random_ud();
     set_ud_phase();
@@ -631,24 +645,27 @@ int main(int argc, char *argv[])
     if (k > 0) {
       dev_frc = fabs(r[0] / r[1]);
       sig_loss = -log10(fabs(1.0 - act0 / act1));
-    } else
+    } else {
       dev_frc = fabs(r[0]);
+    }
 
     if (my_rank == 0) {
-      if (k == 0)
+      if (k == 0) {
         printf("set=NO_PTS:   ");
-      else if (k == 1)
+      } else if (k == 1) {
         printf("set=EVEN_PTS: ");
-      else if (k == 2)
+      } else if (k == 2) {
         printf("set=ODD_PTS:  ");
-      else
+      } else {
         printf("set=ALL_PTS:  ");
+      }
 
       if (k > 0) {
         printf("relative deviation of dS/dt = %.2e ", dev_frc);
         printf("[significance loss = %d digits]\n", (int)(sig_loss));
-      } else
+      } else {
         printf("absolute deviation of dS/dt = %.2e\n", dev_frc);
+      }
     }
   }
 

@@ -34,10 +34,11 @@ static complex_dble random_dd(double mu)
   det.im = 0.0;
 
   for (i = 0; i < 6; i++) {
-    if (dd[i] < 0.5)
+    if (dd[i] < 0.5) {
       dd[i] -= 0.6;
-    else
+    } else {
       dd[i] -= 0.4;
+    }
 
     z.re = det.re * dd[i] - det.im * mu;
     z.im = det.re * mu + det.im * dd[i];
@@ -56,8 +57,9 @@ static double norm(complex_dble *v)
 
   r = 0.0;
 
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < 6; i++) {
     r += (v[i].re * v[i].re + v[i].im * v[i].im);
+  }
 
   return sqrt(r);
 }
@@ -109,11 +111,13 @@ static void random_vv(void)
         vi[j].im = ri[2 * j + 1];
       }
 
-      for (j = 0; j < i; j++)
+      for (j = 0; j < i; j++) {
         proj(vv + 6 * j, vi);
+      }
 
-      for (j = 0; j < i; j++)
+      for (j = 0; j < i; j++) {
         proj(vv + 6 * j, vi);
+      }
 
       r = norm(vi);
     }
@@ -205,8 +209,9 @@ int main(void)
     d = sqrt((det2.re * det2.re + det2.im * det2.im) /
              (det1.re * det1.re + det1.im * det1.im));
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
 
     md += 1;
   }

@@ -111,8 +111,9 @@ static void alloc_hdb(void)
   n = 0;
 
   for (ifc = 0; ifc < 8; ifc += 2) {
-    if (n < nfc[ifc])
+    if (n < nfc[ifc]) {
       n = nfc[ifc];
+    }
   }
 
   n = 3 * (BNDRY + 2 * n);
@@ -124,8 +125,9 @@ static void alloc_hdb(void)
 
 su3_dble *bstap(void)
 {
-  if ((NPROC > 1) && (hdb == NULL))
+  if ((NPROC > 1) && (hdb == NULL)) {
     alloc_hdb();
+  }
 
   return hdb;
 }
@@ -164,10 +166,11 @@ static void get_staples(int ifc)
   mu = ifc / 2;
 
   for (ib = 0; ib < (2 * nfc[ifc]); ib++) {
-    if (ib < (nfc[ifc]))
+    if (ib < (nfc[ifc])) {
       ix = map[ofs[ifc] + ib];
-    else
+    } else {
       ix = map[(BNDRY / 2) + ofs[ifc] + ib - nfc[ifc]];
+    }
 
     for (k = 0; k < 3; k++) {
       nu = k + (k >= mu);
@@ -211,20 +214,23 @@ static void send_staples(int ifc, int tag)
       MPI_Recv(rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD, &stat);
       MPI_Send(sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
     }
-  } else
+  } else {
     cm3x3_zero(3 * FACE0, rbuf);
+  }
 }
 
 void set_bstap(void)
 {
   int ifc, sfc;
 
-  if (query_flags(UDBUF_UP2DATE) != 1)
+  if (query_flags(UDBUF_UP2DATE) != 1) {
     copy_bnd_ud();
+  }
 
   if (NPROC > 1) {
-    if (hdb == NULL)
+    if (hdb == NULL) {
       alloc_hdb();
+    }
 
     for (ifc = 0; ifc < 8; ifc++) {
       sfc = ifc ^ nmu[ifc];

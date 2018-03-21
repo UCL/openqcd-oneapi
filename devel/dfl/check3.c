@@ -49,8 +49,9 @@ static void new_subspace(void)
 
   blk_list(SAP_BLOCKS, &nb, &isw);
 
-  if (nb == 0)
+  if (nb == 0) {
     alloc_bgr(SAP_BLOCKS);
+  }
 
   assign_ud2ubgr(SAP_BLOCKS);
   sw_term(NO_PTS);
@@ -74,13 +75,15 @@ static void new_subspace(void)
       assign_s2s(VOLUME, mds[k], ws[0]);
       set_s2zero(VOLUME, mds[k]);
 
-      for (l = 0; l < sp.ncy; l++)
+      for (l = 0; l < sp.ncy; l++) {
         sap(0.01f, 1, sp.nmr, mds[k], ws[0]);
+      }
     }
 
     for (k = 0; k < Ns; k++) {
-      for (l = 0; l < k; l++)
+      for (l = 0; l < k; l++) {
         project(VOLUME, 1, mds[k], mds[l]);
+      }
 
       normalize(VOLUME, 1, mds[k]);
     }
@@ -203,19 +206,23 @@ static void read_bc_section(FILE *fin)
     cF = 1.0;
     cF_prime = 1.0;
 
-    if (bc == 1)
+    if (bc == 1) {
       read_dprms("phi", 2, phi);
+    }
 
-    if ((bc == 1) || (bc == 2))
+    if ((bc == 1) || (bc == 2)) {
       read_dprms("phi'", 2, phi_prime);
+    }
 
-    if (bc != 3)
+    if (bc != 3) {
       read_line("cF", "%lf", &cF);
+    }
 
-    if (bc == 2)
+    if (bc == 2) {
       read_line("cF'", "%lf", &cF_prime);
-    else
+    } else {
       cF_prime = cF;
+    }
 
     read_dprms("theta", 3, theta);
   }
@@ -290,8 +297,9 @@ int main(int argc, char *argv[])
   read_dfl_section(fin);
   read_gcr_section(fin);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(fin);
+  }
 
   set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion,
                 ut_fermion);
@@ -391,9 +399,10 @@ int main(int argc, char *argv[])
       printf("rho   = %.2e, res   = %.2e\n", rho, res);
       printf("check = %.2e, check = %.2e\n", del, del / nrm);
       printf("time = %.2e sec (total)\n", wdt);
-      if (status > 0)
+      if (status > 0) {
         printf("     = %.2e usec (per point and GCR iteration)",
                (1.0e6 * wdt) / ((double)(status) * (double)(VOLUME)));
+      }
       printf("\n\n");
       fflush(flog);
     }
@@ -407,8 +416,9 @@ int main(int argc, char *argv[])
     unsmear_fields();
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

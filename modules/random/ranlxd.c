@@ -111,20 +111,24 @@ static void update(void)
     STEP(pi, pj);
     pi += 1;
     pj += 1;
-    if (pi == pmax)
+    if (pi == pmax) {
       pi = pmin;
-    if (pj == pmax)
+    }
+    if (pj == pmax) {
       pj = pmin;
+    }
   }
 
   __asm__ __volatile__("movaps %%xmm2, %0" : "=m"(carry));
 
   ir += prm;
   jr += prm;
-  if (ir >= 12)
+  if (ir >= 12) {
     ir -= 12;
-  if (jr >= 12)
+  }
+  if (jr >= 12) {
     jr -= 12;
+  }
   is = 8 * ir;
   is_old = is;
 }
@@ -147,8 +151,9 @@ static void define_constants(void)
 
   for (k = 0; k < 96; k++) {
     next[k] = (k + 1) % 96;
-    if ((k % 4) == 3)
+    if ((k % 4) == 3) {
       next[k] = (k + 5) % 96;
+    }
   }
 }
 
@@ -163,10 +168,11 @@ void rlxd_init(int level, int seed)
   error_loc((level < 1) || (level > 2), 1, "rlxd_init [ranlxd.c]",
             "Bad choice of luxury level (should be 1 or 2)");
 
-  if (level == 1)
+  if (level == 1) {
     pr = 202;
-  else if (level == 2)
+  } else if (level == 2) {
     pr = 397;
+  }
 
   i = seed;
 
@@ -194,8 +200,9 @@ void rlxd_init(int level, int seed)
         jbit = (jbit + 1) % 31;
       }
 
-      if ((k % 4) != i)
+      if ((k % 4) != i) {
         ix = 16777215 - ix;
+      }
 
       x.num[4 * k + i] = (float)(ldexp((double)(ix), -24));
     }
@@ -218,18 +225,23 @@ void ranlxd(double r[], int n)
 {
   int k;
 
-  if (init == 0)
+  if (init == 0) {
     rlxd_init(1, 1);
+  }
 
   for (k = 0; k < n; k++) {
     is = next[is];
-    if (is == is_old)
+    if (is == is_old) {
       update();
+    }
     r[k] = (double)(x.num[is + 4]) + (double)(one_bit.c1 * x.num[is]);
   }
 }
 
-int rlxd_size(void) { return (105); }
+int rlxd_size(void)
+{
+  return (105);
+}
 
 void rlxd_get(int state[])
 {
@@ -242,8 +254,9 @@ void rlxd_get(int state[])
   base = (float)(ldexp(1.0, 24));
   state[0] = rlxd_size();
 
-  for (k = 0; k < 96; k++)
+  for (k = 0; k < 96; k++) {
     state[k + 1] = (int)(base * x.num[k]);
+  }
 
   state[97] = (int)(base * carry.c1);
   state[98] = (int)(base * carry.c2);
@@ -370,18 +383,22 @@ static void update(void)
     STEP(pi, pj);
     pi += 1;
     pj += 1;
-    if (pi == pmax)
+    if (pi == pmax) {
       pi = pmin;
-    if (pj == pmax)
+    }
+    if (pj == pmax) {
       pj = pmin;
+    }
   }
 
   ir += prm;
   jr += prm;
-  if (ir >= 12)
+  if (ir >= 12) {
     ir -= 12;
-  if (jr >= 12)
+  }
+  if (jr >= 12) {
     jr -= 12;
+  }
   is = 8 * ir;
   is_old = is;
 }
@@ -394,8 +411,9 @@ static void define_constants(void)
 
   for (k = 0; k < 96; k++) {
     next[k] = (k + 1) % 96;
-    if ((k % 4) == 3)
+    if ((k % 4) == 3) {
       next[k] = (k + 5) % 96;
+    }
   }
 }
 
@@ -415,10 +433,11 @@ void rlxd_init(int level, int seed)
   error_loc((level < 1) || (level > 2), 1, "rlxd_init [ranlxd.c]",
             "Bad choice of luxury level (should be 1 or 2)");
 
-  if (level == 1)
+  if (level == 1) {
     pr = 202;
-  else if (level == 2)
+  } else if (level == 2) {
     pr = 397;
+  }
 
   i = seed;
 
@@ -446,8 +465,9 @@ void rlxd_init(int level, int seed)
         jbit = (jbit + 1) % 31;
       }
 
-      if ((k % 4) != i)
+      if ((k % 4) != i) {
         ix = 16777215 - ix;
+      }
 
       x.num[4 * k + i] = ix;
     }
@@ -470,18 +490,23 @@ void ranlxd(double r[], int n)
 {
   int k;
 
-  if (init == 0)
+  if (init == 0) {
     rlxd_init(1, 1);
+  }
 
   for (k = 0; k < n; k++) {
     is = next[is];
-    if (is == is_old)
+    if (is == is_old) {
       update();
+    }
     r[k] = one_bit * ((double)(x.num[is + 4]) + one_bit * (double)(x.num[is]));
   }
 }
 
-int rlxd_size(void) { return (105); }
+int rlxd_size(void)
+{
+  return (105);
+}
 
 void rlxd_get(int state[])
 {
@@ -492,8 +517,9 @@ void rlxd_get(int state[])
 
   state[0] = rlxd_size();
 
-  for (k = 0; k < 96; k++)
+  for (k = 0; k < 96; k++) {
     state[k + 1] = x.num[k];
+  }
 
   state[97] = carry.c1;
   state[98] = carry.c2;

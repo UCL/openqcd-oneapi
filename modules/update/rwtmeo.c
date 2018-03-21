@@ -125,8 +125,9 @@ double rwtm1eo(double mu1, double mu2, int isp, double *sqn, int *status)
   tm_parms_t tm;
 
   tm = tm_parms();
-  if (tm.eoflg != 1)
+  if (tm.eoflg != 1) {
     set_tm_parms(1);
+  }
 
   check_parms(mu1, mu2, isp);
   wsd = reserve_wsd(2);
@@ -189,8 +190,9 @@ double rwtm2eo(double mu1, double mu2, int isp, double *sqn, int *status)
   tm_parms_t tm;
 
   tm = tm_parms();
-  if (tm.eoflg != 1)
+  if (tm.eoflg != 1) {
     set_tm_parms(1);
+  }
 
   check_parms(mu1, mu2, isp);
   wsd = reserve_wsd(2);
@@ -215,10 +217,11 @@ double rwtm2eo(double mu1, double mu2, int isp, double *sqn, int *status)
                sqrt(2.0) * mu2, isp, stat[0]);
     status[0] = (status[0] + stat[0] + 1) / 2;
 
-    if (mu1 > 0.0)
+    if (mu1 > 0.0) {
       lnr1 = norm_square_dble(VOLUME / 2, 1, phi);
-    else
+    } else {
       lnr1 = 0.0;
+    }
 
     lnr2 = spinor_prod_re_dble(VOLUME / 2, 1, eta, phi);
   } else if (sp.solver == SAP_GCR) {

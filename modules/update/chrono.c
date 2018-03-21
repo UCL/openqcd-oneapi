@@ -138,8 +138,9 @@ static void alloc_stacks(void)
       fp = force_parms(mdp.ifr[j]);
 
       for (k = 0; k < 4; k++) {
-        if (fp.icr[k] > nst)
+        if (fp.icr[k] > nst) {
           nst = fp.icr[k];
+        }
       }
     }
   }
@@ -162,8 +163,9 @@ static void alloc_stacks(void)
       for (j = 0; j < mdp.nfr; j++) {
         fp = force_parms(mdp.ifr[j]);
 
-        for (k = 0; k < 4; k++)
+        for (k = 0; k < 4; k++) {
           st[fp.icr[k]].ncr = fp.ncr[k];
+        }
       }
     }
   }
@@ -181,8 +183,9 @@ void setup_chrono(void)
   if (nst > 0) {
     ncr = 0;
 
-    for (icr = 0; icr < nst; icr++)
+    for (icr = 0; icr < nst; icr++) {
       ncr += st[icr].ncr;
+    }
 
     if (ncr > 0) {
       ta = malloc(ncr * sizeof(*ta));
@@ -220,9 +223,15 @@ void setup_chrono(void)
   mdt = 0.0;
 }
 
-double mdtime(void) { return mdt; }
+double mdtime(void)
+{
+  return mdt;
+}
 
-void step_mdtime(double dt) { mdt += dt; }
+void step_mdtime(double dt)
+{
+  mdt += dt;
+}
 
 void add_chrono(int icr, spinor_dble *psi)
 {
@@ -238,20 +247,23 @@ void add_chrono(int icr, spinor_dble *psi)
       assign_sd2sd(VOLUME, psi, st[icr].sd[isd]);
 
       isd += 1;
-      if (isd == ncr)
+      if (isd == ncr) {
         isd = 0;
+      }
       st[icr].isd = isd;
     } else {
       jsd = isd + nsd;
-      if (jsd >= ncr)
+      if (jsd >= ncr) {
         jsd -= ncr;
+      }
 
       st[icr].ta[jsd] = mdt;
       assign_sd2sd(VOLUME, psi, st[icr].sd[jsd]);
       st[icr].nsd += 1;
     }
-  } else
+  } else {
     error_loc(1, 1, "add_chrono [chrono.c]", "Unknown field stack");
+  }
 }
 
 int get_chrono(int icr, spinor_dble *psi)
@@ -264,8 +276,9 @@ int get_chrono(int icr, spinor_dble *psi)
   if ((icr > 0) && (icr < nst)) {
     nsd = st[icr].nsd;
 
-    if (nsd == 0)
+    if (nsd == 0) {
       return 0;
+    }
 
     ncr = st[icr].ncr;
     isd = st[icr].isd;
@@ -276,15 +289,17 @@ int get_chrono(int icr, spinor_dble *psi)
 
     for (k = 0; k < nsd; k++) {
       ksd = isd + k;
-      if (ksd >= ncr)
+      if (ksd >= ncr) {
         ksd -= ncr;
+      }
       c = 1.0;
 
       for (l = 0; l < nsd; l++) {
         if (l != k) {
           lsd = isd + l;
-          if (lsd >= ncr)
+          if (lsd >= ncr) {
             lsd -= ncr;
+          }
 
           c *= ((mdt - ta[lsd]) / (ta[ksd] - ta[lsd]));
         }
@@ -294,9 +309,9 @@ int get_chrono(int icr, spinor_dble *psi)
     }
 
     return 1;
-  } else if (icr == 0)
+  } else if (icr == 0) {
     return 0;
-  else {
+  } else {
     error_loc(1, 1, "get_chrono [chrono.c]", "Unknown field stack");
     return 0;
   }

@@ -77,7 +77,10 @@ void reset_stout_smearing(void)
   flg_smearing = 0;
 }
 
-stout_smearing_params_t stout_smearing_parms() { return ssp; }
+stout_smearing_params_t stout_smearing_parms()
+{
+  return ssp;
+}
 
 void print_stout_smearing_parms(void)
 {

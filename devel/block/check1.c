@@ -28,8 +28,9 @@ static void test1(blk_grid_t grid, int *bs)
   int nb, isw, vol, *imb;
   block_t *b, *bm;
 
-  for (ix = 0; ix < VOLUME; ix++)
+  for (ix = 0; ix < VOLUME; ix++) {
     ix_test[ix] = 0;
+  }
 
   itest = 0;
   b = blk_list(grid, &nb, &isw);
@@ -47,25 +48,29 @@ static void test1(blk_grid_t grid, int *bs)
     vol = (*b).vol;
     imb = (*b).imb;
 
-    if (vol != (bs[0] * bs[1] * bs[2] * bs[3]))
+    if (vol != (bs[0] * bs[1] * bs[2] * bs[3])) {
       itest = 1;
+    }
 
     for (ix = 0; ix < vol; ix++) {
       iy = imb[ix];
 
-      if ((iy < 0) || (iy >= VOLUME))
+      if ((iy < 0) || (iy >= VOLUME)) {
         itest = 2;
-      else {
+      } else {
         ix_test[iy] += 1;
-        if (ix_test[iy] > 1)
+        if (ix_test[iy] > 1) {
           itest = 3;
+        }
       }
     }
   }
 
-  for (ix = 0; ix < VOLUME; ix++)
-    if (ix_test[ix] != 1)
+  for (ix = 0; ix < VOLUME; ix++) {
+    if (ix_test[ix] != 1) {
       itest = 4;
+    }
+  }
 
   error(itest == 1, 1, "test1 [check1.c]", "b.vol is incorrect");
   error(itest == 2, 1, "test1 [check1.c]", "b.imb is out of range");
@@ -109,33 +114,39 @@ static void test2(blk_grid_t grid)
             iy = ipt[y3 + L3 * y2 + L2 * L3 * y1 + L1 * L2 * L3 * y0];
             ix = ipt_blk(b, x);
 
-            if ((ix < 0) || (ix > vol))
+            if ((ix < 0) || (ix > vol)) {
               itest = 1;
-            else {
-              if (iy != imb[ix])
+            } else {
+              if (iy != imb[ix]) {
                 itest = 2;
+              }
 
               is = (x0 + x1 + x2 + x3 + bo[0] + bo[1] + bo[2] + bo[3]) % 2;
 
               if (((is == 0) && (ix >= (vol / 2))) ||
-                  ((is != 0) && (ix < (vol / 2))))
+                  ((is != 0) && (ix < (vol / 2)))) {
                 itest = 3;
+              }
 
               for (mu = 0; mu < 4; mu++) {
                 if ((x[mu] + 1) < bs[mu]) {
-                  if (imb[(*b).iup[ix][mu]] != iup[iy][mu])
+                  if (imb[(*b).iup[ix][mu]] != iup[iy][mu]) {
                     itest = 4;
+                  }
                 } else {
-                  if ((*b).iup[ix][mu] != vol)
+                  if ((*b).iup[ix][mu] != vol) {
                     itest = 5;
+                  }
                 }
 
                 if (x[mu] > 0) {
-                  if (imb[(*b).idn[ix][mu]] != idn[iy][mu])
+                  if (imb[(*b).idn[ix][mu]] != idn[iy][mu]) {
                     itest = 6;
+                  }
                 } else {
-                  if ((*b).idn[ix][mu] != vol)
+                  if ((*b).idn[ix][mu] != vol) {
                     itest = 7;
+                  }
                 }
               }
             }
@@ -184,17 +195,20 @@ static void test3(blk_grid_t grid)
 
     ix = ipt_blk(b, x);
     ix = imb[ix];
-    if ((global_time(ix) == 0) && (bc != 3))
+    if ((global_time(ix) == 0) && (bc != 3)) {
       nbp += (bs[1] * bs[2] * bs[3]);
+    }
 
     x[0] = bs[0] - 1;
     ix = ipt_blk(b, x);
     ix = imb[ix];
-    if ((global_time(ix) == (NPROC0 * L0 - 1)) && (bc == 0))
+    if ((global_time(ix) == (NPROC0 * L0 - 1)) && (bc == 0)) {
       nbp += (bs[1] * bs[2] * bs[3]);
+    }
 
-    if ((*b).nbp != nbp)
+    if ((*b).nbp != nbp) {
       itest = 1;
+    }
 
     nall += nbp;
     nbp = (*b).nbp;
@@ -202,27 +216,32 @@ static void test3(blk_grid_t grid)
     for (iy = 0; iy < nbp; iy++) {
       ix = (*b).ibp[iy];
 
-      if ((ix < 0) || (ix >= vol))
+      if ((ix < 0) || (ix >= vol)) {
         itest = 2;
+      }
 
       if (iy > 0) {
-        if (ix <= (*b).ibp[iy - 1])
+        if (ix <= (*b).ibp[iy - 1]) {
           itest = 3;
+        }
       }
 
       ix = imb[ix];
       ie = ((global_time(ix) == 0) && (bc != 3));
       ie |= ((global_time(ix) == (NPROC0 * L0 - 1)) && (bc == 0));
 
-      if (ie == 0)
+      if (ie == 0) {
         itest = 4;
+      }
     }
   }
 
-  if ((cpr[0] == 0) && (bc != 3))
+  if ((cpr[0] == 0) && (bc != 3)) {
     nall -= (L1 * L2 * L3);
-  if ((cpr[0] == (NPROC0 - 1)) && (bc == 0))
+  }
+  if ((cpr[0] == (NPROC0 - 1)) && (bc == 0)) {
     nall -= (L1 * L2 * L3);
+  }
 
   error(itest == 1, 1, "test3 [check1.c]", "b.nbp is incorrect");
   error(itest == 2, 1, "test3 [check1.c]", "b.ibp is out of range");
@@ -240,8 +259,9 @@ static void test4(blk_grid_t grid)
   block_t *b, *bm;
   bndry_t *bb;
 
-  for (ix = 0; ix < (VOLUME + BNDRY); ix++)
+  for (ix = 0; ix < (VOLUME + BNDRY); ix++) {
     ix_test[ix] = 0;
+  }
 
   itest = 0;
   b = blk_list(grid, &nb, &isw);
@@ -255,21 +275,24 @@ static void test4(blk_grid_t grid)
     for (ifc = 0; ifc < 8; ifc++) {
       mu = ifc / 2;
 
-      if (((*bb).ifc != ifc) || ((*bb).vol != (vol / bs[mu])))
+      if (((*bb).ifc != ifc) || ((*bb).vol != (vol / bs[mu]))) {
         itest = 1;
+      }
 
       for (ix = 0; ix < (*bb).vol; ix++) {
         iy = (*bb).ipp[ix];
 
-        if ((iy < 0) || (iy >= vol))
+        if ((iy < 0) || (iy >= vol)) {
           itest = 2;
+        }
 
         iy = (*bb).imb[ix];
 
-        if ((iy < 0) || (iy >= (VOLUME + BNDRY)))
+        if ((iy < 0) || (iy >= (VOLUME + BNDRY))) {
           itest = 3;
-        else
+        } else {
           ix_test[iy] += 1;
+        }
       }
 
       bb += 1;
@@ -287,19 +310,23 @@ static void test4(blk_grid_t grid)
       ib = 0;
 
       for (mu = 0; mu < 4; mu++) {
-        if (((*b).iup[ix][mu] == vol) && (iup[iy][mu] < VOLUME))
+        if (((*b).iup[ix][mu] == vol) && (iup[iy][mu] < VOLUME)) {
           ib += 1;
-        if (((*b).idn[ix][mu] == vol) && (idn[iy][mu] < VOLUME))
+        }
+        if (((*b).idn[ix][mu] == vol) && (idn[iy][mu] < VOLUME)) {
           ib += 1;
+        }
       }
 
       ix_test[iy] += (1 - ib);
     }
   }
 
-  for (ix = 0; ix < (VOLUME + BNDRY); ix++)
-    if (ix_test[ix] != 1)
+  for (ix = 0; ix < (VOLUME + BNDRY); ix++) {
+    if (ix_test[ix] != 1) {
       itest = 4;
+    }
+  }
 
   error(itest == 1, 1, "test4 [check1.c]",
         "bb.ifc and bb.vol are not correctly assigned");
@@ -316,8 +343,9 @@ static void test5(blk_grid_t grid)
   block_t *b, *bm;
   bndry_t *bb;
 
-  for (ix = 0; ix < (VOLUME + BNDRY); ix++)
+  for (ix = 0; ix < (VOLUME + BNDRY); ix++) {
     ix_test[ix] = 0;
+  }
 
   itest = 0;
   b = blk_list(grid, &nb, &isw);
@@ -334,19 +362,22 @@ static void test5(blk_grid_t grid)
         iy = (*bb).ipp[ix];
         iz = (*bb).ipp[ix + ((*bb).vol / 2)];
 
-        if ((iy < (vol / 2)) || (iz >= (vol / 2)))
+        if ((iy < (vol / 2)) || (iz >= (vol / 2))) {
           itest = 1;
+        }
 
         iy = (*bb).imb[ix];
         iz = (*bb).imb[ix + (*bb).vol / 2];
 
         if ((iy >= (VOLUME + (BNDRY / 2))) ||
-            ((iy >= (VOLUME / 2)) && (iy < VOLUME)))
+            ((iy >= (VOLUME / 2)) && (iy < VOLUME))) {
           itest = 2;
+        }
 
         if ((iz < (VOLUME / 2)) ||
-            ((iz >= VOLUME) && (iz < (VOLUME + (BNDRY / 2)))))
+            ((iz >= VOLUME) && (iz < (VOLUME + (BNDRY / 2))))) {
           itest = 2;
+        }
       }
 
       mu = ifc / 2;
@@ -355,32 +386,38 @@ static void test5(blk_grid_t grid)
         iy = (*bb).ipp[ix];
 
         if ((((ifc % 2) == 0) && ((*b).idn[iy][mu] != vol)) ||
-            (((ifc % 2) == 1) && ((*b).iup[iy][mu] != vol)))
+            (((ifc % 2) == 1) && ((*b).iup[iy][mu] != vol))) {
           itest = 3;
+        }
 
         iz = (*bb).map[ix];
 
         if ((ifc % 2) == 0) {
-          for (is = 1; is < bs[mu]; is++)
+          for (is = 1; is < bs[mu]; is++) {
             iz = (*b).idn[iz][mu];
+          }
         } else {
-          for (is = 1; is < bs[mu]; is++)
+          for (is = 1; is < bs[mu]; is++) {
             iz = (*b).iup[iz][mu];
+          }
         }
 
-        if (iy != iz)
+        if (iy != iz) {
           itest = 4;
+        }
 
         iz = imb[iy];
         iy = (*bb).imb[ix];
 
-        if ((ifc % 2) == 0)
+        if ((ifc % 2) == 0) {
           iz = idn[iz][mu];
-        else
+        } else {
           iz = iup[iz][mu];
+        }
 
-        if (iy != iz)
+        if (iy != iz) {
           itest = 5;
+        }
       }
 
       bb += 1;
@@ -428,9 +465,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check1.c]",
                  "Syntax: check1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);
@@ -451,12 +489,13 @@ int main(int argc, char *argv[])
   grid = BLK_GRIDS;
 
   for (igr = 0; igr < (int)(BLK_GRIDS); igr++) {
-    if (igr == 0)
+    if (igr == 0) {
       grid = SAP_BLOCKS;
-    else if (igr == 1)
+    } else if (igr == 1) {
       grid = DFL_BLOCKS;
-    else
+    } else {
       error_root(1, 1, "main [check1.c]", "Unknown block grid");
+    }
 
     alloc_bgr(grid);
 

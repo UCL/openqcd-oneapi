@@ -120,9 +120,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check5.c]",
                  "Syntax: check5 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -164,9 +165,10 @@ int main(int argc, char *argv[])
   one_over_ut = 1.0 / ani.ut_fermion;
   one_over_gamma_f = ani.nu / ani.xi;
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("m0 = %.4e, csw = %.4e, cF = %.4e, cF' = %.4e\n\n", swp.m0, swp.csw,
            swp.cF[0], swp.cF[1]);
+  }
 
   (void)udfld();
   set_ud_phase();
@@ -182,23 +184,26 @@ int main(int argc, char *argv[])
   for (i = 0; i < n; i++) {
     ranlxs(ran, 4);
 
-    if (bc == 0)
+    if (bc == 0) {
       np[0] = (int)(ran[0] * (float)(NPROC0 * L0 - 1));
-    else
+    } else {
       np[0] = (int)(ran[0] * (float)(NPROC0 * L0));
+    }
     np[1] = (int)(ran[1] * (float)(NPROC1 * L1));
     np[2] = (int)(ran[2] * (float)(NPROC2 * L2));
     np[3] = (int)(ran[3] * (float)(NPROC3 * L3));
 
-    if (np[0] == 0)
+    if (np[0] == 0) {
       np[0] = 1;
+    }
 
-    if (bc == 0)
+    if (bc == 0) {
       p[0] = (double)(np[0]) * pi / (double)(NPROC0 * L0 - 1);
-    else if (bc == 3)
+    } else if (bc == 3) {
       p[0] = ((double)(np[0]) * 2.0 * pi + pi) / (double)(NPROC0 * L0);
-    else
+    } else {
       p[0] = (double)(np[0]) * pi / (double)(NPROC0 * L0);
+    }
 
     p[1] = (double)(np[1]) * 2.0 * pi / (double)(NPROC1 * L1);
     p[2] = (double)(np[2]) * 2.0 * pi / (double)(NPROC2 * L2);
@@ -256,15 +261,18 @@ int main(int argc, char *argv[])
             z.re = mp;
             z.im = 0.0;
 
-            if ((cpr[0] == 0) && (x0 == 1) && (bc != 3))
+            if ((cpr[0] == 0) && (x0 == 1) && (bc != 3)) {
               z.re += (swp.cF[0] - 1.0);
+            }
 
-            if ((cpr[0] == (NPROC0 - 1)) && (x0 == (L0 - 2)) && (bc == 0))
+            if ((cpr[0] == (NPROC0 - 1)) && (x0 == (L0 - 2)) && (bc == 0)) {
               z.re += (swp.cF[1] - 1.0);
+            }
 
             if ((cpr[0] == (NPROC0 - 1)) && (x0 == (L0 - 1)) &&
-                ((bc == 1) || (bc == 2)))
+                ((bc == 1) || (bc == 2))) {
               z.re += (swp.cF[1] - 1.0);
+            }
 
             s2.c1 = mul_cplx(z, s0.c1);
             s2.c2 = mul_cplx(z, s0.c2);
@@ -302,10 +310,11 @@ int main(int argc, char *argv[])
             }
 
             if (((cpr[0] == 0) && (x0 == 0) && (bc != 3)) ||
-                ((cpr[0] == (NPROC0 - 1)) && (x0 == (L0 - 1)) && (bc == 0)))
+                ((cpr[0] == (NPROC0 - 1)) && (x0 == (L0 - 1)) && (bc == 0))) {
               psd[1][ix] = sd0;
-            else
+            } else {
               psd[1][ix] = s2;
+            }
           }
         }
       }
@@ -317,12 +326,14 @@ int main(int argc, char *argv[])
     d = norm_square_dble(VOLUME, 1, psd[2]) /
         norm_square_dble(VOLUME, 1, psd[0]);
     d = sqrt(d);
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Normalized deviation = %.1e at p=(%d,%d,%d,%d)\n", d, np[0],
              np[1], np[2], np[3]);
+    }
   }
 
   if (my_rank == 0) {

@@ -619,8 +619,9 @@ void set_s2zero(int vol, spinor *s)
 
   sm = s + vol;
 
-  for (; s < sm; s++)
+  for (; s < sm; s++) {
     (*s) = s0;
+  }
 }
 
 void set_sd2zero(int vol, spinor_dble *sd)
@@ -629,8 +630,9 @@ void set_sd2zero(int vol, spinor_dble *sd)
 
   sm = sd + vol;
 
-  for (; sd < sm; sd++)
+  for (; sd < sm; sd++) {
     (*sd) = sd0;
+  }
 }
 
 void assign_s2s(int vol, spinor const *s, spinor *r)

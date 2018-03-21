@@ -78,9 +78,11 @@ int main(int argc, char *argv[])
     for (ix = 0; ix < NSPIN; ix++) {
       r = (*sps).r;
 
-      for (i = 0; i < 24; i++)
-        if (r[i] != 0.0f)
+      for (i = 0; i < 24; i++) {
+        if (r[i] != 0.0f) {
           ie = 1;
+        }
+      }
 
       sps += 1;
     }
@@ -104,8 +106,9 @@ int main(int argc, char *argv[])
     for (ix = 0; ix < VOLUME; ix++) {
       r = (*sps).r;
 
-      for (i = 0; i < 24; i++)
+      for (i = 0; i < 24; i++) {
         var += (double)(r[i] * r[i]);
+      }
 
       sps += 1;
     }
@@ -136,9 +139,11 @@ int main(int argc, char *argv[])
     for (ix = 0; ix < NSPIN; ix++) {
       rd = (*spsd).r;
 
-      for (i = 0; i < 24; i++)
-        if (rd[i] != 0.0)
+      for (i = 0; i < 24; i++) {
+        if (rd[i] != 0.0) {
           ie = 1;
+        }
+      }
 
       spsd += 1;
     }
@@ -163,8 +168,9 @@ int main(int argc, char *argv[])
     for (ix = 0; ix < VOLUME; ix++) {
       rd = (*spsd).r;
 
-      for (i = 0; i < 24; i++)
+      for (i = 0; i < 24; i++) {
         var += (rd[i] * rd[i]);
+      }
 
       spsd += 1;
     }
@@ -205,10 +211,12 @@ int main(int argc, char *argv[])
       rd = (*spsd).r;
 
       for (i = 0; i < 24; i++) {
-        if (r[i] != 0.0f)
+        if (r[i] != 0.0f) {
           ie = 1;
-        if (rd[i] != 0.0)
+        }
+        if (rd[i] != 0.0) {
           ie = 2;
+        }
       }
     }
   }
@@ -227,9 +235,11 @@ int main(int argc, char *argv[])
     for (ix = 0; ix < VOLUME; ix++) {
       r = (*sps).r;
 
-      for (i = 0; i < 24; i++)
-        if (r[i] != 0.0f)
+      for (i = 0; i < 24; i++) {
+        if (r[i] != 0.0f) {
           ie = 1;
+        }
+      }
     }
   }
 
@@ -251,8 +261,9 @@ int main(int argc, char *argv[])
     mulr_spinor_add_dble(VOLUME, psd[k + NFLDS], psd[k], 1.0);
 
     d = norm_square_dble(VOLUME, 1, psd[k + NFLDS]) / d;
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   if (my_rank == 0) {
@@ -275,12 +286,14 @@ int main(int argc, char *argv[])
     mulr_spinor_add_dble(VOLUME, psd[k], psd[k + NFLDS], -1.0);
 
     d = norm_square_dble(VOLUME, 1, psd[k]) / d;
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("add_s2sd():  %.1e\n", sqrt(dmax));
+  }
 
   dmax = 0.0;
 
@@ -295,8 +308,9 @@ int main(int argc, char *argv[])
     mulr_spinor_add_dble(VOLUME, psd[k], psd[k + NFLDS], -1.0);
 
     d = norm_square_dble(VOLUME, 1, psd[k]) / d;
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   if (my_rank == 0) {

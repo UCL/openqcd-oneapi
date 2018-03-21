@@ -123,8 +123,9 @@ static int ins_blk(block_t const *b)
     first = p;
 
     return 0;
-  } else
+  } else {
     return 1;
+  }
 }
 
 static void rmv_blk(block_t const *b)
@@ -135,10 +136,11 @@ static void rmv_blk(block_t const *b)
 
   for (p = first; p != NULL; p = (*p).next) {
     if ((*p).b == b) {
-      if (q == NULL)
+      if (q == NULL) {
         first = (*p).next;
-      else
+      } else {
         (*q).next = (*p).next;
+      }
 
       free(p);
       return;
@@ -153,8 +155,9 @@ static int fnd_blk(block_t const *b)
   struct ablk_t *p;
 
   for (p = first; p != NULL; p = (*p).next) {
-    if ((*p).b == b)
+    if ((*p).b == b) {
       return 1;
+    }
   }
 
   return 0;
@@ -168,19 +171,23 @@ static void free_bnd(block_t *b)
   shf = (*b).shf;
   bb = (*b).bb;
 
-  if (bb == NULL)
+  if (bb == NULL) {
     return;
+  }
 
-  if (!(shf & 0x2))
+  if (!(shf & 0x2)) {
     free((*bb).ipp);
+  }
 
   free((*bb).imb);
 
-  if ((!(shf & 0x4)) && ((*bb).u != NULL))
+  if ((!(shf & 0x4)) && ((*bb).u != NULL)) {
     afree((*bb).u);
+  }
 
-  if ((!(shf & 0x8)) && ((*bb).ud != NULL))
+  if ((!(shf & 0x8)) && ((*bb).ud != NULL)) {
     afree((*bb).ud);
+  }
 
   if ((!(shf & 0x40)) && ((*bb).nw > 0)) {
     afree((*bb).w[0]);
@@ -200,8 +207,9 @@ void free_blk(block_t *b)
 {
   int shf;
 
-  if (fnd_blk(b) == 0)
+  if (fnd_blk(b) == 0) {
     return;
+  }
 
   shf = (*b).shf;
   error(shf & 0x1, 1, "free_blk [block.c]", "Protected block");
@@ -272,8 +280,9 @@ static void set_u2unity(int vol, su3 *u)
 
   um = u + vol;
 
-  for (; u < um; u++)
+  for (; u < um; u++) {
     (*u) = unity;
+  }
 }
 
 static void set_ud2unity(int vol, su3_dble *ud)
@@ -287,8 +296,9 @@ static void set_ud2unity(int vol, su3_dble *ud)
 
   um = ud + vol;
 
-  for (; ud < um; ud++)
+  for (; ud < um; ud++) {
     (*ud) = unity;
+  }
 }
 
 static void set_sw2unity(int vol, pauli *p)
@@ -305,8 +315,9 @@ static void set_sw2unity(int vol, pauli *p)
 
   pm = p + vol;
 
-  for (; p < pm; p++)
+  for (; p < pm; p++) {
     (*p) = unity;
+  }
 }
 
 static void set_swd2unity(int vol, pauli_dble *pd)
@@ -323,8 +334,9 @@ static void set_swd2unity(int vol, pauli_dble *pd)
 
   pm = pd + vol;
 
-  for (; pd < pm; pd++)
+  for (; pd < pm; pd++) {
     (*pd) = unity;
+  }
 }
 
 static void set_w2zero(int vol, weyl *w)
@@ -333,8 +345,9 @@ static void set_w2zero(int vol, weyl *w)
 
   wm = w + vol;
 
-  for (; w < wm; w++)
+  for (; w < wm; w++) {
     (*w) = w0;
+  }
 }
 
 static void set_wd2zero(int vol, weyl_dble *wd)
@@ -343,8 +356,9 @@ static void set_wd2zero(int vol, weyl_dble *wd)
 
   wm = wd + vol;
 
-  for (; wd < wm; wd++)
+  for (; wd < wm; wd++) {
     (*wd) = wd0;
+  }
 }
 
 static void new_blk(block_t *b, int const *bo, int const *bs, int iu, int iud,
@@ -381,10 +395,12 @@ static void new_blk(block_t *b, int const *bo, int const *bs, int iu, int iud,
                   bs[2] * bs[3] * bs[0] + bs[3] * bs[0] * bs[1]);
   (*b).nbp = 0;
 
-  if ((cpr[0] == 0) && (bo[0] == 0) && (bc_type() != 3))
+  if ((cpr[0] == 0) && (bo[0] == 0) && (bc_type() != 3)) {
     (*b).nbp += bs[1] * bs[2] * bs[3];
-  if ((cpr[0] == (NPROC0 - 1)) && ((bo[0] + bs[0]) == L0) && (bc_type() == 0))
+  }
+  if ((cpr[0] == (NPROC0 - 1)) && ((bo[0] + bs[0]) == L0) && (bc_type() == 0)) {
     (*b).nbp += bs[1] * bs[2] * bs[3];
+  }
 
   (*b).ns = ns;
   (*b).nsd = nsd;
@@ -429,9 +445,9 @@ static void new_blk(block_t *b, int const *bo, int const *bs, int iu, int iud,
     set_swd2unity(2 * (*b).vol, (*b).swd);
   }
 
-  if ((shf & 0x10) || (ns == 0))
+  if ((shf & 0x10) || (ns == 0)) {
     (*b).s = NULL;
-  else {
+  } else {
     (*b).s = malloc(ns * sizeof(*(*b).s));
     error((*b).s == NULL, 1, "new_blk [block.c]",
           "Unable to allocate the single-precision spinor fields");
@@ -440,15 +456,16 @@ static void new_blk(block_t *b, int const *bo, int const *bs, int iu, int iud,
     error((*b).s[0] == NULL, 2, "new_blk [block.c]",
           "Unable to allocate the single-precision spinor fields");
 
-    for (n = 1; n < ns; n++)
+    for (n = 1; n < ns; n++) {
       (*b).s[n] = (*b).s[n - 1] + (*b).vol + 1;
+    }
 
     set_s2zero(ns * ((*b).vol + 1), (*b).s[0]);
   }
 
-  if ((shf & 0x20) || (nsd == 0))
+  if ((shf & 0x20) || (nsd == 0)) {
     (*b).sd = NULL;
-  else {
+  } else {
     (*b).sd = malloc(nsd * sizeof(*(*b).sd));
     error((*b).sd == NULL, 1, "new_blk [block.c]",
           "Unable to allocate the double-precision spinor fields");
@@ -457,8 +474,9 @@ static void new_blk(block_t *b, int const *bo, int const *bs, int iu, int iud,
     error((*b).sd[0] == NULL, 2, "new_blk [block.c]",
           "Unable to allocate the pointer array (*b).sd");
 
-    for (n = 1; n < nsd; n++)
+    for (n = 1; n < nsd; n++) {
       (*b).sd[n] = (*b).sd[n - 1] + (*b).vol + 1;
+    }
 
     set_sd2zero(nsd * ((*b).vol + 1), (*b).sd[0]);
   }
@@ -489,9 +507,11 @@ void alloc_blk(block_t *b, int const *bo, int const *bs, int iu, int iud,
 
     ie = 0;
 
-    for (mu = 0; mu < 4; mu++)
-      if ((iprms[mu] != bo[mu]) || (iprms[4 + mu] != bs[mu]))
+    for (mu = 0; mu < 4; mu++) {
+      if ((iprms[mu] != bo[mu]) || (iprms[4 + mu] != bs[mu])) {
         ie = 1;
+      }
+    }
 
     error((ie) || (iprms[8] != iu) || (iprms[9] != iud) || (iprms[10] != ns) ||
               (iprms[11] != nsd),
@@ -566,8 +586,9 @@ static void new_bnd(block_t *b, int iu, int iud, int nw, int nwd, int shf)
   }
 
   if ((shf & 0x4) || (iu != 1)) {
-    for (ifc = 0; ifc < 8; ifc++)
+    for (ifc = 0; ifc < 8; ifc++) {
       bb[ifc].u = NULL;
+    }
   } else {
     u = amalloc(vol * sizeof(*u), ALIGN);
     error(u == NULL, 1, "new_bnd [block.c]",
@@ -581,8 +602,9 @@ static void new_bnd(block_t *b, int iu, int iud, int nw, int nwd, int shf)
   }
 
   if ((shf & 0x8) || (iud != 1)) {
-    for (ifc = 0; ifc < 8; ifc++)
+    for (ifc = 0; ifc < 8; ifc++) {
       bb[ifc].ud = NULL;
+    }
   } else {
     ud = amalloc(vol * sizeof(*ud), ALIGN);
     error(ud == NULL, 1, "new_bnd [block.c]",
@@ -596,8 +618,9 @@ static void new_bnd(block_t *b, int iu, int iud, int nw, int nwd, int shf)
   }
 
   if ((shf & 0x40) || (nw == 0)) {
-    for (ifc = 0; ifc < 8; ifc++)
+    for (ifc = 0; ifc < 8; ifc++) {
       bb[ifc].w = NULL;
+    }
   } else {
     w = malloc(8 * nw * sizeof(*w));
     wb = amalloc(nw * vol * sizeof(*wb), ALIGN);
@@ -618,8 +641,9 @@ static void new_bnd(block_t *b, int iu, int iud, int nw, int nwd, int shf)
   }
 
   if ((shf & 0x80) || (nwd == 0)) {
-    for (ifc = 0; ifc < 8; ifc++)
+    for (ifc = 0; ifc < 8; ifc++) {
       bb[ifc].wd = NULL;
+    }
   } else {
     wd = malloc(8 * nwd * sizeof(*wd));
     wdb = amalloc(nwd * vol * sizeof(*wdb), ALIGN);
@@ -666,9 +690,11 @@ void alloc_bnd(block_t *b, int iu, int iud, int nw, int nwd)
 
     ie = 0;
 
-    for (mu = 0; mu < 4; mu++)
-      if ((iprms[mu] != bo[mu]) || (iprms[4 + mu] != bs[mu]))
+    for (mu = 0; mu < 4; mu++) {
+      if ((iprms[mu] != bo[mu]) || (iprms[4 + mu] != bs[mu])) {
         ie = 1;
+      }
+    }
 
     error((ie) || (iprms[8] != iu) || (iprms[9] != iud) || (iprms[10] != nw) ||
               (iprms[11] != nwd),
@@ -737,8 +763,9 @@ void clone_blk(block_t const *b, int shf, int const *bo, block_t *c)
 
     for (mu = 0; mu < 4; mu++) {
       if ((iprms[mu] != bbo[mu]) || (iprms[4 + mu] != bs[mu]) ||
-          (iprms[8 + mu] != bo[mu]))
+          (iprms[8 + mu] != bo[mu])) {
         ie = 1;
+      }
     }
 
     error((ie) || (iprms[12] != bshf) || (iprms[13] != iu) ||
@@ -782,14 +809,17 @@ void clone_blk(block_t const *b, int shf, int const *bo, block_t *c)
     (*c).swd = (*b).swd;
   }
 
-  if ((shf & 0x10) && (ns > 0))
+  if ((shf & 0x10) && (ns > 0)) {
     (*c).s = (*b).s;
+  }
 
-  if ((shf & 0x20) && (nsd > 0))
+  if ((shf & 0x20) && (nsd > 0)) {
     (*c).sd = (*b).sd;
+  }
 
-  if (!(shf & 0x2))
+  if (!(shf & 0x2)) {
     blk_geometry(c);
+  }
   blk_imbed(c);
 
   if (ib) {
@@ -807,21 +837,26 @@ void clone_blk(block_t const *b, int shf, int const *bo, block_t *c)
         (*c).bb[ifc].map = (*b).bb[ifc].map;
       }
 
-      if ((shf & 0x4) && (iub != 0))
+      if ((shf & 0x4) && (iub != 0)) {
         (*c).bb[ifc].u = (*b).bb[ifc].u;
+      }
 
-      if ((shf & 0x8) && (iudb != 0))
+      if ((shf & 0x8) && (iudb != 0)) {
         (*c).bb[ifc].ud = (*b).bb[ifc].ud;
+      }
 
-      if ((shf & 0x40) && (nw > 0))
+      if ((shf & 0x40) && (nw > 0)) {
         (*c).bb[ifc].w = (*b).bb[ifc].w;
+      }
 
-      if ((shf & 0x80) && (nwd > 0))
+      if ((shf & 0x80) && (nwd > 0)) {
         (*c).bb[ifc].wd = (*b).bb[ifc].wd;
+      }
     }
 
-    if (!(shf & 0x2))
+    if (!(shf & 0x2)) {
       bnd_geometry(c);
+    }
     bnd_imbed(c);
   }
 }
@@ -845,9 +880,9 @@ int ipt_blk(block_t const *b, int const *x)
   n |= ((x[3] < 0) || (x[3] >= bs[3]));
   ix = x[3] + bs[3] * ix;
 
-  if (n == 0)
+  if (n == 0) {
     return (*b).ipt[ix];
-  else {
+  } else {
     error_loc(1, 1, "ipt_blk [block.c]", "Point coordinates are out of range");
     return 0;
   }

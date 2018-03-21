@@ -72,7 +72,10 @@ ani_params_t set_no_ani_parms(void)
   return set_ani_parms(1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
 }
 
-ani_params_t ani_parms(void) { return ani; }
+ani_params_t ani_parms(void)
+{
+  return ani;
+}
 
 void print_ani_parms(void)
 {
@@ -181,4 +184,7 @@ void check_ani_parms(FILE *fdat)
   }
 }
 
-int ani_params_initialised(void) { return (flg_ani == 1); }
+int ani_params_initialised(void)
+{
+  return (flg_ani == 1);
+}

@@ -24,9 +24,9 @@
 #include "mpi.h"
 #include "random.h"
 #include "sflds.h"
+#include "stout_smearing.h"
 #include "sw_term.h"
 #include "uflds.h"
-#include "stout_smearing.h"
 
 static int my_rank, bc, first, last, step, nmx;
 static double mu, m0, res;
@@ -172,19 +172,23 @@ static void read_bc_section(FILE *fin)
     cF = 1.0;
     cF_prime = 1.0;
 
-    if (bc == 1)
+    if (bc == 1) {
       read_dprms("phi", 2, phi);
+    }
 
-    if ((bc == 1) || (bc == 2))
+    if ((bc == 1) || (bc == 2)) {
       read_dprms("phi'", 2, phi_prime);
+    }
 
-    if (bc != 3)
+    if (bc != 3) {
       read_line("cF", "%lf", &cF);
+    }
 
-    if (bc == 2)
+    if (bc == 2) {
       read_line("cF'", "%lf", &cF_prime);
-    else
+    } else {
       cF_prime = cF;
+    }
 
     read_dprms("theta", 3, theta);
   }
@@ -238,7 +242,6 @@ int main(int argc, char *argv[])
            NPROC3 * L3);
     printf("%dx%dx%dx%d process grid, ", NPROC0, NPROC1, NPROC2, NPROC3);
     printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
-
   }
 
   read_configurations_section(fin);
@@ -328,9 +331,10 @@ int main(int argc, char *argv[])
       printf("rho   = %.2e, res   = %.2e\n", rho, res);
       printf("check = %.2e, check = %.2e\n", del, del / nrm);
       printf("time = %.2e sec (total)\n", wdt);
-      if (status > 0)
+      if (status > 0) {
         printf("     = %.2e usec (per point and CG iteration)",
                (1.0e6 * wdt) / ((double)(status) * (double)(VOLUME)));
+      }
       printf("\n\n");
       fflush(flog);
     }
@@ -375,9 +379,10 @@ int main(int argc, char *argv[])
       printf("rho   = %.2e, res   = %.2e\n", rho, res);
       printf("check = %.2e, check = %.2e\n", del, del / nrm);
       printf("time = %.2e sec (total)\n", wdt);
-      if (status > 0)
+      if (status > 0) {
         printf("     = %.2e usec (per point and CG iteration)",
                (1.0e6 * wdt) / ((double)(status) * (double)(VOLUME)));
+      }
       printf("\n\n");
       fflush(flog);
     }
@@ -388,8 +393,9 @@ int main(int argc, char *argv[])
     release_ws();
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

@@ -94,10 +94,11 @@ static void local_plaq_sum_dble(int iw)
 
   bc = bc_type();
 
-  if (iw == 0)
+  if (iw == 0) {
     wp = 1.0;
-  else
+  } else {
     wp = 0.5;
+  }
 
   udb = udfld();
   reset_hsum(isA[0]);
@@ -109,20 +110,24 @@ static void local_plaq_sum_dble(int iw)
     pas = 0.0;
 
     if ((t < (N0 - 1)) || (bc != 0)) {
-      for (n = 0; n < 3; n++)
+      for (n = 0; n < 3; n++) {
         pat += plaq_dble(n, ix);
+      }
     }
 
     if (((t > 0) || (bc == 3)) && ((t < (N0 - 1)) || (bc != 0))) {
-      for (n = 3; n < 6; n++)
+      for (n = 3; n < 6; n++) {
         pas += plaq_dble(n, ix);
+      }
     } else {
-      for (n = 3; n < 6; n++)
+      for (n = 3; n < 6; n++) {
         pas += wp * plaq_dble(n, ix);
+      }
     }
 
-    if ((t == (N0 - 1)) && ((bc == 1) || (bc == 2)))
+    if ((t == (N0 - 1)) && ((bc == 1) || (bc == 2))) {
       pat += 9.0 * wp;
+    }
 
     if (not_equal_d(pat, 0.0)) {
       add_to_hsum(isA[0], &pat);
@@ -192,8 +197,9 @@ double plaq_action_slices(double *asl)
   double A, smE, smB;
 
   if (init < 2) {
-    if (init < 1)
+    if (init < 1) {
       isA[0] = init_hsum(1);
+    }
 
     for (t = 0; t < L0; t++) {
       isE[t] = init_hsum(1);
@@ -203,8 +209,9 @@ double plaq_action_slices(double *asl)
     init = 2;
   }
 
-  if (query_flags(UDBUF_UP2DATE) != 1)
+  if (query_flags(UDBUF_UP2DATE) != 1) {
     copy_bnd_ud();
+  }
 
   bc = bc_type();
   t0 = cpr[0] * L0;
@@ -221,25 +228,30 @@ double plaq_action_slices(double *asl)
     smB = 0.0;
 
     if ((t < (N0 - 1)) || (bc != 0)) {
-      for (n = 0; n < 3; n++)
+      for (n = 0; n < 3; n++) {
         smE += (3.0 - plaq_dble(n, ix));
+      }
     }
 
     if ((t > 0) || (bc != 1)) {
-      for (n = 3; n < 6; n++)
+      for (n = 3; n < 6; n++) {
         smB += (3.0 - plaq_dble(n, ix));
+      }
     }
 
     t -= t0;
 
-    if (not_equal_d(smE, 0.0))
+    if (not_equal_d(smE, 0.0)) {
       add_to_hsum(isE[t], &smE);
-    if (not_equal_d(smB, 0.0))
+    }
+    if (not_equal_d(smB, 0.0)) {
       add_to_hsum(isB[t], &smB);
+    }
   }
 
-  for (t = 0; t < N0; t++)
+  for (t = 0; t < N0; t++) {
     asl[t] = 0.0;
+  }
 
   for (t = 0; t < L0; t++) {
     local_hsum(isE[t], &smE);
@@ -250,12 +262,14 @@ double plaq_action_slices(double *asl)
     MPI_Reduce(asl, aslE, N0, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Bcast(aslE, N0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   } else {
-    for (t = 0; t < N0; t++)
+    for (t = 0; t < N0; t++) {
       aslE[t] = asl[t];
+    }
   }
 
-  for (t = 0; t < N0; t++)
+  for (t = 0; t < N0; t++) {
     asl[t] = 0.0;
+  }
 
   for (t = 0; t < L0; t++) {
     local_hsum(isB[t], &smB);
@@ -266,32 +280,38 @@ double plaq_action_slices(double *asl)
     MPI_Reduce(asl, aslB, N0, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Bcast(aslB, N0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   } else {
-    for (t = 0; t < N0; t++)
+    for (t = 0; t < N0; t++) {
       aslB[t] = asl[t];
+    }
   }
 
-  if (bc != 3)
+  if (bc != 3) {
     asl[0] = aslE[0] + aslB[0];
-  else
+  } else {
     asl[0] = aslE[0] + aslE[N0 - 1] + 2.0 * aslB[0];
+  }
 
   if (bc == 0) {
-    for (t = 1; t < (N0 - 1); t++)
+    for (t = 1; t < (N0 - 1); t++) {
       asl[t] = aslE[t - 1] + aslE[t] + 2.0 * aslB[t];
+    }
 
     asl[N0 - 1] = aslE[N0 - 2] + aslB[N0 - 1];
   } else {
-    for (t = 1; t < N0; t++)
+    for (t = 1; t < N0; t++) {
       asl[t] = aslE[t - 1] + aslE[t] + 2.0 * aslB[t];
+    }
   }
 
   reset_hsum(isA[0]);
 
-  if ((bc == 1) || (bc == 2))
+  if ((bc == 1) || (bc == 2)) {
     add_to_hsum(isA[0], aslE + N0 - 1);
+  }
 
-  for (t = 0; t < N0; t++)
+  for (t = 0; t < N0; t++) {
     add_to_hsum(isA[0], asl + t);
+  }
 
   local_hsum(isA[0], &A);
 

@@ -92,9 +92,10 @@ int main(int argc, char *argv[])
     random_v(nv, wv[k], sig[k]);
     var = 0.0;
 
-    for (ix = 0; ix < nv; ix++)
+    for (ix = 0; ix < nv; ix++) {
       var +=
           (double)((wv[k][ix].re * wv[k][ix].re + wv[k][ix].im * wv[k][ix].im));
+    }
 
     MPI_Reduce(&var, &var_all, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
@@ -117,8 +118,9 @@ int main(int argc, char *argv[])
     random_vd(nv, wvd[k], sigd[k]);
     var = 0.0;
 
-    for (ix = 0; ix < nv; ix++)
+    for (ix = 0; ix < nv; ix++) {
       var += (wvd[k][ix].re * wvd[k][ix].re + wvd[k][ix].im * wvd[k][ix].im);
+    }
 
     MPI_Reduce(&var, &var_all, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
@@ -141,10 +143,12 @@ int main(int argc, char *argv[])
     mulc_vadd_dble(nv, wvd[k], wvd[k + NFLDS], zd);
 
     for (ix = 0; ix < nv; ix++) {
-      if ((wv[k][ix].re != 0.0f) || (wv[k][ix].im != 0.0f))
+      if ((wv[k][ix].re != 0.0f) || (wv[k][ix].im != 0.0f)) {
         ie = 1;
-      if ((wvd[k][ix].re != 0.0) || (wvd[k][ix].im != 0.0))
+      }
+      if ((wvd[k][ix].re != 0.0) || (wvd[k][ix].im != 0.0)) {
         ie = 2;
+      }
     }
   }
 
@@ -160,8 +164,9 @@ int main(int argc, char *argv[])
     mulc_vadd(nv, wv[k], wv[k + NFLDS], z);
 
     for (ix = 0; ix < nv; ix++) {
-      if ((wv[k][ix].re != 0.0f) || (wv[k][ix].im != 0.0f))
+      if ((wv[k][ix].re != 0.0f) || (wv[k][ix].im != 0.0f)) {
         ie = 1;
+      }
     }
   }
 
@@ -183,8 +188,9 @@ int main(int argc, char *argv[])
     mulc_vadd_dble(nv, wvd[k], wvd[k + NFLDS], zd);
 
     d = vnorm_square_dble(nv, 1, wvd[k]) / d;
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   if (my_rank == 0) {
@@ -207,8 +213,9 @@ int main(int argc, char *argv[])
     mulc_vadd_dble(nv, wvd[k], wvd[k + NFLDS], zd);
 
     d = vnorm_square_dble(nv, 1, wvd[k]) / d;
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   if (my_rank == 0) {

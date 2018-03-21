@@ -101,7 +101,10 @@
 static double mud;
 static sap_parms_t spr;
 
-static void Dop(spinor_dble *s, spinor_dble *r) { Dw_dble(mud, s, r); }
+static void Dop(spinor_dble *s, spinor_dble *r)
+{
+  Dw_dble(mud, s, r);
+}
 
 static void Mop(int k, spinor *rho, spinor *phi, spinor *chi)
 {
@@ -110,8 +113,9 @@ static void Mop(int k, spinor *rho, spinor *phi, spinor *chi)
   set_s2zero(VOLUME, phi);
   assign_s2s(VOLUME, rho, chi);
 
-  for (n = 0; n < spr.ncy; n++)
+  for (n = 0; n < spr.ncy; n++) {
     sap((float)(mud), spr.isolv, spr.nmr, phi, chi);
+  }
 
   diff_s2s(VOLUME, rho, chi);
 }
@@ -131,14 +135,17 @@ double sap_gcr(int nkv, int nmx, double res, double mu, spinor_dble *eta,
 
   blk_list(SAP_BLOCKS, &nb, &isw);
 
-  if (nb == 0)
+  if (nb == 0) {
     alloc_bgr(SAP_BLOCKS);
+  }
 
-  if (query_grid_flags(SAP_BLOCKS, UBGR_MATCH_UD) != 1)
+  if (query_grid_flags(SAP_BLOCKS, UBGR_MATCH_UD) != 1) {
     assign_ud2ubgr(SAP_BLOCKS);
+  }
 
-  if (query_flags(SWD_UP2DATE) != 1)
+  if (query_flags(SWD_UP2DATE) != 1) {
     sw_term(NO_PTS);
+  }
 
   swde = query_flags(SWD_E_INVERTED);
   swdo = query_flags(SWD_O_INVERTED);
@@ -149,34 +156,40 @@ double sap_gcr(int nkv, int nmx, double res, double mu, spinor_dble *eta,
   ifail = 0;
 
   if (spr.isolv == 0) {
-    if ((swde == 1) || (swdo == 1))
+    if ((swde == 1) || (swdo == 1)) {
       sw_term(NO_PTS);
+    }
 
-    if ((swu != 1) || (swe == 1) || (swo == 1))
+    if ((swu != 1) || (swe == 1) || (swo == 1)) {
       assign_swd2swbgr(SAP_BLOCKS, NO_PTS);
+    }
   } else if (spr.isolv == 1) {
     if ((swde != 1) && (swdo == 1)) {
-      if ((swu != 1) || (swe == 1) || (swo != 1))
+      if ((swu != 1) || (swe == 1) || (swo != 1)) {
         assign_swd2swbgr(SAP_BLOCKS, NO_PTS);
+      }
 
       sw_term(NO_PTS);
     } else {
-      if ((swde == 1) || (swdo == 1))
+      if ((swde == 1) || (swdo == 1)) {
         sw_term(NO_PTS);
+      }
 
-      if ((swu != 1) || (swe == 1) || (swo != 1))
+      if ((swu != 1) || (swe == 1) || (swo != 1)) {
         ifail = assign_swd2swbgr(SAP_BLOCKS, ODD_PTS);
+      }
     }
-  } else
+  } else {
     error_root(1, 1, "sap_gcr [sap_gcr.c]", "Unknown block solver");
+  }
 
   rho0 = sqrt(norm_square_dble(VOLUME, 1, eta));
   rho = rho0;
   status[0] = 0;
 
-  if (ifail)
+  if (ifail) {
     status[0] = -2;
-  else {
+  } else {
     ws = reserve_ws(2 * nkv + 1);
     wsd = reserve_wsd(1);
     rsd = reserve_wsd(1);

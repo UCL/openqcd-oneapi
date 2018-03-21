@@ -51,12 +51,13 @@ int endianness(void)
   i = 0x04030201;
   b = (unsigned char *)(&i);
 
-  if ((b[0] == 1u) && (b[1] == 2u) && (b[2] == 3u) && (b[3] == 4u))
+  if ((b[0] == 1u) && (b[1] == 2u) && (b[2] == 3u) && (b[3] == 4u)) {
     return LITTLE_ENDIAN;
-  else if ((b[0] == 4u) && (b[1] == 3u) && (b[2] == 2u) && (b[3] == 1u))
+  } else if ((b[0] == 4u) && (b[1] == 3u) && (b[2] == 2u) && (b[3] == 1u)) {
     return BIG_ENDIAN;
-  else
+  } else {
     return UNKNOWN_ENDIAN;
+  }
 }
 
 void bswap_int(int n, void *a)

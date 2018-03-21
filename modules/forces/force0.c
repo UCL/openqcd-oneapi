@@ -139,10 +139,11 @@ static void set_staples(int n, int ix, int ia)
     } else {
       ifc = 2 * nu;
 
-      if (iy < (VOLUME + (BNDRY / 2)))
+      if (iy < (VOLUME + (BNDRY / 2))) {
         ib = iy - ofs[ifc];
-      else
+      } else {
         ib = iy - ofs[ifc] - (BNDRY / 2) + nfc[ifc];
+      }
 
       vd[0] = hdb[hofs[ifc] + 3 * ib + mu - (mu > nu)];
     }
@@ -158,10 +159,11 @@ static void set_staples(int n, int ix, int ia)
   } else {
     ifc = 2 * mu + 1;
 
-    if (iy < (VOLUME + (BNDRY / 2)))
+    if (iy < (VOLUME + (BNDRY / 2))) {
       ib = iy - ofs[ifc];
-    else
+    } else {
       ib = iy - ofs[ifc] - (BNDRY / 2) + nfc[ifc];
+    }
 
     vd[1] = hdb[hofs[ifc] + 3 * ib + nu - (nu > mu)];
   }
@@ -177,10 +179,11 @@ static void set_staples(int n, int ix, int ia)
     } else {
       ifc = 2 * mu;
 
-      if (iy < (VOLUME + (BNDRY / 2)))
+      if (iy < (VOLUME + (BNDRY / 2))) {
         ib = iy - ofs[ifc];
-      else
+      } else {
         ib = iy - ofs[ifc] - (BNDRY / 2) + nfc[ifc];
+      }
 
       vd[2] = hdb[hofs[ifc] + 3 * ib + nu - (nu > mu)];
     }
@@ -196,10 +199,11 @@ static void set_staples(int n, int ix, int ia)
   } else {
     ifc = 2 * nu + 1;
 
-    if (iy < (VOLUME + (BNDRY / 2)))
+    if (iy < (VOLUME + (BNDRY / 2))) {
       ib = iy - ofs[ifc];
-    else
+    } else {
       ib = iy - ofs[ifc] - (BNDRY / 2) + nfc[ifc];
+    }
 
     vd[3] = hdb[hofs[ifc] + 3 * ib + mu - (mu > nu)];
   }
@@ -215,8 +219,9 @@ void plaq_frc(void)
   mdflds_t *mdfs;
   ani_params_t ani;
 
-  if (query_flags(UDBUF_UP2DATE) != 1)
+  if (query_flags(UDBUF_UP2DATE) != 1) {
     copy_bnd_ud();
+  }
 
   bc = bc_type();
   udb = udfld();
@@ -265,8 +270,9 @@ void plaq_frc(void)
     if ((t > 0) || (bc != 1)) {
       r = 1.0 * one_over_gamma_g * us4;
 
-      if (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0)))
+      if (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0))) {
         r = 0.5 * one_over_gamma_g * us4;
+      }
 
       for (n = 3; n < 6; n++) {
         plaq_uidx(n, ix, ip);
@@ -322,14 +328,16 @@ void force0(double c)
   us4 = us2 * us2;
   us6 = us4 * us2;
 
-  if (query_flags(UDBUF_UP2DATE) != 1)
+  if (query_flags(UDBUF_UP2DATE) != 1) {
     copy_bnd_ud();
+  }
 
   udb = udfld();
   mdfs = mdflds();
 
-  if (force_buffer == NULL)
+  if (force_buffer == NULL) {
     alloc_force_buffer();
+  }
 
   fdb = force_buffer;
   set_alg2zero(4 * VOLUME + 7 * (BNDRY / 4), fdb);
@@ -345,11 +353,13 @@ void force0(double c)
       aniso_plaq_weight = (c0 + 4 * c1) / c0;
     }
 
-    if ((init & 0x2) == 0)
+    if ((init & 0x2) == 0) {
       set_ofs();
+    }
 
-    if (query_flags(BSTAP_UP2DATE) != 1)
+    if (query_flags(BSTAP_UP2DATE) != 1) {
       set_bstap();
+    }
 
     hdb = bstap();
   }
@@ -362,10 +372,11 @@ void force0(double c)
       r1 = c * c1 * gamma_g * ut2 * us4;
       r1tts = c * c1 * gamma_g * ut4 * us2;
 
-      if ((t == 0) && (bc == 1))
+      if ((t == 0) && (bc == 1)) {
         r0 *= cG[0];
-      else if ((t == (N0 - 1)) && (bc != 3))
+      } else if ((t == (N0 - 1)) && (bc != 3)) {
         r0 *= cG[1];
+      }
 
       for (n = 0; n < 3; n++) {
         plaq_uidx(n, ix, ip);
@@ -646,8 +657,9 @@ double action0(int icom)
     tts_weight = 0.0;
   }
 
-  if (query_flags(UDBUF_UP2DATE) != 1)
+  if (query_flags(UDBUF_UP2DATE) != 1) {
     copy_bnd_ud();
+  }
 
   udb = udfld();
 
@@ -663,11 +675,13 @@ double action0(int icom)
       aniso_plaq_weight = (c0 + 4 * c1) / c0;
     }
 
-    if ((init & 0x2) == 0)
+    if ((init & 0x2) == 0) {
       set_ofs();
+    }
 
-    if (query_flags(BSTAP_UP2DATE) != 1)
+    if (query_flags(BSTAP_UP2DATE) != 1) {
       set_bstap();
+    }
     hdb = bstap();
   }
 
@@ -685,10 +699,11 @@ double action0(int icom)
     if ((t < (N0 - 1)) || (bc != 0)) {
       r0 = c0 * aniso_plaq_weight;
 
-      if ((t == 0) && (bc == 1))
+      if ((t == 0) && (bc == 1)) {
         r0 *= cG[0];
-      else if ((t == (N0 - 1)) && (bc != 3))
+      } else if ((t == (N0 - 1)) && (bc != 3)) {
         r0 *= cG[1];
+      }
 
       /* Store plaquette in trU[0], and mununu in trU[1] and mumunu in trU[2]
        * Thus for the three first plaquette directions the TTS plaquettes are
@@ -724,10 +739,11 @@ double action0(int icom)
     add_to_hsum(ism, &act);
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(ism, &act);
-  else
+  } else {
     local_hsum(ism, &act);
+  }
 
   return (lat.beta / 3.0) * act;
 }

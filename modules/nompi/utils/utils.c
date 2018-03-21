@@ -65,10 +65,11 @@ static const int64_t ulp_epsilon_double = 16;
 
 int safe_mod(int x, int y)
 {
-  if (x >= 0)
+  if (x >= 0) {
     return (x % y);
-  else
+  } else {
     return ((y - (abs(x) % y)) % y);
+  }
 }
 
 void *amalloc(size_t size, int p)
@@ -78,8 +79,9 @@ void *amalloc(size_t size, int p)
   unsigned long mask;
   struct addr_t *new, *rnxt;
 
-  if ((size <= 0) || (p < 0))
+  if ((size <= 0) || (p < 0)) {
     return (NULL);
+  }
 
   shift = 1 << p;
   mask = (unsigned long)(shift - 1);
@@ -130,8 +132,9 @@ void afree(void *addr)
           (*pl).next = pn;
           (*pn).last = pl;
           rpos = pl;
-        } else
+        } else {
           rpos = NULL;
+        }
 
         free((*p).true_addr);
         free(p);
@@ -139,8 +142,9 @@ void afree(void *addr)
       }
 
       p = (*p).next;
-      if (p == rpos)
+      if (p == rpos) {
         return;
+      }
     }
   }
 }
@@ -210,15 +214,30 @@ typedef union
   int64_t i;
 } double_as_int;
 
-static float fabs_float(float f) { return f * (1 - 2 * (f < 0.0f)); }
+static float fabs_float(float f)
+{
+  return f * (1 - 2 * (f < 0.0f));
+}
 
-static int isnan_float(float f) { return (f != f); }
+static int isnan_float(float f)
+{
+  return (f != f);
+}
 
-static int isnan_double(double d) { return (d != d); }
+static int isnan_double(double d)
+{
+  return (d != d);
+}
 
-static int isinf_float(float f) { return (f > FLT_MAX || f < -FLT_MAX); }
+static int isinf_float(float f)
+{
+  return (f > FLT_MAX || f < -FLT_MAX);
+}
 
-static int isinf_double(double d) { return (d > DBL_MAX || d < -DBL_MAX); }
+static int isinf_double(double d)
+{
+  return (d > DBL_MAX || d < -DBL_MAX);
+}
 
 static int32_t max32(void)
 {
@@ -241,29 +260,34 @@ static int32_t ulp_distance_f(float f1, float f2)
   int32_t max, distance;
   float_as_int if1, if2;
 
-  if (f1 == f2)
+  if (f1 == f2) {
     return 0;
+  }
 
   max = max32();
 
-  if (isnan_float(f1) || isnan_double(f2))
+  if (isnan_float(f1) || isnan_double(f2)) {
     return max;
+  }
 
-  if (isinf_float(f1) || isinf_float(f2))
+  if (isinf_float(f1) || isinf_float(f2)) {
     return max;
+  }
 
   if1.f = f1;
   if2.f = f2;
 
   /* Do not compare floats of different signs */
-  if ((if1.i < 0) != (if2.i < 0))
+  if ((if1.i < 0) != (if2.i < 0)) {
     return max;
+  }
 
   distance = if1.i - if2.i;
 
   /* Absolute value of distance */
-  if (distance < 0)
+  if (distance < 0) {
     distance = -distance;
+  }
 
   return distance;
 }
@@ -275,49 +299,62 @@ static int64_t ulp_distance_d(double d1, double d2)
   int64_t max, distance;
   double_as_int id1, id2;
 
-  if (d1 == d2)
+  if (d1 == d2) {
     return 0;
+  }
 
   max = max64();
 
-  if (isnan_double(d1) || isnan_double(d2))
+  if (isnan_double(d1) || isnan_double(d2)) {
     return max;
+  }
 
-  if (isinf_double(d1) || isinf_double(d2))
+  if (isinf_double(d1) || isinf_double(d2)) {
     return max;
+  }
 
   id1.d = d1;
   id2.d = d2;
 
   /* Do not compare doubles of different signs */
-  if ((id1.i < 0) != (id2.i < 0))
+  if ((id1.i < 0) != (id2.i < 0)) {
     return max;
+  }
 
   distance = id1.i - id2.i;
 
   /* Absolute value of distance */
-  if (distance < 0)
+  if (distance < 0) {
     distance = -distance;
+  }
 
   return distance;
 }
 
 int is_equal_f(float f1, float f2)
 {
-  if (fabs_float(f1 - f2) < fixed_epsilon_float)
+  if (fabs_float(f1 - f2) < fixed_epsilon_float) {
     return 1;
-  else
+  } else {
     return ulp_distance_f(f1, f2) <= ulp_epsilon_float;
+  }
 }
 
-int not_equal_f(float f1, float f2) { return !is_equal_f(f1, f2); }
+int not_equal_f(float f1, float f2)
+{
+  return !is_equal_f(f1, f2);
+}
 
 int is_equal_d(double d1, double d2)
 {
-  if (fabs(d1 - d2) < fixed_epsilon_double)
+  if (fabs(d1 - d2) < fixed_epsilon_double) {
     return 1;
-  else
+  } else {
     return ulp_distance_d(d1, d2) <= ulp_epsilon_double;
+  }
 }
 
-int not_equal_d(double d1, double d2) { return !is_equal_d(d1, d2); }
+int not_equal_d(double d1, double d2)
+{
+  return !is_equal_d(d1, d2);
+}

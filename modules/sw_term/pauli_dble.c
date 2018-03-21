@@ -748,13 +748,14 @@ static int fwd_house(double eps)
          aa[6 * k + k].im * aa[6 * k + k].im;
     r2 = sqrt(r1);
 
-    for (j = (k + 1); j < 6; j++)
+    for (j = (k + 1); j < 6; j++) {
       r1 += (aa[6 * j + k].re * aa[6 * j + k].re +
              aa[6 * j + k].im * aa[6 * j + k].im);
+    }
 
-    if (r1 >= eps)
+    if (r1 >= eps) {
       r1 = sqrt(r1);
-    else {
+    } else {
       ifail = 1;
       r1 = 1.0;
     }
@@ -833,9 +834,9 @@ static int fwd_house(double eps)
 
   r1 = aa[35].re * aa[35].re + aa[35].im * aa[35].im;
 
-  if (r1 >= eps)
+  if (r1 >= eps) {
     r1 = 1.0 / r1;
-  else {
+  } else {
     ifail = 1;
     r1 = 1.0;
   }
@@ -1399,13 +1400,14 @@ static int fwd_house(double eps)
          aa[6 * k + k].im * aa[6 * k + k].im;
     r2 = sqrt(r1);
 
-    for (j = (k + 1); j < 6; j++)
+    for (j = (k + 1); j < 6; j++) {
       r1 += (aa[6 * j + k].re * aa[6 * j + k].re +
              aa[6 * j + k].im * aa[6 * j + k].im);
+    }
 
-    if (r1 >= eps)
+    if (r1 >= eps) {
       r1 = sqrt(r1);
-    else {
+    } else {
       ifail = 1;
       r1 = 1.0;
     }
@@ -1450,9 +1452,9 @@ static int fwd_house(double eps)
 
   r1 = aa[35].re * aa[35].re + aa[35].im * aa[35].im;
 
-  if (r1 >= eps)
+  if (r1 >= eps) {
     r1 = 1.0 / r1;
-  else {
+  } else {
     ifail = 1;
     r1 = 1.0;
   }
@@ -1537,7 +1539,8 @@ static weyl_dble rs2;
 #include "avx512.h"
 #include "sse.h"
 
-void mul_pauli2_dble(double mu, pauli_dble const *m, weyl_dble const *s, weyl_dble *r)
+void mul_pauli2_dble(double mu, pauli_dble const *m, weyl_dble const *s,
+                     weyl_dble *r)
 {
   weyl_dble const *s2 = s + 1;
   double const *u = m->u, *u2 = (m + 1)->u;
@@ -1692,7 +1695,8 @@ void mul_pauli2_dble(double mu, pauli_dble const *m, weyl_dble const *s, weyl_db
 
 #else
 
-void mul_pauli2_dble(double mu, pauli_dble const *m, weyl_dble const *s, weyl_dble *r)
+void mul_pauli2_dble(double mu, pauli_dble const *m, weyl_dble const *s,
+                     weyl_dble *r)
 {
   mul_pauli_dble(mu, m, s, r);
   mul_pauli_dble(-mu, m + 1, s + 1, r + 1);
@@ -1738,8 +1742,9 @@ static double norm_aa(void)
   z = aa;
   zm = aa + 36;
 
-  for (; z < zm; z++)
+  for (; z < zm; z++) {
     sm += (*z).re * (*z).re + (*z).im * (*z).im;
+  }
 
   return sm;
 }
@@ -1796,8 +1801,9 @@ int inv_pauli_dble(double mu, pauli_dble const *m, pauli_dble *im)
     }
   }
 
-  if ((eps * sm) > 1.0)
+  if ((eps * sm) > 1.0) {
     ifail = 1;
+  }
 
   return ifail;
 }
@@ -1817,9 +1823,10 @@ complex_dble det_pauli_dble(double mu, pauli_dble const *m)
          aa[6 * k + k].im * aa[6 * k + k].im;
     r2 = sqrt(r1);
 
-    for (j = (k + 1); j < 6; j++)
+    for (j = (k + 1); j < 6; j++) {
       r1 += (aa[6 * j + k].re * aa[6 * j + k].re +
              aa[6 * j + k].im * aa[6 * j + k].im);
+    }
 
     r1 = sqrt(r1);
 
@@ -1875,8 +1882,8 @@ complex_dble det_pauli_dble(double mu, pauli_dble const *m)
   return w;
 }
 
-void apply_sw_dble(int vol, double mu, pauli_dble const *m, spinor_dble const *s,
-                   spinor_dble *r)
+void apply_sw_dble(int vol, double mu, pauli_dble const *m,
+                   spinor_dble const *s, spinor_dble *r)
 {
   spin_t *ps, *pr, *pm;
 
@@ -1899,8 +1906,8 @@ void apply_sw_dble(int vol, double mu, pauli_dble const *m, spinor_dble const *s
   }
 }
 
-int apply_swinv_dble(int vol, double mu, pauli_dble const *m, spinor_dble const *s,
-                     spinor_dble *r)
+int apply_swinv_dble(int vol, double mu, pauli_dble const *m,
+                     spinor_dble const *s, spinor_dble *r)
 {
   int ifail;
   double eps;
@@ -1916,8 +1923,9 @@ int apply_swinv_dble(int vol, double mu, pauli_dble const *m, spinor_dble const 
     ifail |= fwd_house(eps);
     solv_sys();
     bck_house();
-    if ((eps * norm_aa()) > 1.0)
+    if ((eps * norm_aa()) > 1.0) {
       ifail = 1;
+    }
     apply_aa((*ps).c, (*pr).c);
     m += 1;
 
@@ -1925,8 +1933,9 @@ int apply_swinv_dble(int vol, double mu, pauli_dble const *m, spinor_dble const 
     ifail |= fwd_house(eps);
     solv_sys();
     bck_house();
-    if ((eps * norm_aa()) > 1.0)
+    if ((eps * norm_aa()) > 1.0) {
       ifail = 1;
+    }
     apply_aa((*ps).c + 6, (*pr).c + 6);
     m += 1;
     pr += 1;

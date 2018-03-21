@@ -93,10 +93,11 @@ static void set_nbf(void)
       bb = (*b).bb;
 
       if ((bb[ifc].ibn) || ((ifc == 0) && (ibd) && (bo[0] == 0)) ||
-          ((ifc == 1) && (ibu) && ((bo[0] + bs[0]) == L0)))
+          ((ifc == 1) && (ibu) && ((bo[0] + bs[0]) == L0))) {
         nsbf[isw][ifc] += bb[ifc].vol;
-      else
+      } else {
         nlbf[isw][ifc] += bb[ifc].vol;
+      }
     }
 
     bm += nbh;
@@ -106,10 +107,11 @@ static void set_nbf(void)
       bb = (*b).bb;
 
       if ((bb[ifc].ibn) || ((ifc == 0) && (ibd) && (bo[0] == 0)) ||
-          ((ifc == 1) && (ibu) && ((bo[0] + bs[0]) == L0)))
+          ((ifc == 1) && (ibu) && ((bo[0] + bs[0]) == L0))) {
         nsbf[isw ^ 0x1][ifc] += bb[ifc].vol;
-      else
+      } else {
         nlbf[isw ^ 0x1][ifc] += bb[ifc].vol;
+      }
     }
   }
 }
@@ -143,8 +145,9 @@ static void alloc_weyl(void)
   w = snd_buf[0][0];
   wm = w + n;
 
-  for (; w < wm; w++)
+  for (; w < wm; w++) {
     (*w) = w0;
+  }
 }
 
 static void add_weyl(void)
@@ -257,10 +260,11 @@ static void alloc_imb(void)
     for (ifc = 0; ifc < 8; ifc++) {
       imb[ic][ifc] = im;
 
-      if (ic ^ isw)
+      if (ic ^ isw) {
         b = b0 + nbh;
-      else
+      } else {
         b = b0;
+      }
       bm = b + nbh;
 
       for (; b < bm; b++) {
@@ -269,17 +273,19 @@ static void alloc_imb(void)
 
         if (!((bb[ifc].ibn) || ((ifc == 0) && (ibd) && (bo[0] == 0)) ||
               ((ifc == 1) && (ibu) && ((bo[0] + bs[0]) == L0)))) {
-          for (n = 0; n < bb[ifc].vol; n++)
+          for (n = 0; n < bb[ifc].vol; n++) {
             im[n] = bb[ifc].imb[n];
+          }
 
           im += bb[ifc].vol;
         }
       }
 
-      if (ic ^ isw)
+      if (ic ^ isw) {
         b = b0;
-      else
+      } else {
         b = b0 + nbh;
+      }
       bm = b + nbh;
 
       for (; b < bm; b++) {
@@ -288,8 +294,9 @@ static void alloc_imb(void)
 
         if ((bb[ifc ^ 0x1].ibn) || ((ifc == 1) && (ibd) && (bo[0] == 0)) ||
             ((ifc == 0) && (ibu) && ((bo[0] + bs[0]) == L0))) {
-          for (n = 0; n < bb[ifc].vol; n++)
+          for (n = 0; n < bb[ifc].vol; n++) {
             im[n] = (*b).imb[bb[ifc].map[n]];
+          }
 
           im += bb[ifc].vol;
         }
@@ -302,8 +309,9 @@ void alloc_sap_bufs(void)
 {
   bndry_t *bb;
 
-  if (init == 1)
+  if (init == 1) {
     return;
+  }
 
   b0 = blk_list(SAP_BLOCKS, &nb, &isw);
   error(b0 == NULL, 1, "alloc_sap_bufs [sap_com.c]",
@@ -331,11 +339,13 @@ static void send_buf(int ic, int ifc, int eo)
 
   if (sflg[io]) {
     if (np == eo) {
-      if (nsbf[ic][io])
+      if (nsbf[ic][io]) {
         MPI_Start(&snd_req[ic][io]);
+      }
     } else {
-      if (nsbf[ic][io ^ 0x1])
+      if (nsbf[ic][io ^ 0x1]) {
         MPI_Start(&rcv_req[ic][io ^ 0x1]);
+      }
     }
   }
 }
@@ -349,11 +359,13 @@ static void wait_buf(int ic, int ifc, int eo)
 
   if (sflg[io]) {
     if (np == eo) {
-      if (nsbf[ic][io])
+      if (nsbf[ic][io]) {
         MPI_Wait(&snd_req[ic][io], &stat);
+      }
     } else {
-      if (nsbf[ic][io ^ 0x1])
+      if (nsbf[ic][io ^ 0x1]) {
         MPI_Wait(&rcv_req[ic][io ^ 0x1], &stat);
+      }
     }
   }
 }
@@ -382,10 +394,11 @@ void sap_com(int ic, spinor *r)
 
     io = (ifc ^ nmu[ifc]) ^ 0x1;
 
-    if (sflg[io ^ 0x1])
+    if (sflg[io ^ 0x1]) {
       nbf = nlbf[ic][io] + nsbf[ic][io];
-    else
+    } else {
       nbf = nlbf[ic][io];
+    }
 
     sub_assign_w2s[io ^ 0x1](imb[ic][io], nbf, loc_buf[ic][io], r);
   }

@@ -64,15 +64,18 @@ static void chk_mode_regen(int isp, int *status)
   if (sp.solver == DFL_SAP_GCR) {
     is = status[2];
 
-    for (i = 2; i < 4; i++)
+    for (i = 2; i < 4; i++) {
       status[i] = status[i + 1];
+    }
 
     status[4] = is;
 
-    if (status[4] > 0)
+    if (status[4] > 0) {
       add2counter("modes", 2, status + 4);
-    if (status[5] > 0)
+    }
+    if (status[5] > 0) {
       add2counter("modes", 2, status + 5);
+    }
   }
 }
 
@@ -153,20 +156,23 @@ static void update_ud(double eps)
       u += 1;
       mom += 1;
 
-      if (bc != 0)
+      if (bc != 0) {
         expXsu3(eps, mom, u);
+      }
       u += 1;
       mom += 1;
 
       for (ifc = 2; ifc < 8; ifc++) {
-        if (bc != 1)
+        if (bc != 1) {
           expXsu3(eps, mom, u);
+        }
         u += 1;
         mom += 1;
       }
     } else if (t == (N0 - 1)) {
-      if (bc != 0)
+      if (bc != 0) {
         expXsu3(eps, mom, u);
+      }
       u += 1;
       mom += 1;
 
@@ -213,10 +219,11 @@ static void dfl_upd(int isp)
                  "failed (status = %d;%d)",
                  status[0], status[1]);
 
-      if (status[1] == 0)
+      if (status[1] == 0) {
         add2counter("modes", 1, status);
-      else
+      } else {
         add2counter("modes", 2, status + 1);
+      }
 
       rtau = 0.0;
     }
@@ -246,10 +253,11 @@ void run_mdint(void)
   start_dfl_upd();
 
   nlk = (double)(4 * N0 * N1) * (double)(N2 * N3);
-  if (bc_type() == 0)
+  if (bc_type() == 0) {
     nlk -= (double)(N1) * (double)(N2 * N3);
-  else if (bc_type() == 1)
+  } else if (bc_type() == 1) {
     nlk -= (double)(3 * N1) * (double)(N2 * N3);
+  }
 
   s = mdsteps(&nop, &ismear, &iunsmear, &itu);
   sm = s + nop;
@@ -274,22 +282,23 @@ void run_mdint(void)
         status[2] = 0;
         status[5] = 0;
 
-        if (fp.force == FRF_TM1)
+        if (fp.force == FRF_TM1) {
           force1(mu[fp.imu[0]], fp.ipf, fp.isp[0], fp.icr[0], eps, status);
-        else if (fp.force == FRF_TM1_EO)
+        } else if (fp.force == FRF_TM1_EO) {
           force4(mu[fp.imu[0]], fp.ipf, 0, fp.isp[0], fp.icr[0], eps, status);
-        else if (fp.force == FRF_TM1_EO_SDET)
+        } else if (fp.force == FRF_TM1_EO_SDET) {
           force4(mu[fp.imu[0]], fp.ipf, 1, fp.isp[0], fp.icr[0], eps, status);
-        else if (fp.force == FRF_TM2)
+        } else if (fp.force == FRF_TM2) {
           force2(mu[fp.imu[0]], mu[fp.imu[1]], fp.ipf, fp.isp[0], fp.icr[0],
                  eps, status);
-        else if (fp.force == FRF_TM2_EO)
+        } else if (fp.force == FRF_TM2_EO) {
           force5(mu[fp.imu[0]], mu[fp.imu[1]], fp.ipf, fp.isp[0], fp.icr[0],
                  eps, status);
-        else if (fp.force == FRF_RAT)
+        } else if (fp.force == FRF_RAT) {
           force3(fp.irat, fp.ipf, 0, fp.isp[0], eps, status);
-        else if (fp.force == FRF_RAT_SDET)
+        } else if (fp.force == FRF_RAT_SDET) {
           force3(fp.irat, fp.ipf, 1, fp.isp[0], eps, status);
+        }
 
         chk_mode_regen(fp.isp[0], status);
         add2counter("force", iop, status);
@@ -300,8 +309,9 @@ void run_mdint(void)
 
       ap = action_parms(iop);
 
-      if (ap.smear == 1)
+      if (ap.smear == 1) {
         unsmear_mdforce();
+      }
 
       update_mom();
       nrm = norm_square_alg(4 * VOLUME, 1, (*mdfs).frc);
@@ -310,35 +320,38 @@ void run_mdint(void)
       if (my_rank == 0) {
         printf("Force %d ", iop);
 
-        if (fp.force == FRG)
+        if (fp.force == FRG) {
           printf("FRG:              ");
-        else if (fp.force == FRF_TM1)
+        } else if (fp.force == FRF_TM1) {
           printf("FRF_TM1:          ");
-        else if (fp.force == FRF_TM1_EO)
+        } else if (fp.force == FRF_TM1_EO) {
           printf("FRF_TM1_EO:       ");
-        else if (fp.force == FRF_TM1_EO_SDET)
+        } else if (fp.force == FRF_TM1_EO_SDET) {
           printf("FRF_TM1_EO_SDET:  ");
-        else if (fp.force == FRF_TM2)
+        } else if (fp.force == FRF_TM2) {
           printf("FRF_TM2:          ");
-        else if (fp.force == FRF_TM2_EO)
+        } else if (fp.force == FRF_TM2_EO) {
           printf("FRF_TM2_EO:       ");
-        else if (fp.force == FRF_RAT)
+        } else if (fp.force == FRF_RAT) {
           printf("FRF_RAT:          ");
-        else if (fp.force == FRF_RAT_SDET)
+        } else if (fp.force == FRF_RAT_SDET) {
           printf("FRF_RAT_SDET:     ");
+        }
 
         printf("nrm = %.2e, eps = % .2e, nrm*|eps| = %.2e, "
                "time = %.2e sec\n",
                nrm / fabs(eps), eps, nrm, wt2 - wt1);
       }
     } else if (iop == ismear) {
-      if (my_rank == 0)
+      if (my_rank == 0) {
         printf("Smearing fields\n");
+      }
 
       smear_fields();
     } else if (iop == iunsmear) {
-      if (my_rank == 0)
+      if (my_rank == 0) {
         printf("Unsmearing fields\n");
+      }
 
       unsmear_fields();
     } else if (iop == itu) {
@@ -372,8 +385,9 @@ void run_mdint(void)
 
   set_frc2zero();
 
-  if (query_flags(UDBUF_UP2DATE) != 1)
+  if (query_flags(UDBUF_UP2DATE) != 1) {
     copy_bnd_ud();
+  }
 
   for (; s < sm; s++) {
     iop = (*s).iop;
@@ -390,22 +404,23 @@ void run_mdint(void)
         status[2] = 0;
         status[5] = 0;
 
-        if (fp.force == FRF_TM1)
+        if (fp.force == FRF_TM1) {
           force1(mu[fp.imu[0]], fp.ipf, fp.isp[0], fp.icr[0], eps, status);
-        else if (fp.force == FRF_TM1_EO)
+        } else if (fp.force == FRF_TM1_EO) {
           force4(mu[fp.imu[0]], fp.ipf, 0, fp.isp[0], fp.icr[0], eps, status);
-        else if (fp.force == FRF_TM1_EO_SDET)
+        } else if (fp.force == FRF_TM1_EO_SDET) {
           force4(mu[fp.imu[0]], fp.ipf, 1, fp.isp[0], fp.icr[0], eps, status);
-        else if (fp.force == FRF_TM2)
+        } else if (fp.force == FRF_TM2) {
           force2(mu[fp.imu[0]], mu[fp.imu[1]], fp.ipf, fp.isp[0], fp.icr[0],
                  eps, status);
-        else if (fp.force == FRF_TM2_EO)
+        } else if (fp.force == FRF_TM2_EO) {
           force5(mu[fp.imu[0]], mu[fp.imu[1]], fp.ipf, fp.isp[0], fp.icr[0],
                  eps, status);
-        else if (fp.force == FRF_RAT)
+        } else if (fp.force == FRF_RAT) {
           force3(fp.irat, fp.ipf, 0, fp.isp[0], eps, status);
-        else if (fp.force == FRF_RAT_SDET)
+        } else if (fp.force == FRF_RAT_SDET) {
           force3(fp.irat, fp.ipf, 1, fp.isp[0], eps, status);
+        }
 
         chk_mode_regen(fp.isp[0], status);
         add2counter("force", iop, status);

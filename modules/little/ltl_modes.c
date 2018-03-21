@@ -106,8 +106,9 @@ int set_ltl_modes(void)
   complex **wv;
   complex_dble **wvd, z;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_matrices();
+  }
 
   wvd = reserve_wvd(2);
   wv = vs + Ns;
@@ -116,8 +117,9 @@ int set_ltl_modes(void)
     assign_v2vd(nvh, wv[k], vds[k]);
 
     if (k > 0) {
-      for (l = 0; l < k; l++)
+      for (l = 0; l < k; l++) {
         Cds[l] = vprod_dble(nvh, 0, vds[l], vds[k]);
+      }
 
       sum_vprod(k, Cds, Cds + Ns);
 
@@ -138,31 +140,35 @@ int set_ltl_modes(void)
       Awhat_dble(wvd[0], wvd[1]);
       assign_vd2vd(nvh, wvd[1], vds[k] + nvh);
       assign_vd2v(nv, vds[k], vs[k]);
-    } else
+    } else {
       error_root(1, 1, "set_ltl_modes() [ltl_modes.c]",
                  "Degenerate little modes");
+    }
   }
 
   release_wvd();
 
   for (k = 0; k < Ns; k++) {
-    for (l = 0; l < Ns; l++)
+    for (l = 0; l < Ns; l++) {
       Cds[Ns * k + l] = vprod_dble(nvh, 0, vds[k], vds[l] + nvh);
+    }
   }
 
   nmat = Ns * Ns;
   sum_vprod(nmat, Cds, Ads);
   ifail = cmat_inv_dble(Ns, Ads, Bds, &cn);
-  if (cn > MAX_FROBENIUS)
+  if (cn > MAX_FROBENIUS) {
     ifail = 1;
+  }
 
   return ifail;
 }
 
 complex_dble *ltl_matrix(void)
 {
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_matrices();
+  }
 
   return Bds;
 }

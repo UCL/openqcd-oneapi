@@ -160,8 +160,9 @@ void start_ranlux(int level, int seed)
   loc_seed = 0;
 
   for (n = 0; n < NPROC; n++) {
-    if (get_ip(n) == my_rank)
+    if (get_ip(n) == my_rank) {
       loc_seed = seed + n * max_seed;
+    }
   }
 
   rlxs_init(level, loc_seed);
@@ -202,8 +203,9 @@ void export_ranlux(int tag, char *out)
     lsize[7] = (stdint_t)(L2);
     lsize[8] = (stdint_t)(L3);
 
-    if (ie == BIG_ENDIAN)
+    if (ie == BIG_ENDIAN) {
       bswap_int(9, lsize);
+    }
 
     iw += fwrite(lsize, sizeof(stdint_t), 9, fout);
   }
@@ -220,15 +222,18 @@ void export_ranlux(int tag, char *out)
         MPI_Recv(&dmy, 1, MPI_INT, 0, tag0, MPI_COMM_WORLD, &stat);
         MPI_Send(rlxs_state, ns, MPI_INT, 0, tag1, MPI_COMM_WORLD);
       }
-    } else if (my_rank == 0)
+    } else if (my_rank == 0) {
       get_state();
+    }
 
     if (my_rank == 0) {
-      for (k = 0; k < ns; k++)
+      for (k = 0; k < ns; k++) {
         state[k] = (stdint_t)(rlxs_state[k]);
+      }
 
-      if (ie == BIG_ENDIAN)
+      if (ie == BIG_ENDIAN) {
         bswap_int(ns, state);
+      }
 
       iw += fwrite(state, sizeof(stdint_t), ns, fout);
     }
@@ -266,8 +271,9 @@ int import_ranlux(char const *in)
 
     ir += fread(lsize, sizeof(stdint_t), 9, fin);
 
-    if (ie == BIG_ENDIAN)
+    if (ie == BIG_ENDIAN) {
       bswap_int(9, lsize);
+    }
 
     n = 0;
     n |= (lsize[1] != (stdint_t)(NPROC0));
@@ -290,11 +296,13 @@ int import_ranlux(char const *in)
     if (my_rank == 0) {
       ir += fread(state, sizeof(stdint_t), ns, fin);
 
-      if (ie == BIG_ENDIAN)
+      if (ie == BIG_ENDIAN) {
         bswap_int(ns, state);
+      }
 
-      for (k = 0; k < ns; k++)
+      for (k = 0; k < ns; k++) {
         rlxs_state[k] = (int)(state[k]);
+      }
     }
 
     if (ip > 0) {
@@ -306,8 +314,9 @@ int import_ranlux(char const *in)
         MPI_Send(&dmy, 1, MPI_INT, 0, tag0, MPI_COMM_WORLD);
         reset_state();
       }
-    } else if (my_rank == 0)
+    } else if (my_rank == 0) {
       reset_state();
+    }
   }
 
   if (my_rank == 0) {

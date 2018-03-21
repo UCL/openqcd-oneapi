@@ -62,8 +62,9 @@ static double get_obs(int nms, double sigsq)
   fact = -1.0 / (2.0 * sigsq);
   sm = 0.0;
 
-  for (i = 0; i < nms; i++)
+  for (i = 0; i < nms; i++) {
     sm += exp(fact * rnd[i]);
+  }
 
   sm /= (double)(nms);
 
@@ -82,20 +83,23 @@ static void set_avgsig(void)
   }
 
   for (i = 0; i < 4; i++) {
-    for (j = 0; j < NTEST; j++)
+    for (j = 0; j < NTEST; j++) {
       avg[i] += obs[i][j];
+    }
   }
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     avg[i] /= (double)(NTEST);
+  }
 
   for (i = 0; i < 4; i++) {
     for (j = 0; j < NTEST; j++) {
       d = fabs(obs[i][j] - avg[i]);
       sig[i] += d * d;
 
-      if (d > dev[i])
+      if (d > dev[i]) {
         dev[i] = d;
+      }
     }
   }
 

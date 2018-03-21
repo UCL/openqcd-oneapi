@@ -111,8 +111,9 @@ static int write_dat(int n, dat_t *ndat)
     iw = fwrite(istd, sizeof(stdint_t), 2, fdat);
     iw += fwrite(dstd, sizeof(double), 2, fdat);
 
-    if (iw != 4)
+    if (iw != 4) {
       return ic;
+    }
 
     ic += 1;
     ndat += 1;
@@ -133,8 +134,9 @@ static int read_dat(int n, dat_t *ndat)
     ir = fread(istd, sizeof(stdint_t), 2, fdat);
     ir += fread(dstd, sizeof(double), 2, fdat);
 
-    if (ir != 4)
+    if (ir != 4) {
       return ic;
+    }
 
     if (endian == BIG_ENDIAN) {
       bswap_int(2, istd);
@@ -239,8 +241,9 @@ static void write_data(void)
 
   istd[0] = (stdint_t)(data.nt);
 
-  if (endian == BIG_ENDIAN)
+  if (endian == BIG_ENDIAN) {
     bswap_int(1, istd);
+  }
 
   iw = fwrite(istd, sizeof(stdint_t), 1, fdat);
 
@@ -251,8 +254,9 @@ static void write_data(void)
     for (t = 0; t < tmax; t++) {
       dstd[0] = data.Wsl[in][t];
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_double(1, dstd);
+      }
 
       iw += fwrite(dstd, sizeof(double), 1, fdat);
     }
@@ -262,8 +266,9 @@ static void write_data(void)
     for (t = 0; t < tmax; t++) {
       dstd[0] = data.Ysl[in][t];
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_double(1, dstd);
+      }
 
       iw += fwrite(dstd, sizeof(double), 1, fdat);
     }
@@ -273,8 +278,9 @@ static void write_data(void)
     for (t = 0; t < tmax; t++) {
       dstd[0] = data.Qsl[in][t];
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_double(1, dstd);
+      }
 
       iw += fwrite(dstd, sizeof(double), 1, fdat);
     }
@@ -293,11 +299,13 @@ static int read_data(void)
 
   ir = fread(istd, sizeof(stdint_t), 1, fdat);
 
-  if (ir != 1)
+  if (ir != 1) {
     return 0;
+  }
 
-  if (endian == BIG_ENDIAN)
+  if (endian == BIG_ENDIAN) {
     bswap_int(1, istd);
+  }
 
   data.nt = (int)(istd[0]);
 
@@ -308,8 +316,9 @@ static int read_data(void)
     for (t = 0; t < tmax; t++) {
       ir += fread(dstd, sizeof(double), 1, fdat);
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_double(1, dstd);
+      }
 
       data.Wsl[in][t] = dstd[0];
     }
@@ -319,8 +328,9 @@ static int read_data(void)
     for (t = 0; t < tmax; t++) {
       ir += fread(dstd, sizeof(double), 1, fdat);
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_double(1, dstd);
+      }
 
       data.Ysl[in][t] = dstd[0];
     }
@@ -330,8 +340,9 @@ static int read_data(void)
     for (t = 0; t < tmax; t++) {
       ir += fread(dstd, sizeof(double), 1, fdat);
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_double(1, dstd);
+      }
 
       data.Qsl[in][t] = dstd[0];
     }
@@ -352,14 +363,16 @@ static void read_dirs(void)
     find_section("Directories");
     read_line("log_dir", "%s", log_dir);
     read_line("dat_dir", "%s", dat_dir);
-    if (noloc == 0)
+    if (noloc == 0) {
       read_line("loc_dir", "%s", loc_dir);
-    else
+    } else {
       loc_dir[0] = '\0';
-    if ((noexp == 0) || ((scnfg) && (strchr(cnfg, '*') == NULL)))
+    }
+    if ((noexp == 0) || ((scnfg) && (strchr(cnfg, '*') == NULL))) {
       read_line("cnfg_dir", "%s", cnfg_dir);
-    else
+    } else {
       cnfg_dir[0] = '\0';
+    }
   }
 
   mpc_bcast_c(nbase, NAME_SIZE);
@@ -374,11 +387,13 @@ static void setup_files(void)
   check_dir_root(log_dir);
   check_dir_root(dat_dir);
 
-  if (noloc == 0)
+  if (noloc == 0) {
     check_dir(loc_dir);
+  }
 
-  if (noexp == 0)
+  if (noexp == 0) {
     check_dir_root(cnfg_dir);
+  }
 
   error_root(name_size("%s/%s.log~", log_dir, nbase) >= NAME_SIZE, 1,
              "setup_files [ym1.c]", "log_dir name is too long");
@@ -432,10 +447,11 @@ static void read_smearing(void)
     set_no_stout_smearing_parms();
   }
 
-  if (append)
+  if (append) {
     check_stout_smearing_parms(fdat);
-  else
+  } else {
     write_stout_smearing_parms(fdat);
+  }
 }
 
 static void read_lat_parms(void)
@@ -460,10 +476,11 @@ static void read_lat_parms(void)
     read_smearing();
   }
 
-  if (append)
+  if (append) {
     check_lat_parms(fdat);
-  else
+  } else {
     write_lat_parms(fdat);
+  }
 }
 
 static void read_ani_parms(void)
@@ -501,10 +518,11 @@ static void read_ani_parms(void)
     set_no_ani_parms();
   }
 
-  if (append)
+  if (append) {
     check_ani_parms(fdat);
-  else
+  } else {
     write_ani_parms(fdat);
+  }
 }
 
 static void read_bc_parms(void)
@@ -524,17 +542,21 @@ static void read_bc_parms(void)
     cG = 1.0;
     cG_prime = 1.0;
 
-    if (bc == 1)
+    if (bc == 1) {
       read_dprms("phi", 2, phi);
+    }
 
-    if ((bc == 1) || (bc == 2))
+    if ((bc == 1) || (bc == 2)) {
       read_dprms("phi'", 2, phi_prime);
+    }
 
-    if (bc != 3)
+    if (bc != 3) {
       read_line("cG", "%lf", &cG);
+    }
 
-    if (bc == 2)
+    if (bc == 2) {
       read_line("cG'", "%lf", &cG_prime);
+    }
   }
 
   mpc_bcast_i(&bc, 1);
@@ -549,10 +571,11 @@ static void read_bc_parms(void)
 
   bcp = set_bc_parms(bc, cG, cG_prime, 1.0, 1.0, phi, phi_prime, theta);
 
-  if (append)
+  if (append) {
     check_bc_parms(fdat);
-  else
+  } else {
     write_bc_parms(fdat);
+  }
 }
 
 static void read_hmc_parms(void)
@@ -569,10 +592,11 @@ static void read_hmc_parms(void)
   iact[0] = 0;
   hmc = set_hmc_parms(1, iact, 0, 0, NULL, 1, tau);
 
-  if (append)
+  if (append) {
     check_hmc_parms(fdat);
-  else
+  } else {
     write_hmc_parms(fdat);
+  }
 }
 
 static void read_integrator(void)
@@ -586,15 +610,16 @@ static void read_integrator(void)
     read_line("integrator", "%s", line);
     lambda = 0.0;
 
-    if (strcmp(line, "LPFR") == 0)
+    if (strcmp(line, "LPFR") == 0) {
       imd = (int)(LPFR);
-    else if (strcmp(line, "OMF2") == 0) {
+    } else if (strcmp(line, "OMF2") == 0) {
       imd = (int)(OMF2);
       read_line("lambda", "%lf", &lambda);
-    } else if (strcmp(line, "OMF4") == 0)
+    } else if (strcmp(line, "OMF4") == 0) {
       imd = (int)(OMF4);
-    else
+    } else {
       error_root(1, 1, "read_integrator [ym1.c]", "Unknown integrator");
+    }
 
     read_line("nstep", "%d", &nstep);
   }
@@ -605,12 +630,13 @@ static void read_integrator(void)
 
   ifr[0] = 0;
 
-  if (imd == (int)(LPFR))
+  if (imd == (int)(LPFR)) {
     set_mdint_parms(0, LPFR, lambda, nstep, 1, ifr);
-  else if (imd == (int)(OMF2))
+  } else if (imd == (int)(OMF2)) {
     set_mdint_parms(0, OMF2, lambda, nstep, 1, ifr);
-  else if (imd == (int)(OMF4))
+  } else if (imd == (int)(OMF4)) {
     set_mdint_parms(0, OMF4, lambda, nstep, 1, ifr);
+  }
 
   smear_parms = stout_smearing_parms();
 
@@ -643,10 +669,11 @@ static void read_schedule(void)
     read_line("nth", "%d", &nth);
     read_line("ntr", "%d", &ntr);
     read_line("dtr_log", "%d", &dtr_log);
-    if (noms == 0)
+    if (noms == 0) {
       read_line("dtr_ms", "%d", &dtr_ms);
-    else
+    } else {
       dtr_ms = 0;
+    }
     read_line("dtr_cnfg", "%d", &dtr_cnfg);
 
     error_root((append != 0) && (nth != 0), 1, "read_schedule [ym1.c]",
@@ -683,8 +710,9 @@ static void read_schedule(void)
       ir = fread(istd, sizeof(stdint_t), 3, fdat);
       error_root(ir != 3, 1, "read_schedule [ym1.c]", "Incorrect read count");
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_int(3, istd);
+      }
 
       ie = 0;
       ie |= (istd[0] != (stdint_t)(dtr_log));
@@ -698,8 +726,9 @@ static void read_schedule(void)
       istd[1] = (stdint_t)(dtr_ms);
       istd[2] = (stdint_t)(dtr_cnfg);
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_int(3, istd);
+      }
 
       iw = fwrite(istd, sizeof(stdint_t), 3, fdat);
       error_root(iw != 3, 1, "read_schedule [ym1.c]", "Incorrect write count");
@@ -719,8 +748,9 @@ static void read_wflow_parms(void)
       error_root(ir != 1, 1, "read_wflow_parms [ym1.c]",
                  "Incorrect read count");
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_int(1, istd);
+      }
 
       error_root(istd[0] != (stdint_t)(noms == 0), 1,
                  "read_wflow_parms [ym1.c]",
@@ -728,8 +758,9 @@ static void read_wflow_parms(void)
     } else {
       istd[0] = (stdint_t)(noms == 0);
 
-      if (endian == BIG_ENDIAN)
+      if (endian == BIG_ENDIAN) {
         bswap_int(1, istd);
+      }
 
       iw = fwrite(istd, sizeof(stdint_t), 1, fdat);
       error_root(iw != 1, 1, "read_wflow_parms [ym1.c]",
@@ -743,14 +774,15 @@ static void read_wflow_parms(void)
       read_line("nstep", "%d", &nstep);
       read_line("dnms", "%d", &dnms);
 
-      if (strcmp(line, "EULER") == 0)
+      if (strcmp(line, "EULER") == 0) {
         flint = 0;
-      else if (strcmp(line, "RK2") == 0)
+      } else if (strcmp(line, "RK2") == 0) {
         flint = 1;
-      else if (strcmp(line, "RK3") == 0)
+      } else if (strcmp(line, "RK3") == 0) {
         flint = 2;
-      else
+      } else {
         error_root(1, 1, "read_wflow_parms [ym1.c]", "Unkown integrator");
+      }
 
       error_root((dnms < 1) || (nstep < dnms) || ((nstep % dnms) != 0), 1,
                  "read_wflow_parms [ym1.c]",
@@ -844,8 +876,9 @@ static void read_infile(int argc, char *argv[])
     if (scnfg) {
       strncpy(cnfg, argv[scnfg + 1], NAME_SIZE - 1);
       cnfg[NAME_SIZE - 1] = '\0';
-    } else
+    } else {
       cnfg[0] = '\0';
+    }
 
     fin = freopen(argv[ifile + 1], "r", stdin);
     error_root(fin == NULL, 1, "read_infile [ym1.c]",
@@ -875,10 +908,11 @@ static void read_infile(int argc, char *argv[])
   setup_files();
 
   if (my_rank == 0) {
-    if (append)
+    if (append) {
       fdat = fopen(par_file, "rb");
-    else
+    } else {
       fdat = fopen(par_file, "wb");
+    }
 
     error_root(fdat == NULL, 1, "read_infile [ym1.c]",
                "Unable to open parameter file");
@@ -896,8 +930,9 @@ static void read_infile(int argc, char *argv[])
     fclose(fin);
     fclose(fdat);
 
-    if (append == 0)
+    if (append == 0) {
       copy_file(par_file, par_save);
+    }
   }
 }
 
@@ -955,8 +990,9 @@ static void check_old_dat(int nl)
              "Unable to open data file");
   nt = 0;
 
-  while (read_dat(1, &ndat) == 1)
+  while (read_dat(1, &ndat) == 1) {
     nt = ndat.nt;
+  }
 
   fclose(fdat);
 
@@ -993,9 +1029,10 @@ static void check_old_msdat(int nl)
       dnt = nt - pnt;
       error_root(dnt < 1, 1, "check_old_msdat [ym1.c]",
                  "Incorrect trajectory separation");
-    } else if (ic > 1)
+    } else if (ic > 1) {
       error_root(nt != (pnt + dnt), 1, "check_old_msdat [ym1.c]",
                  "Trajectory sequence is not equally spaced");
+    }
 
     pnt = nt;
   }
@@ -1016,10 +1053,11 @@ static void check_files(int *nl, int *icnfg)
   ipgrd[1] = 0;
 
   if (my_rank == 0) {
-    if (noloc)
+    if (noloc) {
       error_root(cnfg[strlen(cnfg) - 1] == '*', 1, "check_files [ym1.c]",
                  "Attempt to read an "
                  "imported configuration when -noloc is set");
+    }
 
     if (append) {
       error_root(strstr(cnfg, nbase) != cnfg, 1, "check_files [ym1.c]",
@@ -1032,18 +1070,20 @@ static void check_files(int *nl, int *icnfg)
 
       check_old_log(ic, nl, icnfg);
       check_old_dat(*nl);
-      if (noms == 0)
+      if (noms == 0) {
         check_old_msdat(*nl);
+      }
 
       (*icnfg) += 1;
     } else {
       fin = fopen(log_file, "r");
       fdat = fopen(dat_file, "rb");
 
-      if (noms == 0)
+      if (noms == 0) {
         fend = fopen(msdat_file, "rb");
-      else
+      } else {
         fend = NULL;
+      }
 
       error_root((fin != NULL) || (fdat != NULL) || (fend != NULL), 1,
                  "check_files [ym1.c]",
@@ -1063,22 +1103,25 @@ static void check_files(int *nl, int *icnfg)
 
     icmax = (*icnfg) + (ntr - nth) / dtr_cnfg;
 
-    if (noloc == 0)
+    if (noloc == 0) {
       error_root(name_size("%s/%sn%d_%d", loc_dir, nbase, icmax, NPROC - 1) >=
                      NAME_SIZE,
                  1, "check_files [ym1.c]", "loc_dir name is too long");
+    }
 
-    if (noexp == 0)
+    if (noexp == 0) {
       error_root(name_size("%s/%sn%d", cnfg_dir, nbase, icmax) >= NAME_SIZE, 1,
                  "check_files [ym1.c]", "cnfg_dir name is too long");
+    }
 
     if (scnfg) {
-      if (cnfg[strlen(cnfg) - 1] == '*')
+      if (cnfg[strlen(cnfg) - 1] == '*') {
         error_root(name_size("%s/%s%d", loc_dir, cnfg, NPROC - 1) >= NAME_SIZE,
                    1, "check_files [ym1.c]", "loc_dir name is too long");
-      else
+      } else {
         error_root(name_size("%s/%s", cnfg_dir, cnfg) >= NAME_SIZE, 1,
                    "check_files [ym1.c]", "cnfg_dir name is too long");
+      }
     }
   }
 
@@ -1092,16 +1135,17 @@ static void init_rng(int icnfg)
 
   if (append) {
     if (cnfg[strlen(cnfg) - 1] != '*') {
-      if (norng)
+      if (norng) {
         start_ranlux(level, seed ^ (icnfg - 1));
-      else {
+      } else {
         ic = import_ranlux(rng_file);
         error_root(ic != (icnfg - 1), 1, "init_rng [ym1.c]",
                    "Configuration number mismatch (*.rng file)");
       }
     }
-  } else
+  } else {
     start_ranlux(level, seed);
+  }
 }
 
 static void init_ud(void)
@@ -1119,8 +1163,9 @@ static void init_ud(void)
       sprintf(cnfg_file, "%s_%d", line, my_rank);
       read_cnfg(cnfg_file);
     }
-  } else
+  } else {
     random_ud();
+  }
 }
 
 static void store_ud(su3_dble *usv)
@@ -1155,12 +1200,13 @@ static void set_data(int nt)
     Yact[in] = ym_action_slices(data.Ysl[in]);
     Qtop[in] = tcharge_slices(data.Qsl[in]);
 
-    if (flint == 0)
+    if (flint == 0) {
       fwd_euler(dn, eps);
-    else if (flint == 1)
+    } else if (flint == 1) {
       fwd_rk2(dn, eps);
-    else
+    } else {
       fwd_rk3(dn, eps);
+    }
   }
 
   Wact[in] = plaq_action_slices(data.Wsl[in]);
@@ -1179,28 +1225,31 @@ static void print_info(int icnfg)
     ip = ftell(flog);
     fclose(flog);
 
-    if (ip == 0L)
+    if (ip == 0L) {
       remove("STARTUP_ERROR");
+    }
 
-    if (append)
+    if (append) {
       flog = freopen(log_file, "a", stdout);
-    else
+    } else {
       flog = freopen(log_file, "w", stdout);
+    }
 
     error_root(flog == NULL, 1, "print_info [ym1.c]",
                "Unable to open log file");
 
-    if (append)
+    if (append) {
       printf("Continuation run, start from configuration %s\n\n", cnfg);
-    else {
+    } else {
       printf("\n");
       printf("Simulation of the SU(3) gauge theory\n");
       printf("------------------------------------\n\n");
 
-      if (scnfg)
+      if (scnfg) {
         printf("New run, start from configuration %s\n\n", cnfg);
-      else
+      } else {
         printf("New run, start from random configuration\n\n");
+      }
 
       printf("Using the HMC algorithm\n");
       printf("Program major version: %s\n", openQCD_RELEASE);
@@ -1209,24 +1258,29 @@ static void print_info(int icnfg)
       printf("Program user CFLAGS: %s\n", build_user_cflags);
     }
 
-    if (endian == LITTLE_ENDIAN)
+    if (endian == LITTLE_ENDIAN) {
       printf("The machine is little endian\n");
-    else
+    } else {
       printf("The machine is big endian\n");
-    if (noloc)
+    }
+    if (noloc) {
       printf("The local disks are not used\n");
-    if (noexp)
+    }
+    if (noexp) {
       printf("The generated configurations are not exported\n");
-    if (rmold)
+    }
+    if (rmold) {
       printf("Old configurations are deleted\n");
+    }
     printf("\n");
 
-    if ((ipgrd[0] != 0) && (ipgrd[1] != 0))
+    if ((ipgrd[0] != 0) && (ipgrd[1] != 0)) {
       printf("Process grid and process block size changed:\n");
-    else if (ipgrd[0] != 0)
+    } else if (ipgrd[0] != 0) {
       printf("Process grid changed:\n");
-    else if (ipgrd[1] != 0)
+    } else if (ipgrd[1] != 0) {
       printf("Process block size changed:\n");
+    }
 
     if ((append == 0) || (ipgrd[0] != 0) || (ipgrd[1] != 0)) {
       printf("%dx%dx%dx%d lattice, ", N0, N1, N2, N3);
@@ -1264,10 +1318,10 @@ static void print_info(int icnfg)
 
     if (append) {
       if (cnfg[strlen(cnfg) - 1] != '*') {
-        if (norng)
+        if (norng) {
           printf("level = %d, seed = %d, effective seed = %d\n\n", level, seed,
                  seed ^ (icnfg - 1));
-        else {
+        } else {
           printf("State of ranlxs and ranlxd reset to the\n");
           printf("last exported state\n\n");
         }
@@ -1275,8 +1329,9 @@ static void print_info(int icnfg)
         printf("State of ranlxs and ranlxd read from\n");
         printf("initial field-configuration file\n\n");
       }
-    } else
+    } else {
       printf("level = %d, seed = %d\n\n", level, seed);
+    }
 
     if (append) {
       printf("Trajectories:\n");
@@ -1288,12 +1343,13 @@ static void print_info(int icnfg)
 
       mdp = mdint_parms(0);
 
-      if (mdp.integrator == LPFR)
+      if (mdp.integrator == LPFR) {
         printf("Leapfrog integrator\n");
-      else if (mdp.integrator == OMF2)
+      } else if (mdp.integrator == OMF2) {
         printf("2nd order OMF integrator with lambda = %.4e\n", mdp.lambda);
-      else if (mdp.integrator == OMF4)
+      } else if (mdp.integrator == OMF4) {
         printf("4th order OMF integrator\n");
+      }
 
       printf("Number of steps = %d\n\n", mdp.nstep);
 
@@ -1308,12 +1364,13 @@ static void print_info(int icnfg)
         printf("Online measurement of Wilson flow observables\n\n");
 
         printf("Wilson flow:\n");
-        if (flint == 0)
+        if (flint == 0) {
           printf("Euler integrator\n");
-        else if (flint == 1)
+        } else if (flint == 1) {
           printf("2nd order RK integrator\n");
-        else
+        } else {
           printf("3rd order RK integrator\n");
+        }
         n = fdigits(file_head.eps);
         printf("eps = %.*f\n", IMAX(n, 1), file_head.eps);
         printf("nstep = %d\n", file_head.dn * file_head.nn);
@@ -1415,14 +1472,16 @@ static void save_msdat(int n, double wtms, double wtmsall)
     eps = file_head.eps;
 
     din = nn / 10;
-    if (din < 1)
+    if (din < 1) {
       din = 1;
+    }
 
     printf("Measurement run:\n\n");
 
-    for (in = 0; in <= nn; in += din)
+    for (in = 0; in <= nn; in += din) {
       printf("n = %3d, t = %.2e, Wact = %.6e, Yact = %.6e, Q = % .2e\n",
              in * dn, eps * (double)(in * dn), Wact[in], Yact[in], Qtop[in]);
+    }
 
     printf("\n");
     printf("Configuration fully processed in %.2e sec ", wtms);
@@ -1437,8 +1496,9 @@ static void save_cnfg(int icnfg)
   int ie;
 
   ie = query_flags(UD_PHASE_SET);
-  if (ie == 0)
+  if (ie == 0) {
     ie = check_bc(0.0) ^ 0x1;
+  }
   error_root(ie != 0, 1, "save_cnfg [ym1.c]",
              "Phase-modified field or unexpected boundary values");
 
@@ -1453,14 +1513,15 @@ static void save_cnfg(int icnfg)
   }
 
   if (my_rank == 0) {
-    if ((noloc == 0) && (noexp == 0))
+    if ((noloc == 0) && (noexp == 0)) {
       printf("Configuration no %d saved on the local disks "
              "and exported\n\n",
              icnfg);
-    else if (noloc == 0)
+    } else if (noloc == 0) {
       printf("Configuration no %d saved on the local disks\n\n", icnfg);
-    else if (noexp == 0)
+    } else if (noexp == 0) {
       printf("Configuration no %d exported\n\n", icnfg);
+    }
   }
 }
 
@@ -1474,8 +1535,9 @@ static void check_endflag(int *iend)
       remove(end_file);
       (*iend) = 1;
       printf("End flag set, run stopped\n\n");
-    } else
+    } else {
       (*iend) = 0;
+    }
   }
 
   mpc_bcast_i(iend, 1);
@@ -1503,8 +1565,9 @@ static dat_t compute_log_values(double const *act0, double const *act1,
   double w0[7], w1[7];
   dat_t ndat;
 
-  for (i = 0; i <= hmc.nact; i++)
+  for (i = 0; i <= hmc.nact; i++) {
     w0[0] += (act1[i] - act0[i]);
+  }
 
   w0[1] = plaq_wsum_dble(0) / npl;
 
@@ -1555,23 +1618,26 @@ int main(int argc, char *argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
   read_infile(argc, argv);
-  if (noms == 0)
+  if (noms == 0) {
     alloc_data();
+  }
   check_files(&nl, &icnfg);
   geometry();
   alloc_wud(1);
-  if ((noms == 0) && (flint))
+  if ((noms == 0) && (flint)) {
     alloc_wfd(1);
+  }
 
   print_info(icnfg);
   set_mdsteps();
   init_rng(icnfg);
   init_ud();
 
-  if (bc_type() == 0)
+  if (bc_type() == 0) {
     npl = (double)(6 * (N0 - 1) * N1) * (double)(N2 * N3);
-  else
+  } else {
     npl = (double)(6 * N0 * N1) * (double)(N2 * N3);
+  }
 
   volume = (double)(N0 * N1) * (double)(N2 * N3);
 
@@ -1629,8 +1695,9 @@ int main(int argc, char *argv[])
         fflush(flog);
         copy_file(log_file, log_save);
         copy_file(dat_file, dat_save);
-        if (noms == 0)
+        if (noms == 0) {
           copy_file(msdat_file, msdat_save);
+        }
         copy_file(rng_file, rng_save);
       }
 
@@ -1639,8 +1706,9 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

@@ -151,8 +151,9 @@ static void init_rw(void)
 {
   int irw;
 
-  for (irw = 1; irw <= IRWMAX; irw++)
+  for (irw = 1; irw <= IRWMAX; irw++) {
     rw[irw] = rw[0];
+  }
 
   init = 1;
 }
@@ -164,16 +165,18 @@ rw_parms_t set_rw_parms(int irw, rwfact_t rwfact, int im0, int nsrc, int irp,
   int iprms[6], i, ie;
   double dprms[1];
 
-  if (init == 0)
+  if (init == 0) {
     init_rw();
+  }
 
   error_root((rwfact != RWTM1) && (rwfact != RWTM1_EO) && (rwfact != RWTM2) &&
                  (rwfact != RWTM2_EO) && (rwfact != RWRAT),
              1, "set_rw_parms [rw_parms.c]",
              "Unknown type of reweighting factor");
 
-  if (rwfact != RWRAT)
+  if (rwfact != RWRAT) {
     irp = 0;
+  }
 
   if (NPROC > 1) {
     iprms[0] = irw;
@@ -259,10 +262,11 @@ rw_parms_t set_rw_parms(int irw, rwfact_t rwfact, int im0, int nsrc, int irp,
       rw[irw].mu[i] = mu[i];
       rw[irw].isp[i] = isp[i];
 
-      if (i == 0)
+      if (i == 0) {
         ie |= (mu[i] <= 0.0);
-      else
+      } else {
         ie |= (mu[i] <= mu[i - 1]);
+      }
     }
 
     error_root(ie != 0, 1, "set_rw_parms [rw_parms.c]",
@@ -286,12 +290,13 @@ rw_parms_t set_rw_parms(int irw, rwfact_t rwfact, int im0, int nsrc, int irp,
 
 rw_parms_t rw_parms(int irw)
 {
-  if (init == 0)
+  if (init == 0) {
     init_rw();
+  }
 
-  if ((irw >= 0) && (irw < IRWMAX))
+  if ((irw >= 0) && (irw < IRWMAX)) {
     return rw[irw];
-  else {
+  } else {
     error_loc(1, 1, "rw_parms [rw_parms.c]",
               "Reweighting factor index is out of range");
     return rw[IRWMAX];
@@ -318,17 +323,17 @@ void read_rw_parms(int irw)
 
     read_line("rwfact", "%s", line);
 
-    if (strcmp(line, "RWTM1") == 0)
+    if (strcmp(line, "RWTM1") == 0) {
       idr = 0;
-    else if (strcmp(line, "RWTM1_EO") == 0)
+    } else if (strcmp(line, "RWTM1_EO") == 0) {
       idr = 1;
-    else if (strcmp(line, "RWTM2") == 0)
+    } else if (strcmp(line, "RWTM2") == 0) {
       idr = 2;
-    else if (strcmp(line, "RWTM2_EO") == 0)
+    } else if (strcmp(line, "RWTM2_EO") == 0) {
       idr = 3;
-    else if (strcmp(line, "RWRAT") == 0)
+    } else if (strcmp(line, "RWRAT") == 0) {
       idr = 4;
-    else {
+    } else {
       idr = 5;
       error_root(1, 1, "read_rw_parms [rw_parms.c]",
                  "Unknown reweighting factor %s", line);
@@ -379,28 +384,32 @@ void read_rw_parms(int irw)
   }
 
   if (my_rank == 0) {
-    if (idr < 4)
+    if (idr < 4) {
       read_dprms("mu", nfct, mu);
-    else
+    } else {
       read_iprms("np", nfct, np);
+    }
 
     n = count_tokens("isp");
     error_root(n < 1, 1, "read_rw_parms [rw_parms.c]",
                "No data on the line with tag isp");
 
-    if (n > nfct)
+    if (n > nfct) {
       n = nfct;
+    }
     read_iprms("isp", n, isp);
 
-    for (i = n; i < nfct; i++)
+    for (i = n; i < nfct; i++) {
       isp[i] = isp[n - 1];
+    }
   }
 
   if (NPROC > 1) {
-    if (idr < 4)
+    if (idr < 4) {
       MPI_Bcast(mu, nfct, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    else
+    } else {
       MPI_Bcast(np, nfct, MPI_INT, 0, MPI_COMM_WORLD);
+    }
 
     MPI_Bcast(isp, nfct, MPI_INT, 0, MPI_COMM_WORLD);
   }
@@ -410,8 +419,9 @@ void read_rw_parms(int irw)
   if (idr < 4) {
     free(mu);
     free(isp);
-  } else
+  } else {
     free(np);
+  }
 }
 
 void print_rw_parms(void)
@@ -426,15 +436,15 @@ void print_rw_parms(void)
         printf("Reweighting factor %d:\n", irw);
         idr = 0;
 
-        if (rw[irw].rwfact == RWTM1)
+        if (rw[irw].rwfact == RWTM1) {
           printf("RWTM1 factor\n");
-        else if (rw[irw].rwfact == RWTM1_EO)
+        } else if (rw[irw].rwfact == RWTM1_EO) {
           printf("RWTM1_EO factor\n");
-        else if (rw[irw].rwfact == RWTM2)
+        } else if (rw[irw].rwfact == RWTM2) {
           printf("RWTM2 factor\n");
-        else if (rw[irw].rwfact == RWTM2_EO)
+        } else if (rw[irw].rwfact == RWTM2_EO) {
           printf("RWTM2_EO factor\n");
-        else if (rw[irw].rwfact == RWRAT) {
+        } else if (rw[irw].rwfact == RWRAT) {
           idr = 1;
           printf("RWRAT factor\n");
         }
@@ -456,16 +466,18 @@ void print_rw_parms(void)
           printf("irp = %d\n", rw[irw].irp);
           printf("np =");
 
-          for (i = 0; i < nfct; i++)
+          for (i = 0; i < nfct; i++) {
             printf(" %d", rw[irw].np[i]);
+          }
 
           printf("\n");
         }
 
         printf("isp =");
 
-        for (i = 0; i < nfct; i++)
+        for (i = 0; i < nfct; i++) {
           printf(" %d", rw[irw].isp[i]);
+        }
 
         printf("\n\n");
       }
@@ -493,8 +505,9 @@ void write_rw_parms(FILE *fdat)
         istd[4] = (stdint_t)(rw[irw].irp);
         istd[5] = (stdint_t)(rw[irw].nfct);
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_int(6, istd);
+        }
 
         iw = fwrite(istd, sizeof(stdint_t), 6, fdat);
         nfct = rw[irw].nfct;
@@ -503,8 +516,9 @@ void write_rw_parms(FILE *fdat)
           for (i = 0; i < nfct; i++) {
             istd[0] = (stdint_t)(rw[irw].np[i]);
 
-            if (endian == BIG_ENDIAN)
+            if (endian == BIG_ENDIAN) {
               bswap_int(1, istd);
+            }
 
             iw += fwrite(istd, sizeof(stdint_t), 1, fdat);
           }
@@ -512,8 +526,9 @@ void write_rw_parms(FILE *fdat)
           for (i = 0; i < nfct; i++) {
             dstd[0] = rw[irw].mu[i];
 
-            if (endian == BIG_ENDIAN)
+            if (endian == BIG_ENDIAN) {
               bswap_double(1, dstd);
+            }
 
             iw += fwrite(dstd, sizeof(double), 1, fdat);
           }
@@ -522,8 +537,9 @@ void write_rw_parms(FILE *fdat)
         for (i = 0; i < nfct; i++) {
           istd[0] = (stdint_t)(rw[irw].isp[i]);
 
-          if (endian == BIG_ENDIAN)
+          if (endian == BIG_ENDIAN) {
             bswap_int(1, istd);
+          }
 
           iw += fwrite(istd, sizeof(stdint_t), 1, fdat);
         }
@@ -555,8 +571,9 @@ void check_rw_parms(FILE *fdat)
         error_root(ir != 6, 1, "check_rw_parms [rw_parms.c]",
                    "Incorrect read count");
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_int(6, istd);
+        }
 
         ie |= (istd[0] != (stdint_t)(irw));
         ie |= (istd[1] != (stdint_t)(rw[irw].rwfact));
@@ -574,8 +591,9 @@ void check_rw_parms(FILE *fdat)
           for (i = 0; i < nfct; i++) {
             ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-            if (endian == BIG_ENDIAN)
+            if (endian == BIG_ENDIAN) {
               bswap_int(1, istd);
+            }
 
             ie |= (istd[0] != (stdint_t)(rw[irw].np[i]));
           }
@@ -583,8 +601,9 @@ void check_rw_parms(FILE *fdat)
           for (i = 0; i < nfct; i++) {
             ir += fread(dstd, sizeof(double), 1, fdat);
 
-            if (endian == BIG_ENDIAN)
+            if (endian == BIG_ENDIAN) {
               bswap_double(1, dstd);
+            }
 
             ie |= (dstd[0] != rw[irw].mu[i]);
           }
@@ -593,8 +612,9 @@ void check_rw_parms(FILE *fdat)
         for (i = 0; i < nfct; i++) {
           ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-          if (endian == BIG_ENDIAN)
+          if (endian == BIG_ENDIAN) {
             bswap_int(1, istd);
+          }
 
           ie |= (istd[0] != (stdint_t)(rw[irw].isp[i]));
         }

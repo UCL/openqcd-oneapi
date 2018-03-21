@@ -157,8 +157,9 @@ static void init_fp(void)
 {
   int i;
 
-  for (i = 1; i <= IFRMAX; i++)
+  for (i = 1; i <= IFRMAX; i++) {
     fp[i] = fp[0];
+  }
 
   init = 1;
 }
@@ -170,11 +171,13 @@ force_parms_t set_force_parms(int ifr, force_t force, int ipf, int im0,
   int iprms[23], i, ie;
   int rat[3], mu[4], sp[4], nc[4], ic[4];
 
-  if (init == 0)
+  if (init == 0) {
     init_fp();
+  }
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++) {
     rat[i] = 0;
+  }
 
   for (i = 0; i < 4; i++) {
     mu[i] = 0;
@@ -219,8 +222,9 @@ force_parms_t set_force_parms(int ifr, force_t force, int ipf, int im0,
     iprms[2] = ipf;
     iprms[3] = im0;
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++) {
       iprms[4 + i] = rat[i];
+    }
 
     for (i = 0; i < 4; i++) {
       iprms[7 + i] = mu[i];
@@ -237,8 +241,9 @@ force_parms_t set_force_parms(int ifr, force_t force, int ipf, int im0,
     ie |= (iprms[2] != ipf);
     ie |= (iprms[3] != im0);
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++) {
       ie |= (iprms[4 + i] != rat[i]);
+    }
 
     for (i = 0; i < 4; i++) {
       ie |= (iprms[7 + i] != mu[i]);
@@ -256,8 +261,9 @@ force_parms_t set_force_parms(int ifr, force_t force, int ipf, int im0,
   ie |= (force == FORCES);
   ie |= ((ipf < 0) || (im0 < 0));
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++) {
     ie |= (rat[i] < 0);
+  }
 
   for (i = 0; i < 4; i++) {
     ie |= (mu[i] < 0);
@@ -275,8 +281,9 @@ force_parms_t set_force_parms(int ifr, force_t force, int ipf, int im0,
   fp[ifr].ipf = ipf;
   fp[ifr].im0 = im0;
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++) {
     fp[ifr].irat[i] = rat[i];
+  }
 
   for (i = 0; i < 4; i++) {
     fp[ifr].imu[i] = mu[i];
@@ -290,12 +297,13 @@ force_parms_t set_force_parms(int ifr, force_t force, int ipf, int im0,
 
 force_parms_t force_parms(int ifr)
 {
-  if (init == 0)
+  if (init == 0) {
     init_fp();
+  }
 
-  if ((ifr >= 0) && (ifr < IFRMAX))
+  if ((ifr >= 0) && (ifr < IFRMAX)) {
     return fp[ifr];
-  else {
+  } else {
     error_loc(1, 1, "force_parms [force_parms.c]",
               "Force index is out of range");
     return fp[IFRMAX];
@@ -313,8 +321,9 @@ void read_force_parms(int ifr)
   ipf = 0;
   im0 = 0;
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++) {
     irat[i] = 0;
+  }
 
   for (i = 0; i < 4; i++) {
     imu[i] = 0;
@@ -374,9 +383,10 @@ void read_force_parms(int ifr)
       read_line("im0", "%d", &im0);
       read_line("irat", "%d %d %d", irat, irat + 1, irat + 2);
       read_line("isp", "%d", isp);
-    } else if (strcmp(line, "FRG") != 0)
+    } else if (strcmp(line, "FRG") != 0) {
       error_root(1, 1, "read_force_parms [force_parms.c]", "Unknown force %s",
                  line);
+    }
   }
 
   if (NPROC > 1) {
@@ -405,8 +415,9 @@ void read_force_parms2(int ifr)
   ipf = 0;
   im0 = 0;
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++) {
     irat[i] = 0;
+  }
 
   for (i = 0; i < 4; i++) {
     imu[i] = 0;
@@ -423,9 +434,9 @@ void read_force_parms2(int ifr)
     find_section(line);
     read_line("force", "%s", line);
 
-    if (ap.action == ACG)
+    if (ap.action == ACG) {
       ie = strcmp(line, "FRG");
-    else if (ap.action == ACF_TM1) {
+    } else if (ap.action == ACF_TM1) {
       ie = strcmp(line, "FRF_TM1");
       idf = 1;
       ipf = ap.ipf;
@@ -485,8 +496,9 @@ void read_force_parms2(int ifr)
       irat[1] = ap.irat[1];
       irat[2] = ap.irat[2];
       read_line("isp", "%d", isp);
-    } else
+    } else {
       error_root(1, 1, "read_force_parms2 [force_parms.c]", "Unknown action");
+    }
 
     error_root(ie != 0, 1, "read_force_parms2 [force_parms.c]",
                "Force and action types do not match");
@@ -516,9 +528,9 @@ void print_force_parms(void)
       if (fp[i].force != FORCES) {
         printf("Force %d:\n", i);
 
-        if (fp[i].force == FRG)
+        if (fp[i].force == FRG) {
           printf("FRG force\n\n");
-        else if (fp[i].force == FRF_TM1) {
+        } else if (fp[i].force == FRF_TM1) {
           printf("FRF_TM1 force\n");
           printf("ipf = %d\n", fp[i].ipf);
           printf("im0 = %d\n", fp[i].im0);
@@ -567,8 +579,9 @@ void print_force_parms(void)
           printf("irat = %d %d %d\n", fp[i].irat[0], fp[i].irat[1],
                  fp[i].irat[2]);
           printf("isp = %d\n\n", fp[i].isp[0]);
-        } else
+        } else {
           printf("UNKNOWN force\n\n");
+        }
       }
     }
   }
@@ -585,9 +598,9 @@ void print_force_parms2(void)
       if (fp[i].force != FORCES) {
         printf("Force %d:\n", i);
 
-        if (fp[i].force == FRG)
+        if (fp[i].force == FRG) {
           printf("FRG force\n\n");
-        else if (fp[i].force == FRF_TM1) {
+        } else if (fp[i].force == FRF_TM1) {
           printf("FRF_TM1 force\n");
           printf("isp = %d\n", fp[i].isp[0]);
           printf("ncr = %d\n\n", fp[i].ncr[0]);
@@ -613,8 +626,9 @@ void print_force_parms2(void)
         } else if (fp[i].force == FRF_RAT_SDET) {
           printf("FRF_RAT_SDET force\n");
           printf("isp = %d\n\n", fp[i].isp[0]);
-        } else
+        } else {
           printf("UNKNOWN force\n\n");
+        }
       }
     }
   }
@@ -637,8 +651,9 @@ void write_force_parms(FILE *fdat)
         istd[2] = (stdint_t)(fp[i].ipf);
         istd[3] = (stdint_t)(fp[i].im0);
 
-        for (j = 0; j < 3; j++)
+        for (j = 0; j < 3; j++) {
           istd[4 + j] = (stdint_t)(fp[i].irat[j]);
+        }
 
         for (j = 0; j < 4; j++) {
           istd[7 + j] = (stdint_t)(fp[i].imu[j]);
@@ -647,8 +662,9 @@ void write_force_parms(FILE *fdat)
           istd[19 + j] = (stdint_t)(fp[i].icr[j]);
         }
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_int(23, istd);
+        }
 
         iw = fwrite(istd, sizeof(stdint_t), 23, fdat);
         error_root(iw != 23, 1, "write_force_parms [force_parms.c]",
@@ -676,16 +692,18 @@ void check_force_parms(FILE *fdat)
         error_root(ir != 23, 1, "check_force_parms [force_parms.c]",
                    "Incorrect read count");
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_int(23, istd);
+        }
 
         ie |= (istd[0] != (stdint_t)(i));
         ie |= (istd[1] != (stdint_t)(fp[i].force));
         ie |= (istd[2] != (stdint_t)(fp[i].ipf));
         ie |= (istd[3] != (stdint_t)(fp[i].im0));
 
-        for (j = 0; j < 3; j++)
+        for (j = 0; j < 3; j++) {
           ie |= (istd[4 + j] != (stdint_t)(fp[i].irat[j]));
+        }
 
         for (j = 0; j < 4; j++) {
           ie |= (istd[7 + j] != (stdint_t)(fp[i].imu[j]));

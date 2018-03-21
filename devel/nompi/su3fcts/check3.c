@@ -45,8 +45,9 @@ static void random_Xu(void)
     mu[1] = 2.0 * mu[1] - 1.0;
     mu[2] = -mu[0] - mu[1];
 
-    if (fabs(mu[2]) <= 1.0)
+    if (fabs(mu[2]) <= 1.0) {
       break;
+    }
   }
 
   t = 0.5 * (mu[0] * mu[0] + mu[1] * mu[1] + mu[2] * mu[2]);
@@ -112,8 +113,9 @@ static double dev_uv(void)
 
   for (i = 0; i < 18; i++) {
     dev = fabs(r[i]);
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   return dmax;
@@ -143,17 +145,20 @@ int main(void)
     chexp_drv0(X, sp);
 
     dev = fabs(t - (*sp).t);
-    if (dev > dmax1)
+    if (dev > dmax1) {
       dmax1 = dev;
+    }
 
     dev = fabs(d - (*sp).d);
-    if (dev > dmax2)
+    if (dev > dmax2) {
       dmax2 = dev;
+    }
 
     ch2mat((*sp).p, X, v);
     dev = dev_uv();
-    if (dev > dmax3)
+    if (dev > dmax3) {
       dmax3 = dev;
+    }
   }
 
   printf("Maximal deviation of t      = %.1e\n", dmax1);

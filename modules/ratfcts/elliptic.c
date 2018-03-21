@@ -68,8 +68,9 @@ static double agm(double x, double y)
     x = 0.5 * (px + py);
     y = sqrt(px * py);
 
-    if ((x <= y) || (x >= px) || (y <= py))
+    if ((x <= y) || (x >= px) || (y <= py)) {
       return x;
+    }
   }
 }
 
@@ -201,9 +202,9 @@ void sncndn(double u, double rk, double *sn, double *cn, double *dn)
     sgn_sn *= -1.0;
   }
 
-  if ((2.0 * u) <= K)
+  if ((2.0 * u) <= K) {
     flip = 0;
-  else {
+  } else {
     u = K - u;
     flip = 1;
   }
@@ -212,14 +213,16 @@ void sncndn(double u, double rk, double *sn, double *cn, double *dn)
   k = rk * kp;
 
   delta = pow(DBL_EPSILON, 0.125);
-  if (delta > 1.0e-3)
+  if (delta > 1.0e-3) {
     delta = 1.0e-3;
+  }
 
   if (fabs(u) < delta) {
     (*sn) = sn_small(u, rk);
     (*cn) = sqrt(1.0 - (*sn) * (*sn));
-  } else
+  } else {
     landen(u, rk, sn, cn);
+  }
 
   (*dn) = sqrt(kp * kp + k * k * (*cn) * (*cn));
 

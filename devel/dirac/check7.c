@@ -34,10 +34,11 @@ static void blk_s2zero(int ic, spinor *s)
   nbh = nb / 2;
   vol = (*b).vol;
 
-  if (ic ^ isw)
+  if (ic ^ isw) {
     n = nbh;
-  else
+  } else {
     n = 0;
+  }
 
   nm = n + nbh;
 
@@ -82,9 +83,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check7.c]",
                  "Syntax: check7 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -124,9 +126,10 @@ int main(int argc, char *argv[])
   swp = set_sw_parms(0.05);
   mu = 0.123f;
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("m0 = %.4e, mu = %.4e, csw = %.4e, cF = %.4e, cF' = %.4e\n\n",
            swp.m0, mu, swp.csw, swp.cF[0], swp.cF[1]);
+  }
 
   random_ud();
   set_ud_phase();
@@ -148,8 +151,9 @@ int main(int argc, char *argv[])
     dmax = 0.0f;
     set_tm_parms(itm);
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Twisted-mass flag = %d\n", itm);
+    }
 
     for (ic = 0; ic < 2; ic++) {
       random_s(VOLUME, ps[0], 1.0f);
@@ -157,10 +161,11 @@ int main(int argc, char *argv[])
       blk_s2zero(ic ^ 0x1, ps[0]);
       blk_s2zero(ic ^ 0x1, ps[2]);
 
-      if (ic ^ isw)
+      if (ic ^ isw) {
         n = nbh;
-      else
+      } else {
         n = 0;
+      }
 
       nm = n + nbh;
 
@@ -179,13 +184,15 @@ int main(int argc, char *argv[])
       mulr_spinor_add(VOLUME, ps[0], ps[2], -1.0f);
       mulr_spinor_add(VOLUME, ps[1], ps[3], -1.0f);
 
-      if (norm_square(VOLUME, 0, ps[0]) != 0.0f)
+      if (norm_square(VOLUME, 0, ps[0]) != 0.0f) {
         ie = 1;
+      }
 
       d = norm_square(VOLUME, 1, ps[1]) / norm_square(VOLUME, 1, ps[3]);
 
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
     }
 
     error(ie, 1, "main [check7.c]",
@@ -213,21 +220,24 @@ int main(int argc, char *argv[])
       assign_s2sblk(SAP_BLOCKS, n, ODD_PTS, ps[1], 0);
       Dwee_blk(SAP_BLOCKS, n, mu, 0, 0);
       mulr_spinor_add(vol, b[n].s[0], b[n].s[1], -1.0f);
-      if (norm_square(vol, 0, b[n].s[0]) != 0.0f)
+      if (norm_square(vol, 0, b[n].s[0]) != 0.0f) {
         ie = 1;
+      }
     }
 
     Dwee(mu, ps[0], ps[1]);
     mulr_spinor_add(VOLUME, ps[0], ps[2], -1.0f);
     mulr_spinor_add(VOLUME, ps[1], ps[3], -1.0f);
 
-    if (norm_square(VOLUME, 0, ps[0]) != 0.0f)
+    if (norm_square(VOLUME, 0, ps[0]) != 0.0f) {
       ie = 1;
+    }
 
     d = norm_square(VOLUME, 1, ps[1]) / norm_square(VOLUME, 1, ps[3]);
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
 
     random_s(VOLUME, ps[0], 1.0f);
     random_s(VOLUME, ps[1], 1.0f);
@@ -243,29 +253,33 @@ int main(int argc, char *argv[])
       assign_s2sblk(SAP_BLOCKS, n, EVEN_PTS, ps[1], 0);
       Dwoo_blk(SAP_BLOCKS, n, mu, 0, 0);
       mulr_spinor_add(vol, b[n].s[0], b[n].s[1], -1.0f);
-      if (norm_square(vol, 0, b[n].s[0]) != 0.0f)
+      if (norm_square(vol, 0, b[n].s[0]) != 0.0f) {
         ie = 1;
+      }
     }
 
     Dwoo(mu, ps[0], ps[1]);
     mulr_spinor_add(VOLUME, ps[0], ps[2], -1.0f);
     mulr_spinor_add(VOLUME, ps[1], ps[3], -1.0f);
 
-    if (norm_square(VOLUME, 0, ps[0]) != 0.0f)
+    if (norm_square(VOLUME, 0, ps[0]) != 0.0f) {
       ie = 1;
+    }
 
     d = norm_square(VOLUME, 1, ps[1]) / norm_square(VOLUME, 1, ps[3]);
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
 
     error(ie, 1, "main [check7.c]",
           "Dwee_blk() or Dwoo_blk() changes the fields where it should not");
 
     dmax = (float)(sqrt((double)(dmax)));
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Dwee_blk(), Dwoo_blk(): %.1e\n", dmax);
+    }
 
     dmax = 0.0f;
 
@@ -276,10 +290,11 @@ int main(int argc, char *argv[])
       blk_s2zero(ic ^ 0x1, ps[0]);
       blk_s2zero(ic ^ 0x1, ps[2]);
 
-      if (ic ^ isw)
+      if (ic ^ isw) {
         n = nbh;
-      else
+      } else {
         n = 0;
+      }
 
       nm = n + nbh;
 
@@ -298,13 +313,15 @@ int main(int argc, char *argv[])
       mulr_spinor_add(VOLUME, ps[0], ps[2], -1.0f);
       mulr_spinor_add(VOLUME, ps[1], ps[3], -1.0f);
 
-      if (norm_square(VOLUME, 0, ps[0]) != 0.0f)
+      if (norm_square(VOLUME, 0, ps[0]) != 0.0f) {
         ie = 1;
+      }
 
       d = norm_square(VOLUME, 1, ps[1]) / norm_square(VOLUME, 1, ps[3]);
 
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
     }
 
     error(ie, 1, "main [check7.c]",
@@ -312,8 +329,9 @@ int main(int argc, char *argv[])
 
     dmax = (float)(sqrt((double)(dmax)));
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Dweo_blk():             %.1e\n", dmax);
+    }
 
     dmax = 0.0f;
 
@@ -324,10 +342,11 @@ int main(int argc, char *argv[])
       blk_s2zero(ic ^ 0x1, ps[0]);
       blk_s2zero(ic ^ 0x1, ps[2]);
 
-      if (ic ^ isw)
+      if (ic ^ isw) {
         n = nbh;
-      else
+      } else {
         n = 0;
+      }
 
       nm = n + nbh;
 
@@ -346,13 +365,15 @@ int main(int argc, char *argv[])
       mulr_spinor_add(VOLUME, ps[0], ps[2], -1.0f);
       mulr_spinor_add(VOLUME, ps[1], ps[3], -1.0f);
 
-      if (norm_square(VOLUME, 0, ps[0]) != 0.0f)
+      if (norm_square(VOLUME, 0, ps[0]) != 0.0f) {
         ie = 1;
+      }
 
       d = norm_square(VOLUME, 1, ps[1]) / norm_square(VOLUME, 1, ps[3]);
 
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
     }
 
     error(ie, 1, "main [check7.c]",
@@ -360,8 +381,9 @@ int main(int argc, char *argv[])
 
     dmax = (float)(sqrt((double)(dmax)));
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Dwoe_blk():             %.1e\n", dmax);
+    }
 
     dmax = 0.0f;
     random_s(VOLUME, ps[0], 1.0f);
@@ -378,13 +400,15 @@ int main(int argc, char *argv[])
       Dwhat_blk(SAP_BLOCKS, n, mu, 1, 2);
       mulr_spinor_add(volh, b[n].s[0], b[n].s[2], -1.0f);
       d = norm_square(volh, 0, b[n].s[0]);
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
 
       assign_s2sblk(SAP_BLOCKS, n, ALL_PTS, ps[0], 0);
       mulr_spinor_add(volh, b[n].s[0] + volh, b[n].s[1] + volh, -1.0f);
-      if (norm_square(volh, 0, b[n].s[0] + volh) != 0.0f)
+      if (norm_square(volh, 0, b[n].s[0] + volh) != 0.0f) {
         ie = 1;
+      }
     }
 
     error(ie, 1, "main [check7.c]",
@@ -398,12 +422,14 @@ int main(int argc, char *argv[])
       MPI_Bcast(&dmax, 1, MPI_FLOAT, 0, MPI_COMM_WORLD);
     }
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Dwhat_blk():            %.1e\n\n", dmax);
+    }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

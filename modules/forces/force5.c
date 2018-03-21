@@ -125,8 +125,9 @@ double setpf5(double mu0, double mu1, int ipf, int isp, int icom, int *status)
   tm_parms_t tm;
 
   tm = tm_parms();
-  if (tm.eoflg != 1)
+  if (tm.eoflg != 1) {
     set_tm_parms(1);
+  }
 
   mdfs = mdflds();
   phi = (*mdfs).pf[ipf];
@@ -176,8 +177,9 @@ double setpf5(double mu0, double mu1, int ipf, int isp, int icom, int *status)
                "DFL_SAP_GCR solver failed (mu = %.4e, parameter set "
                "no %d, status = %d,%d,%d)",
                mu1, isp, status[0], status[1], status[2]);
-  } else
+  } else {
     error_root(1, 1, "setpf5 [force5.c]", "Unknown solver");
+  }
 
   z.re = 0.0;
   z.im = mu0 - mu1;

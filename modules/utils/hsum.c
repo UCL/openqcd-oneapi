@@ -77,8 +77,9 @@ static hsum_t *alloc_hsum(int n)
   s = malloc(MAX_LEVELS * n * sizeof(*s));
 
   if (n > nmx) {
-    if (sloc != NULL)
+    if (sloc != NULL) {
       free(sloc);
+    }
     sloc = malloc(n * sizeof(*sloc));
     nmx = n;
   }
@@ -107,23 +108,27 @@ int init_hsum(int n)
     error_loc(nhsmx == INT_MAX, 1, "init_hsum [hsum.c]",
               "Maximal number of hsum instances reached");
 
-    if (nhsmx < (INT_MAX - 16))
+    if (nhsmx < (INT_MAX - 16)) {
       mx = nhsmx + 16;
-    else
+    } else {
       mx = INT_MAX;
+    }
 
     hsn = malloc(mx * sizeof(*hsn));
     error_loc(hsn == NULL, 1, "init_hsum [hsum.c]",
               "Unable to allocate hsum_t structures");
 
-    for (i = 0; i < nhsmx; i++)
+    for (i = 0; i < nhsmx; i++) {
       hsn[i] = hs[i];
+    }
 
-    for (; i < mx; i++)
+    for (; i < mx; i++) {
       hsn[i] = NULL;
+    }
 
-    if (hs != NULL)
+    if (hs != NULL) {
       free(hs);
+    }
     hs = hsn;
     nhsmx = mx;
   }
@@ -147,11 +152,13 @@ void reset_hsum(int id)
     for (i = 0; i < MAX_LEVELS; i++) {
       cnt[i] = 0;
 
-      for (j = 0; j < n; j++)
+      for (j = 0; j < n; j++) {
         sm[i][j] = 0.0;
+      }
     }
-  } else
+  } else {
     error_loc(1, 1, "reset_hsum [hsum.c]", "Parameter id is out of range");
+  }
 }
 
 void add_to_hsum(int id, double const *x)
@@ -164,8 +171,9 @@ void add_to_hsum(int id, double const *x)
     cnt = hs[id][0].cnt;
     sm = hs[id][0].sm;
 
-    for (j = 0; j < n; j++)
+    for (j = 0; j < n; j++) {
       sm[0][j] += x[j];
+    }
 
     cnt[0] += 1;
 
@@ -178,8 +186,9 @@ void add_to_hsum(int id, double const *x)
       cnt[i] += 1;
       cnt[i - 1] = 0;
     }
-  } else
+  } else {
     error_loc(1, 1, "add_to_hsum [hsum.c]", "Parameter id is out of range");
+  }
 }
 
 void local_hsum(int id, double *sx)
@@ -192,27 +201,31 @@ void local_hsum(int id, double *sx)
     cnt = hs[id][0].cnt;
     sm = hs[id][0].sm;
 
-    for (j = 0; j < n; j++)
+    for (j = 0; j < n; j++) {
       sx[j] = sm[0][j];
+    }
 
     for (i = 1; i < MAX_LEVELS; i++) {
       if (cnt[i] > 0) {
-        for (j = 0; j < n; j++)
+        for (j = 0; j < n; j++) {
           sx[j] += sm[i][j];
+        }
       }
     }
-  } else
+  } else {
     error_loc(1, 1, "local_hsum [hsum.c]", "Parameter id is out of range");
+  }
 }
 
 void global_hsum(int id, double *sx)
 {
   int n, iprms[1];
 
-  if ((id >= 0) && (id < nhs))
+  if ((id >= 0) && (id < nhs)) {
     n = hs[id][0].n;
-  else
+  } else {
     n = 0;
+  }
 
   error_root(n == 0, 1, "global_hsum [hsum.c]", "Parameter id is out of range");
 
@@ -226,6 +239,7 @@ void global_hsum(int id, double *sx)
     local_hsum(id, sloc);
     MPI_Reduce(sloc, sx, n, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Bcast(sx, n, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  } else
+  } else {
     local_hsum(id, sx);
+  }
 }

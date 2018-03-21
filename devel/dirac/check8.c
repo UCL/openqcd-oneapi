@@ -34,10 +34,11 @@ static void blk_sd2zero(int ic, spinor_dble *sd)
   nbh = nb / 2;
   vol = (*b).vol;
 
-  if (ic ^ isw)
+  if (ic ^ isw) {
     n = nbh;
-  else
+  } else {
     n = 0;
+  }
 
   nm = n + nbh;
 
@@ -84,9 +85,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check8.c]",
                  "Syntax: check8 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -126,9 +128,10 @@ int main(int argc, char *argv[])
   swp = set_sw_parms(0.05);
   mu = 0.123;
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("m0 = %.4e, mu = %.4e, csw = %.4e, cF = %.4e, cF' = %.4e\n\n",
            swp.m0, mu, swp.csw, swp.cF[0], swp.cF[1]);
+  }
 
   random_ud();
   set_ud_phase();
@@ -145,8 +148,9 @@ int main(int argc, char *argv[])
     dmax = 0.0;
     set_tm_parms(itm);
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Twisted-mass flag = %d\n", itm);
+    }
 
     for (ic = 0; ic < 2; ic++) {
       random_sd(VOLUME, psd[0], 1.0);
@@ -154,10 +158,11 @@ int main(int argc, char *argv[])
       blk_sd2zero(ic ^ 0x1, psd[0]);
       blk_sd2zero(ic ^ 0x1, psd[2]);
 
-      if (ic ^ isw)
+      if (ic ^ isw) {
         n = nbh;
-      else
+      } else {
         n = 0;
+      }
 
       nm = n + nbh;
 
@@ -179,14 +184,16 @@ int main(int argc, char *argv[])
       mulr_spinor_add_dble(VOLUME, psd[0], psd[2], -1.0);
       mulr_spinor_add_dble(VOLUME, psd[1], psd[3], -1.0);
 
-      if (norm_square_dble(VOLUME, 0, psd[0]) != 0.0)
+      if (norm_square_dble(VOLUME, 0, psd[0]) != 0.0) {
         ie = 1;
+      }
 
       d = norm_square_dble(VOLUME, 1, psd[1]) /
           norm_square_dble(VOLUME, 1, psd[3]);
 
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
     }
 
     error(ie, 1, "main [check8.c]",
@@ -217,22 +224,25 @@ int main(int argc, char *argv[])
       assign_sd2sdblk(DFL_BLOCKS, n, ODD_PTS, psd[1], 0);
       Dwee_blk_dble(DFL_BLOCKS, n, mu, 0, 0);
       mulr_spinor_add_dble(vol, b[n].sd[0], b[n].sd[1], -1.0);
-      if (norm_square_dble(vol, 0, b[n].sd[0]) != 0.0)
+      if (norm_square_dble(vol, 0, b[n].sd[0]) != 0.0) {
         ie = 1;
+      }
     }
 
     Dwee_dble(mu, psd[0], psd[1]);
     mulr_spinor_add_dble(VOLUME, psd[0], psd[2], -1.0);
     mulr_spinor_add_dble(VOLUME, psd[1], psd[3], -1.0);
 
-    if (norm_square_dble(VOLUME, 0, psd[0]) != 0.0)
+    if (norm_square_dble(VOLUME, 0, psd[0]) != 0.0) {
       ie = 1;
+    }
 
     d = norm_square_dble(VOLUME, 1, psd[1]) /
         norm_square_dble(VOLUME, 1, psd[3]);
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
 
     random_sd(VOLUME, psd[0], 1.0);
     random_sd(VOLUME, psd[1], 1.0);
@@ -251,22 +261,25 @@ int main(int argc, char *argv[])
       assign_sd2sdblk(DFL_BLOCKS, n, EVEN_PTS, psd[1], 0);
       Dwoo_blk_dble(DFL_BLOCKS, n, mu, 0, 0);
       mulr_spinor_add_dble(vol, b[n].sd[0], b[n].sd[1], -1.0);
-      if (norm_square_dble(vol, 0, b[n].sd[0]) != 0.0)
+      if (norm_square_dble(vol, 0, b[n].sd[0]) != 0.0) {
         ie = 1;
+      }
     }
 
     Dwoo_dble(mu, psd[0], psd[1]);
     mulr_spinor_add_dble(VOLUME, psd[0], psd[2], -1.0);
     mulr_spinor_add_dble(VOLUME, psd[1], psd[3], -1.0);
 
-    if (norm_square_dble(VOLUME, 0, psd[0]) != 0.0)
+    if (norm_square_dble(VOLUME, 0, psd[0]) != 0.0) {
       ie = 1;
+    }
 
     d = norm_square_dble(VOLUME, 1, psd[1]) /
         norm_square_dble(VOLUME, 1, psd[3]);
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
 
     error(ie, 1, "main [check8.c]",
           "Dwee_blk_dble() or Dwoo_blk_dble() "
@@ -274,8 +287,9 @@ int main(int argc, char *argv[])
 
     dmax = sqrt(dmax);
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Dwee_blk_dble(), Dwoo_blk_dble(): %.1e\n", dmax);
+    }
 
     dmax = 0.0;
 
@@ -286,10 +300,11 @@ int main(int argc, char *argv[])
       blk_sd2zero(ic ^ 0x1, psd[0]);
       blk_sd2zero(ic ^ 0x1, psd[2]);
 
-      if (ic ^ isw)
+      if (ic ^ isw) {
         n = nbh;
-      else
+      } else {
         n = 0;
+      }
 
       nm = n + nbh;
 
@@ -311,14 +326,16 @@ int main(int argc, char *argv[])
       mulr_spinor_add_dble(VOLUME, psd[0], psd[2], -1.0);
       mulr_spinor_add_dble(VOLUME, psd[1], psd[3], -1.0);
 
-      if (norm_square_dble(VOLUME, 0, psd[0]) != 0.0)
+      if (norm_square_dble(VOLUME, 0, psd[0]) != 0.0) {
         ie = 1;
+      }
 
       d = norm_square_dble(VOLUME, 1, psd[1]) /
           norm_square_dble(VOLUME, 1, psd[3]);
 
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
     }
 
     error(ie, 1, "main [check8.c]",
@@ -326,8 +343,9 @@ int main(int argc, char *argv[])
 
     dmax = sqrt(dmax);
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Dweo_blk_dble():                  %.1e\n", dmax);
+    }
 
     dmax = 0.0;
 
@@ -338,10 +356,11 @@ int main(int argc, char *argv[])
       blk_sd2zero(ic ^ 0x1, psd[0]);
       blk_sd2zero(ic ^ 0x1, psd[2]);
 
-      if (ic ^ isw)
+      if (ic ^ isw) {
         n = nbh;
-      else
+      } else {
         n = 0;
+      }
 
       nm = n + nbh;
 
@@ -363,14 +382,16 @@ int main(int argc, char *argv[])
       mulr_spinor_add_dble(VOLUME, psd[0], psd[2], -1.0);
       mulr_spinor_add_dble(VOLUME, psd[1], psd[3], -1.0);
 
-      if (norm_square_dble(VOLUME, 0, psd[0]) != 0.0)
+      if (norm_square_dble(VOLUME, 0, psd[0]) != 0.0) {
         ie = 1;
+      }
 
       d = norm_square_dble(VOLUME, 1, psd[1]) /
           norm_square_dble(VOLUME, 1, psd[3]);
 
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
     }
 
     error(ie, 1, "main [check8.c]",
@@ -378,8 +399,9 @@ int main(int argc, char *argv[])
 
     dmax = sqrt(dmax);
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Dwoe_blk_dble():                  %.1e\n", dmax);
+    }
 
     dmax = 0.0;
     random_sd(VOLUME, psd[0], 1.0);
@@ -399,13 +421,15 @@ int main(int argc, char *argv[])
       Dwhat_blk_dble(DFL_BLOCKS, n, mu, 1, 2);
       mulr_spinor_add_dble(volh, b[n].sd[0], b[n].sd[2], -1.0);
       d = norm_square_dble(volh, 0, b[n].sd[0]);
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
 
       assign_sd2sdblk(DFL_BLOCKS, n, ALL_PTS, psd[0], 0);
       mulr_spinor_add_dble(volh, b[n].sd[0] + volh, b[n].sd[1] + volh, -1.0);
-      if (norm_square_dble(volh, 0, b[n].sd[0] + volh) != 0.0)
+      if (norm_square_dble(volh, 0, b[n].sd[0] + volh) != 0.0) {
         ie = 1;
+      }
     }
 
     error(ie, 1, "main [check8.c]",
@@ -419,12 +443,14 @@ int main(int argc, char *argv[])
       MPI_Bcast(&dmax, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     }
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Dwhat_blk_dble():                 %.1e\n\n", dmax);
+    }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

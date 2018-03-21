@@ -60,8 +60,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       cmat_vec_dble(nm, a, v, w);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -79,8 +80,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       cmat_mul_dble(nm, a, b, c);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -92,8 +94,9 @@ int main(void)
   printf("%.2e micro sec (%d Mflops)\n\n", dt,
          (int)((double)(nm * nm * (6 + (nm - 1) * 8)) / dt));
 
-  for (n = 0; n < nm; n++)
+  for (n = 0; n < nm; n++) {
     a[n * nm + n].re = (double)(10 * nm * nm);
+  }
 
   ie = cmat_inv_dble(nm, a, b, &k);
   error(ie != 0, 1, "main [time2.c]", "Matrix is not safely invertible");
@@ -103,8 +106,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       ie = cmat_inv_dble(nm, a, b, &k);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;

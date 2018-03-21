@@ -18,28 +18,28 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include "mpi.h"
-#include "su3.h"
-#include "random.h"
-#include "flags.h"
-#include "utils.h"
-#include "lattice.h"
 #include "archive.h"
-#include "uflds.h"
-#include "sflds.h"
-#include "linalg.h"
-#include "sw_term.h"
-#include "dirac.h"
-#include "sap.h"
 #include "dfl.h"
-#include "ratfcts.h"
+#include "dirac.h"
+#include "flags.h"
 #include "forces.h"
-#include "version.h"
 #include "global.h"
+#include "lattice.h"
+#include "linalg.h"
+#include "mpi.h"
+#include "random.h"
+#include "ratfcts.h"
+#include "sap.h"
+#include "sflds.h"
+#include "su3.h"
+#include "sw_term.h"
+#include "uflds.h"
+#include "utils.h"
+#include "version.h"
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -102,13 +102,14 @@ static void read_dirs(void)
 
 static void setup_files(void)
 {
-  if (noexp)
+  if (noexp) {
     error_root(name_size("%s/%sn%d_%d", loc_dir, nbase, last, NPROC - 1) >=
                    NAME_SIZE,
                1, "setup_files [ms2.c]", "loc_dir name is too long");
-  else
+  } else {
     error_root(name_size("%s/%sn%d", cnfg_dir, nbase, last) >= NAME_SIZE, 1,
                "setup_files [ms2.c]", "cnfg_dir name is too long");
+  }
 
   check_dir_root(log_dir);
   error_root(name_size("%s/%s.ms2.log~", log_dir, nbase) >= NAME_SIZE, 1,
@@ -152,17 +153,21 @@ static void read_bc_parms(void)
     cF = 1.0;
     cF_prime = 1.0;
 
-    if (bc == 1)
+    if (bc == 1) {
       read_dprms("phi", 2, phi);
+    }
 
-    if ((bc == 1) || (bc == 2))
+    if ((bc == 1) || (bc == 2)) {
       read_dprms("phi'", 2, phi_prime);
+    }
 
-    if (bc != 3)
+    if (bc != 3) {
       read_line("cF", "%lf", &cF);
+    }
 
-    if (bc == 2)
+    if (bc == 2) {
       read_line("cF'", "%lf", &cF_prime);
+    }
 
     read_optional_dprms("theta", 3, theta);
   }
@@ -242,11 +247,13 @@ static void read_solver(void)
   read_solver_parms(0);
   sp = solver_parms(0);
 
-  if ((sp.solver == SAP_GCR) || (sp.solver == DFL_SAP_GCR))
+  if ((sp.solver == SAP_GCR) || (sp.solver == DFL_SAP_GCR)) {
     read_sap_parms();
+  }
 
-  if (sp.solver == DFL_SAP_GCR)
+  if (sp.solver == DFL_SAP_GCR) {
     read_dfl_parms();
+  }
 }
 
 static void read_ani_parms(void)
@@ -338,8 +345,9 @@ static void read_infile(int argc, char *argv[])
   MPI_Bcast(&np_rb, 1, MPI_INT, 0, MPI_COMM_WORLD);
   read_solver();
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(fin);
+  }
 }
 
 static void check_files(void)
@@ -360,8 +368,9 @@ static void print_info(void)
     ip = ftell(flog);
     fclose(flog);
 
-    if (ip == 0L)
+    if (ip == 0L) {
       remove("STARTUP_ERROR");
+    }
 
     flog = freopen(log_file, "w", stdout);
     error_root(flog == NULL, 1, "print_info [ms2.c]",
@@ -376,14 +385,16 @@ static void print_info(void)
     printf("Program git SHA: %s\n", build_git_sha);
     printf("Program user CFLAGS: %s\n", build_user_cflags);
 
-    if (endian == LITTLE_ENDIAN)
+    if (endian == LITTLE_ENDIAN) {
       printf("The machine is little endian\n");
-    else
+    } else {
       printf("The machine is big endian\n");
-    if (noexp)
+    }
+    if (noexp) {
       printf("Configurations are read in imported file format\n\n");
-    else
+    } else {
       printf("Configurations are read in exported file format\n\n");
+    }
 
     printf("%dx%dx%dx%d lattice, ", N0, N1, N2, N3);
     printf("%dx%dx%dx%d local lattice\n", L0, L1, L2, L3);
@@ -407,11 +418,13 @@ static void print_info(void)
 
     print_solver_parms(&isap, &idfl);
 
-    if (isap)
+    if (isap) {
       print_sap_parms(0);
+    }
 
-    if (idfl)
+    if (idfl) {
       print_dfl_parms(0);
+    }
 
     printf("Configurations no %d -> %d in steps of %d\n\n", first, last, step);
     fflush(flog);
@@ -456,8 +469,9 @@ static void wsize(int *nws, int *nwsd, int *nwv, int *nwvd)
     MAX(*nws, 2 * sp.nkv + 2);
     MAX(*nwsd, nsd + 4);
     dfl_wsize(nws, nwv, nwvd);
-  } else
+  } else {
     error_root(1, 1, "wsize [ms2.c]", "Unknown or unsupported solver");
+  }
 }
 
 static double power1(int *status)
@@ -484,8 +498,9 @@ static double power1(int *status)
     sap = sap_parms();
     set_sap_parms(sap.bs, sp.isolv, sp.nmr, sp.ncy);
 
-    for (l = 0; l < 3; l++)
+    for (l = 0; l < 3; l++) {
       status[l] = 0;
+    }
   } else {
     nsd = 1;
     error_root(1, 1, "power1 [ms2.c]", "Unknown or unsupported solver");
@@ -503,8 +518,9 @@ static double power1(int *status)
       error_root(stat[0] < 0, 1, "power1 [ms2.c]",
                  "CGNE solver failed (status = %d)", stat[0]);
 
-      if (status[0] < stat[0])
+      if (status[0] < stat[0]) {
         status[0] = stat[0];
+      }
     } else if (sp.solver == SAP_GCR) {
       mulg5_dble(VOLUME / 2, wsd[0]);
       set_sd2zero(VOLUME / 2, wsd[0] + (VOLUME / 2));
@@ -517,8 +533,9 @@ static double power1(int *status)
                  "SAP_GCR solver failed (status = %d;%d)", stat[0], stat[1]);
 
       for (l = 0; l < 2; l++) {
-        if (status[0] < stat[l])
+        if (status[0] < stat[l]) {
           status[0] = stat[l];
+        }
       }
     } else if (sp.solver == DFL_SAP_GCR) {
       mulg5_dble(VOLUME / 2, wsd[0]);
@@ -536,11 +553,13 @@ static double power1(int *status)
                  stat[0], stat[1], stat[2], stat[3], stat[4], stat[5]);
 
       for (l = 0; l < 2; l++) {
-        if (status[l] < stat[l])
+        if (status[l] < stat[l]) {
           status[l] = stat[l];
+        }
 
-        if (status[l] < stat[l + 3])
+        if (status[l] < stat[l + 3]) {
           status[l] = stat[l + 3];
+        }
       }
 
       status[2] += (stat[2] != 0);
@@ -618,8 +637,9 @@ static void check_endflag(int *iend)
       remove(end_file);
       (*iend) = 1;
       printf("End flag set, run stopped\n\n");
-    } else
+    } else {
       (*iend) = 0;
+    }
   }
 
   MPI_Bcast(iend, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -667,8 +687,9 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Configuration no %d\n", nc);
+    }
 
     if (noexp) {
       save_ranlux();
@@ -701,16 +722,20 @@ int main(int argc, char *argv[])
       rbmax = rb;
       rbavg = rb;
     } else {
-      if (ra < ramin)
+      if (ra < ramin) {
         ramin = ra;
-      if (ra > ramax)
+      }
+      if (ra > ramax) {
         ramax = ra;
+      }
       raavg += ra;
 
-      if (rb < rbmin)
+      if (rb < rbmin) {
         rbmin = rb;
-      if (rb > rbmax)
+      }
+      if (rb > rbmax) {
         rbmax = rb;
+      }
       rbavg += rb;
     }
 
@@ -721,10 +746,11 @@ int main(int argc, char *argv[])
     if (my_rank == 0) {
       printf("ra = %.2e, rb = %.2e, ", ra, rb);
 
-      if (dfl.Ns)
+      if (dfl.Ns) {
         printf("status = %d,%d,%d\n", status[0], status[1], status[2]);
-      else
+      } else {
         printf("status = %d\n", status[0]);
+      }
 
       printf("Configuration no %d fully processed in %.2e sec ", nc, wt2 - wt1);
       printf("(average = %.2e sec)\n\n",
@@ -778,8 +804,9 @@ int main(int argc, char *argv[])
 
       printf("   %3d     %.1e      %.1e         %.1e\n", n, delta, d1, d2);
 
-      if ((d1 < 1.0e-2) && (d2 < 1.0e-4))
+      if ((d1 < 1.0e-2) && (d2 < 1.0e-4)) {
         break;
+      }
     }
 
     printf("\n");

@@ -22,8 +22,9 @@ static void allocate_send_recieve_buffers(void)
   for (mu = 0; mu < 4; mu++) {
     nuk = idx[mu].nuk;
 
-    if (nuk > n)
+    if (nuk > n) {
       n = nuk;
+    }
   }
 
   send_receive_buffer = (double *)amalloc(n * sizeof(su3_dble), ALIGN);

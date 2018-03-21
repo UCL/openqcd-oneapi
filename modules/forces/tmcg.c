@@ -120,17 +120,20 @@ double tmcg(int nmx, double res, double mu, spinor_dble *eta, spinor_dble *psi,
   tm_parms_t tm;
 
   tm = tm_parms();
-  if (tm.eoflg == 1)
+  if (tm.eoflg == 1) {
     set_tm_parms(0);
+  }
 
-  if (query_flags(U_MATCH_UD) != 1)
+  if (query_flags(U_MATCH_UD) != 1) {
     assign_ud2u();
+  }
 
   sw_term(NO_PTS);
 
   if ((query_flags(SW_UP2DATE) != 1) || (query_flags(SW_E_INVERTED) != 0) ||
-      (query_flags(SW_O_INVERTED) != 0))
+      (query_flags(SW_O_INVERTED) != 0)) {
     assign_swd2sw();
+  }
 
   ws = reserve_ws(5);
   wsd = reserve_wsd(2);
@@ -197,12 +200,14 @@ double tmcgeo(int nmx, double res, double mu, spinor_dble *eta,
     status[0] = -2;
     rho = rho0;
   } else {
-    if (query_flags(U_MATCH_UD) != 1)
+    if (query_flags(U_MATCH_UD) != 1) {
       assign_ud2u();
+    }
 
     if ((query_flags(SW_UP2DATE) != 1) || (query_flags(SW_E_INVERTED) != 0) ||
-        (query_flags(SW_O_INVERTED) != 1))
+        (query_flags(SW_O_INVERTED) != 1)) {
       assign_swd2sw();
+    }
 
     ws = reserve_ws(5);
     wsd = reserve_wsd(2);

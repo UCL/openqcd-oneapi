@@ -73,8 +73,9 @@ void fill_link_staple_array(su3_dble *staples[], su3_dble *gfield, int ix,
   for (nu = 0; nu < 2; ++nu) {
     get_staple_indices(staple_idx, ix, mu, staple_dirs[nu]);
 
-    for (i = 0; i < 6; ++i)
+    for (i = 0; i < 6; ++i) {
       staples[i + n] = gfield + staple_idx[i];
+    }
 
     n += 6;
   }
@@ -91,8 +92,9 @@ void fill_lambda_staple_array(su3_alg_dble *staples[], su3_alg_dble *lambda,
   for (nu = 0; nu < 2; ++nu) {
     get_staple_indices(staple_idx, ix, mu, staple_dirs[nu]);
 
-    for (i = 0; i < 6; ++i)
+    for (i = 0; i < 6; ++i) {
       staples[i + n] = lambda + staple_idx[i];
+    }
 
     n += 6;
   }
@@ -105,8 +107,9 @@ void compute_xi_fixed_lambda(su3_dble const *gfield)
 
   smear_params = stout_smearing_parms();
 
-  if (xi_field == NULL)
+  if (xi_field == NULL) {
     alloc_xi_field();
+  }
 
   num_links = 4 * VOLUME + 7 * (BNDRY / 4);
   cm3x3_zero(num_links, xi_field);
@@ -264,19 +267,22 @@ int main(int argc, char *argv[])
           }
         }
 
-        if (test_failed)
+        if (test_failed) {
           break;
+        }
       }
 
-      if (!test_failed)
+      if (!test_failed) {
         printf(" none found\n");
+      }
 
       printf("\n-------------------------------------------\n\n");
     }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     report_test_results();
+  }
 
   MPI_Finalize();
   return 0;

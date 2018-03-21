@@ -126,8 +126,9 @@ static void Lvd(complex_dble *v, complex_dble *w)
   int i;
   complex_dble z;
 
-  for (i = 0; i < Ns; i++)
+  for (i = 0; i < Ns; i++) {
     cs1[i] = vprod_dble(nvh, 0, vds[i], v);
+  }
 
   sum_vprod(Ns, cs1, cs2);
   cmat_vec_dble(Ns, awd, cs2, cs1);
@@ -146,8 +147,9 @@ static void RLvd(complex_dble *v, complex_dble *w)
   int i;
   complex_dble z;
 
-  for (i = 0; i < Ns; i++)
+  for (i = 0; i < Ns; i++) {
     cs1[i] = vprod_dble(nvh, 0, vds[i], w);
+  }
 
   sum_vprod(Ns, cs1, cs2);
   cmat_vec_dble(Ns, awd, cs2, cs1);
@@ -202,17 +204,18 @@ double ltl_gcr(int nkv, int nmx, double res, double mu, complex_dble *eta,
   complex **wv;
   complex_dble **wvd, z;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     set_constants();
+  }
 
   status[0] = 0;
   rho0 = sqrt(vnorm_square_dble(nv, 1, eta));
   rho = rho0;
   ifail = set_Awhat(mu);
 
-  if (ifail)
+  if (ifail) {
     status[0] = -2;
-  else {
+  } else {
     wv = reserve_wv(2 * nkv + 1);
     wvd = reserve_wvd(3);
 

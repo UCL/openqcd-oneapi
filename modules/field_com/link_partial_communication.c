@@ -43,8 +43,9 @@ static void init_buffer(void)
   for (mu = 0; mu < 4; mu++) {
     nuk = idx[mu].nuk;
 
-    if (nuk > n)
+    if (nuk > n) {
       n = nuk;
+    }
   }
 
   send_receive_buffer = communication_buffer();

@@ -147,7 +147,7 @@ static void alloc_lks(void)
       }
     }
 
-    if ( (bc == 3) && (nbclks != 0) ) {
+    if ((bc == 3) && (nbclks != 0)) {
       bclks = malloc(nbclks * sizeof(*bclks));
     } else {
       nbclks = 0;
@@ -227,10 +227,11 @@ static void alloc_pts(void)
   bc = bc_type();
 
   if (((cpr[0] == 0) && (bc != 3)) || ((cpr[0] == (NPROC0 - 1)) && (bc == 0))) {
-    if ((NPROC0 == 1) && (bc == 0))
+    if ((NPROC0 == 1) && (bc == 0)) {
       npts = 2 * L1 * L2 * L3;
-    else
+    } else {
       npts = L1 * L2 * L3;
+    }
 
     pts = malloc(npts * sizeof(*pts));
 
@@ -258,8 +259,9 @@ static void alloc_pts(void)
 
 int *bnd_lks(int *n)
 {
-  if (init0 == 0)
+  if (init0 == 0) {
     alloc_lks();
+  }
 
   (*n) = nlks;
 
@@ -268,8 +270,9 @@ int *bnd_lks(int *n)
 
 int *bnd_bnd_lks(int *n)
 {
-  if (init0 == 0)
+  if (init0 == 0) {
     alloc_lks();
+  }
 
   (*n) = nbclks;
 
@@ -278,8 +281,9 @@ int *bnd_bnd_lks(int *n)
 
 int *bnd_pts(int *n)
 {
-  if (init1 == 0)
+  if (init1 == 0) {
     alloc_pts();
+  }
 
   (*n) = npts;
 
@@ -294,8 +298,9 @@ static int is_zero(su3_dble const *u)
   um = (umat_t *)(u);
   it = 1;
 
-  for (i = 0; i < 18; i++)
+  for (i = 0; i < 18; i++) {
     it &= is_equal_d((*um).r[i], 0.0);
+  }
 
   return it;
 }
@@ -309,8 +314,9 @@ static int is_equal(double tol, su3_dble const *u, su3_dble const *v)
   vm = (umat_t *)(v);
   it = 1;
 
-  for (i = 0; i < 18; i++)
+  for (i = 0; i < 18; i++) {
     it &= (fabs((*um).r[i] - (*vm).r[i]) <= tol);
+  }
 
   return it;
 }
@@ -383,15 +389,17 @@ static void open_bc(void)
   int *lk, *lkm;
   su3_dble *ub;
 
-  if (init0 == 0)
+  if (init0 == 0) {
     alloc_lks();
+  }
 
   ub = udfld();
   lk = lks;
   lkm = lk + nlks;
 
-  for (; lk < lkm; lk++)
+  for (; lk < lkm; lk++) {
     ub[*lk] = ud0;
+  }
 
   set_flags(UPDATED_UD);
 }
@@ -401,10 +409,12 @@ static void SF_bc(void)
   int k, *pt, *ptm;
   su3_dble *ub, *u;
 
-  if (init1 == 0)
+  if (init1 == 0) {
     alloc_pts();
-  if (init2 == 0)
+  }
+  if (init2 == 0) {
     set_ubnd();
+  }
 
   ub = udfld();
 
@@ -425,8 +435,9 @@ static void SF_bc(void)
   if (cpr[0] == (NPROC0 - 1)) {
     u = ub + 4 * VOLUME + 7 * (BNDRY / 4);
 
-    for (k = 0; k < 3; k++)
+    for (k = 0; k < 3; k++) {
       u[k] = ubnd[1][k];
+    }
   }
 
   set_flags(UPDATED_UD);
@@ -437,16 +448,18 @@ static void openSF_bc(void)
   int k;
   su3_dble *ub, *u;
 
-  if (init2 == 0)
+  if (init2 == 0) {
     set_ubnd();
+  }
 
   ub = udfld();
 
   if (cpr[0] == (NPROC0 - 1)) {
     u = ub + 4 * VOLUME + 7 * (BNDRY / 4);
 
-    for (k = 0; k < 3; k++)
+    for (k = 0; k < 3; k++) {
       u[k] = ubnd[1][k];
+    }
   }
 
   set_flags(UPDATED_UD);
@@ -460,12 +473,13 @@ void set_bc(void)
              "Gauge configuration must not be modified (phase|smearing)");
   bc = bc_type();
 
-  if (bc == 0)
+  if (bc == 0) {
     open_bc();
-  else if (bc == 1)
+  } else if (bc == 1) {
     SF_bc();
-  else if (bc == 2)
+  } else if (bc == 2) {
     openSF_bc();
+  }
 
   it = check_zero(bc);
   error(it != 1, 1, "set_bc [bcnds.c]",
@@ -477,10 +491,12 @@ static int check_SF(double tol)
   int it, k, *pt, *ptm;
   su3_dble *ub, *u;
 
-  if (init1 == 0)
+  if (init1 == 0) {
     alloc_pts();
-  if (init2 == 0)
+  }
+  if (init2 == 0) {
     set_ubnd();
+  }
 
   it = 1;
   ub = udfld();
@@ -502,8 +518,9 @@ static int check_SF(double tol)
   if (cpr[0] == (NPROC0 - 1)) {
     u = ub + 4 * VOLUME + 7 * (BNDRY / 4);
 
-    for (k = 0; k < 3; k++)
+    for (k = 0; k < 3; k++) {
       it &= is_equal(tol, u + k, ubnd[1] + k);
+    }
   }
 
   return it;
@@ -514,8 +531,9 @@ static int check_openSF(double tol)
   int it, k;
   su3_dble *ub, *u;
 
-  if (init2 == 0)
+  if (init2 == 0) {
     set_ubnd();
+  }
 
   it = 1;
   ub = udfld();
@@ -523,8 +541,9 @@ static int check_openSF(double tol)
   if (cpr[0] == (NPROC0 - 1)) {
     u = ub + 4 * VOLUME + 7 * (BNDRY / 4);
 
-    for (k = 0; k < 3; k++)
+    for (k = 0; k < 3; k++) {
       it &= is_equal(tol, u + k, ubnd[1] + k);
+    }
   }
 
   return it;
@@ -547,10 +566,11 @@ int check_bc(double tol)
   bc = bc_type();
   it = check_zero(bc);
 
-  if (bc == 1)
+  if (bc == 1) {
     it &= check_SF(tol);
-  else if (bc == 2)
+  } else if (bc == 2) {
     it &= check_openSF(tol);
+  }
 
   if (NPROC > 1) {
     is = it;
@@ -564,8 +584,9 @@ void bnd_s2zero(ptset_t set, spinor *s)
 {
   int *pt, *pm;
 
-  if (init1 == 0)
+  if (init1 == 0) {
     alloc_pts();
+  }
 
   if (npts > 0) {
     if (set == ALL_PTS) {
@@ -577,11 +598,13 @@ void bnd_s2zero(ptset_t set, spinor *s)
     } else if (set == ODD_PTS) {
       pt = pts + npts / 2;
       pm = pts + npts;
-    } else
+    } else {
       return;
+    }
 
-    for (; pt < pm; pt++)
+    for (; pt < pm; pt++) {
       s[*pt] = s0;
+    }
   }
 }
 
@@ -589,8 +612,9 @@ void bnd_sd2zero(ptset_t set, spinor_dble *sd)
 {
   int *pt, *pm;
 
-  if (init1 == 0)
+  if (init1 == 0) {
     alloc_pts();
+  }
 
   if (npts > 0) {
     if (set == ALL_PTS) {
@@ -602,10 +626,12 @@ void bnd_sd2zero(ptset_t set, spinor_dble *sd)
     } else if (set == ODD_PTS) {
       pt = pts + npts / 2;
       pm = pts + npts;
-    } else
+    } else {
       return;
+    }
 
-    for (; pt < pm; pt++)
+    for (; pt < pm; pt++) {
       sd[*pt] = sd0;
+    }
   }
 }

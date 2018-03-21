@@ -87,22 +87,25 @@ static void update_ud(double eps, su3_alg_dble *frc)
       frc += 1;
       u += 1;
 
-      if (bc != 0)
+      if (bc != 0) {
         expXsu3(eps, frc, u);
+      }
       frc += 1;
       u += 1;
 
       for (ifc = 2; ifc < 8; ifc++) {
-        if ((bc == 0) || (bc == 2))
+        if ((bc == 0) || (bc == 2)) {
           expXsu3(2.0 * eps, frc, u);
-        else if (bc == 3)
+        } else if (bc == 3) {
           expXsu3(eps, frc, u);
+        }
         frc += 1;
         u += 1;
       }
     } else if (t == (N0 - 1)) {
-      if (bc != 0)
+      if (bc != 0) {
         expXsu3(eps, frc, u);
+      }
       frc += 1;
       u += 1;
 
@@ -111,10 +114,11 @@ static void update_ud(double eps, su3_alg_dble *frc)
       u += 1;
 
       for (ifc = 2; ifc < 8; ifc++) {
-        if (bc == 0)
+        if (bc == 0) {
           expXsu3(2.0 * eps, frc, u);
-        else
+        } else {
           expXsu3(eps, frc, u);
+        }
         frc += 1;
         u += 1;
       }

@@ -60,8 +60,9 @@ static complex *psi;
 
 static void alloc_wrotate(int n)
 {
-  if (nrot > 0)
+  if (nrot > 0) {
     afree(psi);
+  }
 
   psi = amalloc(n * sizeof(*psi), ALIGN);
   error_loc(psi == NULL, 1, "alloc_wrotate [valg.c]",
@@ -108,12 +109,13 @@ float vnorm_square(int n, int icom, complex const *v)
   x = 0.0;
   vm = v + n;
 
-  for (; v < vm; v++)
+  for (; v < vm; v++) {
     x += (double)((*v).re * (*v).re + (*v).im * (*v).im);
+  }
 
-  if ((icom != 1) || (NPROC == 1))
+  if ((icom != 1) || (NPROC == 1)) {
     return (float)(x);
-  else {
+  } else {
     MPI_Reduce(&x, &y, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Bcast(&y, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     return (float)(y);
@@ -162,10 +164,11 @@ float vnormalize(int n, int icom, complex *v)
   r = vnorm_square(n, icom, v);
   r = (float)(sqrt((double)(r)));
 
-  if (not_equal_f(r, 0.0f))
+  if (not_equal_f(r, 0.0f)) {
     vscale(n, 1.0f / r, v);
-  else
+  } else {
     error_loc(1, 1, "vnormalize [valg.c]", "Vector field has vanishing norm");
+  }
 
   return r;
 }
@@ -176,8 +179,9 @@ void vrotate(int n, int nv, complex **pv, complex const *a)
   complex const *z;
   complex s, *vj;
 
-  if (nv > nrot)
+  if (nv > nrot) {
     alloc_wrotate(nv);
+  }
 
   for (i = 0; i < n; i++) {
     for (k = 0; k < nv; k++) {

@@ -106,14 +106,15 @@ static void random_g(void)
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
 
-    if ((t > 0) || (bc != 1))
+    if ((t > 0) || (bc != 1)) {
 #ifdef SITERAND
       random_su3_dble(gx, 0);
 #else
       random_su3_dble(gx);
 #endif
-    else
+    } else {
       (*gx) = unity;
+    }
 
     gx += 1;
   }
@@ -256,9 +257,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check1.c]",
                  "Syntax: check1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -296,8 +298,9 @@ int main(int argc, char *argv[])
   psd = reserve_wsd(5);
 
   g = amalloc(NSPIN * sizeof(*g), 4);
-  if (BNDRY != 0)
+  if (BNDRY != 0) {
     gbuf = amalloc((BNDRY / 2) * sizeof(*gbuf), 4);
+  }
 
   error((g == NULL) || ((BNDRY != 0) && (gbuf == NULL)), 1, "main [check1.c]",
         "Unable to allocate auxiliary arrays");
@@ -305,9 +308,10 @@ int main(int argc, char *argv[])
   swp = set_sw_parms(-0.0123);
   mu = 0.0376;
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("m0 = %.4e, csw = %.4e, cF = %.4e, cF' = %.4e\n\n", swp.m0, swp.csw,
            swp.cF[0], swp.cF[1]);
+  }
 
   random_g();
   random_ud();

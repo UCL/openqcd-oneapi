@@ -92,18 +92,20 @@ double ym_action(void)
   double S;
 
   if (init == 0) {
-    for (t = 0; t < L0; t++)
+    for (t = 0; t < L0; t++) {
       isx[t] = init_hsum(1);
+    }
 
     init = 1;
   }
 
   ft = ftensor();
   bc = bc_type();
-  if (bc == 0)
+  if (bc == 0) {
     tmx = N0 - 1;
-  else
+  } else {
     tmx = N0;
+  }
   reset_hsum(isx[0]);
 
   for (ix = 0; ix < VOLUME; ix++) {
@@ -115,10 +117,11 @@ double ym_action(void)
     }
   }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     global_hsum(isx[0], &S);
-  else
+  } else {
     local_hsum(isx[0], &S);
+  }
 
   return 0.5 * S;
 }
@@ -129,22 +132,25 @@ double ym_action_slices(double *asl)
   double S;
 
   if (init == 0) {
-    for (t = 0; t < L0; t++)
+    for (t = 0; t < L0; t++) {
       isx[t] = init_hsum(1);
+    }
 
     init = 1;
   }
 
   ft = ftensor();
   bc = bc_type();
-  if (bc == 0)
+  if (bc == 0) {
     tmx = N0 - 1;
-  else
+  } else {
     tmx = N0;
+  }
   t0 = cpr[0] * L0;
 
-  for (t = 0; t < L0; t++)
+  for (t = 0; t < L0; t++) {
     reset_hsum(isx[t]);
+  }
 
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
@@ -156,8 +162,9 @@ double ym_action_slices(double *asl)
     }
   }
 
-  for (t = 0; t < N0; t++)
+  for (t = 0; t < N0; t++) {
     asl0[t] = 0.0;
+  }
 
   for (t = 0; t < L0; t++) {
     local_hsum(isx[t], &S);
@@ -168,14 +175,16 @@ double ym_action_slices(double *asl)
     MPI_Reduce(asl0, asl, N0, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Bcast(asl, N0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   } else {
-    for (t = 0; t < N0; t++)
+    for (t = 0; t < N0; t++) {
       asl[t] = asl0[t];
+    }
   }
 
   S = 0.0;
 
-  for (t = 0; t < N0; t++)
+  for (t = 0; t < N0; t++) {
     S += asl[t];
+  }
 
   return S;
 }

@@ -64,9 +64,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check2.c]",
                  "Syntax: check2 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -105,10 +106,11 @@ int main(int argc, char *argv[])
   set_sw_parms(0.05);
 
   for (itm = 0; itm < 2; itm++) {
-    if (itm == 0)
+    if (itm == 0) {
       set_tm_parms(1);
-    else
+    } else {
       set_tm_parms(0);
+    }
 
     random_ud();
     set_ud_phase();
@@ -135,8 +137,9 @@ int main(int argc, char *argv[])
       res = norm_square(VOLUME, 1, ps[1]);
       res = (float)(sqrt((double)(res)));
 
-      if (my_rank == 0)
+      if (my_rank == 0) {
         printf("n = %d: \t residue = %.2e\t ", n + 1, res);
+      }
 
       Dw(mu, ps[0], ps[3]);
       mulr_spinor_add(VOLUME, ps[3], ps[2], -1.0f);
@@ -156,9 +159,10 @@ int main(int argc, char *argv[])
       del[2] = norm_square(VOLUME, 1, ps[3]);
       del[2] = (float)(sqrt((double)(del[1])));
 
-      if (my_rank == 0)
+      if (my_rank == 0) {
         printf("check = %.2e, bnd checks = %.1e,%.1e\n", del[0], del[1],
                del[2]);
+      }
     }
 
     ie = assign_swd2swbgr(SAP_BLOCKS, ODD_PTS);
@@ -181,8 +185,9 @@ int main(int argc, char *argv[])
       res = norm_square(VOLUME, 1, ps[1]);
       res = (float)(sqrt((double)(res)));
 
-      if (my_rank == 0)
+      if (my_rank == 0) {
         printf("n = %d: \t residue = %.2e\t ", n + 1, res);
+      }
 
       Dw(mu, ps[0], ps[3]);
       mulr_spinor_add(VOLUME, ps[3], ps[2], -1.0f);
@@ -202,17 +207,20 @@ int main(int argc, char *argv[])
       del[2] = norm_square(VOLUME, 1, ps[3]);
       del[2] = (float)(sqrt((double)(del[1])));
 
-      if (my_rank == 0)
+      if (my_rank == 0) {
         printf("check = %.2e, bnd checks = %.1e,%.1e\n", del[0], del[1],
                del[2]);
+      }
     }
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("\n");
+    }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

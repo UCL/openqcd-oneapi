@@ -58,10 +58,12 @@ static float diff_pauli(void)
 
     for (j = 0; j < 36; j++) {
       d = u[j] - (float)(ud[j]);
-      if (d < 0.0f)
+      if (d < 0.0f) {
         d = -d;
-      if (d > dmax)
+      }
+      if (d > dmax) {
         dmax = d;
+      }
     }
   }
 
@@ -72,8 +74,9 @@ static void random_spin(void)
 {
   int i;
 
-  for (i = 0; i < NM; i++)
+  for (i = 0; i < NM; i++) {
     gauss(sp1[i].r, 24);
+  }
 }
 
 static void cp_spin(spin_t *sp, spin_t *rp)
@@ -81,8 +84,9 @@ static void cp_spin(spin_t *sp, spin_t *rp)
   int i, j;
 
   for (i = 0; i < NM; i++) {
-    for (j = 0; j < 24; j++)
+    for (j = 0; j < 24; j++) {
       rp[i].r[j] = sp[i].r[j];
+    }
   }
 }
 
@@ -96,10 +100,12 @@ static float diff_spin(spin_t *sp, spin_t *rp)
   for (i = 0; i < NM; i++) {
     for (j = 0; j < 24; j++) {
       d = sp[i].r[j] - rp[i].r[j];
-      if (d < 0.0f)
+      if (d < 0.0f) {
         d = -d;
-      if (d > dmax)
+      }
+      if (d > dmax) {
         dmax = d;
+      }
     }
   }
 

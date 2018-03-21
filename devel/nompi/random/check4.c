@@ -35,8 +35,9 @@ int main(void)
     if (scanf("%d", &n) == 1) {
       printf("\n");
 
-      if (n <= 0)
+      if (n <= 0) {
         exit(0);
+      }
 
       f = amalloc(n * sizeof(double), 3);
       r = amalloc(n * sizeof(float), 3);
@@ -46,10 +47,11 @@ int main(void)
       for (i = 0; i < n; i++) {
         x = (double)(r[i]);
 
-        if (x >= 0)
+        if (x >= 0) {
           f[i] = 0.5 + 0.5 * pchi_square(2.0 * x * x, 1);
-        else
+        } else {
           f[i] = 0.5 - 0.5 * pchi_square(2.0 * x * x, 1);
+        }
       }
 
       ks_test(n, f, &kp, &km);
@@ -68,10 +70,11 @@ int main(void)
       for (i = 0; i < n; i++) {
         x = rd[i];
 
-        if (x >= 0)
+        if (x >= 0) {
           f[i] = 0.5 + 0.5 * pchi_square(2.0 * x * x, 1);
-        else
+        } else {
           f[i] = 0.5 - 0.5 * pchi_square(2.0 * x * x, 1);
+        }
       }
 
       ks_test(n, f, &kp, &km);

@@ -249,8 +249,9 @@ void apply_u2sd(int vol, int const *imb, su3_dble const *ud,
     si = sd + (*imb);
     imb += 1;
 
-    if (imb < imm)
+    if (imb < imm) {
       _prefetch_spinor_dble(sd + (*imb));
+    }
 
     _sse_load_dble((*si).c1);
     _sse_su3_multiply_dble(*ud);
@@ -285,8 +286,9 @@ void apply_udag2sd(int vol, int const *imb, su3_dble const *ud,
     si = sd + (*imb);
     imb += 1;
 
-    if (imb < imm)
+    if (imb < imm) {
       _prefetch_spinor_dble(sd + (*imb));
+    }
 
     _sse_load_dble((*si).c1);
     _sse_su3_inverse_multiply_dble(*ud);
@@ -320,8 +322,9 @@ static void spinor_prod_gamma0(int vol, spinor_dble const *sd,
 
   while (rm < rt) {
     rm += BLK_LENGTH;
-    if (rm > rt)
+    if (rm > rt) {
       rm = rt;
+    }
 
     _start_sm();
 
@@ -367,8 +370,9 @@ static void spinor_prod_gamma1(int vol, spinor_dble const *sd,
 
   while (rm < rt) {
     rm += BLK_LENGTH;
-    if (rm > rt)
+    if (rm > rt) {
       rm = rt;
+    }
 
     _start_sm();
 
@@ -414,8 +418,9 @@ static void spinor_prod_gamma2(int vol, spinor_dble const *sd,
 
   while (rm < rt) {
     rm += BLK_LENGTH;
-    if (rm > rt)
+    if (rm > rt) {
       rm = rt;
+    }
 
     _start_sm();
 
@@ -461,8 +466,9 @@ static void spinor_prod_gamma3(int vol, spinor_dble const *sd,
 
   while (rm < rt) {
     rm += BLK_LENGTH;
-    if (rm > rt)
+    if (rm > rt) {
       rm = rt;
+    }
 
     _start_sm();
 
@@ -553,8 +559,9 @@ static void spinor_prod_gamma0(int vol, spinor_dble const *sd,
 
   while (rm < rt) {
     rm += BLK_LENGTH;
-    if (rm > rt)
+    if (rm > rt) {
       rm = rt;
+    }
 
     z0.re = 0.0;
     z0.im = 0.0;
@@ -611,8 +618,9 @@ static void spinor_prod_gamma1(int vol, spinor_dble const *sd,
 
   while (rm < rt) {
     rm += BLK_LENGTH;
-    if (rm > rt)
+    if (rm > rt) {
       rm = rt;
+    }
 
     z0.re = 0.0;
     z0.im = 0.0;
@@ -671,8 +679,9 @@ static void spinor_prod_gamma2(int vol, spinor_dble const *sd,
 
   while (rm < rt) {
     rm += BLK_LENGTH;
-    if (rm > rt)
+    if (rm > rt) {
       rm = rt;
+    }
 
     z0.re = 0.0;
     z0.im = 0.0;
@@ -731,8 +740,9 @@ static void spinor_prod_gamma3(int vol, spinor_dble const *sd,
 
   while (rm < rt) {
     rm += BLK_LENGTH;
-    if (rm > rt)
+    if (rm > rt) {
       rm = rt;
+    }
 
     z0.re = 0.0;
     z0.im = 0.0;

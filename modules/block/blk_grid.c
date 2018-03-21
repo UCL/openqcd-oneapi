@@ -103,8 +103,9 @@ static block_t *blks(int *bs, int iu, int iud, int ns, int nsd, int iub,
               alloc_blk(b, bo, bs, iu, iud, ns, nsd);
               alloc_bnd(b, iub, iudb, nw, nwd);
               (*b).shf = shf;
-            } else
+            } else {
               clone_blk(b, shf, bo, rbe);
+            }
 
             rbe += 1;
           } else {
@@ -171,14 +172,16 @@ void alloc_bgr(blk_grid_t grid)
     ns = dfl.Ns + 1;
     nsd = dfl.Ns + 1;
     shf = 0xb;
-  } else
+  } else {
     error_root(1, 1, "alloc_bgr [blk_grid.c]", "Unknown block grid");
+  }
 
   bgr[igr].b = blks(bs, iu, iud, ns, nsd, iub, iudb, nw, nwd, shf,
                     &(bgr[igr].nb), &(bgr[grid].isw));
 
-  if (grid == SAP_BLOCKS)
+  if (grid == SAP_BLOCKS) {
     alloc_sap_bufs();
+  }
 }
 
 block_t *blk_list(blk_grid_t grid, int *nb, int *isw)

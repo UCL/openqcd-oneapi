@@ -120,18 +120,20 @@ static void alloc_mdflds(void)
 
 mdflds_t *mdflds(void)
 {
-  if (mdfs == NULL)
+  if (mdfs == NULL) {
     alloc_mdflds();
+  }
 
   return mdfs;
 }
 
 void set_frc2zero(void)
 {
-  if (mdfs == NULL)
+  if (mdfs == NULL) {
     alloc_mdflds();
-  else
+  } else {
     set_alg2zero(4 * VOLUME + 7 * (BNDRY / 4), (*mdfs).frc);
+  }
 }
 
 void bnd_mom2zero(void)
@@ -143,16 +145,18 @@ void bnd_mom2zero(void)
   bc = bc_type();
 
   if ((bc == 0) || (bc == 1)) {
-    if (mdfs == NULL)
+    if (mdfs == NULL) {
       alloc_mdflds();
+    }
     mom = (*mdfs).mom;
 
     if (bc == 0) {
       lks = bnd_lks(&nlks);
       lkm = lks + nlks;
 
-      for (; lks < lkm; lks++)
+      for (; lks < lkm; lks++) {
         mom[*lks] = md0;
+      }
     } else if (bc == 1) {
       pts = bnd_pts(&npts);
       ptm = pts + npts;
@@ -161,8 +165,9 @@ void bnd_mom2zero(void)
       for (; pts < ptm; pts++) {
         m = mom + 8 * (pts[0] - (VOLUME / 2));
 
-        for (ifc = 2; ifc < 8; ifc++)
+        for (ifc = 2; ifc < 8; ifc++) {
           m[ifc] = md0;
+        }
       }
     }
   }
@@ -170,8 +175,9 @@ void bnd_mom2zero(void)
 
 void random_mom(void)
 {
-  if (mdfs == NULL)
+  if (mdfs == NULL) {
     alloc_mdflds();
+  }
   random_alg(4 * VOLUME, (*mdfs).mom);
   bnd_mom2zero();
 }
@@ -181,6 +187,12 @@ double momentum_action(int icom)
   return 0.5 * norm_square_alg(4 * VOLUME, icom, (*mdfs).mom);
 }
 
-void copy_bnd_frc(void) { copy_boundary_su3_alg_field((*mdflds()).frc); }
+void copy_bnd_frc(void)
+{
+  copy_boundary_su3_alg_field((*mdflds()).frc);
+}
 
-void add_bnd_frc(void) { add_boundary_su3_alg_field((*mdflds()).frc); }
+void add_bnd_frc(void)
+{
+  add_boundary_su3_alg_field((*mdflds()).frc);
+}

@@ -131,8 +131,9 @@ static float vdev(int n, complex *v, complex *w)
   for (i = 0; i < n; i++) {
     d = (float)(fabs((double)(v[i].re - w[i].re))) +
         (float)(fabs((double)(v[i].im - w[i].im)));
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   return dmax;
@@ -149,15 +150,19 @@ static float mdev(int n, complex *a, complex *b)
     for (j = 0; j < n; j++) {
       d = (float)(fabs((double)(a[i * n + j].re - b[i * n + j].re))) +
           (float)(fabs((double)(a[i * n + j].im - b[i * n + j].im)));
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
     }
   }
 
   return dmax;
 }
 
-static void rvec(int n, complex *v) { gauss((float *)(v), 2 * n); }
+static void rvec(int n, complex *v)
+{
+  gauss((float *)(v), 2 * n);
+}
 
 static void rmat(int n, complex *a)
 {
@@ -182,8 +187,9 @@ static void vec2vec(int n, complex *v, complex *w)
 {
   int i;
 
-  for (i = 0; i < n; i++)
+  for (i = 0; i < n; i++) {
     w[i] = v[i];
+  }
 }
 
 static void mat2mat(int n, complex *a, complex *b)
@@ -191,8 +197,9 @@ static void mat2mat(int n, complex *a, complex *b)
   int i, j;
 
   for (i = 0; i < n; i++) {
-    for (j = 0; j < n; j++)
+    for (j = 0; j < n; j++) {
       b[i * n + j] = a[i * n + j];
+    }
   }
 }
 
@@ -247,8 +254,9 @@ int main(void)
     mvec(n, a2, v2, w2);
 
     d = vdev(n, w1, w2);
-    if (d > d1)
+    if (d > d1) {
       d1 = d;
+    }
 
     error((mdev(n, a1, a2) != 0.0f) || (vdev(n, v1, v2) != 0.0f), 1,
           "main [check1.c]", "cmat_vec: input values have changed");
@@ -264,8 +272,9 @@ int main(void)
     mvec_assign(n, a2, v2, w2);
 
     d = vdev(n, w1, w2);
-    if (d > d1)
+    if (d > d1) {
       d1 = d;
+    }
 
     error((mdev(n, a1, a2) != 0.0f) || (vdev(n, v1, v2) != 0.0f), 1,
           "main [check1.c]", "cmat_vec_assign: input values have changed");
@@ -281,8 +290,9 @@ int main(void)
     madd(n, a2, b2, c2);
 
     d = mdev(n, c1, c2);
-    if (d > d2)
+    if (d > d2) {
       d2 = d;
+    }
 
     error((mdev(n, a1, a2) != 0.0f) || (mdev(n, b1, b2) != 0.0f), 1,
           "main [check1.c]", "cmat_add: input values have changed");
@@ -298,8 +308,9 @@ int main(void)
     msub(n, a2, b2, c2);
 
     d = mdev(n, c1, c2);
-    if (d > d3)
+    if (d > d3) {
       d3 = d;
+    }
 
     error((mdev(n, a1, a2) != 0.0f) || (mdev(n, b1, b2) != 0.0f), 1,
           "main [check1.c]", "cmat_sub: input values have changed");
@@ -315,8 +326,9 @@ int main(void)
     mmul(n, a2, b2, c2);
 
     d = mdev(n, c1, c2);
-    if (d > d4)
+    if (d > d4) {
       d4 = d;
+    }
 
     error((mdev(n, a1, a2) != 0.0f) || (mdev(n, b1, b2) != 0.0f), 1,
           "main [check1.c]", "cmat_mul: input values have changed");
@@ -330,8 +342,9 @@ int main(void)
     mdag(n, a2, b2);
 
     d = mdev(n, b1, b2);
-    if (d > d5)
+    if (d > d5) {
       d5 = d;
+    }
 
     error(mdev(n, a1, a2) != 0.0f, 1, "main [check1.c]",
           "cmat_dag: input values have changed");

@@ -110,8 +110,9 @@ int main(int argc, char *argv[])
     mulr_spinor_add_dble(VOLUME, psd[k], psd[k + 3], -1.0);
     d = norm_square_dble(VOLUME, 0, psd[k]);
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   MPI_Reduce(&d, &dmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);

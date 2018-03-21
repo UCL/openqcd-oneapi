@@ -76,8 +76,9 @@ static int cp_swd2sw(block_t *b, ptset_t set)
       ifail |= inv_pauli_dble(0.0, p, ms);
       ifail |= inv_pauli_dble(0.0, p + 1, ms + 1);
       assign_pauli(2, ms, pb);
-    } else
+    } else {
       assign_pauli(2, p, pb);
+    }
   }
 
   pm += (*b).vol;
@@ -90,8 +91,9 @@ static int cp_swd2sw(block_t *b, ptset_t set)
       ifail |= inv_pauli_dble(0.0, p, ms);
       ifail |= inv_pauli_dble(0.0, p + 1, ms + 1);
       assign_pauli(2, ms, pb);
-    } else
+    } else {
       assign_pauli(2, p, pb);
+    }
   }
 
   return ifail;
@@ -138,15 +140,18 @@ int assign_swd2swbgr(blk_grid_t grid, ptset_t set)
   bm = b + nb;
   ifail = 0;
 
-  for (; b < bm; b++)
+  for (; b < bm; b++) {
     ifail |= cp_swd2sw(b, set);
+  }
 
   set_grid_flags(grid, ASSIGNED_SWD2SWBGR);
 
-  if ((set == ALL_PTS) || (set == EVEN_PTS))
+  if ((set == ALL_PTS) || (set == EVEN_PTS)) {
     set_grid_flags(grid, INVERTED_SW_E);
-  if ((set == ALL_PTS) || (set == ODD_PTS))
+  }
+  if ((set == ALL_PTS) || (set == ODD_PTS)) {
     set_grid_flags(grid, INVERTED_SW_O);
+  }
 
   if (set != NO_PTS) {
     n = ifail;

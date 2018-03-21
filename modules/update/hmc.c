@@ -88,8 +88,9 @@ static void init_rs(int nr)
   int k;
 
   if (nr > nrs) {
-    if (nrs > 0)
+    if (nrs > 0) {
       free(rs);
+    }
 
     rs = malloc(nr * sizeof(*rs));
     error_root(rs == NULL, 1, "init_rs [hmc.c]",
@@ -97,8 +98,9 @@ static void init_rs(int nr)
     nrs = nr;
   }
 
-  for (k = 0; k < nr; k++)
+  for (k = 0; k < nr; k++) {
     rs[k] = 0;
+  }
 }
 
 static int check_rat_actions(void)
@@ -130,17 +132,20 @@ static int check_rat_actions(void)
 
         if ((ap.action == ACF_RAT) || (ap.action == ACF_RAT_SDET)) {
           if ((ap.irat[0] == ir) && (ap.im0 == im0)) {
-            if (ap.action == ACF_RAT_SDET)
+            if (ap.action == ACF_RAT_SDET) {
               isw += 1;
+            }
 
-            for (j = ap.irat[1]; j <= ap.irat[2]; j++)
+            for (j = ap.irat[1]; j <= ap.irat[2]; j++) {
               rs[j] += 1;
+            }
           }
         }
       }
 
-      for (l = 0; l < nr; l++)
+      for (l = 0; l < nr; l++) {
         ie |= (rs[l] != isw);
+      }
     }
   }
 
@@ -153,9 +158,9 @@ static int match_force(action_parms_t ap, force_parms_t fp)
 
   ie = 1;
 
-  if (ap.action == ACG)
+  if (ap.action == ACG) {
     ie &= (fp.force == FRG);
-  else if (ap.action == ACF_TM1) {
+  } else if (ap.action == ACF_TM1) {
     ie &= (fp.force == FRF_TM1);
     ie &= (ap.ipf == fp.ipf);
     ie &= (ap.im0 == fp.im0);
@@ -196,8 +201,9 @@ static int match_force(action_parms_t ap, force_parms_t fp)
     ie &= (ap.irat[0] == fp.irat[0]);
     ie &= (ap.irat[1] == fp.irat[1]);
     ie &= (ap.irat[2] == fp.irat[2]);
-  } else
+  } else {
     ie = 0;
+  }
 
   return ie;
 }
@@ -239,11 +245,11 @@ void hmc_sanity_check(void)
     for (i = 0; i < nact; i++) {
       ap = action_parms(iact[i]);
 
-      if (ap.action == ACG)
+      if (ap.action == ACG) {
         iacg += 1;
-      else if ((ap.action == ACF_TM1) || (ap.action == ACF_TM1_EO) ||
-               (ap.action == ACF_TM1_EO_SDET) || (ap.action == ACF_TM2) ||
-               (ap.action == ACF_TM2_EO)) {
+      } else if ((ap.action == ACF_TM1) || (ap.action == ACF_TM1_EO) ||
+                 (ap.action == ACF_TM1_EO_SDET) || (ap.action == ACF_TM2) ||
+                 (ap.action == ACF_TM2_EO)) {
         iepf |= (ap.ipf < 0);
         iepf |= (ap.ipf >= npf);
         iemu |= (ap.imu[0] < 0);
@@ -449,16 +455,18 @@ void hmc_wsize(int *nwud, int *nws, int *nwsd, int *nwv, int *nwvd)
       nsd = 1;
       solver_wsize(ap.isp[0], nsd, 0, nws, nwsd, nwv, nwvd);
 
-      if ((ap.action == ACF_TM2) || (ap.action == ACF_TM2_EO))
+      if ((ap.action == ACF_TM2) || (ap.action == ACF_TM2_EO)) {
         solver_wsize(ap.isp[1], nsd, 0, nws, nwsd, nwv, nwvd);
+      }
     } else if ((ap.action == ACF_RAT) || (ap.action == ACF_RAT_SDET)) {
       np = ap.irat[2] - ap.irat[1] + 1;
       sp = solver_parms(ap.isp[0]);
 
-      if (sp.solver == MSCG)
+      if (sp.solver == MSCG) {
         nsd = np;
-      else
+      } else {
         nsd = 2;
+      }
 
       solver_wsize(ap.isp[0], nsd, np, nws, nwsd, nwv, nwvd);
     }
@@ -477,22 +485,24 @@ void hmc_wsize(int *nwud, int *nws, int *nwsd, int *nwv, int *nwvd)
           (fp.force == FRF_TM2_EO)) {
         sp = solver_parms(fp.isp[0]);
 
-        if (fp.icr[0] == 0)
+        if (fp.icr[0] == 0) {
           nsd = 2;
-        else if (sp.solver == CGNE)
+        } else if (sp.solver == CGNE) {
           nsd = 3;
-        else
+        } else {
           nsd = 4;
+        }
 
         solver_wsize(fp.isp[0], nsd, 0, nws, nwsd, nwv, nwvd);
       } else if ((fp.force == FRF_RAT) || (fp.force == FRF_RAT_SDET)) {
         np = fp.irat[2] - fp.irat[1] + 1;
         sp = solver_parms(fp.isp[0]);
 
-        if (sp.solver == MSCG)
+        if (sp.solver == MSCG) {
           nsd = np;
-        else
+        } else {
           nsd = 3;
+        }
 
         solver_wsize(fp.isp[0], nsd, np, nws, nwsd, nwv, nwvd);
       }
@@ -506,8 +516,9 @@ static void chk_mode_regen(int isp, int *status)
 
   sp = solver_parms(isp);
 
-  if ((sp.solver == DFL_SAP_GCR) && (status[2] > 0))
+  if ((sp.solver == DFL_SAP_GCR) && (status[2] > 0)) {
     add2counter("modes", 2, status + 2);
+  }
 }
 
 static void start_hmc(double *act0, su3_dble *uold)
@@ -530,22 +541,25 @@ static void start_hmc(double *act0, su3_dble *uold)
   clear_counters();
   udb = udfld();
   cm3x3_assign(4 * VOLUME, udb, uold);
-  if ((cpr[0] == (NPROC0 - 1)) && ((bc_type() == 1) || (bc_type() == 2)))
+  if ((cpr[0] == (NPROC0 - 1)) && ((bc_type() == 1) || (bc_type() == 2))) {
     cm3x3_assign(3, udb + 4 * VOLUME + 7 * (BNDRY / 4), ubnd);
+  }
 
   error_root(query_flags(UD_IS_CLEAN) == 0, 1, "start_hmc [hmc.c]",
              "Modified (phase|smearing) initial configuration");
 
-  if (npf != 0)
+  if (npf != 0) {
     set_ud_phase();
+  }
   random_mom();
   act0[0] = momentum_action(0);
   dfl = dfl_parms();
   smear_params = stout_smearing_parms();
 
   if (dfl.Ns) {
-    if (smear_params.smear_fermion == 1)
+    if (smear_params.smear_fermion == 1) {
       smear_fields();
+    }
 
     dfl_modes2(status);
     error_root((status[1] < 0) || ((status[1] == 0) && (status[0] < 0)), 1,
@@ -554,19 +568,22 @@ static void start_hmc(double *act0, su3_dble *uold)
                "failed (status = %d;%d)",
                status[0], status[1]);
 
-    if (status[1] == 0)
+    if (status[1] == 0) {
       add2counter("modes", 0, status);
-    else
+    } else {
       add2counter("modes", 2, status + 1);
+    }
 
-    if (smear_params.smear_fermion == 1)
+    if (smear_params.smear_fermion == 1) {
       unsmear_fields();
+    }
   }
 
   n = 2;
 
-  if (query_flags(UDBUF_UP2DATE) != 1)
+  if (query_flags(UDBUF_UP2DATE) != 1) {
     copy_bnd_ud();
+  }
 
   for (i = 0; i < nact; i++) {
     ap = action_parms(iact[i]);
@@ -639,8 +656,9 @@ static void end_hmc(double *act1)
   mu = hmc.mu;
   n = 2;
 
-  if (query_flags(UDBUF_UP2DATE) != 1)
+  if (query_flags(UDBUF_UP2DATE) != 1) {
     copy_bnd_ud();
+  }
 
   for (i = 0; i < nact; i++) {
     ap = action_parms(iact[i]);
@@ -698,8 +716,9 @@ static int accept_hmc(double *act0, double *act1, su3_dble *uold)
   iac = 0;
   da = 0.0;
 
-  for (i = 0; i <= nact; i++)
+  for (i = 0; i <= nact; i++) {
     da += (act1[i] - act0[i]);
+  }
 
   if (NPROC > 1) {
     r = da;
@@ -709,26 +728,31 @@ static int accept_hmc(double *act0, double *act1, su3_dble *uold)
   if (my_rank == 0) {
     ranlxd(&r, 1);
 
-    if (da <= 0.0)
+    if (da <= 0.0) {
       iac = 1;
-    else if (r <= exp(-da))
+    } else if (r <= exp(-da)) {
       iac = 1;
+    }
   }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     MPI_Bcast(&iac, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  }
 
   if (iac == 0) {
     udb = udfld();
     cm3x3_assign(4 * VOLUME, uold, udb);
-    if ((cpr[0] == (NPROC0 - 1)) && ((bc_type() == 1) || (bc_type() == 2)))
+    if ((cpr[0] == (NPROC0 - 1)) && ((bc_type() == 1) || (bc_type() == 2))) {
       cm3x3_assign(3, ubnd, udb + 4 * VOLUME + 7 * (BNDRY / 4));
+    }
     set_flags(UPDATED_UD);
-    if (npf != 0)
+    if (npf != 0) {
       set_flags(UNSET_UD_PHASE);
+    }
   } else {
-    if (npf != 0)
+    if (npf != 0) {
       unset_ud_phase();
+    }
     renormalize_ud();
   }
 

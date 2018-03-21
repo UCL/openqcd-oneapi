@@ -115,15 +115,17 @@ static void alloc_idx(void)
     ib = malloc((BNDRY / 4) * sizeof(*ib));
     error(ib == NULL, 1, "alloc_idx [shift.c]",
           "Unable to allocate index arrays");
-  } else
+  } else {
     ib = NULL;
+  }
 
   for (mu = 0; mu < 4; mu++) {
     if (np[mu] > 1) {
       (*cl).idx = ib;
       ib += nlk[mu];
-    } else
+    } else {
       (*cl).idx = NULL;
+    }
 
     cl += 1;
   }
@@ -145,8 +147,9 @@ static void alloc_idx(void)
         ib += 4 * npt[mu];
       }
     } else {
-      for (t = 0; t < bs[mu]; t++)
+      for (t = 0; t < bs[mu]; t++) {
         (*cs).idx[t] = (*(cs - 1)).idx[bs[mu] - 1 - t];
+      }
     }
 
     cs += 1;
@@ -159,8 +162,9 @@ static void fce_pts(void)
   int mu, ix, iy, *idx[4];
   int *fce0, *fce1, *fcem;
 
-  for (mu = 0; mu < 4; mu++)
+  for (mu = 0; mu < 4; mu++) {
     idx[mu] = (comstar[2 * mu]).idx[1];
+  }
 
   ix = 0;
 
@@ -176,10 +180,11 @@ static void fce_pts(void)
           ix += 1;
 
           for (mu = 0; mu < 4; mu++) {
-            if (x[mu] == 0)
+            if (x[mu] == 0) {
               idx[mu][iy] = 1;
-            else
+            } else {
               idx[mu][iy] = 0;
+            }
           }
         }
       }
@@ -201,8 +206,9 @@ static void fce_pts(void)
       fce1 = (comstar[2 * mu]).idx[t];
       fcem = fce0 + 4 * npt[mu];
 
-      for (; fce0 < fcem; fce0 += 4, fce1 += 4)
+      for (; fce0 < fcem; fce0 += 4, fce1 += 4) {
         *fce1 = iup[*fce0][mu];
+      }
     }
   }
 }
@@ -211,13 +217,15 @@ static int uofs(int ix, int mu)
 {
   int iy, iz;
 
-  if (ix >= (VOLUME / 2))
+  if (ix >= (VOLUME / 2)) {
     return 8 * (ix - (VOLUME / 2)) + 2 * mu;
+  }
 
   iy = iup[ix][mu];
 
-  if (iy < VOLUME)
+  if (iy < VOLUME) {
     return 8 * (iy - (VOLUME / 2)) + 2 * mu + 1;
+  }
 
   iz = iy - (VOLUME + (BNDRY / 2) + ofs[mu]);
 
@@ -274,8 +282,9 @@ static void alloc_udbufs(void)
   n = 0;
 
   for (mu = 0; mu < 4; mu++) {
-    if (npt[mu] > n)
+    if (npt[mu] > n) {
       n = npt[mu];
+    }
   }
 
   sdbuf = amalloc(8 * n * sizeof(su3_dble), ALIGN);
@@ -303,8 +312,9 @@ static void get_udlinks(void)
       idx = (*cl).idx;
       idm = idx + nlk[mu];
 
-      for (; idx < idm; idx++, u++)
+      for (; idx < idm; idx++, u++) {
         *u = ub[*idx];
+      }
 
       tag = mpi_tag();
       nbf = 18 * nlk[mu];
@@ -359,8 +369,9 @@ static void put_udlinks(void)
       idx = (*cl).idx;
       idm = idx + nlk[mu];
 
-      for (; idx < idm; idx++, u++)
+      for (; idx < idm; idx++, u++) {
         ub[*idx] = *u;
+      }
     }
 
     cl += 1;
@@ -380,16 +391,18 @@ static void get_udstars(int ifc)
   cs = comstar + ifc;
   mu = ifc / 2;
 
-  if (np[mu] > 1)
+  if (np[mu] > 1) {
     u = sdbuf;
-  else
+  } else {
     u = rdbuf;
+  }
 
   idx = (*cs).idx[0];
   idm = idx + 4 * npt[mu];
 
-  for (; idx < idm; idx++, u++)
+  for (; idx < idm; idx++, u++) {
     *u = ub[*idx];
+  }
 
   if (np[mu] > 1) {
     tag = mpi_tag();
@@ -427,16 +440,18 @@ static void shift_udstars(int ifc)
     id1 = (*cs).idx[t + 1];
     idm = id0 + 4 * npt[mu];
 
-    for (; id0 < idm; id0++, id1++)
+    for (; id0 < idm; id0++, id1++) {
       ub[*id0] = ub[*id1];
+    }
   }
 
   id0 = (*cs).idx[bs[mu] - 1];
   idm = id0 + 4 * npt[mu];
   u = rdbuf;
 
-  for (; id0 < idm; id0++, u++)
+  for (; id0 < idm; id0++, u++) {
     ub[*id0] = *u;
+  }
 }
 
 int shift_ud(int *s)
@@ -457,8 +472,9 @@ int shift_ud(int *s)
           1, "shift_ud [shift.c]", "Shift vector is not global");
   }
 
-  if (sdbuf == NULL)
+  if (sdbuf == NULL) {
     alloc_udbufs();
+  }
 
   for (mu = 0; mu < 4; mu++) {
     n = np[mu] * bs[mu];
@@ -466,14 +482,17 @@ int shift_ud(int *s)
     if (abs(s[mu]) > (n / 2)) {
       sr[mu] = safe_mod(s[mu], n);
 
-      if (sr[mu] > (n / 2))
+      if (sr[mu] > (n / 2)) {
         sr[mu] -= n;
-    } else
+      }
+    } else {
       sr[mu] = s[mu];
+    }
   }
 
-  if ((sr[0] == 0) && (sr[1] == 0) && (sr[2] == 0) && (sr[3] == 0))
+  if ((sr[0] == 0) && (sr[1] == 0) && (sr[2] == 0) && (sr[3] == 0)) {
     return 0;
+  }
 
   error_root((sr[0] != 0) && (bc_type() != 3), 1, "shift_ud [shift.c]",
              "Shifts in time are only permitted for periodic bc");
@@ -486,10 +505,11 @@ int shift_ud(int *s)
   n = 0;
 
   for (mu = 0; mu < 4; mu++) {
-    if (sr[mu] >= 0)
+    if (sr[mu] >= 0) {
       ifc = 2 * mu + 1;
-    else
+    } else {
       ifc = 2 * mu;
+    }
 
     for (t = 0; t < abs(sr[mu]); t++) {
       shift_udstars(ifc);

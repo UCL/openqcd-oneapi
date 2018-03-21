@@ -27,8 +27,9 @@ static void random_pauli(pauli_dble *m)
   u = (*m).u;
   gauss_dble(u, 36);
 
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < 6; i++) {
     (*m).u[i] += 10.0;
+  }
 }
 
 static void pauli2mat(pauli_dble *m, complex_dble *a)
@@ -80,8 +81,9 @@ int main(void)
   pauli2mat(ma + 1, aa[1]);
   cmat_mul_dble(6, aa[0], aa[0], aa[2]);
 
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < 6; i++) {
     aa[2][6 * i + i].re += mu * mu;
+  }
 
   cmat_mul_dble(6, aa[1], aa[2], aa[3]);
   cmat_sub_dble(6, aa[3], aa[0], aa[2]);
@@ -91,17 +93,21 @@ int main(void)
     for (j = 0; j < 6; j++) {
       d = aa[2][6 * i + j].re;
 
-      if (d < 0.0)
+      if (d < 0.0) {
         d = -d;
-      if (d > dmax)
+      }
+      if (d > dmax) {
         dmax = d;
+      }
 
       d = aa[2][6 * i + j].im;
 
-      if (d < 0.0)
+      if (d < 0.0) {
         d = -d;
-      if (d > dmax)
+      }
+      if (d > dmax) {
         dmax = d;
+      }
     }
   }
 
@@ -113,10 +119,12 @@ int main(void)
   for (i = 0; i < 36; i++) {
     d = ma[0].u[i] - ma[1].u[i];
 
-    if (d < 0.0)
+    if (d < 0.0) {
       d = -d;
-    if (d > dmax)
+    }
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   error(dmax != 0.0, 1, "main [check5.c]",

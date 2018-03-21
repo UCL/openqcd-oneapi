@@ -30,8 +30,9 @@ static void sncndn_smallk(double u, double rk, double *sn, double *cn,
   v = (pi * u) / (2.0 * K);
 
   nmax = (int)(-1.5 * log(DBL_EPSILON) / t);
-  if (nmax < 1)
+  if (nmax < 1) {
     nmax = 1;
+  }
 
   (*sn) = 0.0;
   (*cn) = 0.0;
@@ -108,19 +109,22 @@ int main(void)
     if (sn != 0.0) {
       dev = fabs(1.0 - snsk / sn);
 
-      if (dev > dmax_sn)
+      if (dev > dmax_sn) {
         dmax_sn = dev;
+      }
     }
 
     dev = fabs(1.0 - cnsk / cn);
 
-    if (dev > dmax_cn)
+    if (dev > dmax_cn) {
       dmax_cn = dev;
+    }
 
     dev = fabs(1.0 - dnsk / dn);
 
-    if (dev > dmax_dn)
+    if (dev > dmax_dn) {
       dmax_dn = dev;
+    }
   }
 
   printf("-K/2<=u<=K/2, rk<=0.1:\n");
@@ -143,18 +147,21 @@ int main(void)
 
     dev = fabs(snsk - sn);
 
-    if (dev > dmax_sn)
+    if (dev > dmax_sn) {
       dmax_sn = dev;
+    }
 
     dev = fabs(cnsk - cn);
 
-    if (dev > dmax_cn)
+    if (dev > dmax_cn) {
       dmax_cn = dev;
+    }
 
     dev = fabs(dnsk - dn);
 
-    if (dev > dmax_dn)
+    if (dev > dmax_dn) {
       dmax_dn = dev;
+    }
   }
 
   printf("-8*K<=u<=8K, rk<=0.1:\n");
@@ -178,19 +185,22 @@ int main(void)
     if (sn != 0.0) {
       dev = fabs(1.0 - snsk / sn);
 
-      if (dev > dmax_sn)
+      if (dev > dmax_sn) {
         dmax_sn = dev;
+      }
     }
 
     dev = fabs(1.0 - cnsk / cn);
 
-    if (dev > dmax_cn)
+    if (dev > dmax_cn) {
       dmax_cn = dev;
+    }
 
     dev = fabs(1.0 - dnsk / dn);
 
-    if (dev > dmax_dn)
+    if (dev > dmax_dn) {
       dmax_dn = dev;
+    }
   }
 
   printf("-K/2<=u<=K/2, Landen recursion:\n");
@@ -213,18 +223,21 @@ int main(void)
 
     dev = fabs(snsk - sn);
 
-    if (dev > dmax_sn)
+    if (dev > dmax_sn) {
       dmax_sn = dev;
+    }
 
     dev = fabs(cnsk - cn);
 
-    if (dev > dmax_cn)
+    if (dev > dmax_cn) {
       dmax_cn = dev;
+    }
 
     dev = fabs(dnsk - dn);
 
-    if (dev > dmax_dn)
+    if (dev > dmax_dn) {
       dmax_dn = dev;
+    }
   }
 
   printf("-8*K<=u<=8K, Landen recursion:\n");

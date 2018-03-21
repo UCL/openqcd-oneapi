@@ -49,8 +49,9 @@ static void cpvec(int n, complex_dble *s, complex_dble *r)
 {
   int i;
 
-  for (i = 0; i < n; i++)
+  for (i = 0; i < n; i++) {
     r[i] = s[i];
+  }
 }
 
 static int diffvec(int n, complex_dble *s, complex_dble *r)
@@ -58,8 +59,9 @@ static int diffvec(int n, complex_dble *s, complex_dble *r)
   int i;
 
   for (i = 0; i < n; i++) {
-    if ((s[i].re != r[i].re) || (s[i].im != r[i].im))
+    if ((s[i].re != r[i].re) || (s[i].im != r[i].im)) {
       return 1;
+    }
   }
 
   return 0;
@@ -90,8 +92,9 @@ int main(void)
       if (j > i) {
         mv.c[6 * i + j].re = mv.c[6 * j + i].re;
         mv.c[6 * i + j].im = -mv.c[6 * j + i].im;
-      } else
+      } else {
         mv.c[6 * i + j].im = 0.0;
+      }
     }
   }
 
@@ -138,8 +141,9 @@ int main(void)
 
   for (i = 0; i < 12; i++) {
     d = fabs(r1.r[i] - r2.r[i]);
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   printf("Maximal absolute deviation = %.1e\n", dmax);

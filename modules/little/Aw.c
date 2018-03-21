@@ -151,8 +151,9 @@ void Aw(complex *v, complex *w)
   complex **Aeo, **Aoe;
   Aw_t Aw;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_vs();
+  }
 
   Aw = Awop();
   apply_Aee(Aw.Aee, v, w);
@@ -194,16 +195,18 @@ void Aw(complex *v, complex *w)
     Aeo += 8;
   }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     cpv_ext_bnd(w);
+  }
 }
 
 void Aweeinv(complex *v, complex *w)
 {
   Aw_t Aw;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_vs();
+  }
 
   Aw = Awophat();
   apply_Aee(Aw.Aee, v, w);
@@ -213,8 +216,9 @@ void Awooinv(complex *v, complex *w)
 {
   Aw_t Aw;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_vs();
+  }
 
   Aw = Awophat();
   apply_Aoo(Aw.Aoo, v, w);
@@ -227,11 +231,13 @@ void Awoe(complex *v, complex *w)
   complex **Aoe;
   Aw_t Aw;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_vs();
+  }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     cpv_int_bnd(v);
+  }
 
   Aw = Awop();
   Aoe = Aw.Aoe;
@@ -263,11 +269,13 @@ void Aweo(complex *v, complex *w)
   complex **Aeo;
   Aw_t Aw;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_vs();
+  }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     set_v2zero(nbbh * Ns, w + nb * Ns);
+  }
 
   Aw = Awop();
   Aeo = Aw.Aeo;
@@ -291,8 +299,9 @@ void Aweo(complex *v, complex *w)
     Aeo += 8;
   }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     cpv_ext_bnd(w);
+  }
 }
 
 void Awhat(complex *v, complex *w)
@@ -302,8 +311,9 @@ void Awhat(complex *v, complex *w)
   complex **Aeo, **Aoe;
   Aw_t Aw;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_vs();
+  }
 
   assign_v2v(nbh * Ns, v, w);
 
@@ -336,6 +346,7 @@ void Awhat(complex *v, complex *w)
     Aeo += 8;
   }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     cpv_ext_bnd(w);
+  }
 }

@@ -82,8 +82,9 @@ static void alloc_ubuf(void)
   for (ifc = 0; ifc < 8; ifc++) {
     nmu[ifc] = cpr[ifc / 2] & 0x1;
 
-    if (ifc > 0)
+    if (ifc > 0) {
       ofs[ifc] = ofs[ifc - 1] + nbf[ifc - 1];
+    }
 
     sflg[ifc] = ((ifc > 1) || ((ifc == 0) && ((cpr[0] != 0) || (bc != 0))) ||
                  ((ifc == 1) && ((cpr[0] != (NPROC0 - 1)) || (bc == 3))));
@@ -99,10 +100,12 @@ static void alloc_ubuf(void)
     error(ubuf == NULL, 1, "alloc_ubuf [map_u2blk.c]",
           "Unable to allocate communication buffer");
 
-    for (ib = 0; ib < BNDRY; ib++)
+    for (ib = 0; ib < BNDRY; ib++) {
       ubuf[ib] = u0;
-  } else
+    }
+  } else {
     ubuf = NULL;
+  }
 
   init = 1;
 }
@@ -179,15 +182,19 @@ static void send_bnd_u(void)
       tag = tags[ifc];
 
       if (np == 0) {
-        if (sflg[io])
+        if (sflg[io]) {
           MPI_Send(sbuf, n, MPI_FLOAT, saddr, tag, MPI_COMM_WORLD);
-        if (rflg[io])
+        }
+        if (rflg[io]) {
           MPI_Recv(rbuf, n, MPI_FLOAT, raddr, tag, MPI_COMM_WORLD, &stat);
+        }
       } else {
-        if (rflg[io])
+        if (rflg[io]) {
           MPI_Recv(rbuf, n, MPI_FLOAT, raddr, tag, MPI_COMM_WORLD, &stat);
-        if (sflg[io])
+        }
+        if (sflg[io]) {
           MPI_Send(sbuf, n, MPI_FLOAT, saddr, tag, MPI_COMM_WORLD);
+        }
       }
     }
   }
@@ -245,10 +252,11 @@ static void assign_ud2ub(block_t *b)
         for (; ix < volb; ix++) {
           iy = imbb[ix];
 
-          if (iy < VOLUME)
+          if (iy < VOLUME) {
             set_ud2u(udb + 8 * (iy - (VOLUME / 2)) + ifc, u);
-          else
+          } else {
             (*u) = ubuf[iy - VOLUME];
+          }
 
           u += 1;
         }
@@ -278,8 +286,9 @@ void assign_ud2ubgr(blk_grid_t grid)
           "Parameter is not global");
   }
 
-  if (init == 0)
+  if (init == 0) {
     alloc_ubuf();
+  }
 
   b = blk_list(grid, &nb, &isw);
 
@@ -293,8 +302,9 @@ void assign_ud2ubgr(blk_grid_t grid)
 
   bm = b + nb;
 
-  for (; b < bm; b++)
+  for (; b < bm; b++) {
     assign_ud2ub(b);
+  }
 
   set_grid_flags(grid, ASSIGNED_UD2UBGR);
 }

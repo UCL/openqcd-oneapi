@@ -36,8 +36,9 @@ void allocate_smeared_fields(void)
     error(sfields[0] == NULL, 1, "allocate_smeared_fields [smeared_fields.c]",
           "Unable to allocate memory space for the smeared gauge fields");
 
-    for (i = 1; i < nsmear; i++)
+    for (i = 1; i < nsmear; i++) {
       sfields[i] = sfields[i - 1] + nlinks;
+    }
   }
 }
 
@@ -48,8 +49,9 @@ void allocate_smeared_fields(void)
  */
 su3_dble **smeared_fields(void)
 {
-  if (sfields == NULL)
+  if (sfields == NULL) {
     allocate_smeared_fields();
+  }
 
   return sfields;
 }
@@ -91,9 +93,10 @@ void allocate_smearing_ch_coeff_fields(void)
           "Unable to allocate memory space for the Cayley-Hamilton coefficient "
           "fields");
 
-    for (i = 1; i < nsmear; i++)
+    for (i = 1; i < nsmear; i++) {
       exp_ch_mat_coeff_pair_field[i] =
           exp_ch_mat_coeff_pair_field[i - 1] + nlinks;
+    }
   }
 }
 
@@ -103,8 +106,9 @@ void allocate_smearing_ch_coeff_fields(void)
  */
 void free_smearing_ch_coeff_fields(void)
 {
-  if (exp_ch_mat_coeff_pair_field != NULL)
+  if (exp_ch_mat_coeff_pair_field != NULL) {
     afree(exp_ch_mat_coeff_pair_field[0]);
+  }
 }
 
 /* Summary:
@@ -114,8 +118,9 @@ void free_smearing_ch_coeff_fields(void)
  */
 ch_mat_coeff_pair_t **smearing_ch_coeff_fields(void)
 {
-  if (exp_ch_mat_coeff_pair_field == NULL)
+  if (exp_ch_mat_coeff_pair_field == NULL) {
     allocate_smearing_ch_coeff_fields();
+  }
 
   return exp_ch_mat_coeff_pair_field;
 }

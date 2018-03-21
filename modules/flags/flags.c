@@ -138,8 +138,9 @@ static void find_gap(int *a, int *d)
   for (k = 0; k < NFLGS; k++) {
     h = flgs[k];
 
-    if ((h > 0) && (h < (*d)))
+    if ((h > 0) && (h < (*d))) {
       (*d) = h;
+    }
   }
 
   for (k = 0; k < NFLGS; k++) {
@@ -152,8 +153,9 @@ static void find_gap(int *a, int *d)
       if ((h > 0) && (h < hmax)) {
         hmax = h;
 
-        if (h <= (*d))
+        if (h <= (*d)) {
           break;
+        }
       }
     }
 
@@ -174,8 +176,9 @@ static void compress_flags(void)
   d -= 1;
 
   for (k = 0; k < NFLGS; k++) {
-    if (flgs[k] > a)
+    if (flgs[k] > a) {
       flgs[k] -= d;
+    }
   }
 
   lat.u.tag = flgs[0];
@@ -203,8 +206,9 @@ static void compress_flags(void)
 
 static int next_tag(void)
 {
-  if (tag == INT_MAX)
+  if (tag == INT_MAX) {
     compress_flags();
+  }
   tag += 1;
 
   return tag;
@@ -234,8 +238,9 @@ static void set_arrays(void)
 {
   int igr;
 
-  for (igr = 1; igr <= (int)(BLK_GRIDS); igr++)
+  for (igr = 1; igr <= (int)(BLK_GRIDS); igr++) {
     gfs[igr] = gfs[0];
+  }
 
   gfs[(int)(SAP_BLOCKS)].shf = 0x0;
   gfs[(int)(DFL_BLOCKS)].shf = 0x2;
@@ -252,8 +257,9 @@ void set_flags(event_t event)
 {
   int iprms[1], iev;
 
-  if (init == 0)
+  if (init == 0) {
     set_arrays();
+  }
 
   iev = (int)(event);
 
@@ -265,18 +271,20 @@ void set_flags(event_t event)
     error(iprms[0] != iev, 1, "set_flags [flags.c]", "Parameter is not global");
   }
 
-  if (event_fcts[iev] == NULL)
+  if (event_fcts[iev] == NULL) {
     error_root(1, 1, "set_flags [flags.c]", "No action associated to event");
-  else
+  } else {
     event_fcts[iev]();
+  }
 }
 
 void set_grid_flags(blk_grid_t grid, event_t event)
 {
   int iprms[2], igr, iev;
 
-  if (init == 0)
+  if (init == 0) {
     set_arrays();
+  }
 
   igr = (int)(grid);
   iev = (int)(event);
@@ -291,14 +299,15 @@ void set_grid_flags(blk_grid_t grid, event_t event)
           "Parameters are not global");
   }
 
-  if (grid == BLK_GRIDS)
+  if (grid == BLK_GRIDS) {
     error_root(1, 1, "set_grid_flags [flags.c]",
                "BLK_GRIDS is a dummy block grid");
+  }
 
-  if (grid_event_fcts[iev] == NULL)
+  if (grid_event_fcts[iev] == NULL) {
     error_root(1, 1, "set_grid_flags [flags.c]",
                "No action associated to event");
-  else {
+  } else {
     gf = gfs + igr;
     grid_event_fcts[iev]();
   }
@@ -308,24 +317,27 @@ int query_flags(query_t query)
 {
   int iqr;
 
-  if (init == 0)
+  if (init == 0) {
     set_arrays();
+  }
 
   iqr = (int)(query);
 
   if (query_fcts[iqr] == NULL) {
     error_loc(1, 1, "query_flags [flags.c]", "No response to query");
     return -1;
-  } else
+  } else {
     return query_fcts[iqr]();
+  }
 }
 
 int query_grid_flags(blk_grid_t grid, query_t query)
 {
   int iqr;
 
-  if (init == 0)
+  if (init == 0) {
     set_arrays();
+  }
 
   iqr = (int)(query);
 
@@ -342,8 +354,9 @@ void print_flags(void)
 {
   int my_rank;
 
-  if (init == 0)
+  if (init == 0) {
     set_arrays();
+  }
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
@@ -369,20 +382,22 @@ void print_grid_flags(blk_grid_t grid)
 {
   int my_rank;
 
-  if (init == 0)
+  if (init == 0) {
     set_arrays();
+  }
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
   if (my_rank == 0) {
     gf = gfs + (int)(grid);
 
-    if (grid == SAP_BLOCKS)
+    if (grid == SAP_BLOCKS) {
       printf("Flags on the SAP block grid:\n");
-    else if (grid == DFL_BLOCKS)
+    } else if (grid == DFL_BLOCKS) {
       printf("Flags on the DFL block grid:\n");
-    else
+    } else {
       error_root(1, 1, "print_grid_flags [flags.c]", "Unknown block grid");
+    }
 
     printf("shf        = %#x\n", (*gf).shf);
     printf("u          = %d(%d)\n", (*gf).u.tag, (*gf).u.state);

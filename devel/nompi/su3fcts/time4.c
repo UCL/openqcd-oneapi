@@ -58,8 +58,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       prod2su3alg(u, v, X);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -76,8 +77,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       prod2u3alg(u, v, Y);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -93,8 +95,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       rotate_su3alg(u, X);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;

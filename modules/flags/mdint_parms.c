@@ -112,8 +112,9 @@ static void init_mdp(void)
 {
   int i;
 
-  for (i = 1; i <= ILVMAX; i++)
+  for (i = 1; i <= ILVMAX; i++) {
     mdp[i] = mdp[0];
+  }
 
   init = 1;
 }
@@ -143,11 +144,13 @@ mdint_parms_t set_mdint_parms(int ilv, integrator_t integrator, double lambda,
   int iprms[4], i, j, ie;
   double dprms[1];
 
-  if (init == 0)
+  if (init == 0) {
     init_mdp();
+  }
 
-  if (integrator != OMF2)
+  if (integrator != OMF2) {
     lambda = 0.0;
+  }
 
   if (NPROC > 1) {
     iprms[0] = ilv;
@@ -184,15 +187,17 @@ mdint_parms_t set_mdint_parms(int ilv, integrator_t integrator, double lambda,
   ie |= (nstep < 1);
   ie |= (nfr < 1);
 
-  for (i = 0; i < nfr; i++)
+  for (i = 0; i < nfr; i++) {
     ie |= (ifr[i] < 0);
+  }
 
   error_root(ie != 0, 1, "set_mdint_parms [mdint_parms.c]",
              "Parameters are out of range");
 
   for (i = 0; i < nfr; i++) {
-    for (j = (i + 1); j < nfr; j++)
+    for (j = (i + 1); j < nfr; j++) {
       ie |= (ifr[i] == ifr[j]);
+    }
   }
 
   error_root(ie != 0, 1, "set_mdint_parms [mdint_parms.c]",
@@ -203,20 +208,22 @@ mdint_parms_t set_mdint_parms(int ilv, integrator_t integrator, double lambda,
   mdp[ilv].nstep = nstep;
   alloc_ifr(ilv, nfr);
 
-  for (i = 0; i < nfr; i++)
+  for (i = 0; i < nfr; i++) {
     mdp[ilv].ifr[i] = ifr[i];
+  }
 
   return mdp[ilv];
 }
 
 mdint_parms_t mdint_parms(int ilv)
 {
-  if (init == 0)
+  if (init == 0) {
     init_mdp();
+  }
 
-  if ((ilv >= 0) && (ilv < ILVMAX))
+  if ((ilv >= 0) && (ilv < ILVMAX)) {
     return mdp[ilv];
-  else {
+  } else {
     error_loc(1, 1, "mdint_parms [mdint_parms.c]",
               "Level index is out of range");
     return mdp[ILVMAX];
@@ -247,9 +254,10 @@ void read_mdint_parms(int ilv)
     } else if (strcmp(line, "OMF4") == 0) {
       idi = 2;
       lambda = 0.0;
-    } else
+    } else {
       error_root(1, 1, "read_mdint_parms [mdint_parms.c]",
                  "Unknown integrator %s", line);
+    }
 
     read_line("nstep", "%d", &nstep);
     error_root(nstep < 1, 1, "read_mdint [mdint_parms.c]",
@@ -268,17 +276,19 @@ void read_mdint_parms(int ilv)
   ifr = malloc(nfr * sizeof(*ifr));
   error(ifr == NULL, 1, "read_mdint [mdint_parms.c]",
         "Unable to allocate index array");
-  if (my_rank == 0)
+  if (my_rank == 0) {
     read_iprms("forces", nfr, ifr);
+  }
 
   MPI_Bcast(ifr, nfr, MPI_INT, 0, MPI_COMM_WORLD);
 
-  if (idi == 0)
+  if (idi == 0) {
     set_mdint_parms(ilv, LPFR, lambda, nstep, nfr, ifr);
-  else if (idi == 1)
+  } else if (idi == 1) {
     set_mdint_parms(ilv, OMF2, lambda, nstep, nfr, ifr);
-  else if (idi == 2)
+  } else if (idi == 2) {
     set_mdint_parms(ilv, OMF4, lambda, nstep, nfr, ifr);
+  }
 
   free(ifr);
 }
@@ -295,16 +305,17 @@ void print_mdint_parms(void)
       if (mdp[i].integrator != INTEGRATORS) {
         printf("Level %d:\n", i);
 
-        if (mdp[i].integrator == LPFR)
+        if (mdp[i].integrator == LPFR) {
           printf("Leapfrog integrator\n");
-        else if (mdp[i].integrator == OMF2) {
+        } else if (mdp[i].integrator == OMF2) {
           n = fdigits(mdp[i].lambda);
           printf("2nd order OMF integrator with lambda = %.*f\n", IMAX(n, 1),
                  mdp[i].lambda);
-        } else if (mdp[i].integrator == OMF4)
+        } else if (mdp[i].integrator == OMF4) {
           printf("4th order OMF integrator\n");
-        else
+        } else {
           printf("Unknown integrator\n");
+        }
 
         printf("Number of steps = %d\n", mdp[i].nstep);
 
@@ -314,8 +325,9 @@ void print_mdint_parms(void)
         if (nfr > 0) {
           printf("Forces =");
 
-          for (j = 0; j < nfr; j++)
+          for (j = 0; j < nfr; j++) {
             printf(" %d", ifr[j]);
+          }
 
           printf("\n");
         }
@@ -341,8 +353,9 @@ void write_mdint_parms(FILE *fdat)
 
     for (i = 0; i < ILVMAX; i++) {
       nfr = mdp[i].nfr;
-      if (nfr > nmx)
+      if (nfr > nmx) {
         nmx = nfr;
+      }
     }
 
     istd = malloc((nmx + 4) * sizeof(stdint_t));
@@ -358,8 +371,9 @@ void write_mdint_parms(FILE *fdat)
         istd[2] = (stdint_t)(mdp[i].nstep);
         istd[3] = (stdint_t)(mdp[i].nfr);
 
-        for (j = 0; j < nfr; j++)
+        for (j = 0; j < nfr; j++) {
           istd[4 + j] = (stdint_t)(mdp[i].ifr[j]);
+        }
 
         dstd[0] = mdp[i].lambda;
         n = 4 + nfr;
@@ -396,8 +410,9 @@ void check_mdint_parms(FILE *fdat)
 
     for (i = 0; i < ILVMAX; i++) {
       nfr = mdp[i].nfr;
-      if (nfr > nmx)
+      if (nfr > nmx) {
         nmx = nfr;
+      }
     }
 
     istd = malloc((nmx + 4) * sizeof(stdint_t));
@@ -424,8 +439,9 @@ void check_mdint_parms(FILE *fdat)
         ie |= (istd[2] != (stdint_t)(mdp[i].nstep));
         ie |= (istd[3] != (stdint_t)(mdp[i].nfr));
 
-        for (j = 0; j < nfr; j++)
+        for (j = 0; j < nfr; j++) {
           ie |= (istd[4 + j] != (stdint_t)(mdp[i].ifr[j]));
+        }
 
         ie |= (dstd[0] != mdp[i].lambda);
       }

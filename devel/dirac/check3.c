@@ -54,9 +54,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check1.c]",
                  "Syntax: check1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -94,9 +95,10 @@ int main(int argc, char *argv[])
   swp = set_sw_parms(-0.0123);
   mu = 0.0376;
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("m0 = %.4e, csw = %.4e, cF = %.4e, cF' = %.4e\n\n", swp.m0, swp.csw,
            swp.cF[0], swp.cF[1]);
+  }
 
   random_ud();
   set_ud_phase();
@@ -104,8 +106,9 @@ int main(int argc, char *argv[])
   assign_ud2u();
   assign_swd2sw();
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_s(NSPIN, ps[i], 1.0f);
+  }
 
   Dw(mu, ps[0], ps[2]);
   mulg5(VOLUME, ps[2]);
@@ -119,11 +122,13 @@ int main(int argc, char *argv[])
                             (z1.im - z2.im) * (z1.im - z2.im))));
   d /= (float)(sqrt((double)(12 * NPROC) * (double)(VOLUME)));
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Deviation from gamma5-Hermiticity    = %.1e\n", d);
+  }
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_s(NSPIN, ps[i], 1.0f);
+  }
 
   assign_s2s(VOLUME, ps[0], ps[1]);
   assign_s2s(VOLUME, ps[2], ps[3]);
@@ -146,8 +151,9 @@ int main(int argc, char *argv[])
   error(d != 0.0f, 1, "main [check3.c]",
         "Dwee() changes the output field where it should not");
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_s(NSPIN, ps[i], 1.0f);
+  }
 
   assign_s2s(VOLUME, ps[0], ps[1]);
   assign_s2s(VOLUME, ps[2], ps[3]);
@@ -170,8 +176,9 @@ int main(int argc, char *argv[])
   error(d != 0.0f, 1, "main [check3.c]",
         "Dwoo() changes the output field where it should not");
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_s(NSPIN, ps[i], 1.0f);
+  }
 
   assign_s2s(VOLUME, ps[0], ps[1]);
   assign_s2s(VOLUME, ps[2], ps[3]);
@@ -194,8 +201,9 @@ int main(int argc, char *argv[])
   error(d != 0.0f, 1, "main [check3.c]",
         "Dwoe() changes the output field where it should not");
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_s(NSPIN, ps[i], 1.0f);
+  }
 
   assign_s2s(VOLUME, ps[0], ps[1]);
   assign_s2s(VOLUME, ps[2], ps[3]);
@@ -218,8 +226,9 @@ int main(int argc, char *argv[])
   error(d != 0.0f, 1, "main [check3.c]",
         "Dweo() changes the output field where it should not");
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_s(NSPIN, ps[i], 1.0f);
+  }
 
   assign_s2s(VOLUME, ps[0], ps[1]);
   assign_s2s(VOLUME, ps[2], ps[3]);
@@ -242,8 +251,9 @@ int main(int argc, char *argv[])
   error(d != 0.0f, 1, "main [check3.c]",
         "Dwhat() changes the output field where it should not");
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_s(NSPIN, ps[i], 1.0f);
+  }
 
   assign_s2s(VOLUME, ps[0], ps[2]);
   Dw(mu, ps[0], ps[1]);
@@ -261,11 +271,13 @@ int main(int argc, char *argv[])
   d = norm_square(VOLUME, 1, ps[3]) / norm_square(VOLUME, 1, ps[1]);
   d = (float)(sqrt((double)(d)));
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Deviation of Dw() from Dwee(),..     = %.1e\n", d);
+  }
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_s(NSPIN, ps[i], 1.0f);
+  }
 
   assign_s2s(NSPIN, ps[0], ps[1]);
   Dwhat(mu, ps[0], ps[2]);
@@ -279,11 +291,13 @@ int main(int argc, char *argv[])
   d = norm_square(VOLUME / 2, 1, ps[1]) / norm_square(VOLUME / 2, 1, ps[2]);
   d = (float)(sqrt((double)(d)));
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Deviation of Dwhat() from Dwee(),..  = %.1e\n", d);
+  }
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_s(NSPIN, ps[i], 1.0f);
+  }
 
   assign_s2s(VOLUME, ps[0], ps[2]);
 

@@ -86,11 +86,10 @@ int main(int argc, char *argv[])
              MPI_COMM_WORLD);
 
   if (my_rank == 0) {
-    sprintf(
-        test_text,
-        "Check of smear_fields() with rho_t = %.2f, rho_s = %.2f, n = %d",
-        stout_params.rho_temporal, stout_params.rho_spatial,
-        stout_params.num_smear);
+    sprintf(test_text,
+            "Check of smear_fields() with rho_t = %.2f, rho_s = %.2f, n = %d",
+            stout_params.rho_temporal, stout_params.rho_spatial,
+            stout_params.num_smear);
 
     register_test(1, test_text);
     print_test_header(1);

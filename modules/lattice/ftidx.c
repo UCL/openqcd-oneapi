@@ -80,8 +80,9 @@ static void set_nft(void)
     idx[n].nft[0] = nfc[mu];
     idx[n].nft[1] = nfc[nu];
 
-    if (nfc[nu] > 0)
+    if (nfc[nu] > 0) {
       idx[n].nft[0] += (nfc[mu] / bs[nu]);
+    }
   }
 }
 
@@ -93,15 +94,17 @@ static void alloc_idx(void)
   set_nft();
   np = 0;
 
-  for (n = 0; n < 6; n++)
+  for (n = 0; n < 6; n++) {
     np += (idx[n].nft[0] + idx[n].nft[1]);
+  }
 
   if (BNDRY > 0) {
     iw = malloc((np + 9 * (BNDRY / 2)) * sizeof(*iw));
     error(iw == NULL, 1, "alloc_idx [ftidx.c]",
           "Unable to allocate index arrays");
-  } else
+  } else {
     iw = NULL;
+  }
 
   for (n = 0; n < 6; n++) {
     idx[n].ift[0] = iw;
@@ -125,10 +128,11 @@ static void alloc_idx(void)
 
 static int ibnd(int mu, int iy)
 {
-  if (iy > (VOLUME + (BNDRY / 2)))
+  if (iy > (VOLUME + (BNDRY / 2))) {
     return iy - ofs[mu] - BNDRY / 2;
-  else
+  } else {
     return iy - ofs[mu] - nfc[mu] / 2;
+  }
 }
 
 static void set_idx(void)
@@ -206,8 +210,9 @@ static void set_idx(void)
 
 ftidx_t *ftidx(void)
 {
-  if (init == 0)
+  if (init == 0) {
     set_idx();
+  }
 
   return idx;
 }
@@ -217,8 +222,9 @@ void plaq_ftidx(int n, int ix, int *ip)
   int mu, nu;
   int iy, iw, k;
 
-  if (init == 0)
+  if (init == 0) {
     set_idx();
+  }
 
   mu = plns[n][0];
   nu = plns[n][1];

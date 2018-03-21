@@ -70,8 +70,9 @@ static double ln_gamma(int k)
 {
   double y, z, zm1, zm2;
 
-  if (k < 40)
+  if (k < 40) {
     return lng[k];
+  }
 
   z = (double)k;
   z = z / xd2;
@@ -93,10 +94,12 @@ static double pchi1(double chi_square)
 
   x = chi_square;
 
-  if (x <= 1.0e-18)
+  if (x <= 1.0e-18) {
     return xd0;
-  if (x >= 40.0)
+  }
+  if (x >= 40.0) {
     return xd1;
+  }
 
   z = x / xd2;
   a = xd2 * sqrt(z / pi) * exp(-z);
@@ -121,8 +124,9 @@ static double pchi2(double chi_square, int nu)
   x = chi_square;
   xnu = (double)nu;
 
-  if (x <= 1.0e-18)
+  if (x <= 1.0e-18) {
     return xd0;
+  }
 
   if (x <= xnu) {
     z = x / xd2;
@@ -132,8 +136,9 @@ static double pchi2(double chi_square, int nu)
     p = x / z;
     y = xd0;
 
-    if ((lna - log(xd1 - p)) < -18.5)
+    if ((lna - log(xd1 - p)) < -18.5) {
       return y;
+    }
 
     a = exp(lna);
 
@@ -150,13 +155,15 @@ static double pchi2(double chi_square, int nu)
 
     z = xnu - xd2;
     p = z / x;
-    if (nu % 2 == 1)
+    if (nu % 2 == 1) {
       y = pchi1(x);
-    else
+    } else {
       y = xd1;
+    }
 
-    if ((lna - log(xd1 - p)) < -18.5)
+    if ((lna - log(xd1 - p)) < -18.5) {
       return y;
+    }
 
     a = exp(lna);
 
@@ -172,8 +179,9 @@ static double pchi2(double chi_square, int nu)
 
 double pchi_square(double chi_square, int nu)
 {
-  if (init == 0)
+  if (init == 0) {
     define_constants();
+  }
 
   if ((nu < 1) || (nu > 1000) || (chi_square < xd0)) {
     printf("Error in pchi_square: argument out of range\n");
@@ -181,8 +189,9 @@ double pchi_square(double chi_square, int nu)
     exit(0);
   }
 
-  if (nu == 1)
+  if (nu == 1) {
     return pchi1(chi_square);
-  else
+  } else {
     return pchi2(chi_square, nu);
+  }
 }

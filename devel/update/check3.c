@@ -68,7 +68,8 @@ static void read_anisotropy_section(void)
     MPI_Bcast(&us_fermion, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&ut_fermion, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion, ut_fermion);
+    set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion,
+                  ut_fermion);
 
   } else {
     set_no_ani_parms();
@@ -97,16 +98,19 @@ static void read_lat_parms(void)
     kappa = malloc(nk * sizeof(*kappa));
     error(kappa == NULL, 1, "read_lat_parms [check3.c]",
           "Unable to allocate parameter array");
-    if (my_rank == 0)
+    if (my_rank == 0) {
       read_dprms("kappa", nk, kappa);
+    }
     MPI_Bcast(kappa, nk, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  } else
+  } else {
     kappa = NULL;
+  }
 
   set_lat_parms(beta, c0, nk, kappa, csw);
 
-  if (nk > 0)
+  if (nk > 0) {
     free(kappa);
+  }
 }
 
 static void read_smearing_section(void)
@@ -163,11 +167,13 @@ static void read_bc_parms(void)
   cF = 1.0;
   cF_prime = 1.0;
 
-  if (bc == 1)
+  if (bc == 1) {
     read_dprms("phi", 2, phi);
+  }
 
-  if ((bc == 1) || (bc == 2))
+  if ((bc == 1) || (bc == 2)) {
     read_dprms("phi'", 2, phi_prime);
+  }
 
   if (bc != 3) {
     read_line("cG", "%lf", &cG);
@@ -218,28 +224,34 @@ static void read_hmc_parms(void)
     iact = malloc(nact * sizeof(*iact));
     error(iact == NULL, 1, "read_hmc_parms [check3.c]",
           "Unable to allocate temporary array");
-    if (my_rank == 0)
+    if (my_rank == 0) {
       read_iprms("actions", nact, iact);
+    }
     MPI_Bcast(iact, nact, MPI_INT, 0, MPI_COMM_WORLD);
-  } else
+  } else {
     iact = NULL;
+  }
 
   if (nmu > 0) {
     mu = malloc(nmu * sizeof(*mu));
     error(mu == NULL, 1, "read_hmc_parms [check3.c]",
           "Unable to allocate temporary array");
-    if (my_rank == 0)
+    if (my_rank == 0) {
       read_dprms("mu", nmu, mu);
+    }
     MPI_Bcast(mu, nmu, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  } else
+  } else {
     mu = NULL;
+  }
 
   set_hmc_parms(nact, iact, npf, nmu, mu, nlv, tau);
 
-  if (nact > 0)
+  if (nact > 0) {
     free(iact);
-  if (nmu > 0)
+  }
+  if (nmu > 0) {
     free(mu);
+  }
 }
 
 static void read_integrator(void)
@@ -261,8 +273,9 @@ static void read_integrator(void)
       k = mdp.ifr[j];
       fp = force_parms(k);
 
-      if (fp.force == FORCES)
+      if (fp.force == FORCES) {
         read_force_parms2(k);
+      }
 
       fp = force_parms(k);
 
@@ -270,8 +283,9 @@ static void read_integrator(void)
         l = fp.irat[0];
         rp = rat_parms(l);
 
-        if (rp.degree == 0)
+        if (rp.degree == 0) {
           read_rat_parms(l);
+        }
       }
     }
   }
@@ -292,8 +306,9 @@ static void read_actions(void)
     k = iact[i];
     ap = action_parms(k);
 
-    if (ap.action == ACTIONS)
+    if (ap.action == ACTIONS) {
       read_action_parms(k);
+    }
 
     ap = action_parms(k);
 
@@ -301,8 +316,9 @@ static void read_actions(void)
       l = ap.irat[0];
       rp = rat_parms(l);
 
-      if (rp.degree == 0)
+      if (rp.degree == 0) {
         read_rat_parms(l);
+      }
     }
   }
 }
@@ -400,10 +416,11 @@ static void read_solvers(void)
         (ap.action == ACF_TM1_EO_SDET) || (ap.action == ACF_TM2) ||
         (ap.action == ACF_TM2_EO) || (ap.action == ACF_RAT) ||
         (ap.action == ACF_RAT_SDET)) {
-      if ((ap.action == ACF_TM2) || (ap.action == ACF_TM2_EO))
+      if ((ap.action == ACF_TM2) || (ap.action == ACF_TM2_EO)) {
         nsp = 2;
-      else
+      } else {
         nsp = 1;
+      }
 
       for (k = 0; k < nsp; k++) {
         j = ap.isp[k];
@@ -413,9 +430,9 @@ static void read_solvers(void)
           read_solver_parms(j);
           sp = solver_parms(j);
 
-          if (sp.solver == SAP_GCR)
+          if (sp.solver == SAP_GCR) {
             isap = 1;
-          else if (sp.solver == DFL_SAP_GCR) {
+          } else if (sp.solver == DFL_SAP_GCR) {
             isap = 1;
             idfl = 1;
           }
@@ -443,9 +460,9 @@ static void read_solvers(void)
           read_solver_parms(k);
           sp = solver_parms(k);
 
-          if (sp.solver == SAP_GCR)
+          if (sp.solver == SAP_GCR) {
             isap = 1;
-          else if (sp.solver == DFL_SAP_GCR) {
+          } else if (sp.solver == DFL_SAP_GCR) {
             isap = 1;
             idfl = 1;
           }
@@ -454,11 +471,13 @@ static void read_solvers(void)
     }
   }
 
-  if (isap)
+  if (isap) {
     read_sap_parms();
+  }
 
-  if (idfl)
+  if (idfl) {
     read_dfl_parms();
+  }
 }
 
 static void chk_mode_regen(int isp, int *status)
@@ -467,8 +486,9 @@ static void chk_mode_regen(int isp, int *status)
 
   sp = solver_parms(isp);
 
-  if ((sp.solver == DFL_SAP_GCR) && (status[2] > 0))
+  if ((sp.solver == DFL_SAP_GCR) && (status[2] > 0)) {
     add2counter("modes", 2, status + 2);
+  }
 }
 
 static void start_hmc(double *act0, su3_dble *uold, su3_alg_dble *mold)
@@ -508,18 +528,18 @@ static void start_hmc(double *act0, su3_dble *uold, su3_alg_dble *mold)
   for (i = 0; i < nact; i++) {
     ap = action_parms(iact[i]);
 
-    if (ap.action == ACG)
+    if (ap.action == ACG) {
       act0[1] = action0(0);
-    else {
+    } else {
       set_sw_parms(sea_quark_mass(ap.im0));
 
-      if (ap.action == ACF_TM1)
+      if (ap.action == ACF_TM1) {
         act0[n] = setpf1(mu[ap.imu[0]], ap.ipf, 0);
-      else if (ap.action == ACF_TM1_EO)
+      } else if (ap.action == ACF_TM1_EO) {
         act0[n] = setpf4(mu[ap.imu[0]], ap.ipf, 0, 0);
-      else if (ap.action == ACF_TM1_EO_SDET)
+      } else if (ap.action == ACF_TM1_EO_SDET) {
         act0[n] = setpf4(mu[ap.imu[0]], ap.ipf, 1, 0);
-      else if (ap.action == ACF_TM2) {
+      } else if (ap.action == ACF_TM2) {
         status[2] = 0;
         act0[n] =
             setpf2(mu[ap.imu[0]], mu[ap.imu[1]], ap.ipf, ap.isp[1], 0, status);
@@ -541,8 +561,9 @@ static void start_hmc(double *act0, su3_dble *uold, su3_alg_dble *mold)
         act0[n] = setpf3(ap.irat, ap.ipf, 1, ap.isp[0], 0, status);
         chk_mode_regen(ap.isp[0], status);
         add2counter("field", ap.ipf, status);
-      } else
+      } else {
         error_root(1, 1, "start_hmc [check3.c]", "Unknown action");
+      }
 
       n += 1;
     }
@@ -568,28 +589,29 @@ static void end_hmc(double *act1)
   for (i = 0; i < nact; i++) {
     ap = action_parms(iact[i]);
 
-    if (ap.action == ACG)
+    if (ap.action == ACG) {
       act1[1] = action0(0);
-    else {
+    } else {
       set_sw_parms(sea_quark_mass(ap.im0));
       status[2] = 0;
 
-      if (ap.action == ACF_TM1)
+      if (ap.action == ACF_TM1) {
         act1[n] = action1(mu[ap.imu[0]], ap.ipf, ap.isp[0], 0, status);
-      else if (ap.action == ACF_TM1_EO)
+      } else if (ap.action == ACF_TM1_EO) {
         act1[n] = action4(mu[ap.imu[0]], ap.ipf, 0, ap.isp[0], 0, status);
-      else if (ap.action == ACF_TM1_EO_SDET)
+      } else if (ap.action == ACF_TM1_EO_SDET) {
         act1[n] = action4(mu[ap.imu[0]], ap.ipf, 1, ap.isp[0], 0, status);
-      else if (ap.action == ACF_TM2)
+      } else if (ap.action == ACF_TM2) {
         act1[n] =
             action2(mu[ap.imu[0]], mu[ap.imu[1]], ap.ipf, ap.isp[0], 0, status);
-      else if (ap.action == ACF_TM2_EO)
+      } else if (ap.action == ACF_TM2_EO) {
         act1[n] =
             action5(mu[ap.imu[0]], mu[ap.imu[1]], ap.ipf, ap.isp[0], 0, status);
-      else if (ap.action == ACF_RAT)
+      } else if (ap.action == ACF_RAT) {
         act1[n] = action3(ap.irat, ap.ipf, 0, ap.isp[0], 0, status);
-      else if (ap.action == ACF_RAT_SDET)
+      } else if (ap.action == ACF_RAT_SDET) {
         act1[n] = action3(ap.irat, ap.ipf, 1, ap.isp[0], 0, status);
+      }
 
       chk_mode_regen(ap.isp[0], status);
       add2counter("action", iact[i], status);
@@ -682,8 +704,9 @@ int main(int argc, char *argv[])
   read_integrator();
   read_solvers();
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(fin);
+  }
 
   hmc_wsize(&nwud, &nws, &nwsd, &nwv, &nwvd);
   alloc_wud(nwud);
@@ -702,8 +725,9 @@ int main(int argc, char *argv[])
   error(act0 == NULL, 1, "main [check3.c]", "Unable to allocate action arrays");
   tau[0] = hmc.tau;
 
-  for (i = 1; i < 4; i++)
+  for (i = 1; i < 4; i++) {
     tau[i] = tau[i - 1] / pow(4.0, 1.0 / 3.0);
+  }
 
   print_ani_parms();
   print_lat_parms();
@@ -716,10 +740,12 @@ int main(int argc, char *argv[])
   print_force_parms2();
   print_solver_parms(&isap, &idfl);
 
-  if (isap)
+  if (isap) {
     print_sap_parms(0);
-  if (idfl)
+  }
+  if (idfl) {
     print_dfl_parms(1);
+  }
 
   if (my_rank == 0) {
     printf("Configurations %sn%d -> %sn%d in steps of %d\n\n", nbase, first,
@@ -756,10 +782,11 @@ int main(int argc, char *argv[])
                     tau[i]);
       set_mdsteps();
 
-      if (i == 0)
+      if (i == 0) {
         start_hmc(act0, usv[0], fsv[0]);
-      else
+      } else {
         restart_hmc(usv[0], fsv[0]);
+      }
 
       run_mdint();
       end_hmc(act1);
@@ -811,8 +838,9 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

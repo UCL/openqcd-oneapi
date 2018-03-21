@@ -82,10 +82,12 @@ int main(int argc, char *argv[])
   ie = 0;
 
   for (k = 1; k < NFIELDS; k++) {
-    if ((wv[k] - wv[0]) != (k * nvec))
+    if ((wv[k] - wv[0]) != (k * nvec)) {
       ie = 1;
-    if ((wvd[k] - wvd[0]) != (k * nvec))
+    }
+    if ((wvd[k] - wvd[0]) != (k * nvec)) {
       ie = 2;
+    }
   }
 
   error(ie == 1, 1, "main [check1.c]",
@@ -95,11 +97,13 @@ int main(int argc, char *argv[])
 
   for (k = 0; k < NFIELDS; k++) {
     for (ix = 0; ix < nvec; ix++) {
-      if ((wv[k][ix].re != 0.0f) || (wv[k][ix].im != 0.0f))
+      if ((wv[k][ix].re != 0.0f) || (wv[k][ix].im != 0.0f)) {
         ie = 1;
+      }
 
-      if ((wvd[k][ix].re != 0.0) || (wvd[k][ix].im != 0.0))
+      if ((wvd[k][ix].re != 0.0) || (wvd[k][ix].im != 0.0)) {
         ie = 2;
+      }
     }
   }
 
@@ -114,13 +118,17 @@ int main(int argc, char *argv[])
   wv = vflds();
   wvd = vdflds();
 
-  for (k = 1; k < (2 * Ns); k++)
-    if ((wv[k] - wv[0]) != (k * nv))
+  for (k = 1; k < (2 * Ns); k++) {
+    if ((wv[k] - wv[0]) != (k * nv)) {
       ie = 1;
+    }
+  }
 
-  for (k = 1; k < Ns; k++)
-    if ((wvd[k] - wvd[0]) != (k * nv))
+  for (k = 1; k < Ns; k++) {
+    if ((wvd[k] - wvd[0]) != (k * nv)) {
       ie = 2;
+    }
+  }
 
   error(ie == 1, 1, "main [check1.c]",
         "Field addresses returned by vflds() are incorrect");
@@ -128,15 +136,19 @@ int main(int argc, char *argv[])
         "Field addresses returned by vdflds() are incorrect");
 
   for (k = 0; k < (2 * Ns); k++) {
-    for (ix = 0; ix < nv; ix++)
-      if ((wv[k][ix].re != 0.0f) || (wv[k][ix].im != 0.0f))
+    for (ix = 0; ix < nv; ix++) {
+      if ((wv[k][ix].re != 0.0f) || (wv[k][ix].im != 0.0f)) {
         ie = 1;
+      }
+    }
   }
 
   for (k = 0; k < Ns; k++) {
-    for (ix = 0; ix < nv; ix++)
-      if ((wvd[k][ix].re != 0.0) || (wvd[k][ix].im != 0.0))
+    for (ix = 0; ix < nv; ix++) {
+      if ((wvd[k][ix].re != 0.0) || (wvd[k][ix].im != 0.0)) {
         ie = 2;
+      }
+    }
   }
 
   error(ie == 1, 1, "main [check1.c]",

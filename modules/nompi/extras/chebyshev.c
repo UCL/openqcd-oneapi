@@ -56,8 +56,9 @@ static double *alist, *clist, *flist;
 
 static void allocate_arrays(int nmax)
 {
-  for (max_degree = 16; max_degree <= nmax;)
+  for (max_degree = 16; max_degree <= nmax;) {
     max_degree *= 2;
+  }
 
   alist = malloc((max_degree + 1) * sizeof(double));
   clist = malloc((max_degree * 2) * sizeof(double));
@@ -125,11 +126,13 @@ static void compute_alist(int n)
 
   for (i = 0; i <= n; ++i) {
     sum = 0.5 * (flist[0] + flist[max_degree]);
-    if (i % 2 == 1)
+    if (i % 2 == 1) {
       sum -= flist[max_degree];
+    }
 
-    for (k = dk; k < max_degree; k += dk)
+    for (k = dk; k < max_degree; k += dk) {
       sum += flist[k] * clist[(i * k) % (2 * max_degree)];
+    }
 
     alist[i] = r * sum;
   }
@@ -147,8 +150,9 @@ static void compute_blist(int n, double a, double b)
     if (i % 2 == 0) {
       sum = 0.5 * (flist[0] + flist[max_degree]);
 
-      for (k = dk; k < max_degree; k += dk)
+      for (k = dk; k < max_degree; k += dk) {
         sum += flist[k] * clist[(i * k) % (2 * max_degree)];
+      }
 
       alist[i] = (a - b) * r * sum / (double)(i * i - 1);
     } else {
@@ -171,14 +175,16 @@ static int test_convergence(int n)
 
     for (k = 0; k < kmax; ++k) {
       a = fabs(alist[i * kmax + k]);
-      if (a > m[i])
+      if (a > m[i]) {
         m[i] = a;
+      }
     }
   }
 
   if ((m[0] >= 1.0e2 * m[1]) && (m[0] >= 1.0e4 * m[2]) &&
-      (m[0] >= 1.0e6 * m[3]))
+      (m[0] >= 1.0e6 * m[3])) {
     return (0);
+  }
 
   return (1);
 }
@@ -191,12 +197,14 @@ static double abs_error(int n)
   kmin = n / 2 + 1;
   err = 0.0;
 
-  for (k = 0; k < kmin; ++k)
+  for (k = 0; k < kmin; ++k) {
     err += fabs(alist[k]);
+  }
   err *= (DBL_EPSILON);
 
-  for (k = kmin; k < n; ++k)
+  for (k = kmin; k < n; ++k) {
     err += fabs(alist[k]);
+  }
 
   return (2.0 * err);
 }
@@ -210,8 +218,9 @@ static int economize(int n, double eps, double err, double c[])
 
   for (k = n; k >= 1; --k) {
     r += fabs(c[k]);
-    if (r >= eps)
+    if (r >= eps) {
       break;
+    }
   }
 
   return (k);
@@ -245,8 +254,9 @@ int cheby_fit(double a, double b, double (*f)(double x), int nmax, double eps,
     if ((itest == 0) && (err < eps)) {
       n /= 2;
       c[0] = 0.5 * alist[0];
-      for (k = 1; k <= n; ++k)
+      for (k = 1; k <= n; ++k) {
         c[k] = alist[k];
+      }
       break;
     }
   }
@@ -276,8 +286,9 @@ double cheby_val(double a, double b, int n, double c[], double x)
     exit(0);
   }
 
-  if (n == 0)
+  if (n == 0) {
     return (c[0]);
+  }
 
   z = 2.0 * (a + b - 2.0 * x) / (a - b);
   u = c[n];
@@ -320,8 +331,9 @@ double cheby_int(double a, double b, double (*f)(double x), int nmax,
 
     if ((itest == 0) && (err < eps)) {
       n /= 2;
-      for (k = n; k >= 0; k -= 2)
+      for (k = n; k >= 0; k -= 2) {
         sum += alist[k];
+      }
       break;
     }
   }

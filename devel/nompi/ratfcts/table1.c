@@ -15,8 +15,9 @@
 
 #define MAIN_PROGRAM
 
-#include "utils.h"
 #include "ratfcts.h"
+#include "utils.h"
+#include <stdio.h>
 
 static int n;
 static double eps, delta, As, *ars;
@@ -37,8 +38,9 @@ static double zolotarev_sign(double x)
   y = x * x;
   p = 1.0;
 
-  for (r = 0; r < n; r++)
+  for (r = 0; r < n; r++) {
     p *= ((y + ars[2 * r]) / (y + ars[2 * r + 1]));
+  }
 
   return x * As * p;
 }

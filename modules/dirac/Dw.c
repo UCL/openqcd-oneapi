@@ -92,9 +92,9 @@
  *   The functions here are the main culprints why the entire codebase cannot be
  *   made to satisfy const correctness. All the functions should have the
  *   signature:
- *    
+ *
  *   Dw...(float mu, spinor const *s, spinor *r)
- *   
+ *
  *   However, due to the fact that these routines manipulate the boundary of the
  *   field s this cannot be the case. The boundary storage is fairly ingrained
  *   into the computation, so it will be a bit of work to decouple these. Any
@@ -1556,9 +1556,6 @@ static void deo(int *piup, int *pidn, su3 *u, spinor *pl)
 
 void Dw(float mu, spinor *s, spinor *r)
 {
-#ifdef dirac_counters
-  Dw_counter++;
-#endif
   int bc, ix, t;
   int *piup, *pidn;
 #if (defined QPX)
@@ -1569,14 +1566,19 @@ void Dw(float mu, spinor *s, spinor *r)
   spin_t *so, *ro;
   tm_parms_t tm;
 
+#ifdef dirac_counters
+  Dw_counter++;
+#endif
+
   cps_int_bnd(0x1, s);
   m = swfld();
   apply_sw(VOLUME / 2, mu, m, s, r);
   set_s2zero(BNDRY / 2, r + VOLUME);
 
   tm = tm_parms();
-  if (tm.eoflg == 1)
+  if (tm.eoflg == 1) {
     mu = 0.0f;
+  }
 
   coe = -0.5f;
   ceo = -0.5f;
@@ -1671,12 +1673,13 @@ void Dw(float mu, spinor *s, spinor *r)
 
 void Dwee(float mu, spinor *s, spinor *r)
 {
-#ifdef dirac_counters
-  Dwee_counter++;
-#endif
   int bc, ix, t;
   pauli *m, *mm;
   spin_t *se, *re;
+
+#ifdef dirac_counters
+  Dwee_counter++;
+#endif
 
   bc = bc_type();
   m = swfld();
@@ -1691,9 +1694,9 @@ void Dwee(float mu, spinor *s, spinor *r)
       t = global_time(ix);
       ix += 1;
 
-      if ((t > 0) && ((t < (N0 - 1)) || (bc != 0)))
+      if ((t > 0) && ((t < (N0 - 1)) || (bc != 0))) {
         mul_pauli2(mu, m, &((*se).s), &((*re).s));
-      else {
+      } else {
         (*se).s = s0;
         (*re).s = s0;
       }
@@ -1713,13 +1716,14 @@ void Dwee(float mu, spinor *s, spinor *r)
 
 void Dwoo(float mu, spinor *s, spinor *r)
 {
-#ifdef dirac_counters
-  Dwoo_counter++;
-#endif
   int bc, ix, t;
   pauli *m, *mm;
   spin_t *so, *ro;
   tm_parms_t tm;
+
+#ifdef dirac_counters
+  Dwoo_counter++;
+#endif
 
   bc = bc_type();
   m = swfld() + VOLUME;
@@ -1727,8 +1731,9 @@ void Dwoo(float mu, spinor *s, spinor *r)
   so = (spin_t *)(s + (VOLUME / 2));
   ro = (spin_t *)(r + (VOLUME / 2));
   tm = tm_parms();
-  if (tm.eoflg == 1)
+  if (tm.eoflg == 1) {
     mu = 0.0f;
+  }
 
   if (((cpr[0] == 0) && (bc != 3)) || ((cpr[0] == (NPROC0 - 1)) && (bc == 0))) {
     ix = VOLUME / 2;
@@ -1737,9 +1742,9 @@ void Dwoo(float mu, spinor *s, spinor *r)
       t = global_time(ix);
       ix += 1;
 
-      if ((t > 0) && ((t < (N0 - 1)) || (bc != 0)))
+      if ((t > 0) && ((t < (N0 - 1)) || (bc != 0))) {
         mul_pauli2(mu, m, &((*so).s), &((*ro).s));
-      else {
+      } else {
         (*so).s = s0;
         (*ro).s = s0;
       }
@@ -1759,13 +1764,14 @@ void Dwoo(float mu, spinor *s, spinor *r)
 
 void Dwoe(spinor *s, spinor *r)
 {
-#ifdef dirac_counters
-  Dwoe_counter++;
-#endif
   int bc, ix, t;
   int *piup, *pidn;
   su3 *u, *um;
   spin_t *ro;
+
+#ifdef dirac_counters
+  Dwoe_counter++;
+#endif
 
   cps_int_bnd(0x1, s);
 
@@ -1795,8 +1801,9 @@ void Dwoe(spinor *s, spinor *r)
 #else
         (*ro) = rs;
 #endif
-      } else
+      } else {
         (*ro).s = s0;
+      }
 
       piup += 4;
       pidn += 4;
@@ -1820,13 +1827,14 @@ void Dwoe(spinor *s, spinor *r)
 
 void Dweo(spinor *s, spinor *r)
 {
-#ifdef dirac_counters
-  Dweo_counter++;
-#endif
   int bc, ix, t;
   int *piup, *pidn;
   su3 *u, *um;
   spin_t *so;
+
+#ifdef dirac_counters
+  Dweo_counter++;
+#endif
 
   set_s2zero(BNDRY / 2, r + VOLUME);
 
@@ -1856,8 +1864,9 @@ void Dweo(spinor *s, spinor *r)
         rs = (*so);
 #endif
         deo(piup, pidn, u, r);
-      } else
+      } else {
         (*so).s = s0;
+      }
 
       piup += 4;
       pidn += 4;
@@ -1884,13 +1893,14 @@ void Dweo(spinor *s, spinor *r)
 
 void Dwhat(float mu, spinor *s, spinor *r)
 {
-#ifdef dirac_counters
-  Dwhat_counter++;
-#endif
   int bc, ix, t;
   int *piup, *pidn;
   su3 *u, *um;
   pauli *m;
+
+#ifdef dirac_counters
+  Dwhat_counter++;
+#endif
 
   cps_int_bnd(0x1, s);
   m = swfld();
@@ -1957,9 +1967,6 @@ void Dwhat(float mu, spinor *s, spinor *r)
 
 void Dw_blk(blk_grid_t grid, int n, float mu, int k, int l)
 {
-#ifdef dirac_counters
-  Dw_blk_counter++;
-#endif
   int nb, isw, vol, volh, ibu, ibd;
   int *piup, *pidn, *ibp, *ibm;
 #if (defined QPX)
@@ -1971,6 +1978,10 @@ void Dw_blk(blk_grid_t grid, int n, float mu, int k, int l)
   spin_t *so, *ro;
   block_t *b;
   tm_parms_t tm;
+
+#ifdef dirac_counters
+  Dw_blk_counter++;
+#endif
 
   b = blk_list(grid, &nb, &isw);
 
@@ -2000,8 +2011,9 @@ void Dw_blk(blk_grid_t grid, int n, float mu, int k, int l)
   m = (*b).sw;
   apply_sw(volh, mu, m, s, r);
   tm = tm_parms();
-  if (tm.eoflg == 1)
+  if (tm.eoflg == 1) {
     mu = 0.0f;
+  }
 
   coe = -0.5f;
   ceo = -0.5f;
@@ -2017,8 +2029,9 @@ void Dw_blk(blk_grid_t grid, int n, float mu, int k, int l)
     ibp = (*b).ibp;
     ibm = ibp + (*b).nbp / 2;
 
-    for (; ibp < ibm; ibp++)
+    for (; ibp < ibm; ibp++) {
       s[*ibp] = s0;
+    }
 
     ibu = ((cpr[0] == (NPROC0 - 1)) && (((*b).bo[0] + (*b).bs[0]) == L0) &&
            (bc_type() == 0));
@@ -2064,8 +2077,9 @@ void Dw_blk(blk_grid_t grid, int n, float mu, int k, int l)
     ibp = (*b).ibp;
     ibm = ibp + (*b).nbp / 2;
 
-    for (; ibp < ibm; ibp++)
+    for (; ibp < ibm; ibp++) {
       r[*ibp] = s0;
+    }
   } else {
     for (; u < um; u += 8) {
       doe(piup, pidn, u, s);
@@ -2103,14 +2117,15 @@ void Dw_blk(blk_grid_t grid, int n, float mu, int k, int l)
 
 void Dwee_blk(blk_grid_t grid, int n, float mu, int k, int l)
 {
-#ifdef dirac_counters
-  Dwee_blk_counter++;
-#endif
   int nb, isw, vol, ibu, ibd;
   int *piup, *pidn;
   pauli *m, *mm;
   spin_t *se, *re;
   block_t *b;
+
+#ifdef dirac_counters
+  Dwee_blk_counter++;
+#endif
 
   b = blk_list(grid, &nb, &isw);
 
@@ -2143,9 +2158,9 @@ void Dwee_blk(blk_grid_t grid, int n, float mu, int k, int l)
     ibd = ((cpr[0] == 0) && ((*b).bo[0] == 0));
 
     for (; m < mm; m += 2) {
-      if (((pidn[0] < vol) || (!ibd)) && ((piup[0] < vol) || (!ibu)))
+      if (((pidn[0] < vol) || (!ibd)) && ((piup[0] < vol) || (!ibu))) {
         mul_pauli2(mu, m, &((*se).s), &((*re).s));
-      else {
+      } else {
         (*se).s = s0;
         (*re).s = s0;
       }
@@ -2167,15 +2182,16 @@ void Dwee_blk(blk_grid_t grid, int n, float mu, int k, int l)
 
 void Dwoo_blk(blk_grid_t grid, int n, float mu, int k, int l)
 {
-#ifdef dirac_counters
-  Dwoo_blk_counter++;
-#endif
   int nb, isw, vol, volh, ibu, ibd;
   int *piup, *pidn;
   pauli *m, *mm;
   spin_t *so, *ro;
   block_t *b;
   tm_parms_t tm;
+
+#ifdef dirac_counters
+  Dwoo_blk_counter++;
+#endif
 
   b = blk_list(grid, &nb, &isw);
 
@@ -2198,8 +2214,9 @@ void Dwoo_blk(blk_grid_t grid, int n, float mu, int k, int l)
   so = (spin_t *)((*b).s[k] + volh);
   ro = (spin_t *)((*b).s[l] + volh);
   tm = tm_parms();
-  if (tm.eoflg == 1)
+  if (tm.eoflg == 1) {
     mu = 0.0f;
+  }
 
   m = (*b).sw + vol;
   mm = m + vol;
@@ -2213,9 +2230,9 @@ void Dwoo_blk(blk_grid_t grid, int n, float mu, int k, int l)
     ibd = ((cpr[0] == 0) && ((*b).bo[0] == 0));
 
     for (; m < mm; m += 2) {
-      if (((pidn[0] < vol) || (!ibd)) && ((piup[0] < vol) || (!ibu)))
+      if (((pidn[0] < vol) || (!ibd)) && ((piup[0] < vol) || (!ibu))) {
         mul_pauli2(mu, m, &((*so).s), &((*ro).s));
-      else {
+      } else {
         (*so).s = s0;
         (*ro).s = s0;
       }
@@ -2237,9 +2254,6 @@ void Dwoo_blk(blk_grid_t grid, int n, float mu, int k, int l)
 
 void Dwoe_blk(blk_grid_t grid, int n, int k, int l)
 {
-#ifdef dirac_counters
-  Dwoe_blk_counter++;
-#endif
   int nb, isw, vol, volh, ibu, ibd;
   int *piup, *pidn, *ibp, *ibm;
 #if (defined QPX)
@@ -2249,6 +2263,10 @@ void Dwoe_blk(blk_grid_t grid, int n, int k, int l)
   spinor *s;
   spin_t *ro;
   block_t *b;
+
+#ifdef dirac_counters
+  Dwoe_blk_counter++;
+#endif
 
   b = blk_list(grid, &nb, &isw);
 
@@ -2284,8 +2302,9 @@ void Dwoe_blk(blk_grid_t grid, int n, int k, int l)
     ibp = (*b).ibp;
     ibm = ibp + (*b).nbp / 2;
 
-    for (; ibp < ibm; ibp++)
+    for (; ibp < ibm; ibp++) {
       s[*ibp] = s0;
+    }
 
     ibu = ((cpr[0] == (NPROC0 - 1)) && (((*b).bo[0] + (*b).bs[0]) == L0) &&
            (bc_type() == 0));
@@ -2300,8 +2319,9 @@ void Dwoe_blk(blk_grid_t grid, int n, int k, int l)
 #else
         (*ro) = rs;
 #endif
-      } else
+      } else {
         (*ro).s = s0;
+      }
 
       piup += 4;
       pidn += 4;
@@ -2325,15 +2345,16 @@ void Dwoe_blk(blk_grid_t grid, int n, int k, int l)
 
 void Dweo_blk(blk_grid_t grid, int n, int k, int l)
 {
-#ifdef dirac_counters
-  Dweo_blk_counter++;
-#endif
   int nb, isw, vol, volh, ibu, ibd;
   int *piup, *pidn, *ibp, *ibm;
   su3 *u, *um;
   spinor *r;
   spin_t *so;
   block_t *b;
+
+#ifdef dirac_counters
+  Dweo_blk_counter++;
+#endif
 
   b = blk_list(grid, &nb, &isw);
 
@@ -2379,8 +2400,9 @@ void Dweo_blk(blk_grid_t grid, int n, int k, int l)
         rs = (*so);
 #endif
         deo(piup, pidn, u, r);
-      } else
+      } else {
         (*so).s = s0;
+      }
 
       piup += 4;
       pidn += 4;
@@ -2390,8 +2412,9 @@ void Dweo_blk(blk_grid_t grid, int n, int k, int l)
     ibp = (*b).ibp;
     ibm = ibp + (*b).nbp / 2;
 
-    for (; ibp < ibm; ibp++)
+    for (; ibp < ibm; ibp++) {
       r[*ibp] = s0;
+    }
   } else {
     for (; u < um; u += 8) {
 #if (defined QPX)
@@ -2411,15 +2434,16 @@ void Dweo_blk(blk_grid_t grid, int n, int k, int l)
 
 void Dwhat_blk(blk_grid_t grid, int n, float mu, int k, int l)
 {
-#ifdef dirac_counters
-  Dwhat_blk_counter++;
-#endif
   int nb, isw, vol, volh, ibu, ibd;
   int *piup, *pidn, *ibp, *ibm;
   su3 *u, *um;
   pauli *m;
   spinor *s, *r;
   block_t *b;
+
+#ifdef dirac_counters
+  Dwhat_blk_counter++;
+#endif
 
   b = blk_list(grid, &nb, &isw);
 
@@ -2461,8 +2485,9 @@ void Dwhat_blk(blk_grid_t grid, int n, float mu, int k, int l)
     ibp = (*b).ibp;
     ibm = ibp + (*b).nbp / 2;
 
-    for (; ibp < ibm; ibp++)
+    for (; ibp < ibm; ibp++) {
       s[*ibp] = s0;
+    }
 
     ibu = ((cpr[0] == (NPROC0 - 1)) && (((*b).bo[0] + (*b).bs[0]) == L0) &&
            (bc_type() == 0));
@@ -2490,8 +2515,9 @@ void Dwhat_blk(blk_grid_t grid, int n, float mu, int k, int l)
     ibp = (*b).ibp;
     ibm = ibp + (*b).nbp / 2;
 
-    for (; ibp < ibm; ibp++)
+    for (; ibp < ibm; ibp++) {
       r[*ibp] = s0;
+    }
   } else {
     for (; u < um; u += 8) {
       doe(piup, pidn, u, s);

@@ -228,8 +228,9 @@ static int cmp_u(su3 *u, su3 *v)
   uv = (umat_t *)(v);
 
   for (i = 0; i < 18; i++) {
-    if ((*uu).r[i] != (*uv).r[i])
+    if ((*uu).r[i] != (*uv).r[i]) {
       return 1;
+    }
   }
 
   return 0;
@@ -243,8 +244,9 @@ static int is_zero(su3 *u)
   um = (umat_t *)(u);
   ie = 1;
 
-  for (i = 0; i < 18; i++)
+  for (i = 0; i < 18; i++) {
     ie &= ((*um).r[i] == 0.0f);
+  }
 
   return ie;
 }
@@ -256,10 +258,11 @@ static int is_on_bnd(int ix)
   bc = bc_type();
   t = global_time(ix);
 
-  if (((t == 0) && (bc != 3)) || ((t == (NPROC0 * L0 - 1)) && (bc == 0)))
+  if (((t == 0) && (bc != 3)) || ((t == (NPROC0 * L0 - 1)) && (bc == 0))) {
     return 1;
-  else
+  } else {
     return 0;
+  }
 }
 
 static int check_ubnd(block_t *b)
@@ -274,8 +277,9 @@ static int check_ubnd(block_t *b)
   bb = (*b).bb;
   ie = 0;
 
-  if ((*bb).u == NULL)
+  if ((*bb).u == NULL) {
     return 0;
+  }
 
   for (ifc = 0; ifc < 8; ifc++) {
     u = (*bb).u;
@@ -283,11 +287,12 @@ static int check_ubnd(block_t *b)
     for (iz = 0; iz < (*bb).vol; iz++) {
       ix = (*bb).ipp[iz];
 
-      if ((ifc <= 1) && (is_on_bnd((*b).imb[ix])))
+      if ((ifc <= 1) && (is_on_bnd((*b).imb[ix]))) {
         ie |= (is_zero(u) ^ 0x1);
-      else {
-        if (iz < ((*bb).vol / 2))
+      } else {
+        if (iz < ((*bb).vol / 2)) {
           ie |= cmp_u(u, (*b).u + 8 * (ix - ((*b).vol / 2)) + (ifc ^ 0x1));
+        }
 
         fnd_coord(b, ix, &x0, &x1, &x2, &x3);
 
@@ -296,28 +301,36 @@ static int check_ubnd(block_t *b)
         y2 = cpr[2] * L2 + bo[2] + x2;
         y3 = cpr[3] * L3 + bo[3] + x3;
 
-        if (iz < ((*bb).vol / 2))
+        if (iz < ((*bb).vol / 2)) {
           ie |= check_u(y0, y1, y2, y3, ifc ^ 0x1, u);
-        else {
-          if (ifc == 0)
+        } else {
+          if (ifc == 0) {
             y0 = safe_mod(y0 - 1, NPROC0 * L0);
-          if (ifc == 1)
+          }
+          if (ifc == 1) {
             y0 = safe_mod(y0 + 1, NPROC0 * L0);
+          }
 
-          if (ifc == 2)
+          if (ifc == 2) {
             y1 = safe_mod(y1 - 1, NPROC1 * L1);
-          if (ifc == 3)
+          }
+          if (ifc == 3) {
             y1 = safe_mod(y1 + 1, NPROC1 * L1);
+          }
 
-          if (ifc == 4)
+          if (ifc == 4) {
             y2 = safe_mod(y2 - 1, NPROC2 * L2);
-          if (ifc == 5)
+          }
+          if (ifc == 5) {
             y2 = safe_mod(y2 + 1, NPROC2 * L2);
+          }
 
-          if (ifc == 6)
+          if (ifc == 6) {
             y3 = safe_mod(y3 - 1, NPROC3 * L3);
-          if (ifc == 7)
+          }
+          if (ifc == 7) {
             y3 = safe_mod(y3 + 1, NPROC3 * L3);
+          }
 
           ie |= check_u(y0, y1, y2, y3, ifc, u);
         }
@@ -379,9 +392,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check3.c]",
                  "Syntax: check3 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);

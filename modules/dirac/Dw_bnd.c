@@ -112,9 +112,15 @@
                        : "=m"((rh).c1.c1), "=m"((rh).c1.c2), "=m"((rh).c1.c3), \
                          "=m"((rh).c2.c1), "=m"((rh).c2.c2), "=m"((rh).c2.c3))
 
-static void mul_umat(su3 *u) { _avx_su3_pair_multiply(u[0], u[1]); }
+static void mul_umat(su3 *u)
+{
+  _avx_su3_pair_multiply(u[0], u[1]);
+}
 
-static void mul_uinv(su3 *u) { _avx_su3_pair_inverse_multiply(u[0], u[1]); }
+static void mul_uinv(su3 *u)
+{
+  _avx_su3_pair_inverse_multiply(u[0], u[1]);
+}
 
 void Dw_bnd(blk_grid_t grid, int n, int k, int l)
 {
@@ -420,9 +426,15 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
                        : "=m"((w).c1.c1), "=m"((w).c1.c2), "=m"((w).c1.c3),    \
                          "=m"((w).c2.c1), "=m"((w).c2.c2), "=m"((w).c2.c3))
 
-static void mul_umat(su3 *u) { _sse_su3_multiply(*u); }
+static void mul_umat(su3 *u)
+{
+  _sse_su3_multiply(*u);
+}
 
-static void mul_uinv(su3 *u) { _sse_su3_inverse_multiply(*u); }
+static void mul_uinv(su3 *u)
+{
+  _sse_su3_inverse_multiply(*u);
+}
 
 void Dw_bnd(blk_grid_t grid, int n, int k, int l)
 {
@@ -824,8 +836,9 @@ void Dw_bnd(blk_grid_t grid, int n, int k, int l)
         (*w) = w0;
       }
     } else {
-      for (; w < wm; w++)
+      for (; w < wm; w++) {
         (*w) = w0;
+      }
     }
   } else {
     u = (*bb).u;

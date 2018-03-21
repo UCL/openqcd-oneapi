@@ -109,8 +109,9 @@ double setpf1(double mu, int ipf, int icom)
   tm_parms_t tm;
 
   tm = tm_parms();
-  if (tm.eoflg == 1)
+  if (tm.eoflg == 1) {
     set_tm_parms(0);
+  }
 
   wsd = reserve_wsd(1);
   random_sd(VOLUME, wsd[0], 1.0);
@@ -140,8 +141,9 @@ void force1(double mu, int ipf, int isp, int icr, double c, int *status)
   tm_parms_t tm;
 
   tm = tm_parms();
-  if (tm.eoflg == 1)
+  if (tm.eoflg == 1) {
     set_tm_parms(0);
+  }
 
   mdfs = mdflds();
   sp = solver_parms(isp);
@@ -171,21 +173,25 @@ void force1(double mu, int ipf, int isp, int icr, double c, int *status)
         if (res1 > sp.res) {
           tmcg(sp.nmx, sp.res / res1, mu, rho, psi, status);
           mulr_spinor_add_dble(VOLUME, chi, psi, -1.0);
-        } else
+        } else {
           status[0] = 0;
-      } else
+        }
+      } else {
         tmcg(sp.nmx, sp.res, mu, phi, chi, status);
+      }
 
       release_wsd();
-    } else
+    } else {
       tmcg(sp.nmx, sp.res, mu, phi, chi, status);
+    }
 
     error_root(status[0] < 0, 1, "force1 [force1.c]",
                "CGNE solver failed (mu = %.4e, parameter set no %d, "
                "status = %d)",
                mu, isp, status[0]);
-    if (icr)
+    if (icr) {
       add_chrono(icr, chi);
+    }
     Dw_dble(-mu, chi, psi);
     mulg5_dble(VOLUME, psi);
   } else if (sp.solver == SAP_GCR) {
@@ -222,8 +228,9 @@ void force1(double mu, int ipf, int isp, int icr, double c, int *status)
               mulg5_dble(VOLUME, eta);
               sap_gcr(sp.nkv, sp.nmx, sp.res / res1, -mu, eta, rho, status + 1);
               mulr_spinor_add_dble(VOLUME, chi, rho, -1.0);
-            } else
+            } else {
               status[1] = 0;
+            }
           } else {
             mulg5_dble(VOLUME, psi);
             sap_gcr(sp.nkv, sp.nmx, sp.res, -mu, psi, chi, status + 1);
@@ -256,8 +263,9 @@ void force1(double mu, int ipf, int isp, int icr, double c, int *status)
                "SAP_GCR solver failed (mu = %.4e, parameter set no %d, "
                "status = %d;%d)",
                mu, isp, status[0], status[1]);
-    if (icr)
+    if (icr) {
       add_chrono(icr, chi);
+    }
   } else if (sp.solver == DFL_SAP_GCR) {
     sap = sap_parms();
     set_sap_parms(sap.bs, sp.isolv, sp.nmr, sp.ncy);
@@ -294,8 +302,9 @@ void force1(double mu, int ipf, int isp, int icr, double c, int *status)
                            status + 3);
               mulr_spinor_add_dble(VOLUME, chi, rho, -1.0);
             } else {
-              for (l = 3; l < 6; l++)
+              for (l = 3; l < 6; l++) {
                 status[l] = 0;
+              }
             }
           } else {
             mulg5_dble(VOLUME, psi);
@@ -303,8 +312,9 @@ void force1(double mu, int ipf, int isp, int icr, double c, int *status)
             mulg5_dble(VOLUME, psi);
           }
         } else {
-          for (l = 0; l < 6; l++)
+          for (l = 0; l < 6; l++) {
             status[l] = 0;
+          }
         }
       } else {
         mulg5_dble(VOLUME, phi);
@@ -333,10 +343,12 @@ void force1(double mu, int ipf, int isp, int icr, double c, int *status)
                mu, isp, status[0], status[1], status[2], status[3], status[4],
                status[5]);
 
-    if (icr)
+    if (icr) {
       add_chrono(icr, chi);
-  } else
+    }
+  } else {
     error_root(1, 1, "force1 [force1.c]", "Unknown solver");
+  }
 
   set_xt2zero();
   add_prod2xt(1.0, chi, psi);
@@ -359,8 +371,9 @@ double action1(double mu, int ipf, int isp, int icom, int *status)
   tm_parms_t tm;
 
   tm = tm_parms();
-  if (tm.eoflg == 1)
+  if (tm.eoflg == 1) {
     set_tm_parms(0);
+  }
 
   mdfs = mdflds();
   sp = solver_parms(isp);

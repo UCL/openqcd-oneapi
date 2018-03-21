@@ -65,9 +65,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check6.c]",
                  "Syntax: check6 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -112,8 +113,9 @@ int main(int argc, char *argv[])
       printf("n=%3d, A=%12.6e, dev=%6.1e, A[0...%d]=%8.2e", (i + 1) * dn, A1,
              dev, N0 - 1, A[0]);
 
-      for (t = 1; t < N0; t++)
+      for (t = 1; t < N0; t++) {
         printf(", %8.2e", A[t]);
+      }
 
       printf("\n");
     }
@@ -121,8 +123,9 @@ int main(int argc, char *argv[])
     MPI_Bcast(A0, N0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     for (t = 0; t < N0; t++) {
-      if ((A[t] - A0[t]) != 0.0)
+      if ((A[t] - A0[t]) != 0.0) {
         break;
+      }
     }
 
     error(t != N0, 1, "main [check6.c]",

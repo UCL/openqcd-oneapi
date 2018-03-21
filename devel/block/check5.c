@@ -44,8 +44,9 @@ static int cmp_s(spinor *r, spinor *s)
   rs = (spin_t *)(s);
 
   for (i = 0; i < 24; i++) {
-    if ((*rr).r[i] != (*rs).r[i])
+    if ((*rr).r[i] != (*rs).r[i]) {
       return 1;
+    }
   }
 
   return 0;
@@ -60,8 +61,9 @@ static int cmp_sd(spinor_dble *r, spinor_dble *s)
   rs = (spin_dble_t *)(s);
 
   for (i = 0; i < 24; i++) {
-    if ((*rr).r[i] != (*rs).r[i])
+    if ((*rr).r[i] != (*rs).r[i]) {
       return 1;
+    }
   }
 
   return 0;
@@ -95,8 +97,9 @@ static int check_sb(block_t *b, ptset_t set, int k, spinor *s)
           n1 = ((is == 1) && ((set == ALL_PTS) || (set == ODD_PTS)));
 
           if ((n0 == 1) || (n1 == 1)) {
-            if (cmp_s((*b).s[k] + ix, s + iy))
+            if (cmp_s((*b).s[k] + ix, s + iy)) {
               return 1;
+            }
           }
         }
       }
@@ -134,8 +137,9 @@ static int check_sdb(block_t *b, ptset_t set, int k, spinor_dble *sd)
           n1 = ((is == 1) && ((set == ALL_PTS) || (set == ODD_PTS)));
 
           if ((n0 == 1) || (n1 == 1)) {
-            if (cmp_sd((*b).sd[k] + ix, sd + iy))
+            if (cmp_sd((*b).sd[k] + ix, sd + iy)) {
               return 1;
+            }
           }
         }
       }
@@ -152,8 +156,9 @@ static int diff_s(int vol, spinor *s, spinor *r)
   sm = s + vol;
 
   for (; s < sm; s++) {
-    if (cmp_s(s, r))
+    if (cmp_s(s, r)) {
       return 1;
+    }
 
     r += 1;
   }
@@ -168,8 +173,9 @@ static int diff_sd(int vol, spinor_dble *s, spinor_dble *r)
   sm = s + vol;
 
   for (; s < sm; s++) {
-    if (cmp_sd(s, r))
+    if (cmp_sd(s, r)) {
       return 1;
+    }
 
     r += 1;
   }
@@ -235,14 +241,15 @@ int main(int argc, char *argv[])
 
   for (n = 0; n < nb; n++) {
     for (iset = 0; iset <= (int)(PT_SETS); iset++) {
-      if (iset == 0)
+      if (iset == 0) {
         set = ALL_PTS;
-      else if (iset == 1)
+      } else if (iset == 1) {
         set = EVEN_PTS;
-      else if (iset == 2)
+      } else if (iset == 2) {
         set = ODD_PTS;
-      else
+      } else {
         set = NO_PTS;
+      }
 
       k = ((k + 1) % ns);
       l = ((k + 1) % ns);
@@ -253,13 +260,15 @@ int main(int argc, char *argv[])
       error(check_sb(b, set, k, ps[0]), 1, "main [check5.c]",
             "assign_s2sblk() is incorrect");
 
-      if ((set == EVEN_PTS) || (set == NO_PTS))
+      if ((set == EVEN_PTS) || (set == NO_PTS)) {
         error(diff_s(vol / 2, (*b).s[k] + vol / 2, (*b).s[l] + vol / 2), 2,
               "main [check5.c]",
               "Unexpected change of the block field by assign_s2sblk()");
-      if ((set == ODD_PTS) || (set == NO_PTS))
+      }
+      if ((set == ODD_PTS) || (set == NO_PTS)) {
         error(diff_s(vol / 2, (*b).s[k], (*b).s[l]), 3, "main [check5.c]",
               "Unexpected change of the block field by assign_s2sblk()");
+      }
 
       error(diff_s(VOLUME, ps[0], ps[1]), 1, "main [check5.c]",
             "assign_s2sblk() changes the input field");
@@ -289,14 +298,15 @@ int main(int argc, char *argv[])
 
   for (n = 0; n < nb; n++) {
     for (iset = 0; iset < (int)(PT_SETS); iset++) {
-      if (iset == 0)
+      if (iset == 0) {
         set = ALL_PTS;
-      else if (iset == 1)
+      } else if (iset == 1) {
         set = EVEN_PTS;
-      else if (iset == 2)
+      } else if (iset == 2) {
         set = ODD_PTS;
-      else
+      } else {
         set = NO_PTS;
+      }
 
       k = ((k + 1) % nsd);
       l = ((k + 1) % nsd);
@@ -307,13 +317,15 @@ int main(int argc, char *argv[])
       error(check_sdb(b, set, k, psd[0]), 1, "main [check5.c]",
             "assign_sd2sdblk() is incorrect");
 
-      if ((set == EVEN_PTS) || (set == NO_PTS))
+      if ((set == EVEN_PTS) || (set == NO_PTS)) {
         error(diff_sd(vol / 2, (*b).sd[k] + vol / 2, (*b).sd[l] + vol / 2), 2,
               "main [check5.c]",
               "Unexpected change of the block field by assign_sd2sdblk()");
-      if ((set == ODD_PTS) || (set == NO_PTS))
+      }
+      if ((set == ODD_PTS) || (set == NO_PTS)) {
         error(diff_sd(vol / 2, (*b).sd[k], (*b).sd[l]), 3, "main [check5.c]",
               "Unexpected change of the block field by assign_sd2sdblk()");
+      }
 
       error(diff_sd(VOLUME, psd[0], psd[1]), 1, "main [check5.c]",
             "assign_sd2sdblk() changes the input field");
@@ -347,14 +359,15 @@ int main(int argc, char *argv[])
 
   for (n = 0; n < nb; n++) {
     for (iset = 0; iset < (int)(PT_SETS); iset++) {
-      if (iset == 0)
+      if (iset == 0) {
         set = ALL_PTS;
-      else if (iset == 1)
+      } else if (iset == 1) {
         set = EVEN_PTS;
-      else if (iset == 2)
+      } else if (iset == 2) {
         set = ODD_PTS;
-      else
+      } else {
         set = NO_PTS;
+      }
 
       k = ((k + 1) % nsd);
       l = ((k + 1) % nsd);
@@ -365,13 +378,15 @@ int main(int argc, char *argv[])
       error(check_sdb(b, set, k, psd[0]), 1, "main [check5.c]",
             "assign_s2sdblk() is incorrect");
 
-      if ((set == EVEN_PTS) || (set == NO_PTS))
+      if ((set == EVEN_PTS) || (set == NO_PTS)) {
         error(diff_sd(vol / 2, (*b).sd[k] + vol / 2, (*b).sd[l] + vol / 2), 2,
               "main [check5.c]",
               "Unexpected change of the block field by assign_s2sdblk()");
-      if ((set == ODD_PTS) || (set == NO_PTS))
+      }
+      if ((set == ODD_PTS) || (set == NO_PTS)) {
         error(diff_sd(vol / 2, (*b).sd[k], (*b).sd[l]), 3, "main [check5.c]",
               "Unexpected change of the block field by assign_s2sdblk()");
+      }
 
       error(diff_s(VOLUME, ps[0], ps[1]), 1, "main [check5.c]",
             "assign_s2sdblk() changes the input field");

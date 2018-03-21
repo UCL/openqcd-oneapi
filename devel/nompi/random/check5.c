@@ -36,8 +36,9 @@ static void dev(su3 *u, double *d1, double *d2)
 
   for (i = 0; i < 18; i++) {
     d = fabs((double)(r[i]));
-    if (d > (*d1))
+    if (d > (*d1)) {
       *d1 = d;
+    }
   }
 
   det1.re = ((*u).c22.re * (*u).c33.re - (*u).c22.im * (*u).c33.im) -
@@ -62,11 +63,13 @@ static void dev(su3 *u, double *d1, double *d2)
 
   *d2 = 0.0;
   d = fabs((double)(det.re) - 1.0);
-  if (d > (*d2))
+  if (d > (*d2)) {
     *d2 = d;
+  }
   d = fabs((double)(det.im));
-  if (d > (*d2))
+  if (d > (*d2)) {
     *d2 = d;
+  }
 }
 
 int main(void)
@@ -89,10 +92,12 @@ int main(void)
     random_su3(&u);
     dev(&u, &d1, &d2);
 
-    if (d1 > dmax1)
+    if (d1 > dmax1) {
       dmax1 = d1;
-    if (d2 > dmax2)
+    }
+    if (d2 > dmax2) {
       dmax2 = d2;
+    }
   }
 
   printf("In 10000 trials:\n");
@@ -113,8 +118,9 @@ int main(void)
     if (scanf("%d", &n) == 1) {
       printf("\n");
 
-      if (n <= 0)
+      if (n <= 0) {
         exit(0);
+      }
 
       a = amalloc(n * sizeof(double), 3);
 

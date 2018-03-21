@@ -173,9 +173,11 @@ int find_opt(int argc, char *argv[], char const *opt)
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
   if (my_rank == 0) {
-    for (k = 1; k < argc; k++)
-      if (strcmp(argv[k], opt) == 0)
+    for (k = 1; k < argc; k++) {
+      if (strcmp(argv[k], opt) == 0) {
         return k;
+      }
+    }
   }
 
   return 0;
@@ -186,8 +188,9 @@ int fdigits(double x)
   int m, n, ne, k;
   double y, z;
 
-  if (is_equal_d(x, 0.0))
+  if (is_equal_d(x, 0.0)) {
     return 0;
+  }
 
   y = fabs(x);
   z = DBL_EPSILON * y;
@@ -198,8 +201,9 @@ int fdigits(double x)
   for (k = 0; k < (DBL_DIG - m); k++) {
     z = sqrt((double)(ne)) * DBL_EPSILON * y;
 
-    if (((y - floor(y)) <= z) || ((ceil(y) - y) <= z))
+    if (((y - floor(y)) <= z) || ((ceil(y) - y) <= z)) {
       break;
+    }
 
     y *= 10.0;
     ne += 1;
@@ -237,8 +241,9 @@ void check_dir(char const *dir)
   error_loc(tmp == NULL, 1, "check_dir [mutils.c]", text);
   fclose(tmp);
 
-  if (n == 1)
+  if (n == 1) {
     remove(tmp_file);
+  }
   free(tmp_file);
 }
 
@@ -269,8 +274,9 @@ void check_dir_root(char const *dir)
                "Unable to access directory %s from process 0", dir);
 
     fclose(tmp);
-    if (n == 1)
+    if (n == 1) {
       remove(tmp_file);
+    }
     free(tmp_file);
   }
 }
@@ -294,14 +300,15 @@ int name_size(char const *format, ...)
     for (;;) {
       pp = strchr(pc, '%');
 
-      if (pp == NULL)
+      if (pp == NULL) {
         break;
+      }
 
       pc = pp + 1;
 
-      if (pc[0] == 's')
+      if (pc[0] == 's') {
         nlen += (strlen(va_arg(args, char *)) - 2);
-      else if (pc[0] == 'd') {
+      } else if (pc[0] == 'd') {
         sprintf(inum, "%d", va_arg(args, int));
         nlen += (strlen(inum) - 2);
       } else if (pc[0] == '.') {
@@ -320,8 +327,9 @@ int name_size(char const *format, ...)
 
         nlen += (n + 1 - strlen(inum));
         dmy = va_arg(args, double);
-        if (dmy < 0.0)
+        if (dmy < 0.0) {
           nlen += 1;
+        }
       } else {
         ie = 3;
         break;
@@ -351,12 +359,15 @@ static int cmp_text(char const *text1, char const *text2)
     n1 = strcspn(p1, " \t\n");
     n2 = strcspn(p2, " \t\n");
 
-    if (n1 != n2)
+    if (n1 != n2) {
       return 0;
-    if (n1 == 0)
+    }
+    if (n1 == 0) {
       return 1;
-    if (strncmp(p1, p2, n1) != 0)
+    }
+    if (strncmp(p1, p2, n1) != 0) {
       return 0;
+    }
 
     p1 += n1;
     p2 += n1;
@@ -374,8 +385,9 @@ static char *get_line(void)
                "Input line is longer than NAME_SIZE-1");
 
     c = strchr(line, '#');
-    if (c != NULL)
+    if (c != NULL) {
       c[0] = '\0';
+    }
   }
 
   return s;
@@ -432,7 +444,10 @@ static long find_section_impl(char const *title, int optional)
   }
 }
 
-long find_section(char const *title) { return find_section_impl(title, 0); }
+long find_section(char const *title)
+{
+  return find_section_impl(title, 0);
+}
 
 long find_optional_section(char const *title)
 {
@@ -441,8 +456,9 @@ long find_optional_section(char const *title)
 
 static void check_tag(char const *tag)
 {
-  if (tag[0] == '\0')
+  if (tag[0] == '\0') {
     return;
+  }
 
   error_root((strspn(tag, " 0123456789.") != 0L) ||
                  (strcspn(tag, " \n") != strlen(tag)),
@@ -479,8 +495,9 @@ static long find_tag_impl(char const *tag, int optional)
       pr[0] = '\0';
 
       if (strcmp(pl, tag) == 0) {
-        if (tofs != No_Section_Found)
+        if (tofs != No_Section_Found) {
           ie = 1;
+        }
         tofs = ofs;
       }
     }
@@ -506,7 +523,10 @@ static long find_tag_impl(char const *tag, int optional)
   return tofs;
 }
 
-static long find_tag(char const *tag) { return find_tag_impl(tag, 0); }
+static long find_tag(char const *tag)
+{
+  return find_tag_impl(tag, 0);
+}
 
 static long read_line_impl(int optional, char const *tag, char const *format,
                            va_list args)
@@ -555,29 +575,33 @@ static long read_line_impl(int optional, char const *tag, char const *format,
         strcpy(str_src, va_arg(args, char *));
       }
     } else if (p == strstr(p, "%d")) {
-      if (use_optional == 0)
+      if (use_optional == 0) {
         ic = sscanf(pl, "%d", va_arg(args, int *));
-      else
+      } else {
         (*va_arg(args, int *)) = va_arg(args, int);
+      }
     } else if (p == strstr(p, "%f")) {
-      if (use_optional == 0)
+      if (use_optional == 0) {
         ic = sscanf(pl, "%f", va_arg(args, float *));
-      else
+      } else {
         (*va_arg(args, float *)) = (float)va_arg(args, double);
+      }
     } else if (p == strstr(p, "%lf")) {
       is = 3;
-      if (use_optional == 0)
+      if (use_optional == 0) {
         ic = sscanf(pl, "%lf", va_arg(args, double *));
-      else
+      } else {
         (*va_arg(args, double *)) = va_arg(args, double);
+      }
     } else {
       error_root(1, 1, "read_line [mutils.c]",
                  "Incorrect format string %s on line with tag %s", format, tag);
     }
 
-    if (use_optional == 0)
+    if (use_optional == 0) {
       error_root(ic != 1, 1, "read_line [mutils.c]",
                  "Missing data item(s) on line with tag %s", tag);
+    }
 
     p += is;
     if (use_optional == 0) {
@@ -603,8 +627,9 @@ long read_line(char const *tag, char const *format, ...)
     va_end(args);
 
     return tofs;
-  } else
+  } else {
     return No_Section_Found;
+  }
 }
 
 long read_optional_line(char const *tag, char const *format, ...)
@@ -621,8 +646,9 @@ long read_optional_line(char const *tag, char const *format, ...)
     va_end(args);
 
     return tofs;
-  } else
+  } else {
     return No_Section_Found;
+  }
 }
 
 int count_tokens(char const *tag)
@@ -640,8 +666,9 @@ int count_tokens(char const *tag)
       s = get_line();
       s += strspn(s, " \t");
       s += strcspn(s, " \t\n");
-    } else
+    } else {
       s = get_line();
+    }
 
     s += strspn(s, " \t\n");
     n = 0;
@@ -653,8 +680,9 @@ int count_tokens(char const *tag)
     }
 
     return n;
-  } else
+  } else {
     return 0;
+  }
 }
 
 static long read_iprms_impl(char const *tag, int n, int *iprms, int optional)
@@ -672,14 +700,16 @@ static long read_iprms_impl(char const *tag, int n, int *iprms, int optional)
     if (tag[0] != '\0') {
       loc = find_tag_impl(tag, optional);
 
-      if (loc == No_Section_Found)
+      if (loc == No_Section_Found) {
         return loc;
+      }
 
       s = get_line();
       s += strspn(s, " \t");
       s += strcspn(s, " \t\n");
-    } else
+    } else {
       s = get_line();
+    }
 
     s += strspn(s, " \t\n");
     nc = 0;
@@ -692,8 +722,9 @@ static long read_iprms_impl(char const *tag, int n, int *iprms, int optional)
         nc += 1;
         s += strcspn(s, " \t\n");
         s += strspn(s, " \t\n");
-      } else
+      } else {
         break;
+      }
     }
 
     error_root(nc != n, 1, "read_iprms [mutils.c]", "Incorrect read count");
@@ -728,14 +759,16 @@ static long read_dprms_impl(char const *tag, int n, double *dprms, int optional)
     if (tag[0] != '\0') {
       loc = find_tag_impl(tag, optional);
 
-      if (loc == No_Section_Found)
+      if (loc == No_Section_Found) {
         return loc;
+      }
 
       s = get_line();
       s += strspn(s, " \t");
       s += strcspn(s, " \t\n");
-    } else
+    } else {
       s = get_line();
+    }
 
     s += strspn(s, " \t\n");
     nc = 0;
@@ -748,8 +781,9 @@ static long read_dprms_impl(char const *tag, int n, double *dprms, int optional)
         nc += 1;
         s += strcspn(s, " \t\n");
         s += strspn(s, " \t\n");
-      } else
+      } else {
         break;
+      }
     }
 
     error_root(nc != n, 1, "read_dprms [mutils.c]", "Incorrect read count");
@@ -791,6 +825,7 @@ void copy_file(char const *in, char const *out)
   if ((ferror(fin) == 0) && (ferror(fout) == 0)) {
     fclose(fin);
     fclose(fout);
-  } else
+  } else {
     error_loc(1, 1, "copy_file [mutils.c]", "Read or write error");
+  }
 }

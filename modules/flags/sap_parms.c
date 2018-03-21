@@ -135,7 +135,10 @@ sap_parms_t set_sap_parms(int const *bs, int isolv, int nmr, int ncy)
   return sap;
 }
 
-sap_parms_t sap_parms(void) { return sap; }
+sap_parms_t sap_parms(void)
+{
+  return sap;
+}
 
 void print_sap_parms(int ipr)
 {
@@ -168,15 +171,17 @@ void write_sap_parms(FILE *fdat)
   endian = endianness();
 
   if (my_rank == 0) {
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++) {
       istd[i] = (stdint_t)(sap.bs[i]);
+    }
 
     istd[4] = (stdint_t)(sap.isolv);
     istd[5] = (stdint_t)(sap.nmr);
     istd[6] = (stdint_t)(sap.ncy);
 
-    if (endian == BIG_ENDIAN)
+    if (endian == BIG_ENDIAN) {
       bswap_int(7, istd);
+    }
 
     iw = fwrite(istd, sizeof(stdint_t), 7, fdat);
     error_root(iw != 7, 1, "write_sap_parms [sap_parms.c]",
@@ -198,13 +203,15 @@ void check_sap_parms(FILE *fdat)
     error_root(ir != 7, 1, "check_sap_parms [sap_parms.c]",
                "Incorrect read count");
 
-    if (endian == BIG_ENDIAN)
+    if (endian == BIG_ENDIAN) {
       bswap_int(7, istd);
+    }
 
     ie = 0;
 
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++) {
       ie |= (istd[i] != (stdint_t)(sap.bs[i]));
+    }
 
     ie |= (istd[4] != (stdint_t)(sap.isolv));
     ie |= (istd[5] != (stdint_t)(sap.nmr));

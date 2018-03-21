@@ -82,8 +82,9 @@ static void snd_pairs(int *dist)
   int c0, c1, c2, c3, ic;
   int bo0[4], bo1[4], ip0, ip1, dmy;
 
-  for (ic = 0; ic < NPROC; ic++)
+  for (ic = 0; ic < NPROC; ic++) {
     isnd[ic] = 0;
+  }
 
   for (c0 = 0; c0 < (NPROC0 * L0); c0 += L0) {
     for (c1 = 0; c1 < (NPROC1 * L1); c1 += L1) {
@@ -102,10 +103,12 @@ static void snd_pairs(int *dist)
           ipt_global(bo0, &ip0, &dmy);
           ipt_global(bo1, &ip1, &dmy);
 
-          if (my_rank == ip0)
+          if (my_rank == ip0) {
             iprcv = ip1;
-          if (my_rank == ip1)
+          }
+          if (my_rank == ip1) {
             ipsnd = ip0;
+          }
 
           if ((isnd[ip1] == 0) && (ip0 != ip1)) {
             isnd[ip1] = 1;
@@ -133,8 +136,9 @@ static void snd_field(int *dist)
     MPI_Recv(ubuf, nbuf, MPI_DOUBLE, iprcv, tag, MPI_COMM_WORLD, &stat);
     MPI_Send(uold, nbuf, MPI_DOUBLE, ipsnd, tag, MPI_COMM_WORLD);
   } else {
-    for (n = 0; n < (4 * VOLUME); n++)
+    for (n = 0; n < (4 * VOLUME); n++) {
       ubuf[n] = uold[n];
+    }
   }
 }
 
@@ -190,8 +194,9 @@ static int cmp_su3_dble(su3_dble *u, su3_dble *v)
   r[17] = (*u).c33.im - (*v).c33.im;
 
   for (k = 0; k < 18; k++) {
-    if (r[k] != 0.0)
+    if (r[k] != 0.0) {
       return 1;
+    }
   }
 
   return 0;
@@ -233,9 +238,10 @@ static int cmp_field(int *s)
                     ix = x3 + L3 * x2 + L2 * L3 * x1 + L1 * L2 * L3 * x0;
                     iy = y3 + L3 * y2 + L2 * L3 * y1 + L1 * L2 * L3 * y0;
 
-                    for (mu = 0; mu < 4; mu++)
+                    for (mu = 0; mu < 4; mu++) {
                       itest |=
                           cmp_su3_dble(unew + 4 * ix + mu, ubuf + 4 * iy + mu);
+                    }
                   }
                 }
               }
@@ -269,8 +275,9 @@ static void random_vec(int *svec)
 
   for (mu = 0; mu < 4; mu++) {
     svec[mu] = (int)((double)(bs[mu]) * r[mu]);
-    if (svec[mu] > (bs[mu] / 2))
+    if (svec[mu] > (bs[mu] / 2)) {
       svec[mu] -= bs[mu];
+    }
   }
 
   MPI_Bcast(svec, 4, MPI_INT, 0, MPI_COMM_WORLD);
@@ -300,9 +307,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check3.c]",
                  "Syntax: check3 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -319,8 +327,9 @@ int main(int argc, char *argv[])
   geometry();
   alloc_bufs();
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Elementary shift vectors:\n\n");
+  }
 
   for (ifc = 0; ifc < 8; ifc++) {
     if ((ifc > 1) || (bc == 3)) {
@@ -333,10 +342,11 @@ int main(int argc, char *argv[])
       s[3] = 0;
       mu = ifc / 2;
 
-      if ((ifc & 0x1) == 0)
+      if ((ifc & 0x1) == 0) {
         s[mu] = 1;
-      else
+      } else {
         s[mu] = -1;
+      }
 
       shift_ud(s);
       save_field(unew);
@@ -348,10 +358,11 @@ int main(int argc, char *argv[])
       if (my_rank == 0) {
         printf("Shift vector (% 3d,% 3d,% 3d,% 3d): ", s[0], s[1], s[2], s[3]);
 
-        if (itest == 0)
+        if (itest == 0) {
           printf("ok\n");
-        else
+        } else {
           printf("failed\n");
+        }
       }
     }
   }
@@ -366,8 +377,9 @@ int main(int argc, char *argv[])
     save_field(uold);
 
     random_vec(s);
-    if (bc != 3)
+    if (bc != 3) {
       s[0] = 0;
+    }
     shift_ud(s);
     save_field(unew);
     itest = cmp_field(s);
@@ -378,10 +390,11 @@ int main(int argc, char *argv[])
     if (my_rank == 0) {
       printf("Shift vector (% 3d,% 3d,% 3d,% 3d): ", s[0], s[1], s[2], s[3]);
 
-      if (itest == 0)
+      if (itest == 0) {
         printf("ok\n");
-      else
+      } else {
         printf("failed\n");
+      }
     }
   }
 

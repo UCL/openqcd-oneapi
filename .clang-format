@@ -36,3 +36,7 @@ ConstructorInitializerAllOnOneLineOrOnePerLine : 'true'
 
 # If true, clang-format will sort #includes.
 SortIncludes: 'true'
+
+AllowShortFunctionsOnASingleLine: 'Empty'
+AllowShortIfStatementsOnASingleLine: 'false'
+AllowShortLoopsOnASingleLine: 'false'

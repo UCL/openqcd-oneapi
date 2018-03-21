@@ -61,20 +61,23 @@ static void alloc_sw(void)
   unity.u[4] = 1.0f;
   unity.u[5] = 1.0f;
 
-  for (i = 6; i < 36; i++)
+  for (i = 6; i < 36; i++) {
     unity.u[i] = 0.0f;
+  }
 
   sw = swb;
   sm = sw + 2 * VOLUME;
 
-  for (; sw < sm; sw++)
+  for (; sw < sm; sw++) {
     (*sw) = unity;
+  }
 }
 
 pauli *swfld(void)
 {
-  if (swb == NULL)
+  if (swb == NULL) {
     alloc_sw();
+  }
 
   return swb;
 }
@@ -99,20 +102,23 @@ static void alloc_swd(void)
   unity.u[4] = 1.0;
   unity.u[5] = 1.0;
 
-  for (i = 6; i < 36; i++)
+  for (i = 6; i < 36; i++) {
     unity.u[i] = 0.0;
+  }
 
   sw = swdb;
   sm = sw + 2 * VOLUME;
 
-  for (; sw < sm; sw++)
+  for (; sw < sm; sw++) {
     (*sw) = unity;
+  }
 }
 
 pauli_dble *swdfld(void)
 {
-  if (swdb == NULL)
+  if (swdb == NULL) {
     alloc_swd();
+  }
 
   return swdb;
 }
@@ -122,8 +128,9 @@ void assign_swd2sw(void)
   error(swdb == NULL, 1, "assign_swd2sw [swflds.c]",
         "Attempt to access unallocated memory space");
 
-  if (swb == NULL)
+  if (swb == NULL) {
     alloc_sw();
+  }
 
   assign_pauli(2 * VOLUME, swdb, swb);
   set_flags(ASSIGNED_SWD2SW);

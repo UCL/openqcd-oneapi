@@ -41,9 +41,9 @@ static int normalize(su3_vector *v)
   r = _vector_prod_re((*v), (*v));
   r = (float)sqrt((double)(r));
 
-  if (is_equal_f(r, 0.0f))
+  if (is_equal_f(r, 0.0f)) {
     return 1;
-  else {
+  } else {
     r = 1.0f / r;
     _vector_mul((*v), r, (*v));
     return 0;
@@ -57,9 +57,9 @@ static int normalize_dble(su3_vector_dble *v)
   r = _vector_prod_re((*v), (*v));
   r = sqrt(r);
 
-  if (is_equal_d(r, 0.0))
+  if (is_equal_d(r, 0.0)) {
     return 1;
-  else {
+  } else {
     r = 1.0 / r;
     _vector_mul((*v), r, (*v));
     return 0;

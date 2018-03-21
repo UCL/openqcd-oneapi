@@ -58,12 +58,14 @@ static void alloc_ftbuf(void)
 
   for (n = 0; n < 6; n++) {
     nft = idx[n].nft[0];
-    if (nft > nbf)
+    if (nft > nbf) {
       nbf = nft;
+    }
 
     nft = idx[n].nft[1];
-    if (nft > nbf)
+    if (nft > nbf) {
       nbf = nft;
+    }
   }
 
   ftbuf = amalloc(nbf * sizeof(*ftbuf), ALIGN);
@@ -114,20 +116,25 @@ static void fwd_send(int n, int dir, u3_alg_dble *ft)
     raddr = npr[2 * mu + 1];
     sbuf = ftbuf;
     rbuf = ft + VOLUME;
-    if (dir == 1)
+    if (dir == 1) {
       rbuf += idx[n].nft[0];
+    }
     nbf = 9 * nft;
 
     if (np == 0) {
-      if ((mu > 0) || (cpr[0] > 0) || (bc == 3))
+      if ((mu > 0) || (cpr[0] > 0) || (bc == 3)) {
         MPI_Send(sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
-      if ((mu > 0) || (cpr[0] < (NPROC0 - 1)) || (bc == 3))
+      }
+      if ((mu > 0) || (cpr[0] < (NPROC0 - 1)) || (bc == 3)) {
         MPI_Recv(rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD, &stat);
+      }
     } else {
-      if ((mu > 0) || (cpr[0] < (NPROC0 - 1)) || (bc == 3))
+      if ((mu > 0) || (cpr[0] < (NPROC0 - 1)) || (bc == 3)) {
         MPI_Recv(rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD, &stat);
-      if ((mu > 0) || (cpr[0] > 0) || (bc == 3))
+      }
+      if ((mu > 0) || (cpr[0] > 0) || (bc == 3)) {
         MPI_Send(sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
+      }
     }
   }
 }
@@ -135,8 +142,9 @@ static void fwd_send(int n, int dir, u3_alg_dble *ft)
 void copy_bnd_ft(int n, u3_alg_dble *ft)
 {
   if (NPROC > 1) {
-    if (idx == NULL)
+    if (idx == NULL) {
       alloc_ftbuf();
+    }
 
     pack_buf(n, 1, ft);
     fwd_send(n, 1, ft);
@@ -162,21 +170,26 @@ static void bck_send(int n, int dir, u3_alg_dble *ft)
     saddr = npr[2 * mu + 1];
     raddr = npr[2 * mu];
     sbuf = ft + VOLUME;
-    if (dir == 1)
+    if (dir == 1) {
       sbuf += idx[n].nft[0];
+    }
     rbuf = ftbuf;
     nbf = 9 * nft;
 
     if (np == 0) {
-      if ((mu > 0) || (cpr[0] < (NPROC0 - 1)) || (bc == 3))
+      if ((mu > 0) || (cpr[0] < (NPROC0 - 1)) || (bc == 3)) {
         MPI_Send(sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
-      if ((mu > 0) || (cpr[0] > 0) || (bc == 3))
+      }
+      if ((mu > 0) || (cpr[0] > 0) || (bc == 3)) {
         MPI_Recv(rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD, &stat);
+      }
     } else {
-      if ((mu > 0) || (cpr[0] > 0) || (bc == 3))
+      if ((mu > 0) || (cpr[0] > 0) || (bc == 3)) {
         MPI_Recv(rbuf, nbf, MPI_DOUBLE, raddr, tag, MPI_COMM_WORLD, &stat);
-      if ((mu > 0) || (cpr[0] < (NPROC0 - 1)) || (bc == 3))
+      }
+      if ((mu > 0) || (cpr[0] < (NPROC0 - 1)) || (bc == 3)) {
         MPI_Send(sbuf, nbf, MPI_DOUBLE, saddr, tag, MPI_COMM_WORLD);
+      }
     }
   }
 }
@@ -220,8 +233,9 @@ static void unpack_buf(int n, int dir, u3_alg_dble *ft)
 void add_bnd_ft(int n, u3_alg_dble *ft)
 {
   if (NPROC > 1) {
-    if (idx == NULL)
+    if (idx == NULL) {
       alloc_ftbuf();
+    }
 
     bck_send(n, 0, ft);
     unpack_buf(n, 0, ft);

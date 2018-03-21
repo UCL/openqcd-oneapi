@@ -98,10 +98,11 @@ void dfl_sd2vd(spinor_dble const *sd, complex_dble *vd)
   vol = (*b).vol;
 
   for (n = 0; n < nb; n++) {
-    if (n < nbh)
+    if (n < nbh) {
       m = n + isw * nbh;
-    else
+    } else {
       m = n - isw * nbh;
+    }
 
     assign_sd2sdblk(DFL_BLOCKS, m, ALL_PTS, sd, 0);
     sdb = b[m].sd;
@@ -128,10 +129,11 @@ void dfl_vd2sd(complex_dble const *vd, spinor_dble *sd)
   vol = (*b).vol;
 
   for (n = 0; n < nb; n++) {
-    if (n < nbh)
+    if (n < nbh) {
       m = n + isw * nbh;
-    else
+    } else {
       m = n - isw * nbh;
+    }
 
     sdb = b[m].sd;
     set_sd2zero(vol, sdb[0]);
@@ -161,10 +163,11 @@ void dfl_sub_vd2sd(complex_dble const *vd, spinor_dble *sd)
   vol = (*b).vol;
 
   for (n = 0; n < nb; n++) {
-    if (n < nbh)
+    if (n < nbh) {
       m = n + isw * nbh;
-    else
+    } else {
       m = n - isw * nbh;
+    }
 
     assign_sd2sdblk(DFL_BLOCKS, m, ALL_PTS, sd, 0);
     sdb = b[m].sd;
@@ -195,10 +198,11 @@ void dfl_s2v(spinor const *s, complex *v)
   vol = (*b).vol;
 
   for (n = 0; n < nb; n++) {
-    if (n < nbh)
+    if (n < nbh) {
       m = n + isw * nbh;
-    else
+    } else {
       m = n - isw * nbh;
+    }
 
     assign_s2sblk(DFL_BLOCKS, m, ALL_PTS, s, 0);
     sb = b[m].s;
@@ -225,10 +229,11 @@ void dfl_v2s(complex const *v, spinor *s)
   vol = (*b).vol;
 
   for (n = 0; n < nb; n++) {
-    if (n < nbh)
+    if (n < nbh) {
       m = n + isw * nbh;
-    else
+    } else {
       m = n - isw * nbh;
+    }
 
     sb = b[m].s;
     set_s2zero(vol, sb[0]);
@@ -258,10 +263,11 @@ void dfl_sub_v2s(complex const *v, spinor *s)
   vol = (*b).vol;
 
   for (n = 0; n < nb; n++) {
-    if (n < nbh)
+    if (n < nbh) {
       m = n + isw * nbh;
-    else
+    } else {
       m = n - isw * nbh;
+    }
 
     assign_s2sblk(DFL_BLOCKS, m, ALL_PTS, s, 0);
     sb = b[m].s;
@@ -306,10 +312,11 @@ void dfl_subspace(spinor **mds)
   vs = vflds() + Ns;
 
   for (n = 0; n < nb; n++) {
-    if (n < nbh)
+    if (n < nbh) {
       m = n + isw * nbh;
-    else
+    } else {
       m = n - isw * nbh;
+    }
 
     sb = b[m].s;
     sdb = b[m].sd;

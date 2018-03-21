@@ -166,8 +166,9 @@ static void print_res(spinor **mds)
     r = (double)(norm_square(VOLUME, 1, ws[0]) /
                  norm_square(VOLUME, 1, mds[k]));
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("k = %2d, |Dw*psi|/|psi| = %.1e\n", k, sqrt(r));
+    }
   }
 
   release_ws();
@@ -202,8 +203,9 @@ static int set_frame(void)
 
     blk_list(SAP_BLOCKS, &nb, &isw);
 
-    if (nb == 0)
+    if (nb == 0) {
       alloc_bgr(SAP_BLOCKS);
+    }
   }
 
   dpr = dfl_pro_parms();
@@ -214,11 +216,13 @@ static int set_frame(void)
   error_root(dgn.ninv == 0, 1, "set_frame [dfl_modes.c]",
              "Deflation subspace generation parameters are not set");
 
-  if (query_flags(U_MATCH_UD) != 1)
+  if (query_flags(U_MATCH_UD) != 1) {
     assign_ud2u();
+  }
 
-  if (query_grid_flags(SAP_BLOCKS, UBGR_MATCH_UD) != 1)
+  if (query_grid_flags(SAP_BLOCKS, UBGR_MATCH_UD) != 1) {
     assign_ud2ubgr(SAP_BLOCKS);
+  }
 
   sw = sw_parms();
   m0 = sw.m0;
@@ -226,21 +230,24 @@ static int set_frame(void)
   sw_term(NO_PTS);
 
   if ((query_flags(SW_UP2DATE) != 1) || (query_flags(SW_E_INVERTED) == 1) ||
-      (query_flags(SW_O_INVERTED) == 1))
+      (query_flags(SW_O_INVERTED) == 1)) {
     assign_swd2sw();
+  }
 
   ifail = 0;
   swu = query_grid_flags(SAP_BLOCKS, SW_UP2DATE);
   swe = query_grid_flags(SAP_BLOCKS, SW_E_INVERTED);
   swo = query_grid_flags(SAP_BLOCKS, SW_O_INVERTED);
 
-  if ((swu != 1) || (swe == 1) || (swo != 1))
+  if ((swu != 1) || (swe == 1) || (swo != 1)) {
     ifail = assign_swd2swbgr(SAP_BLOCKS, ODD_PTS);
+  }
 
   tm = tm_parms();
   eoflg = tm.eoflg;
-  if (eoflg != 1)
+  if (eoflg != 1) {
     set_tm_parms(1);
+  }
 
   return ifail;
 }
@@ -267,8 +274,9 @@ static void random_fields(spinor **mds)
       ranlxs((*s).r, 24);
 #endif
 
-      for (l = 0; l < 24; l++)
+      for (l = 0; l < 24; l++) {
         (*s).r[l] -= 0.5f;
+      }
     }
 
     bnd_s2zero(ALL_PTS, mds[k]);
@@ -282,8 +290,9 @@ static void renormalize_fields(spinor **mds)
   int k, l;
 
   for (k = 0; k < Ns; k++) {
-    for (l = 0; l < k; l++)
+    for (l = 0; l < k; l++) {
       project(VOLUME, 1, mds[k], mds[l]);
+    }
 
     normalize(VOLUME, 1, mds[k]);
   }
@@ -354,17 +363,19 @@ static void smooth_fields(int ncy, spinor **mds)
     set_s2zero(VOLUME, mds[k]);
     r0 = (double)(norm_square(VOLUME, 1, ws[0]));
 
-    for (l = 0; l < ncy; l++)
+    for (l = 0; l < ncy; l++) {
       sap((float)(dgn.mu), 1, dgn.nmr, mds[k], ws[0]);
+    }
 
     r1 = (double)(norm_square(VOLUME, 1, ws[0]));
     r0 = sqrt(r0);
     r1 = sqrt(r1);
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("SAP smoothing of mode no %2d: "
              "residue %.1e -> %.1e, ratio = %.1e\n",
              k, r0, r1, r1 / r0);
+    }
   }
 
   release_ws();
@@ -397,25 +408,28 @@ static void dfl_smooth_fields(spinor **mds, int *status)
     set_s2zero(VOLUME, mds[k]);
     r0 = (double)(norm_square(VOLUME, 1, ws[0]));
 
-    for (l = 0; l < dgn.ncy; l++)
+    for (l = 0; l < dgn.ncy; l++) {
       sap((float)(dgn.mu), 1, dgn.nmr, mds[k], ws[0]);
+    }
 
     r1 = (double)(norm_square(VOLUME, 1, ws[0]));
     r0 = sqrt(r0);
     r1 = sqrt(r1);
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Deflated SAP smoothing of mode no %2d: "
              "status = %d, residue %.1e -> %.1e, ratio = %.1e\n",
              k, stat, r0, r1, r1 / r0);
+    }
 
     mulr_spinor_add(VOLUME, mds[k], ws[1], 1.0f);
 
     if (status[0] >= 0) {
-      if (stat >= 0)
+      if (stat >= 0) {
         status[0] += stat;
-      else
+      } else {
         status[0] = stat;
+      }
     }
   }
 
@@ -437,8 +451,9 @@ static void smooth_fields(int ncy, spinor **mds)
     assign_s2s(VOLUME, mds[k], ws[0]);
     set_s2zero(VOLUME, mds[k]);
 
-    for (l = 0; l < ncy; l++)
+    for (l = 0; l < ncy; l++) {
       sap((float)(dgn.mu), 1, dgn.nmr, mds[k], ws[0]);
+    }
   }
 
   release_ws();
@@ -467,16 +482,18 @@ static void dfl_smooth_fields(spinor **mds, int *status)
     assign_s2s(VOLUME, mds[k], ws[0]);
     set_s2zero(VOLUME, mds[k]);
 
-    for (l = 0; l < dgn.ncy; l++)
+    for (l = 0; l < dgn.ncy; l++) {
       sap((float)(dgn.mu), 1, dgn.nmr, mds[k], ws[0]);
+    }
 
     mulr_spinor_add(VOLUME, mds[k], ws[1], 1.0f);
 
     if (status[0] >= 0) {
-      if (stat >= 0)
+      if (stat >= 0) {
         status[0] += stat;
-      else
+      } else {
         status[0] = stat;
+      }
     }
   }
 
@@ -520,8 +537,9 @@ void dfl_modes(int *status)
     }
 
     for (; n < dgn.ninv; n++) {
-      if (nrn > 3)
+      if (nrn > 3) {
         renormalize_fields(mds);
+      }
 
       dfl_subspace(mds);
       ifail = set_Awhat(dgn.mu);
@@ -533,8 +551,9 @@ void dfl_modes(int *status)
         dfl_smooth_fields(mds, status);
         nrn += 1;
 
-        if (status[0] < 0)
+        if (status[0] < 0) {
           break;
+        }
 
 #ifdef DFL_MODES_DBG
         print_res(mds);
@@ -551,8 +570,9 @@ void dfl_modes(int *status)
 
   release_ws();
   set_sw_parms(m0);
-  if (eoflg != 1)
+  if (eoflg != 1) {
     set_tm_parms(eoflg);
+  }
 
 #ifdef DFL_MODES_DBG
   if (my_rank == 0) {
@@ -593,9 +613,9 @@ void dfl_update(int nsm, int *status)
   }
 #endif
 
-  if (ifail)
+  if (ifail) {
     status[0] = -2;
-  else {
+  } else {
     for (n = 0; n < nsm; n++) {
       ifail = set_Awhat(dgn.mu);
 
@@ -606,11 +626,13 @@ void dfl_update(int nsm, int *status)
         dfl_smooth_fields(mds, status);
         nrn += 1;
 
-        if (status[0] < 0)
+        if (status[0] < 0) {
           break;
+        }
 
-        if ((nrn > 3) && (n < (nsm - 1)))
+        if ((nrn > 3) && (n < (nsm - 1))) {
           renormalize_fields(mds);
+        }
 
         dfl_subspace(mds);
 
@@ -628,8 +650,9 @@ void dfl_update(int nsm, int *status)
 
   release_ws();
   set_sw_parms(m0);
-  if (eoflg != 1)
+  if (eoflg != 1) {
     set_tm_parms(eoflg);
+  }
 
 #ifdef DFL_MODES_DBG
   if (my_rank == 0) {
@@ -654,8 +677,9 @@ void dfl_modes2(int *status)
 #endif
 
     dfl_modes(status + 1);
-  } else
+  } else {
     status[1] = 0;
+  }
 }
 
 void dfl_update2(int nsm, int *status)
@@ -672,6 +696,7 @@ void dfl_update2(int nsm, int *status)
 #endif
 
     dfl_modes(status + 1);
-  } else
+  } else {
     status[1] = 0;
+  }
 }

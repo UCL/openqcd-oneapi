@@ -42,14 +42,16 @@ static double afld(int *x, int mu)
 
   phi = 0.0;
 
-  for (nu = 0; nu < mu; nu++)
+  for (nu = 0; nu < mu; nu++) {
     phi -= inp[nu] * mt[mu][nu] * xt[nu];
+  }
 
   phi *= inp[mu];
 
   if (safe_mod(x[mu], np[mu]) == (np[mu] - 1)) {
-    for (nu = (mu + 1); nu < 4; nu++)
+    for (nu = (mu + 1); nu < 4; nu++) {
       phi -= inp[nu] * mt[mu][nu] * xt[nu];
+    }
   }
 
   return twopi * phi;
@@ -115,10 +117,11 @@ static double Qtbnd(void)
   qloc = 0.0;
 
   for (ib = 0; ib < 2; ib++) {
-    if (ib == 0)
+    if (ib == 0) {
       x[0] = 1;
-    else
+    } else {
       x[0] = N0 - 1;
+    }
 
     if (((ib == 0) && (bc == 1) && (cpr[0] == 0)) ||
         ((ib == 1) && ((bc == 1) || (bc == 2)) && (cpr[0] == (NPROC0 - 1)))) {
@@ -192,8 +195,9 @@ static double Qtbnd(void)
     MPI_Reduce(&qloc, &qall, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Bcast(&qall, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     return qall;
-  } else
+  } else {
     return qloc;
+  }
 }
 
 static double Qmt(void)
@@ -242,16 +246,17 @@ static double Qmt(void)
 
   sm /= (twopi * twopi);
 
-  if (bc == 0)
+  if (bc == 0) {
     sm *= (double)((N0 - 2) * N1) * (double)(N2 * N3);
-  else if (bc == 1) {
+  } else if (bc == 1) {
     sm *= (double)((N0 - 3) * N1) * (double)(N2 * N3);
     sm += Qtbnd();
   } else if (bc == 2) {
     sm *= (double)((N0 - 2) * N1) * (double)(N2 * N3);
     sm += Qtbnd();
-  } else
+  } else {
     sm *= (double)(N0 * N1) * (double)(N2 * N3);
+  }
 
   return sm;
 }
@@ -274,8 +279,9 @@ static void choose_mt(void)
   for (mu = 0; mu < 4; mu++) {
     mt[mu][mu] = 0.0;
 
-    for (nu = 0; nu < mu; nu++)
+    for (nu = 0; nu < mu; nu++) {
       mt[mu][nu] = -mt[nu][mu];
+    }
   }
 }
 
@@ -304,13 +310,15 @@ static void set_ud(void)
             u = udb + 8 * (ix - (VOLUME / 2));
 
             for (ifc = 0; ifc < 8; ifc++) {
-              if (ifc & 0x1)
+              if (ifc & 0x1) {
                 x[ifc / 2] -= 1;
+              }
 
               phi = afld(x, ifc / 2);
 
-              if (ifc & 0x1)
+              if (ifc & 0x1) {
                 x[ifc / 2] += 1;
+              }
 
               (*u) = ud0;
               (*u).c11.re = cos(phi);
@@ -354,9 +362,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check2.c]",
                  "Syntax: check2 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -398,12 +407,14 @@ int main(int argc, char *argv[])
     Q1 = Qmt();
     Q2 = tcharge();
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Field no = %2d, Q1 = % 8.4e, Q2 = % 8.4e\n", i + 1, Q1, Q2);
+    }
 
     d = fabs(Q1 - Q2);
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   if (my_rank == 0) {

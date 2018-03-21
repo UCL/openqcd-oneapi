@@ -56,8 +56,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       su3xsu3(u, v, w);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -74,8 +75,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       su3dagxsu3(u, v, w);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -91,8 +93,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       su3xsu3dag(u, v, w);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -108,8 +111,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       su3dagxsu3dag(u, v, w);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -125,8 +129,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       su3xu3alg(u, X, v);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -142,8 +147,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       su3dagxu3alg(u, X, v);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -159,8 +165,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       u3algxsu3(X, u, v);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -176,8 +183,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       u3algxsu3dag(X, u, v);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;

@@ -33,8 +33,9 @@ int main(void)
     rlxd_init(level, 1);
 
     t1 = (float)clock();
-    for (k = 1; k <= NLOOPS; k++)
+    for (k = 1; k <= NLOOPS; k++) {
       ranlxd(r, NRLX);
+    }
     t2 = (float)clock();
 
     dt = (t2 - t1) / (float)(CLOCKS_PER_SEC);
@@ -51,8 +52,9 @@ int main(void)
     rlxd_init(level, 1);
 
     t1 = (float)clock();
-    for (k = 1; k <= NLOOPS; k++)
+    for (k = 1; k <= NLOOPS; k++) {
       gauss_dble(r, NGSS);
+    }
     t2 = (float)clock();
 
     dt = (t2 - t1) / (float)(CLOCKS_PER_SEC);

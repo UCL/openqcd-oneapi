@@ -87,9 +87,9 @@ void zolotarev(int n, double eps, double *A, double *ar, double *delta)
 
     s = sn * sn;
 
-    if ((r % 2) == 0)
+    if ((r % 2) == 0) {
       (*A) /= s;
-    else {
+    } else {
       (*A) *= s;
       s *= k;
       d *= (s * s);

@@ -137,10 +137,11 @@ double norm_square_alg(int vol, int icom, su3_alg_dble const *X)
     add_to_hsum(ism, &sm);
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(ism, &sm);
-  else
+  } else {
     local_hsum(ism, &sm);
+  }
 
   return 4.0 * sm;
 }
@@ -169,10 +170,11 @@ double scalar_prod_alg(int vol, int icom, su3_alg_dble const *X,
     add_to_hsum(ism, &sm);
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(ism, &sm);
-  else
+  } else {
     local_hsum(ism, &sm);
+  }
 
   return sm;
 }

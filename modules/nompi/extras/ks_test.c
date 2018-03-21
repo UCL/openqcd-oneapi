@@ -73,10 +73,12 @@ void ks_test(int n, double f[], double *pkp, double *pkm)
 
     k = (int)x;
     pn[k] += 1;
-    if (x < pu[k])
+    if (x < pu[k]) {
       pu[k] = x;
-    if (x > pv[k])
+    }
+    if (x > pv[k]) {
       pv[k] = x;
+    }
   }
 
   sn = 0.0;
@@ -86,12 +88,14 @@ void ks_test(int n, double f[], double *pkp, double *pkm)
   for (k = 0; k <= n; k++) {
     if (pn[k] > 0) {
       x = pu[k] - sn;
-      if (x > km)
+      if (x > km) {
         km = x;
+      }
       sn += (double)pn[k];
       x = sn - pv[k];
-      if (x > kp)
+      if (x > kp) {
         kp = x;
+      }
     }
   }
 
@@ -115,17 +119,19 @@ void ks_prob(int n, double kp, double km, double *pp, double *pm)
 
   xn = (double)n;
 
-  if (kp < 1e-8)
+  if (kp < 1e-8) {
     *pp = 0.0;
-  else if (kp > 3.5)
+  } else if (kp > 3.5) {
     *pp = 1.0;
-  else
+  } else {
     *pp = 1.0 - exp(-2.0 * kp * kp) * (1.0 - 2.0 * kp / (3.0 * sqrt(xn)));
+  }
 
-  if (km < 1e-8)
+  if (km < 1e-8) {
     *pm = 0.0;
-  else if (km > 3.5)
+  } else if (km > 3.5) {
     *pm = 1.0;
-  else
+  } else {
     *pm = 1.0 - exp(-2.0 * km * km) * (1.0 - 2.0 * km / (3.0 * sqrt(xn)));
+  }
 }

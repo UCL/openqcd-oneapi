@@ -138,10 +138,11 @@ static double sdet(void)
   swp = sw_parms();
   ani = ani_parms();
 
-  if ((1.0 + 3.0 * ani.nu / ani.xi + swp.m0) > 1.0)
+  if ((1.0 + 3.0 * ani.nu / ani.xi + swp.m0) > 1.0) {
     c = pow(1.0 + 3.0 * ani.nu / ani.xi + swp.m0, -6.0);
-  else
+  } else {
     c = 1.0;
+  }
 
   sw_term(NO_PTS);
   reset_hsum(isx);
@@ -153,8 +154,9 @@ static double sdet(void)
   while (ix < VOLUME) {
     p = 1.0;
     iy = ix + 8;
-    if (iy > VOLUME)
+    if (iy > VOLUME) {
       iy = VOLUME;
+    }
 
     for (; ix < iy; ix++) {
       t = global_time(ix);
@@ -162,17 +164,19 @@ static double sdet(void)
       if (((t > 0) || (bc == 3)) && ((t < (N0 - 1)) || (bc != 0))) {
         z = det_pauli_dble(0.0, m);
 
-        if (z.re > 0.0)
+        if (z.re > 0.0) {
           p *= (c * z.re);
-        else
+        } else {
           ie = 1;
+        }
 
         z = det_pauli_dble(0.0, m + 1);
 
-        if (z.re > 0.0)
+        if (z.re > 0.0) {
           p *= (c * z.re);
-        else
+        } else {
           ie = 1;
+        }
       }
 
       m += 2;
@@ -181,8 +185,9 @@ static double sdet(void)
     if (not_equal_d(p, 0.0)) {
       smx = -2.0 * log(p);
       add_to_hsum(isx, &smx);
-    } else
+    } else {
       ie = 1;
+    }
   }
 
   error(ie != 0, 1, "sdet [force4.c]",
@@ -199,10 +204,11 @@ double setpf4(double mu, int ipf, int isw, int icom)
   spinor_dble *phi, **wsd;
   mdflds_t *mdfs;
 
-  if (isw == 1)
+  if (isw == 1) {
     act = sdet();
-  else
+  } else {
     act = 0.0;
+  }
 
   wsd = reserve_wsd(1);
   random_sd(VOLUME / 2, wsd[0], 1.0);
@@ -242,8 +248,9 @@ void force4(double mu, int ipf, int isw, int isp, int icr, double c,
   tm_parms_t tm;
 
   tm = tm_parms();
-  if (tm.eoflg != 1)
+  if (tm.eoflg != 1) {
     set_tm_parms(1);
+  }
 
   sp = solver_parms(isp);
 
@@ -285,14 +292,17 @@ void force4(double mu, int ipf, int isw, int isp, int icr, double c,
         if (res1 > sp.res) {
           tmcgeo(sp.nmx, sp.res / res1, mu, rho, psi, status);
           mulr_spinor_add_dble(VOLUME / 2, chi, psi, -1.0);
-        } else
+        } else {
           status[0] = 0;
-      } else
+        }
+      } else {
         tmcgeo(sp.nmx, sp.res, mu, phi, chi, status);
+      }
 
       release_wsd();
-    } else
+    } else {
       tmcgeo(sp.nmx, sp.res, mu, phi, chi, status);
+    }
 
     error_root(status[0] < 0, 1, "force4 [force4.c]",
                "CGNE solver failed (mu = %.4e, parameter set no %d, "
@@ -306,8 +316,9 @@ void force4(double mu, int ipf, int isw, int isp, int icr, double c,
     Dwoe_dble(psi, psi);
     Dwoo_dble(0.0, psi, psi);
 
-    if (icr)
+    if (icr) {
       add_chrono(icr, chi);
+    }
 
     add_prod2xt(1.0, chi, psi);
     add_prod2xv(-1.0, chi, psi);
@@ -363,8 +374,9 @@ void force4(double mu, int ipf, int isw, int isp, int icr, double c,
               sap_gcr(sp.nkv, sp.nmx, sp.res / res1, -mu, eta, rho, status + 1);
 
               mulr_spinor_add_dble(VOLUME, chi, rho, -1.0);
-            } else
+            } else {
               status[1] = 0;
+            }
           } else {
             assign_sd2sd(VOLUME / 2, psi, eta);
             mulg5_dble(VOLUME / 2, eta);
@@ -415,8 +427,9 @@ void force4(double mu, int ipf, int isw, int isp, int icr, double c,
                "status = %d;%d)",
                mu, isp, status[0], status[1]);
 
-    if (icr)
+    if (icr) {
       add_chrono(icr, chi);
+    }
 
     add_prod2xt(1.0, chi, psi);
     add_prod2xv(1.0, chi, psi);
@@ -474,8 +487,9 @@ void force4(double mu, int ipf, int isw, int isp, int icr, double c,
 
               mulr_spinor_add_dble(VOLUME, chi, rho, -1.0);
             } else {
-              for (l = 3; l < 6; l++)
+              for (l = 3; l < 6; l++) {
                 status[l] = 0;
+              }
             }
           } else {
             assign_sd2sd(VOLUME / 2, psi, eta);
@@ -485,8 +499,9 @@ void force4(double mu, int ipf, int isw, int isp, int icr, double c,
             dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, -mu, eta, chi, status + 3);
           }
         } else {
-          for (l = 0; l < 6; l++)
+          for (l = 0; l < 6; l++) {
             status[l] = 0;
+          }
         }
       } else {
         mulg5_dble(VOLUME / 2, phi);
@@ -530,13 +545,15 @@ void force4(double mu, int ipf, int isw, int isp, int icr, double c,
                mu, isp, status[0], status[1], status[2], status[3], status[4],
                status[5]);
 
-    if (icr)
+    if (icr) {
       add_chrono(icr, chi);
+    }
 
     add_prod2xt(1.0, chi, psi);
     add_prod2xv(1.0, chi, psi);
-  } else
+  } else {
     error_root(1, 1, "force4 [force4.c]", "Unknown solver");
+  }
 
   sw_frc(c);
   hop_frc(c);
@@ -555,17 +572,19 @@ double action4(double mu, int ipf, int isw, int isp, int icom, int *status)
   tm_parms_t tm;
 
   tm = tm_parms();
-  if (tm.eoflg != 1)
+  if (tm.eoflg != 1) {
     set_tm_parms(1);
+  }
 
   mdfs = mdflds();
   phi = (*mdfs).pf[ipf];
   sp = solver_parms(isp);
 
-  if (isw == 1)
+  if (isw == 1) {
     act = sdet();
-  else
+  } else {
     act = 0.0;
+  }
 
   if (sp.solver == CGNE) {
     rsd = reserve_wsd(1);
@@ -626,8 +645,9 @@ double action4(double mu, int ipf, int isw, int isp, int icom, int *status)
     act += norm_square_dble(VOLUME / 2, 0, psi);
 
     release_wsd();
-  } else
+  } else {
     error_root(1, 1, "action4 [force4.c]", "Unknown solver");
+  }
 
   if (icom == 1) {
     r = act;

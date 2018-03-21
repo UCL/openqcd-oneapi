@@ -119,8 +119,9 @@ static void init_rat(void)
   int ir;
 
   for (ir = 0; ir < IRMAX; ir++) {
-    if (ir > 0)
+    if (ir > 0) {
       rats[ir] = rats[0];
+    }
 
     irats[ir][0] = 0;
     irats[ir][1] = 0;
@@ -139,8 +140,9 @@ static int fnd_rat(int const *irat)
 
   for (ir = 0; ir < irs; ir++) {
     if ((irat[0] == irats[ir][0]) && (irat[1] == irats[ir][1]) &&
-        (irat[2] == irats[ir][2]))
+        (irat[2] == irats[ir][2])) {
       return ir;
+    }
   }
 
   return irs;
@@ -165,8 +167,9 @@ static void alloc_rat(int const *irat)
         "Improper coefficient range or undefined rational function");
 
   if (n > ns) {
-    if (ns > 0)
+    if (ns > 0) {
       free(ars);
+    }
     ars = malloc(2 * n * sizeof(*ars));
     ns = n;
   }
@@ -243,8 +246,9 @@ ratfct_t ratfct(int const *irat)
 {
   int ir;
 
-  if (init == 0)
+  if (init == 0) {
     init_rat();
+  }
 
   ir = fnd_rat(irat);
 

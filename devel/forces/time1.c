@@ -48,9 +48,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [time1.c]",
                  "Syntax: time1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -99,15 +100,17 @@ int main(int argc, char *argv[])
   hop_frc(1.0);
 
   n = (int)(3.0e6 / (double)(4 * VOLUME));
-  if (n < 2)
+  if (n < 2) {
     n = 2;
+  }
   wdt = 0.0;
 
   while (wdt < 5.0) {
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       plaq_frc();
+    }
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();
 
@@ -123,16 +126,18 @@ int main(int argc, char *argv[])
   }
 
   n = (int)(3.0e6 / (double)(4 * VOLUME));
-  if (n < 2)
+  if (n < 2) {
     n = 2;
+  }
   wdt = 0.0;
   set_xt2zero();
 
   while (wdt < 5.0) {
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       add_prod2xt(0.0, wsd[0], wsd[1]);
+    }
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();
 
@@ -142,20 +147,23 @@ int main(int argc, char *argv[])
 
   wdt = 2.0e6 * wdt / ((double)(n) * (double)(4 * VOLUME));
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("add_prod2xt():   %4.3f usec\n", wdt);
+  }
 
   n = (int)(3.0e6 / (double)(4 * VOLUME));
-  if (n < 2)
+  if (n < 2) {
     n = 2;
+  }
   wdt = 0.0;
   set_xv2zero();
 
   while (wdt < 5.0) {
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       add_prod2xv(0.0, wsd[0], wsd[1]);
+    }
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();
 
@@ -165,20 +173,23 @@ int main(int argc, char *argv[])
 
   wdt = 2.0e6 * wdt / ((double)(n) * (double)(4 * VOLUME));
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("add_prod2xv():   %4.3f usec\n", wdt);
+  }
 
   n = (int)(3.0e6 / (double)(4 * VOLUME));
-  if (n < 2)
+  if (n < 2) {
     n = 2;
+  }
   wdt = 0.0;
   set_frc2zero();
 
   while (wdt < 5.0) {
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       sw_frc(0.0);
+    }
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();
 
@@ -188,20 +199,23 @@ int main(int argc, char *argv[])
 
   wdt = 2.0e6 * wdt / ((double)(n) * (double)(4 * VOLUME));
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("sw_frc():        %4.3f usec\n", wdt);
+  }
 
   n = (int)(3.0e6 / (double)(4 * VOLUME));
-  if (n < 2)
+  if (n < 2) {
     n = 2;
+  }
   wdt = 0.0;
   set_frc2zero();
 
   while (wdt < 5.0) {
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       hop_frc(0.0);
+    }
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();
 

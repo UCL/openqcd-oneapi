@@ -58,8 +58,9 @@ int main(void)
 
   rlxs_init(0, 23456);
 
-  for (n = 0; n < 4; n++)
+  for (n = 0; n < 4; n++) {
     ranlxs(mp[n].u, 36);
+  }
 
   ranlxs(s1.r, 12);
   ranlxs(s2.r, 12);

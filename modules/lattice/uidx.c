@@ -122,15 +122,16 @@ static int offset(int ix, int mu)
   if (ix < (VOLUME / 2)) {
     iy = iup[ix][mu];
 
-    if (iy < VOLUME)
+    if (iy < VOLUME) {
       return 8 * (iy - (VOLUME / 2)) + 2 * mu + 1;
-    else {
+    } else {
       ib = iy - ofs[mu] - (BNDRY / 2);
 
       return 4 * VOLUME + snu[mu] + ib;
     }
-  } else
+  } else {
     return 8 * (ix - (VOLUME / 2)) + 2 * mu;
+  }
 }
 
 static void set_idx(void)
@@ -178,16 +179,18 @@ static void set_idx(void)
 
 uidx_t *uidx(void)
 {
-  if (init == 0)
+  if (init == 0) {
     set_idx();
+  }
 
   return idx;
 }
 
 void alloc_uidx(void)
 {
-  if (init == 0)
+  if (init == 0) {
     set_idx();
+  }
 }
 
 void plaq_uidx(int n, int ix, int *ip)
@@ -195,8 +198,9 @@ void plaq_uidx(int n, int ix, int *ip)
   int mu, nu;
   int iy, ic;
 
-  if (init == 0)
+  if (init == 0) {
     set_idx();
+  }
 
   mu = plns[n][0];
   nu = plns[n][1];
@@ -209,13 +213,14 @@ void plaq_uidx(int n, int ix, int *ip)
   } else {
     iy = iup[ix][mu];
 
-    if (iy < VOLUME)
+    if (iy < VOLUME) {
       ip[1] = offset(iy, nu);
-    else {
-      if (iy < (VOLUME + (BNDRY / 2)))
+    } else {
+      if (iy < (VOLUME + (BNDRY / 2))) {
         ic = iy - VOLUME - nfc[mu];
-      else
+      } else {
         ic = iy - VOLUME - (BNDRY / 2);
+      }
 
       ip[1] = 4 * VOLUME + (BNDRY / 4) + 3 * ic + nu - (nu > mu);
     }
@@ -224,13 +229,14 @@ void plaq_uidx(int n, int ix, int *ip)
   ip[2] = offset(ix, nu);
   iy = iup[ix][nu];
 
-  if (iy < VOLUME)
+  if (iy < VOLUME) {
     ip[3] = offset(iy, mu);
-  else {
-    if (iy < (VOLUME + (BNDRY / 2)))
+  } else {
+    if (iy < (VOLUME + (BNDRY / 2))) {
       ic = iy - VOLUME - nfc[nu];
-    else
+    } else {
       ic = iy - VOLUME - (BNDRY / 2);
+    }
 
     ip[3] = 4 * VOLUME + (BNDRY / 4) + 3 * ic + mu - (mu > nu);
   }

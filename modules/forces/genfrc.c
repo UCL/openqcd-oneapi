@@ -89,8 +89,9 @@ void sw_frc(double c)
   fb = (*mdfs).frc;
   set_alg2zero(7 * (BNDRY / 4), fb + 4 * VOLUME);
 
-  if (query_flags(UDBUF_UP2DATE) != 1)
+  if (query_flags(UDBUF_UP2DATE) != 1) {
     copy_bnd_ud();
+  }
   ub = udfld();
   xt = xtensor();
 

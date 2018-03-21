@@ -124,8 +124,9 @@ static void set_nsps(int n, int const *np, int const *isp)
   int k;
 
   if (n > ns) {
-    if (ns > 0)
+    if (ns > 0) {
       free(nsps);
+    }
 
     nsps = malloc(2 * n * sizeof(*nsps));
     error(nsps == NULL, 1, "set_nsps [rwrat.c]",
@@ -153,8 +154,9 @@ static void set_res(int np, double res)
   int k;
 
   if (np > nps) {
-    if (nps > 0)
+    if (nps > 0) {
       free(rs);
+    }
 
     rs = malloc(np * sizeof(*rs));
     error(rs == NULL, 1, "set_res [rwrat.c]",
@@ -162,8 +164,9 @@ static void set_res(int np, double res)
     nps = np;
   }
 
-  for (k = 0; k < np; k++)
+  for (k = 0; k < np; k++) {
     rs[k] = res;
+  }
 }
 
 static void apply_Rk(int np, int isp, double *mu, double *rmu, spinor_dble *eta,
@@ -187,8 +190,9 @@ static void apply_Rk(int np, int isp, double *mu, double *rmu, spinor_dble *eta,
                "(isp=%d, status=%d)",
                isp, status[0]);
 
-    for (k = 0; k < np; k++)
+    for (k = 0; k < np; k++) {
       mulr_spinor_add_dble(VOLUME / 2, psi, rsd[k], rmu[k]);
+    }
 
     release_wsd();
   } else if (sp.solver == SAP_GCR) {
@@ -227,8 +231,9 @@ static void apply_Rk(int np, int isp, double *mu, double *rmu, spinor_dble *eta,
     mulg5_dble(VOLUME / 2, eta);
     set_sd2zero(VOLUME / 2, eta + (VOLUME / 2));
 
-    for (l = 0; l < 3; l++)
+    for (l = 0; l < 3; l++) {
       status[l] = 0;
+    }
 
     for (k = 0; k < np; k++) {
       dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, mu[k], eta, rsd[0], stat);
@@ -254,13 +259,15 @@ static void apply_Rk(int np, int isp, double *mu, double *rmu, spinor_dble *eta,
       mulr_spinor_add_dble(VOLUME / 2, psi, rsd[1], rmu[k]);
     }
 
-    for (l = 0; l < 2; l++)
+    for (l = 0; l < 2; l++) {
       status[l] = (status[l] + np) / (2 * np);
+    }
 
     mulg5_dble(VOLUME / 2, eta);
     release_wsd();
-  } else
+  } else {
     error_root(1, 1, "apply_Rk [rwrat.c]", "Unknown or unsupported solver");
+  }
 }
 
 static void apply_QR(int n, int const *np, int const *isp, ratfct_t *rf,
@@ -280,12 +287,14 @@ static void apply_QR(int n, int const *np, int const *isp, ratfct_t *rf,
     sp = solver_parms(isp[k]);
 
     if (sp.solver == DFL_SAP_GCR) {
-      for (l = 0; l < 2; l++)
+      for (l = 0; l < 2; l++) {
         status[k][l] += stat[l];
+      }
 
       status[k][2] += (stat[2] != 0);
-    } else
+    } else {
       status[k][0] += stat[0];
+    }
 
     mu += np[k];
     rmu += np[k];
@@ -325,10 +334,12 @@ static void init_stat(int n, int const *isp, int **status)
     sp = solver_parms(isp[k]);
 
     if (sp.solver == DFL_SAP_GCR) {
-      for (l = 0; l < 3; l++)
+      for (l = 0; l < 3; l++) {
         status[k][l] = 0;
-    } else
+      }
+    } else {
       status[k][0] = 0;
+    }
   }
 }
 
@@ -341,8 +352,9 @@ static void avg_stat(int nz, int n, int const *isp, int **status)
     sp = solver_parms(isp[k]);
 
     if (sp.solver == DFL_SAP_GCR) {
-      for (l = 0; l < 2; l++)
+      for (l = 0; l < 2; l++) {
         status[k][l] = (status[k][l] + nz) / (2 * nz);
+      }
 
 #ifdef RWRAT_DBG
       message("[rwrat]: status[%d] = %d,%d,%d\n", k, status[k][0], status[k][1],
@@ -407,8 +419,9 @@ double rwrat(int irp, int n, int const *np, int const *isp, double *sqn,
              "Improper choice of np");
 
   tm = tm_parms();
-  if (tm.eoflg != 1)
+  if (tm.eoflg != 1) {
     set_tm_parms(1);
+  }
 
   irat[0] = irp;
   irat[1] = 0;

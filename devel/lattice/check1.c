@@ -39,8 +39,9 @@ static void set_ia(void)
   ia[0][7] = ia[0][6] + (FACE3 / 2);
   ia[0][8] = ia[0][7] + (FACE3 / 2);
 
-  for (ifc = 0; ifc < 9; ifc++)
+  for (ifc = 0; ifc < 9; ifc++) {
     ia[1][ifc] = ia[0][ifc] + (BNDRY / 2);
+  }
 }
 
 int main(int argc, char *argv[])
@@ -104,8 +105,9 @@ int main(int argc, char *argv[])
     ir /= NPROC2;
     n[3] = ir % NPROC3;
 
-    if (ip_test[in] != ipr_global(n))
+    if (ip_test[in] != ipr_global(n)) {
       itest = 1;
+    }
 
     n[0] -= (n[0] % NPROC0_BLK);
     n[1] -= (n[1] % NPROC1_BLK);
@@ -113,8 +115,9 @@ int main(int argc, char *argv[])
     n[3] -= (n[3] % NPROC3_BLK);
     ir = ipr_global(n);
 
-    if ((ip_test[in] < ir) || (ip_test[in] >= (ir + NPROC_BLK)))
+    if ((ip_test[in] < ir) || (ip_test[in] >= (ir + NPROC_BLK))) {
       itest = 2;
+    }
   }
 
   error(itest == 1, 1, "main [check1.c]", "ipr_global is process dependent");
@@ -128,18 +131,21 @@ int main(int argc, char *argv[])
 
   for (mu = 0; mu < 4; mu++) {
     n[mu] -= 1;
-    if (npr[2 * mu] != ipr_global(n))
+    if (npr[2 * mu] != ipr_global(n)) {
       itest = 1;
+    }
     n[mu] += 2;
-    if (npr[2 * mu + 1] != ipr_global(n))
+    if (npr[2 * mu + 1] != ipr_global(n)) {
       itest = 1;
+    }
     n[mu] -= 1;
   }
 
   error(itest == 1, 1, "main [check1.c]", "npr is incorrect");
 
-  for (ix = 0; ix < VOLUME; ix++)
+  for (ix = 0; ix < VOLUME; ix++) {
     ix_test[ix] = 0;
+  }
 
   for (x0 = 0; x0 < L0; x0++) {
     for (x1 = 0; x1 < L1; x1++) {
@@ -147,10 +153,11 @@ int main(int argc, char *argv[])
         for (x3 = 0; x3 < L3; x3++) {
           ix = ipt[x3 + L3 * x2 + L2 * L3 * x1 + L1 * L2 * L3 * x0];
 
-          if ((ix < 0) || (ix >= VOLUME))
+          if ((ix < 0) || (ix >= VOLUME)) {
             itest = 1;
-          else
+          } else {
             ix_test[ix] += 1;
+          }
         }
       }
     }
@@ -159,8 +166,9 @@ int main(int argc, char *argv[])
   error(itest == 1, 1, "main [check1.c]", "The index ipt is out of range");
 
   for (ix = 0; ix < VOLUME; ix++) {
-    if (ix_test[ix] != 1)
+    if (ix_test[ix] != 1) {
       itest = 1;
+    }
   }
 
   error(itest == 1, 1, "main [check1.c]", "The index ipt is not one-to-one");
@@ -173,8 +181,9 @@ int main(int argc, char *argv[])
           ir = (x0 + x1 + x2 + x3) % 2;
 
           if (((ir == 0) && (ix >= (VOLUME / 2))) ||
-              ((ir == 1) && (ix < (VOLUME / 2))))
+              ((ir == 1) && (ix < (VOLUME / 2)))) {
             itest = 1;
+          }
 
           ir = (ir + 1) % 2;
           iy0 = iup[ix][0];
@@ -183,10 +192,11 @@ int main(int argc, char *argv[])
 
           if ((x0 == (L0 - 1)) && (NPROC0 > 1)) {
             iy0 -= VOLUME;
-            if ((iy0 < ia[ir][1]) || (iy0 >= ia[ir][2]))
+            if ((iy0 < ia[ir][1]) || (iy0 >= ia[ir][2])) {
               itest = 2;
-            else
+            } else {
               iy0 = map[iy0];
+            }
           }
 
           iy1 = iup[ix][1];
@@ -195,10 +205,11 @@ int main(int argc, char *argv[])
 
           if ((x1 == (L1 - 1)) && (NPROC1 > 1)) {
             iy1 -= VOLUME;
-            if ((iy1 < ia[ir][3]) || (iy1 >= ia[ir][4]))
+            if ((iy1 < ia[ir][3]) || (iy1 >= ia[ir][4])) {
               itest = 2;
-            else
+            } else {
               iy1 = map[iy1];
+            }
           }
 
           iy2 = iup[ix][2];
@@ -207,10 +218,11 @@ int main(int argc, char *argv[])
 
           if ((x2 == (L2 - 1)) && (NPROC2 > 1)) {
             iy2 -= VOLUME;
-            if ((iy2 < ia[ir][5]) || (iy2 >= ia[ir][6]))
+            if ((iy2 < ia[ir][5]) || (iy2 >= ia[ir][6])) {
               itest = 2;
-            else
+            } else {
               iy2 = map[iy2];
+            }
           }
 
           iy3 = iup[ix][3];
@@ -219,14 +231,16 @@ int main(int argc, char *argv[])
 
           if ((x3 == (L3 - 1)) && (NPROC3 > 1)) {
             iy3 -= VOLUME;
-            if ((iy3 < ia[ir][7]) || (iy3 >= ia[ir][8]))
+            if ((iy3 < ia[ir][7]) || (iy3 >= ia[ir][8])) {
               itest = 2;
-            else
+            } else {
               iy3 = map[iy3];
+            }
           }
 
-          if ((iy0 != iz0) || (iy1 != iz1) || (iy2 != iz2) || (iy3 != iz3))
+          if ((iy0 != iz0) || (iy1 != iz1) || (iy2 != iz2) || (iy3 != iz3)) {
             itest = 3;
+          }
 
           iy0 = idn[ix][0];
           iz0 = ipt[x3 + L3 * x2 + L2 * L3 * x1 +
@@ -234,10 +248,11 @@ int main(int argc, char *argv[])
 
           if ((x0 == 0) && (NPROC0 > 1)) {
             iy0 -= VOLUME;
-            if ((iy0 < ia[ir][0]) || (iy0 >= ia[ir][1]))
+            if ((iy0 < ia[ir][0]) || (iy0 >= ia[ir][1])) {
               itest = 4;
-            else
+            } else {
               iy0 = map[iy0];
+            }
           }
 
           iy1 = idn[ix][1];
@@ -246,10 +261,11 @@ int main(int argc, char *argv[])
 
           if ((x1 == 0) && (NPROC1 > 1)) {
             iy1 -= VOLUME;
-            if ((iy1 < ia[ir][2]) || (iy1 >= ia[ir][3]))
+            if ((iy1 < ia[ir][2]) || (iy1 >= ia[ir][3])) {
               itest = 4;
-            else
+            } else {
               iy1 = map[iy1];
+            }
           }
 
           iy2 = idn[ix][2];
@@ -258,10 +274,11 @@ int main(int argc, char *argv[])
 
           if ((x2 == 0) && (NPROC2 > 1)) {
             iy2 -= VOLUME;
-            if ((iy2 < ia[ir][4]) || (iy2 >= ia[ir][5]))
+            if ((iy2 < ia[ir][4]) || (iy2 >= ia[ir][5])) {
               itest = 4;
-            else
+            } else {
               iy2 = map[iy2];
+            }
           }
 
           iy3 = idn[ix][3];
@@ -270,14 +287,16 @@ int main(int argc, char *argv[])
 
           if ((x3 == 0) && (NPROC3 > 1)) {
             iy3 -= VOLUME;
-            if ((iy3 < ia[ir][6]) || (iy3 >= ia[ir][7]))
+            if ((iy3 < ia[ir][6]) || (iy3 >= ia[ir][7])) {
               itest = 4;
-            else
+            } else {
               iy3 = map[iy3];
+            }
           }
 
-          if ((iy0 != iz0) || (iy1 != iz1) || (iy2 != iz2) || (iy3 != iz3))
+          if ((iy0 != iz0) || (iy1 != iz1) || (iy2 != iz2) || (iy3 != iz3)) {
             itest = 5;
+          }
         }
       }
     }

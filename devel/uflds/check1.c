@@ -99,8 +99,9 @@ static double dev_zero(su3_dble *u)
 
   for (; r < rm; r++) {
     d = fabs(*r);
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   return dmax;
@@ -167,11 +168,13 @@ static double dev_udet(int t, int ifc, su3_dble *u)
   dmax = 0.0;
 
   d = fabs(w.re - det.re);
-  if (d > dmax)
+  if (d > dmax) {
     dmax = d;
+  }
   d = fabs(w.im - det.im);
-  if (d > dmax)
+  if (d > dmax) {
     dmax = d;
+  }
 
   return dmax;
 }
@@ -188,8 +191,9 @@ static double dev_udu(su3_dble *ud, su3 *u)
 
   for (; r < rm; r++) {
     d = fabs((*rd) - (double)(*r));
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
     rd += 1;
   }
 
@@ -207,8 +211,9 @@ static double dev_udud(su3_dble *u, su3_dble *v)
 
   for (; r < rm; r++) {
     d = fabs((*s) - (*r));
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
     s += 1;
   }
 
@@ -234,13 +239,15 @@ static double cmp_ud(su3_dble *usv)
     x0 = global_time(ix);
 
     if ((bc == 0) &&
-        (((x0 == 0) && (ifc == 1)) || ((x0 == (N0 - 1)) && (ifc == 0))))
+        (((x0 == 0) && (ifc == 1)) || ((x0 == (N0 - 1)) && (ifc == 0)))) {
       d = dev_zero(u) + dev_zero(v);
-    else
+    } else {
       d = dev_udud(u, v);
+    }
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
 
     v += 1;
   }
@@ -277,9 +284,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check1.c]",
                  "Syntax: check1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -305,8 +313,9 @@ int main(int argc, char *argv[])
   for (u = ub; u < um; u++) {
     d1 = dev_udu(&vd, u);
 
-    if (d1 > dmax1)
+    if (d1 > dmax1) {
       dmax1 = d1;
+    }
   }
 
   MPI_Reduce(&dmax1, &dmax1_all, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
@@ -336,16 +345,19 @@ int main(int argc, char *argv[])
     if ((bc == 0) &&
         (((x0 == 0) && (ifc == 1)) || ((x0 == (N0 - 1)) && (ifc == 0)))) {
       d2 = dev_zero(ud);
-      if (d2 > dmax2)
+      if (d2 > dmax2) {
         dmax2 = d2;
+      }
     } else if ((bc != 1) || (x0 > 0) || (ifc < 2)) {
       d1 = dev_unity(ud);
-      if (d1 > dmax1)
+      if (d1 > dmax1) {
         dmax1 = d1;
+      }
     } else {
       d2 = dev_bval(ifc / 2, phi, ud);
-      if (d2 > dmax2)
+      if (d2 > dmax2) {
         dmax2 = d2;
+      }
     }
   }
 
@@ -356,8 +368,9 @@ int main(int argc, char *argv[])
       d2 = dev_bval(k, phi_prime, ud);
       ud += 1;
 
-      if (d2 > dmax2)
+      if (d2 > dmax2) {
         dmax2 = d2;
+      }
     }
   }
 
@@ -367,8 +380,9 @@ int main(int argc, char *argv[])
   if (my_rank == 0) {
     printf("Allocate double-precision gauge field\n");
     printf("|ud-1| = %.2e\n", dmax1_all);
-    if (bc != 3)
+    if (bc != 3) {
       printf("|ud-bval| = %.2e\n", dmax2_all);
+    }
     printf("\n");
   }
 
@@ -387,8 +401,9 @@ int main(int argc, char *argv[])
   for (ud = udb; ud < udm; ud++) {
     d1 = dev_udu(ud, u);
 
-    if (d1 > dmax1)
+    if (d1 > dmax1) {
       dmax1 = d1;
+    }
 
     u += 1;
   }
@@ -423,10 +438,12 @@ int main(int argc, char *argv[])
       d2 = dev_udet(x0, ifc, ud);
     }
 
-    if (d1 > dmax1)
+    if (d1 > dmax1) {
       dmax1 = d1;
-    if (d2 > dmax2)
+    }
+    if (d2 > dmax2) {
       dmax2 = d2;
+    }
   }
 
   MPI_Reduce(&dmax1, &dmax1_all, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
@@ -462,10 +479,12 @@ int main(int argc, char *argv[])
       d2 = dev_udet(x0, ifc, ud);
     }
 
-    if (d1 > dmax1)
+    if (d1 > dmax1) {
       dmax1 = d1;
-    if (d2 > dmax2)
+    }
+    if (d2 > dmax2) {
       dmax2 = d2;
+    }
   }
 
   MPI_Reduce(&dmax1, &dmax1_all, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
@@ -490,8 +509,9 @@ int main(int argc, char *argv[])
   print_flags();
   release_wud();
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
   MPI_Finalize();
   exit(0);
 }

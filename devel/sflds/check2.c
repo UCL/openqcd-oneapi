@@ -46,8 +46,9 @@ static int is_zero_dble(spinor_dble *s)
   sp = (spin_dble_t *)(s);
   ie = 1;
 
-  for (i = 0; i < 24; i++)
+  for (i = 0; i < 24; i++) {
     ie &= ((*sp).r[i] == 0.0);
+  }
 
   return ie;
 }
@@ -64,14 +65,15 @@ static int check_int_bnd_dble(spinor_dble *s)
     t = global_time(ix);
 
     if ((ix < (VOLUME / 2)) &&
-        (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0))))
+        (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0)))) {
       ie &= is_zero_dble(s);
-    else if ((ix >= (VOLUME / 2)) && (t == (N0 - 1)) &&
-             ((bc == 1) || (bc == 2))) {
+    } else if ((ix >= (VOLUME / 2)) && (t == (N0 - 1)) &&
+               ((bc == 1) || (bc == 2))) {
       iy = iup[ix][0];
       ie &= is_zero_dble(s + iy - ix);
-    } else
+    } else {
       ie &= (is_zero_dble(s) ^ 0x1);
+    }
 
     s += 1;
   }
@@ -91,10 +93,11 @@ static int check_ext_bnd_dble(spinor_dble *s)
     t = global_time(ix);
 
     if ((ix < (VOLUME / 2)) &&
-        (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0))))
+        (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0)))) {
       ie &= is_zero_dble(s);
-    else
+    } else {
       ie &= (is_zero_dble(s) ^ 0x1);
+    }
 
     s += 1;
   }
@@ -169,11 +172,13 @@ static spinor_dble theta(int ifc, spinor_dble *s)
   r.s = mul_gamma(ifc / 2, s);
 
   if (ifc & 0x1) {
-    for (i = 0; i < 18; i++)
+    for (i = 0; i < 18; i++) {
       r.r[i] = 0.5 * ((*sp).r[i] - r.r[i]);
+    }
   } else {
-    for (i = 0; i < 18; i++)
+    for (i = 0; i < 18; i++) {
       r.r[i] = 0.5 * ((*sp).r[i] + r.r[i]);
+    }
   }
 
   return r.s;
@@ -198,26 +203,30 @@ static void set_sd(spinor_dble *s)
   ranlxs(ran, 4);
   MPI_Bcast(ran, 4, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
-  if (bc == 0)
+  if (bc == 0) {
     np[0] = (int)(ran[0] * (float)(N0 - 1));
-  else
+  } else {
     np[0] = (int)(ran[0] * (float)(N0));
+  }
   np[1] = (int)(ran[1] * (float)(N1));
   np[2] = (int)(ran[2] * (float)(N2));
   np[3] = (int)(ran[3] * (float)(N3));
 
-  for (k = 0; k < 4; k++)
-    if (np[k] == 0)
+  for (k = 0; k < 4; k++) {
+    if (np[k] == 0) {
       np[k] = 1;
+    }
+  }
 
   pi = 4.0 * atan(1.0);
 
-  if (bc == 0)
+  if (bc == 0) {
     p[0] = pi * (double)(np[0]) / (double)(N0 - 1);
-  else if (bc == 3)
+  } else if (bc == 3) {
     p[0] = 2 * pi * (double)(np[0]) / (double)(N0);
-  else
+  } else {
     p[0] = pi * (double)(np[0]) / (double)(N0);
+  }
 
   p[1] = 2 * pi * (double)(np[1]) / (double)(N1);
   p[2] = 2 * pi * (double)(np[2]) / (double)(N2);
@@ -273,26 +282,30 @@ static void set_sd_bnd(int is, spinor_dble *s)
   ranlxs(ran, 4);
   MPI_Bcast(ran, 4, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
-  if (bc == 0)
+  if (bc == 0) {
     np[0] = (int)(ran[0] * (float)(N0 - 1));
-  else
+  } else {
     np[0] = (int)(ran[0] * (float)(N0));
+  }
   np[1] = (int)(ran[1] * (float)(N1));
   np[2] = (int)(ran[2] * (float)(N2));
   np[3] = (int)(ran[3] * (float)(N3));
 
-  for (k = 0; k < 4; k++)
-    if (np[k] == 0)
+  for (k = 0; k < 4; k++) {
+    if (np[k] == 0) {
       np[k] = 1;
+    }
+  }
 
   pi = 4.0 * atan(1.0);
 
-  if (bc == 0)
+  if (bc == 0) {
     p[0] = pi * (double)(np[0]) / (double)(N0 - 1);
-  else if (bc == 3)
+  } else if (bc == 3) {
     p[0] = 2 * pi * (double)(np[0]) / (double)(N0);
-  else
+  } else {
     p[0] = pi * (double)(np[0]) / (double)(N0);
+  }
 
   p[1] = 2 * pi * (double)(np[1]) / (double)(N1);
   p[2] = 2 * pi * (double)(np[2]) / (double)(N2);
@@ -412,15 +425,17 @@ static double check_cpsd_int(int is, spinor_dble *s)
                 r.s.c4 = mul_cplx(z, &(rs.c4));
                 sp = (spin_dble_t *)(s + iy);
 
-                for (i = 0; i < 18; i++)
+                for (i = 0; i < 18; i++) {
                   r.r[i] -= (*sp).r[i];
+                }
 
                 r.s = theta((ifc ^ 0x1) ^ is, &(r.s));
 
                 for (i = 0; i < 18; i++) {
                   d = fabs(r.r[i]);
-                  if (d > dmax)
+                  if (d > dmax) {
                     dmax = d;
+                  }
                 }
               }
             }
@@ -466,10 +481,11 @@ static double check_cpsd_ext(int is, spinor_dble *s)
             for (ifc = 0; ifc < 8; ifc++) {
               mu = ifc / 2;
 
-              if (ifc & 0x1)
+              if (ifc & 0x1) {
                 iy = iup[ix][mu];
-              else
+              } else {
                 iy = idn[ix][mu];
+              }
 
               if ((iy >= VOLUME) &&
                   ((ifc > 1) || ((ifc == 0) && ((cpr[0] > 0) || (bc == 3))) ||
@@ -492,21 +508,24 @@ static double check_cpsd_ext(int is, spinor_dble *s)
                 r.s.c4 = mul_cplx(z, &(rs.c4));
                 r.s = theta((ifc ^ 0x1) ^ is, &(r.s));
 
-                for (i = 0; i < 18; i++)
+                for (i = 0; i < 18; i++) {
                   (*sp).r[i] -= r.r[i];
+                }
               }
             }
 
             for (i = 0; i < 18; i++) {
               d = fabs((*sp).r[i]);
-              if (d > dmax)
+              if (d > dmax) {
                 dmax = d;
+              }
             }
           } else {
             for (i = 0; i < 18; i++) {
               d = fabs((*sp).r[i]);
-              if (d > dmax)
+              if (d > dmax) {
                 dmax = d;
+              }
             }
           }
         }
@@ -548,9 +567,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check2.c]",
                  "Syntax: check2 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -584,8 +604,9 @@ int main(int argc, char *argv[])
       mulr_spinor_add(NSPIN, ps[k], ps[k + 1], -1.0f);
       d = (double)(norm_square(NSPIN, 1, ps[k])) / d;
       d = sqrt(d);
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
 
       random_sd(NSPIN, psd[k], 1.0);
       assign_sd2s(NSPIN, psd[k], ps[k]);
@@ -596,8 +617,9 @@ int main(int argc, char *argv[])
       mulr_spinor_add(NSPIN, ps[k], ps[k + 1], -1.0f);
       d = (double)(norm_square(NSPIN, 1, ps[k])) / d;
       d = sqrt(d);
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
     }
   }
 
@@ -634,15 +656,18 @@ int main(int argc, char *argv[])
     cpsd_int_bnd(is, psd[0]);
     mulr_spinor_add_dble(VOLUME, psd[1], psd[0], -1.0);
     d = norm_square_dble(VOLUME, 1, psd[1]);
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
     d = check_cpsd_int(is, psd[0]);
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Maximal deviation (cpsd_int_bnd) = %.1e\n", dmax);
+  }
 
   dmax = 0.0;
 
@@ -654,12 +679,14 @@ int main(int argc, char *argv[])
     mulr_spinor_add_dble(NSPIN - VOLUME, psd[1] + VOLUME, psd[0] + VOLUME,
                          -1.0);
     d = norm_square_dble(NSPIN - VOLUME, 1, psd[1] + VOLUME);
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
     mulr_spinor_add_dble(VOLUME, psd[0], psd[1], -1.0);
     d = check_cpsd_ext(is, psd[0]);
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   if (my_rank == 0) {

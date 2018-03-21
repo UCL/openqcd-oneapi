@@ -96,16 +96,18 @@ static void add_vec(double *ru, double *rv, double *rw)
 {
   int i;
 
-  for (i = 0; i < 18; i++)
+  for (i = 0; i < 18; i++) {
     rw[i] = ru[i] + rv[i];
+  }
 }
 
 static void mulr_vec(double r, double *ru, double *rv)
 {
   int i;
 
-  for (i = 0; i < 18; i++)
+  for (i = 0; i < 18; i++) {
     rv[i] = r * ru[i];
+  }
 }
 
 static void mulc_vec(complex_dble c, double *ru, double *rv)
@@ -137,8 +139,9 @@ static void random_matrix(su3_dble *u)
 
   ranlxd(r, 18);
 
-  for (i = 0; i < 18; i++)
+  for (i = 0; i < 18; i++) {
     r[i] = 2.0 * r[i] - 1.0;
+  }
 
   vec2mat(r, u);
 }
@@ -153,8 +156,9 @@ static void start_test(void)
 
   ranlxd(r, 6);
 
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < 6; i++) {
     r[i] = 2.0 * r[i] - 1.0;
+  }
 
   cs[0].re = r[0];
   cs[0].im = r[1];
@@ -200,8 +204,9 @@ static double dev_uv(su3_dble *u, su3_dble *v)
 
   for (i = 0; i < 18; i++) {
     dev = fabs(r[i]);
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   return dmax;
@@ -221,8 +226,9 @@ int main(void)
   rlxd_init(1, SEED);
   alloc_matrices();
 
-  for (i = 0; i < 15; i++)
+  for (i = 0; i < 15; i++) {
     dmax[i] = 0.0;
+  }
 
   for (i = 0; i < NTEST; i++) {
     start_test();
@@ -231,8 +237,9 @@ int main(void)
     cm3x3_zero(1, vs);
     dev = dev_uv(&ud0, vs);
     vec2mat(rvs, vs);
-    if (dev > dmax[0])
+    if (dev > dmax[0]) {
       dmax[0] = dev;
+    }
 
     cm3x3_unity(1, vs);
     (*vs).c11.re -= 1.0;
@@ -240,19 +247,22 @@ int main(void)
     (*vs).c33.re -= 1.0;
     dev = dev_uv(&ud0, vs);
     vec2mat(rvs, vs);
-    if (dev > dmax[1])
+    if (dev > dmax[1]) {
       dmax[1] = dev;
+    }
 
     mat2vec(us, rus);
     mat2vec(ws, rws);
     vec2mat(rus, ws);
     cm3x3_assign(1, us, vs);
     dev = dev_uv(ws, vs);
-    if (dev > dmax[2])
+    if (dev > dmax[2]) {
       dmax[2] = dev;
+    }
     dev = dev_uv(ws, us);
-    if (dev > dmax[2])
+    if (dev > dmax[2]) {
       dmax[2] = dev;
+    }
     vec2mat(rvs, vs);
     vec2mat(rws, ws);
 
@@ -262,12 +272,14 @@ int main(void)
     cm3x3_swap(1, us, vs);
     vec2mat(rus, ws);
     dev = dev_uv(ws, vs);
-    if (dev > dmax[14])
+    if (dev > dmax[14]) {
       dmax[14] = dev;
+    }
     vec2mat(rvs, ws);
     dev = dev_uv(ws, us);
-    if (dev > dmax[14])
+    if (dev > dmax[14]) {
       dmax[14] = dev;
+    }
     vec2mat(rus, us);
     vec2mat(rvs, vs);
     vec2mat(rws, ws);
@@ -277,18 +289,21 @@ int main(void)
     vec2mat(rzs, ws);
     cm3x3_dagger(us, vs);
     dev = dev_uv(vs, ws);
-    if (dev > dmax[3])
+    if (dev > dmax[3]) {
       dmax[3] = dev;
+    }
     vec2mat(rus, ws);
     dev = dev_uv(us, ws);
-    if (dev > dmax[3])
+    if (dev > dmax[3]) {
       dmax[3] = dev;
+    }
 
     vec2mat(rzs, ws);
     cm3x3_dagger(us, us);
     dev = dev_uv(us, ws);
-    if (dev > dmax[3])
+    if (dev > dmax[3]) {
       dmax[3] = dev;
+    }
     vec2mat(rus, us);
     vec2mat(rvs, vs);
     vec2mat(rws, ws);
@@ -299,8 +314,9 @@ int main(void)
     trs.im -= ((*vs).c11.im + (*vs).c22.im + (*vs).c33.im);
     dev = fabs(trs.re) + fabs(trs.im);
     vec2mat(rvs, vs);
-    if (dev > dmax[4])
+    if (dev > dmax[4]) {
       dmax[4] = dev;
+    }
 
     cm3x3_tr(us, us, &trs);
     su3xsu3(us, us, vs);
@@ -308,24 +324,27 @@ int main(void)
     trs.im -= ((*vs).c11.im + (*vs).c22.im + (*vs).c33.im);
     dev = fabs(trs.re) + fabs(trs.im);
     vec2mat(rvs, vs);
-    if (dev > dmax[4])
+    if (dev > dmax[4]) {
       dmax[4] = dev;
+    }
 
     cm3x3_retr(us, us + 1, &trs.re);
     su3xsu3(us, us + 1, vs);
     trs.re -= ((*vs).c11.re + (*vs).c22.re + (*vs).c33.re);
     dev = fabs(trs.re);
     vec2mat(rvs, vs);
-    if (dev > dmax[5])
+    if (dev > dmax[5]) {
       dmax[5] = dev;
+    }
 
     cm3x3_retr(us, us, &trs.re);
     su3xsu3(us, us, vs);
     trs.re -= ((*vs).c11.re + (*vs).c22.re + (*vs).c33.re);
     dev = fabs(trs.re);
     vec2mat(rvs, vs);
-    if (dev > dmax[5])
+    if (dev > dmax[5]) {
       dmax[5] = dev;
+    }
 
     mat2vec(us, rus);
     mat2vec(vs, rvs);
@@ -336,8 +355,9 @@ int main(void)
     dev = dev_uv(vs, zs);
     vec2mat(rvs, vs);
     vec2mat(rzs, zs);
-    if (dev > dmax[6])
+    if (dev > dmax[6]) {
       dmax[6] = dev;
+    }
 
     mat2vec(us, rvs);
     add_vec(rus, rvs, rws);
@@ -346,8 +366,9 @@ int main(void)
     dev = dev_uv(us, zs);
     vec2mat(rus, us);
     vec2mat(rzs, zs);
-    if (dev > dmax[6])
+    if (dev > dmax[6]) {
       dmax[6] = dev;
+    }
 
     mat2vec(ws, rws);
     mat2vec(zs, rzs);
@@ -361,8 +382,9 @@ int main(void)
     dev = dev_uv(ws, zs);
     vec2mat(rws, ws);
     vec2mat(rzs, zs);
-    if (dev > dmax[7])
+    if (dev > dmax[7]) {
       dmax[7] = dev;
+    }
 
     mat2vec(vs, rvs);
     mat2vec(zs, rzs);
@@ -376,8 +398,9 @@ int main(void)
     dev = dev_uv(vs, zs);
     vec2mat(rvs, vs);
     vec2mat(rzs, zs);
-    if (dev > dmax[7])
+    if (dev > dmax[7]) {
       dmax[7] = dev;
+    }
 
     mat2vec(ws, rws);
     mat2vec(zs, rzs);
@@ -386,16 +409,18 @@ int main(void)
     vec2mat(rvs, zs);
     cm3x3_mulr(&rs, us, ws);
     dev = dev_uv(ws, zs);
-    if (dev > dmax[8])
+    if (dev > dmax[8]) {
       dmax[8] = dev;
+    }
 
     cm3x3_mulr(&rs, us, us);
     dev = dev_uv(us, zs);
     vec2mat(rus, us);
     vec2mat(rws, ws);
     vec2mat(rzs, zs);
-    if (dev > dmax[8])
+    if (dev > dmax[8]) {
       dmax[8] = dev;
+    }
 
     mat2vec(us, rus);
     mat2vec(vs, rvs);
@@ -407,8 +432,9 @@ int main(void)
     dev = dev_uv(vs, ws);
     vec2mat(rvs, vs);
     vec2mat(rws, ws);
-    if (dev > dmax[9])
+    if (dev > dmax[9]) {
       dmax[9] = dev;
+    }
 
     mulr_vec(rs, rus, rws);
     add_vec(rus, rws, rvs);
@@ -418,8 +444,9 @@ int main(void)
     dev = dev_uv(us, ws);
     vec2mat(rus, us);
     vec2mat(rws, ws);
-    if (dev > dmax[9])
+    if (dev > dmax[9]) {
       dmax[9] = dev;
+    }
 
     mat2vec(ws, rws);
     mat2vec(zs, rzs);
@@ -428,16 +455,18 @@ int main(void)
     vec2mat(rvs, zs);
     cm3x3_mulc(cs, us, ws);
     dev = dev_uv(ws, zs);
-    if (dev > dmax[10])
+    if (dev > dmax[10]) {
       dmax[10] = dev;
+    }
 
     cm3x3_mulc(cs, us, us);
     dev = dev_uv(us, zs);
     vec2mat(rus, us);
     vec2mat(rws, ws);
     vec2mat(rzs, zs);
-    if (dev > dmax[10])
+    if (dev > dmax[10]) {
       dmax[10] = dev;
+    }
 
     mat2vec(us, rus);
     mat2vec(vs, rvs);
@@ -449,8 +478,9 @@ int main(void)
     dev = dev_uv(vs, ws);
     vec2mat(rvs, vs);
     vec2mat(rws, ws);
-    if (dev > dmax[11])
+    if (dev > dmax[11]) {
       dmax[11] = dev;
+    }
 
     mulc_vec(cs[0], rus, rws);
     add_vec(rus, rws, rvs);
@@ -460,8 +490,9 @@ int main(void)
     dev = dev_uv(us, ws);
     vec2mat(rus, us);
     vec2mat(rws, ws);
-    if (dev > dmax[11])
+    if (dev > dmax[11]) {
       dmax[11] = dev;
+    }
 
     mat2vec(us, rus);
     mat2vec(vs, rvs);
@@ -476,16 +507,18 @@ int main(void)
     (*ws).c33.im += cs[0].im;
     cm3x3_lc1(cs, us, vs);
     dev = dev_uv(vs, ws);
-    if (dev > dmax[12])
+    if (dev > dmax[12]) {
       dmax[12] = dev;
+    }
 
     cm3x3_lc1(cs, us, us);
     dev = dev_uv(us, ws);
     vec2mat(rus, us);
     vec2mat(rvs, vs);
     vec2mat(rws, ws);
-    if (dev > dmax[12])
+    if (dev > dmax[12]) {
       dmax[12] = dev;
+    }
 
     mat2vec(us, rus);
     mat2vec(us + 1, rus + 18);
@@ -501,15 +534,17 @@ int main(void)
     (*ws).c33.im += cs[0].im;
     cm3x3_lc2(cs, us, vs);
     dev = dev_uv(vs, ws);
-    if (dev > dmax[13])
+    if (dev > dmax[13]) {
       dmax[13] = dev;
+    }
 
     cm3x3_lc2(cs, us, us);
     vec2mat(rus, us);
     cm3x3_lc2(cs, us, us);
     dev = dev_uv(us, ws);
-    if (dev > dmax[13])
+    if (dev > dmax[13]) {
       dmax[13] = dev;
+    }
   }
 
   printf("Maximal deviation of cm3x3_zero()     = %.1e\n", dmax[0]);
@@ -529,8 +564,9 @@ int main(void)
   printf("Maximal deviation of cm3x3_lc2()      = %.1e\n\n", dmax[13]);
 
   for (i = 1; i < 15; i++) {
-    if (dmax[i] > dmax[0])
+    if (dmax[i] > dmax[0]) {
       dmax[0] = dmax[i];
+    }
   }
 
   printf("Maximal deviation (all tests)         = %.1e\n\n", dmax[0]);

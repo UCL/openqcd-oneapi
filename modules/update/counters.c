@@ -116,8 +116,9 @@ static counter_t *alloc_cnt(int nc)
     }
 
     return cnt;
-  } else
+  } else {
     return NULL;
+  }
 }
 
 static void set_nc(void)
@@ -143,25 +144,30 @@ static void set_nc(void)
         (ap.action == ACF_TM1_EO_SDET) || (ap.action == ACF_TM2) ||
         (ap.action == ACF_TM2_EO) || (ap.action == ACF_RAT) ||
         (ap.action == ACF_RAT_SDET)) {
-      if (j >= nac)
+      if (j >= nac) {
         nac = j + 1;
+      }
 
       sp = solver_parms(ap.isp[0]);
-      if (sp.solver == DFL_SAP_GCR)
+      if (sp.solver == DFL_SAP_GCR) {
         nmd = 3;
+      }
 
       if ((ap.action == ACF_TM2) || (ap.action == ACF_TM2_EO)) {
-        if (ap.ipf >= nfd)
+        if (ap.ipf >= nfd) {
           nfd = ap.ipf + 1;
+        }
 
         sp = solver_parms(ap.isp[1]);
-        if (sp.solver == DFL_SAP_GCR)
+        if (sp.solver == DFL_SAP_GCR) {
           nmd = 3;
+        }
       }
 
       if ((ap.action == ACF_RAT) || (ap.action == ACF_RAT_SDET)) {
-        if (ap.ipf >= nfd)
+        if (ap.ipf >= nfd) {
           nfd = ap.ipf + 1;
+        }
       }
     }
   }
@@ -177,12 +183,14 @@ static void set_nc(void)
           (fp.force == FRF_TM1_EO_SDET) || (fp.force == FRF_TM2) ||
           (fp.force == FRF_TM2_EO) || (fp.force == FRF_RAT) ||
           (fp.force == FRF_RAT_SDET)) {
-        if (k >= nfr)
+        if (k >= nfr) {
           nfr = k + 1;
+        }
 
         sp = solver_parms(fp.isp[0]);
-        if (sp.solver == DFL_SAP_GCR)
+        if (sp.solver == DFL_SAP_GCR) {
           nmd = 3;
+        }
       }
     }
   }
@@ -209,38 +217,43 @@ static void set_ns(void)
         (ap.action == ACF_RAT_SDET)) {
       sp = solver_parms(ap.isp[0]);
 
-      if ((sp.solver == CGNE) || (sp.solver == MSCG) || (sp.solver == SAP_GCR))
+      if ((sp.solver == CGNE) || (sp.solver == MSCG) ||
+          (sp.solver == SAP_GCR)) {
         act[j].ns = 1;
-      else if (sp.solver == DFL_SAP_GCR)
+      } else if (sp.solver == DFL_SAP_GCR) {
         act[j].ns = 2;
-      else
+      } else {
         error_root(1, 1, "set_ns [counters.c]", "Unknown solver");
+      }
 
       if ((ap.action == ACF_TM2) || (ap.action == ACF_TM2_EO)) {
         k = ap.ipf;
         sp = solver_parms(ap.isp[1]);
 
         if ((sp.solver == CGNE) || (sp.solver == MSCG) ||
-            (sp.solver == SAP_GCR))
+            (sp.solver == SAP_GCR)) {
           fld[k].ns = 1;
-        else if (sp.solver == DFL_SAP_GCR)
+        } else if (sp.solver == DFL_SAP_GCR) {
           fld[k].ns = 2;
-        else
+        } else {
           error_root(1, 1, "set_ns [counters.c]", "Unknown solver");
+        }
       } else if ((ap.action == ACF_RAT) || (ap.action == ACF_RAT_SDET)) {
         k = ap.ipf;
         sp = solver_parms(ap.isp[0]);
 
         if ((sp.solver == CGNE) || (sp.solver == MSCG) ||
-            (sp.solver == SAP_GCR))
+            (sp.solver == SAP_GCR)) {
           fld[k].ns = 1;
-        else if (sp.solver == DFL_SAP_GCR)
+        } else if (sp.solver == DFL_SAP_GCR) {
           fld[k].ns = 2;
-        else
+        } else {
           error_root(1, 1, "set_ns [counters.c]", "Unknown solver");
+        }
       }
-    } else if (ap.action != ACG)
+    } else if (ap.action != ACG) {
       error_root(1, 1, "set_ns [counters.c]", "Unknown action");
+    }
   }
 
   for (i = 0; i < hmc.nlv; i++) {
@@ -256,16 +269,18 @@ static void set_ns(void)
           (fp.force == FRF_RAT_SDET)) {
         sp = solver_parms(fp.isp[0]);
 
-        if ((sp.solver == CGNE) || (sp.solver == MSCG))
+        if ((sp.solver == CGNE) || (sp.solver == MSCG)) {
           frc[k].ns = 1;
-        else if (sp.solver == SAP_GCR)
+        } else if (sp.solver == SAP_GCR) {
           frc[k].ns = 2;
-        else if (sp.solver == DFL_SAP_GCR)
+        } else if (sp.solver == DFL_SAP_GCR) {
           frc[k].ns = 4;
-        else
+        } else {
           error_root(1, 1, "set_ns [counters.c]", "Unknown solver");
-      } else if (fp.force != FRG)
+        }
+      } else if (fp.force != FRG) {
         error_root(1, 1, "set_ns [counters.c]", "Unknown force");
+      }
     }
   }
 
@@ -283,8 +298,9 @@ static void alloc_stat(int nc, counter_t *cnt)
   if (nc > 0) {
     ns = 0;
 
-    for (i = 0; i < nc; i++)
+    for (i = 0; i < nc; i++) {
       ns += cnt[i].ns;
+    }
 
     stat = malloc(ns * sizeof(*stat));
     error(stat == NULL, 1, "alloc_stat [counters.c]",
@@ -330,8 +346,9 @@ static void set_cnt2zero(int nc, counter_t *cnt)
     ns = cnt[i].ns;
     stat = cnt[i].status;
 
-    for (j = 0; j < ns; j++)
+    for (j = 0; j < ns; j++) {
       stat[j] = 0;
+    }
   }
 }
 
@@ -370,10 +387,12 @@ void add2counter(char const *type, int idx, int const *status)
     ns = cnt[idx].ns;
     stat = cnt[idx].status;
 
-    for (i = 0; i < ns; i++)
+    for (i = 0; i < ns; i++) {
       stat[i] += status[i];
-  } else
+    }
+  } else {
     error_loc(1, 1, "add2counter [counters.c]", "Counter index out of range");
+  }
 }
 
 int get_count(char const *type, int idx, int *status)
@@ -403,12 +422,14 @@ int get_count(char const *type, int idx, int *status)
     ns = cnt[idx].ns;
     stat = cnt[idx].status;
 
-    for (i = 0; i < ns; i++)
+    for (i = 0; i < ns; i++) {
       status[i] = stat[i];
+    }
 
     return n;
-  } else
+  } else {
     error_loc(1, 1, "get_count [counters.c]", "Counter index out of range");
+  }
 
   return 0;
 }
@@ -463,28 +484,33 @@ void print_avgstat(char const *type, int idx)
       if ((strcmp(type, "modes") == 0) && (idx == 0)) {
         n += mds[2].n;
 
-        if (n > 0)
+        if (n > 0) {
           r = 1.0 / (double)(n);
-        else
+        } else {
           r = 1.0;
+        }
 
         printf("%d", (int)((double)(stat[0] + mds[2].status[0]) * r + 0.5));
 
-        if (mds[2].n > 0)
+        if (mds[2].n > 0) {
           printf(" (no of regenerations = %d)", mds[2].n);
+        }
       } else {
-        if (n > 0)
+        if (n > 0) {
           r = 1.0 / (double)(n);
-        else
+        } else {
           r = 1.0;
+        }
 
         printf("%d", (int)((double)(stat[0]) * r + 0.5));
 
-        for (i = 1; i < ns; i++)
+        for (i = 1; i < ns; i++) {
           printf(",%d", (int)((double)(stat[i]) * r + 0.5));
+        }
 
-        if ((strcmp(type, "modes") == 0) && (idx == 1))
+        if ((strcmp(type, "modes") == 0) && (idx == 1)) {
           printf(" (no of updates = %d)", n);
+        }
       }
 
       printf("\n");
@@ -497,22 +523,26 @@ void print_all_avgstat(void)
   int i;
 
   for (i = 0; i < nac; i++) {
-    if (act[i].ns > 0)
+    if (act[i].ns > 0) {
       print_avgstat("action", i);
+    }
   }
 
   for (i = 0; i < nfd; i++) {
-    if (fld[i].ns > 0)
+    if (fld[i].ns > 0) {
       print_avgstat("field", i);
+    }
   }
 
   for (i = 0; i < nfr; i++) {
-    if (frc[i].ns > 0)
+    if (frc[i].ns > 0) {
       print_avgstat("force", i);
+    }
   }
 
   for (i = 0; i < (nmd - 1); i++) {
-    if (mds[i].ns > 0)
+    if (mds[i].ns > 0) {
       print_avgstat("modes", i);
+    }
   }
 }

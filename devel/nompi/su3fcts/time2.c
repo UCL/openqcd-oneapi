@@ -155,8 +155,9 @@ int main(void)
 
   rlxd_init(1, 123456);
 
-  for (k = 0; k < 4; k++)
+  for (k = 0; k < 4; k++) {
     random_su3_dble(u + k);
+  }
 
   gauss_dble((double *)(s), 48);
   gauss_dble((double *)(r), 48);
@@ -169,8 +170,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       fast_multiply(u, s, r);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -186,8 +188,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       fast_inverse_multiply(u, s, r);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -205,8 +208,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       slow_multiply(u, s, t);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -229,8 +233,9 @@ int main(void)
     diff = _vector_prod_re(r[k], r[k]);
     norm = _vector_prod_re(s[k], s[k]);
     diff = sqrt(diff / norm);
-    if (diff > delta)
+    if (diff > delta) {
       delta = diff;
+    }
   }
 
 #if (defined AVX)
@@ -248,8 +253,9 @@ int main(void)
     diff = _vector_prod_re(r[k], r[k]);
     norm = _vector_prod_re(s[k], s[k]);
     diff = sqrt(diff / norm);
-    if (diff > delta)
+    if (diff > delta) {
       delta = diff;
+    }
   }
 
 #if (defined AVX)

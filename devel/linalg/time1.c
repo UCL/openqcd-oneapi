@@ -31,8 +31,9 @@ static double wt_spinor_prod(int nflds, int icom)
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-  for (i = 0; i < nflds; i++)
+  for (i = 0; i < nflds; i++) {
     random_s(VOLUME, ps[i], 1.0f);
+  }
 
   nmax = 1;
 
@@ -41,8 +42,9 @@ static double wt_spinor_prod(int nflds, int icom)
     wt1 = MPI_Wtime();
 
     for (n = 0; n < nmax; n++) {
-      for (i = 0; i < nflds; i += 2)
+      for (i = 0; i < nflds; i += 2) {
         spinor_prod(VOLUME, icom, ps[i], ps[i + 1]);
+      }
     }
 
     wt2 = MPI_Wtime();
@@ -53,8 +55,9 @@ static double wt_spinor_prod(int nflds, int icom)
     if (my_rank == 0) {
       wtav /= (double)(NPROC);
 
-      if (wtav > 2.0)
+      if (wtav > 2.0) {
         ib = 1;
+      }
 
       wtav /= (double)((nmax * nflds) / 2);
     }
@@ -80,8 +83,9 @@ static double wt_norm_square(int nflds, int icom)
     wt1 = MPI_Wtime();
 
     for (n = 0; n < nmax; n++) {
-      for (i = 0; i < nflds; i++)
+      for (i = 0; i < nflds; i++) {
         (void)(norm_square(VOLUME, icom, ps[i]));
+      }
     }
 
     wt2 = MPI_Wtime();
@@ -92,8 +96,9 @@ static double wt_norm_square(int nflds, int icom)
     if (my_rank == 0) {
       wtav /= (double)(NPROC);
 
-      if (wtav > 2.0)
+      if (wtav > 2.0) {
         ib = 1;
+      }
 
       wtav /= (double)(nmax * nflds);
     }
@@ -119,8 +124,9 @@ static double wt_normalize(int nflds, int icom)
     wt1 = MPI_Wtime();
 
     for (n = 0; n < nmax; n++) {
-      for (i = 0; i < nflds; i++)
+      for (i = 0; i < nflds; i++) {
         (void)(normalize(VOLUME, icom, ps[i]));
+      }
     }
 
     wt2 = MPI_Wtime();
@@ -131,8 +137,9 @@ static double wt_normalize(int nflds, int icom)
     if (my_rank == 0) {
       wtav /= (double)(NPROC);
 
-      if (wtav > 2.0)
+      if (wtav > 2.0) {
         ib = 1;
+      }
 
       wtav /= (double)(nmax * nflds);
     }
@@ -161,8 +168,9 @@ static double wt_mulc_spinor_add(int nflds)
     wt1 = MPI_Wtime();
 
     for (n = 0; n < nmax; n++) {
-      for (i = 0; i < nflds; i += 2)
+      for (i = 0; i < nflds; i += 2) {
         mulc_spinor_add(VOLUME, ps[i], ps[i + 1], z);
+      }
 
       z.re -= z.re;
       z.im -= z.im;
@@ -176,8 +184,9 @@ static double wt_mulc_spinor_add(int nflds)
     if (my_rank == 0) {
       wtav /= (double)(NPROC);
 
-      if (wtav > 2.0)
+      if (wtav > 2.0) {
         ib = 1;
+      }
 
       wtav /= (double)((nmax * nflds) / 2);
     }
@@ -209,8 +218,9 @@ static double wt_project(int nflds, int icom)
     wt1 = MPI_Wtime();
 
     for (n = 0; n < nmax; n++) {
-      for (i = 0; i < nflds; i += 2)
+      for (i = 0; i < nflds; i += 2) {
         project(VOLUME, icom, ps[i], ps[i + 1]);
+      }
     }
 
     wt2 = MPI_Wtime();
@@ -221,8 +231,9 @@ static double wt_project(int nflds, int icom)
     if (my_rank == 0) {
       wtav /= (double)(NPROC);
 
-      if (wtav > 2.0)
+      if (wtav > 2.0) {
         ib = 1;
+      }
 
       wtav /= (double)((nmax * nflds) / 2);
     }
@@ -241,8 +252,9 @@ static void gram_schmidt(int n, spinor **s)
 
   for (i = 0; i < n; i++) {
     for (k = 0; k < 2; k++) {
-      for (j = 0; j < i; j++)
+      for (j = 0; j < i; j++) {
         project(VOLUME, 0, s[i], s[j]);
+      }
     }
 
     (void)(normalize(VOLUME, 0, s[i]));
@@ -262,8 +274,9 @@ static void random_unitary(int n)
 
   for (i = 0; i < n; i++) {
     for (k = 0; k < 2; k++) {
-      for (j = 0; j < i; j++)
+      for (j = 0; j < i; j++) {
         vproject(n, 0, vmat + i * n, vmat + j * n);
+      }
     }
 
     (void)(vnormalize(n, 0, vmat + i * n));
@@ -290,8 +303,9 @@ static double wt_rotate(void)
   }
 
   gram_schmidt(5, ppk);
-  for (i = 0; i < 5; i++)
+  for (i = 0; i < 5; i++) {
     assign_s2s(VOLUME, ps[i], ps[i + 5]);
+  }
   random_unitary(5);
   nmax = 1;
 
@@ -301,8 +315,9 @@ static double wt_rotate(void)
 
     for (n = 0; n < nmax; n++) {
       if ((n & 0xf) == 0x0) {
-        for (i = 0; i < 5; i++)
+        for (i = 0; i < 5; i++) {
           assign_s2s(VOLUME, ps[i + 5], ps[i]);
+        }
       }
 
       rotate(VOLUME, 5, ppk, vmat);
@@ -317,8 +332,9 @@ static double wt_rotate(void)
     if (my_rank == 0) {
       wtav /= (double)(NPROC);
 
-      if (wtav > 2.0)
+      if (wtav > 2.0) {
         ib = 1;
+      }
 
       wtav /= (double)(2 * nmax);
     }
@@ -352,17 +368,19 @@ int main(int argc, char *argv[])
     printf("%dx%dx%dx%d process grid, ", NPROC0, NPROC1, NPROC2, NPROC3);
     printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
 
-    if (NPROC > 1)
+    if (NPROC > 1) {
       printf("There are %d MPI processes\n", NPROC);
-    else
+    } else {
       printf("There is 1 MPI process\n");
+    }
 
-    if ((VOLUME * sizeof(float)) < (64 * 1024))
+    if ((VOLUME * sizeof(float)) < (64 * 1024)) {
       printf("The local size of a quark field is %d KB\n",
              (int)((24 * VOLUME * sizeof(float)) / (1024)));
-    else
+    } else {
       printf("The local size of a quark field is %d MB\n",
              (int)((24 * VOLUME * sizeof(float)) / (1024 * 1024)));
+    }
 
 #if (defined x64)
 #if (defined AVX)
@@ -388,10 +406,12 @@ int main(int argc, char *argv[])
   geometry();
 
   nflds = (int)((4 * 1024 * 1024) / (VOLUME * sizeof(float))) + 1;
-  if ((nflds % 2) == 1)
+  if ((nflds % 2) == 1) {
     nflds += 1;
-  if (nflds < 10)
+  }
+  if (nflds < 10) {
     nflds = 10;
+  }
   alloc_ws(nflds);
   ps = reserve_ws(nflds);
 

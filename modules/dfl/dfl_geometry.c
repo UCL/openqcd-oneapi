@@ -139,13 +139,15 @@ static void set_grid_sizes(void)
 
   obbe[0] = 0;
 
-  for (ifc = 1; ifc < 8; ifc++)
+  for (ifc = 1; ifc < 8; ifc++) {
     obbe[ifc] = obbe[ifc - 1] + nbbe[ifc - 1];
+  }
 
   obbo[0] = obbe[7] + nbbe[7];
 
-  for (ifc = 1; ifc < 8; ifc++)
+  for (ifc = 1; ifc < 8; ifc++) {
     obbo[ifc] = obbo[ifc - 1] + nbbo[ifc - 1];
+  }
 }
 
 static void alloc_arrays(void)
@@ -237,28 +239,36 @@ static void set_inn(void)
           inn[in][7] = index(n0, n1, n2, n3 + 1);
 
           if (NPROC0 > 1) {
-            if (n0 == 0)
+            if (n0 == 0) {
               inn[in][0] = nb;
-            if (n0 == (nbl[0] - 1))
+            }
+            if (n0 == (nbl[0] - 1)) {
               inn[in][1] = nb;
+            }
           }
           if (NPROC1 > 1) {
-            if (n1 == 0)
+            if (n1 == 0) {
               inn[in][2] = nb;
-            if (n1 == (nbl[1] - 1))
+            }
+            if (n1 == (nbl[1] - 1)) {
               inn[in][3] = nb;
+            }
           }
           if (NPROC2 > 1) {
-            if (n2 == 0)
+            if (n2 == 0) {
               inn[in][4] = nb;
-            if (n2 == (nbl[2] - 1))
+            }
+            if (n2 == (nbl[2] - 1)) {
               inn[in][5] = nb;
+            }
           }
           if (NPROC3 > 1) {
-            if (n3 == 0)
+            if (n3 == 0) {
               inn[in][6] = nb;
-            if (n3 == (nbl[3] - 1))
+            }
+            if (n3 == (nbl[3] - 1)) {
               inn[in][7] = nb;
+            }
           }
         }
       }
@@ -268,8 +278,9 @@ static void set_inn(void)
   obbe = dfl_grid.obbe;
   obbo = dfl_grid.obbo;
 
-  for (ifc = 0; ifc < 8; ifc++)
+  for (ifc = 0; ifc < 8; ifc++) {
     ic[ifc] = 0;
+  }
 
   for (in = 0; in < nbh; in++) {
     for (ifc = 0; ifc < 8; ifc++) {
@@ -280,8 +291,9 @@ static void set_inn(void)
     }
   }
 
-  for (ifc = 0; ifc < 8; ifc++)
+  for (ifc = 0; ifc < 8; ifc++) {
     ic[ifc] = 0;
+  }
 
   for (in = nbh; in < nb; in++) {
     for (ifc = 0; ifc < 8; ifc++) {
@@ -333,10 +345,11 @@ static void set_idx(void)
   nbh = nb / 2;
 
   for (ix = 0; ix < nb; ix++) {
-    if (ix < nbh)
+    if (ix < nbh) {
       idx[ix] = ix + isw * nbh;
-    else
+    } else {
       idx[ix] = ix - isw * nbh;
+    }
   }
 }
 
@@ -355,8 +368,9 @@ static void set_dfl_grid(void)
 
 dfl_grid_t dfl_geometry(void)
 {
-  if (init == 0)
+  if (init == 0) {
     set_dfl_grid();
+  }
 
   return dfl_grid;
 }

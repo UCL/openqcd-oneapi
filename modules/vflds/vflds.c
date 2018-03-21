@@ -79,8 +79,9 @@ static void alloc_vflds(void)
   int n;
   complex *w;
 
-  if (nv == 0)
+  if (nv == 0) {
     vfld_size();
+  }
 
   vs = malloc(4 * Ns * sizeof(*vs));
   w = amalloc(2 * Ns * nv * sizeof(*w), ALIGN);
@@ -103,8 +104,9 @@ static void alloc_vdflds(void)
   int n;
   complex_dble *wd;
 
-  if (nv == 0)
+  if (nv == 0) {
     vfld_size();
+  }
 
   vds = malloc(2 * Ns * sizeof(*vds));
   wd = amalloc(Ns * nv * sizeof(*wd), ALIGN);
@@ -126,11 +128,13 @@ complex **vflds(void)
 {
   int n;
 
-  if (vs == NULL)
+  if (vs == NULL) {
     alloc_vflds();
+  }
 
-  for (n = 0; n < (2 * Ns); n++)
+  for (n = 0; n < (2 * Ns); n++) {
     v[n] = vs[n];
+  }
 
   return v;
 }
@@ -139,11 +143,13 @@ complex_dble **vdflds(void)
 {
   int n;
 
-  if (vds == NULL)
+  if (vds == NULL) {
     alloc_vdflds();
+  }
 
-  for (n = 0; n < Ns; n++)
+  for (n = 0; n < Ns; n++) {
     vd[n] = vds[n];
+  }
 
   return vd;
 }

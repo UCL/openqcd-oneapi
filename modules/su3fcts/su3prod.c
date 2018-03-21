@@ -81,7 +81,10 @@ static const sse_double c0 = {0.5, 0.5}, c1 = {-1.0 / 3.0, -1.0 / 3.0};
 static su3_dble uX ALIGNED16;
 static double tr ALIGNED8;
 
-static void su3xsu3vec(su3_dble const *u) { _avx_su3_multiply_dble(*u); }
+static void su3xsu3vec(su3_dble const *u)
+{
+  _avx_su3_multiply_dble(*u);
+}
 
 static void su3xsu3vec_pair(su3_dble const *u)
 {
@@ -725,7 +728,10 @@ static const sse_double c0 = {0.5, 0.5}, c1 = {-1.0 / 3.0, -1.0 / 3.0};
 static su3_dble uX ALIGNED16;
 static double tr ALIGNED8;
 
-static void su3xsu3vec(su3_dble const *u) { _sse_su3_multiply_dble(*u); }
+static void su3xsu3vec(su3_dble const *u)
+{
+  _sse_su3_multiply_dble(*u);
+}
 
 static void su3dagxsu3vec(su3_dble const *u)
 {
@@ -1393,7 +1399,10 @@ void rotate_su3alg(su3_dble const *u, su3_alg_dble *X)
 static su3_vector_dble psi, chi;
 static su3_dble uX;
 
-static void su3xsu3vec(su3_dble const *u) { _su3_multiply(chi, *u, psi); }
+static void su3xsu3vec(su3_dble const *u)
+{
+  _su3_multiply(chi, *u, psi);
+}
 
 static void su3dagxsu3vec(su3_dble const *u)
 {

@@ -45,8 +45,9 @@ static void random_Xu(void)
     mu[1] = 2.0 * mu[1] - 1.0;
     mu[2] = -mu[0] - mu[1];
 
-    if (fabs(mu[2]) <= 1.0)
+    if (fabs(mu[2]) <= 1.0) {
       break;
+    }
   }
 
   cm3x3_zero(1, u);
@@ -110,8 +111,9 @@ static double dev_uv(void)
 
   for (i = 0; i < 18; i++) {
     dev = fabs(r[i]);
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   return dmax;
@@ -142,8 +144,9 @@ int main(void)
     project_to_su3_dble(v);
 
     dev = dev_uv();
-    if (dev > dmax1)
+    if (dev > dmax1) {
       dmax1 = dev;
+    }
 
     flip_signX();
     chexp_drv0(X, sp);
@@ -152,8 +155,9 @@ int main(void)
     cm3x3_unity(1, u);
 
     dev = dev_uv();
-    if (dev > dmax2)
+    if (dev > dmax2) {
       dmax2 = dev;
+    }
   }
 
   printf("Maximal deviation of exp(X) from SU(3)     = %.1e\n", dmax1);

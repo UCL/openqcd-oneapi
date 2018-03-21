@@ -121,10 +121,11 @@ static struct addr_t *first = NULL;
 
 int safe_mod(int x, int y)
 {
-  if (x >= 0)
+  if (x >= 0) {
     return x % y;
-  else
+  } else {
     return (y - (abs(x) % y)) % y;
+  }
 }
 
 void *amalloc(size_t size, int p)
@@ -134,8 +135,9 @@ void *amalloc(size_t size, int p)
   unsigned long mask;
   struct addr_t *new;
 
-  if ((size <= 0) || (p < 0))
+  if ((size <= 0) || (p < 0)) {
     return (NULL);
+  }
 
   shift = 1 << p;
   mask = (unsigned long)(shift - 1);
@@ -157,8 +159,9 @@ void *amalloc(size_t size, int p)
   first = new;
 
   amem_use += size + shift;
-  if (amem_max < amem_use)
+  if (amem_max < amem_use) {
     amem_max = amem_use;
+  }
 
   return (void *)(addr);
 }
@@ -171,10 +174,11 @@ void afree(void *addr)
 
   for (p = first; p != NULL; p = (*p).next) {
     if ((*p).addr == addr) {
-      if (q != NULL)
+      if (q != NULL) {
         (*q).next = (*p).next;
-      else
+      } else {
         first = (*p).next;
+      }
 
       free((*p).true_addr);
       amem_use -= (*p).true_size;
@@ -186,25 +190,33 @@ void afree(void *addr)
   }
 }
 
-double amem_use_mb() { return ((double)amem_use) / (1024 * 1024); }
+double amem_use_mb()
+{
+  return ((double)amem_use) / (1024 * 1024);
+}
 
-double amem_max_mb() { return ((double)amem_max) / (1024 * 1024); }
+double amem_max_mb()
+{
+  return ((double)amem_max) / (1024 * 1024);
+}
 
 int mpi_permanent_tag(void)
 {
-  if (pcmn_cnt < MAX_PERMANENT_TAG)
+  if (pcmn_cnt < MAX_PERMANENT_TAG) {
     pcmn_cnt += 1;
-  else
+  } else {
     error_loc(1, 1, "mpi_permanent_tag [utils.c]",
               "Requested more than 16384 tags");
+  }
 
   return pcmn_cnt;
 }
 
 int mpi_tag(void)
 {
-  if (cmn_cnt == MAX_TAG)
+  if (cmn_cnt == MAX_TAG) {
     cmn_cnt = MAX_PERMANENT_TAG;
+  }
 
   cmn_cnt += 1;
 
@@ -252,20 +264,24 @@ void mpc_bcast_c(char *buf, int num)
   char *pc;
   int *pi;
   nint = (sizeof(char) * num) / sizeof(int);
-  while (nint * sizeof(int) < num * sizeof(char))
+  while (nint * sizeof(int) < num * sizeof(char)) {
     nint++;
+  }
   pc = (char *)mpcBuf;
   pi = (int *)mpcBuf;
-  if (mpcRank < 0)
+  if (mpcRank < 0) {
     MPI_Comm_rank(MPI_COMM_WORLD, &mpcRank);
+  }
   error_root(nint > MPC_BUF_LEN, 0, "mpc_bcast_c [utils.c]",
              "Too many elements: %d", num);
   if (mpcRank == 0) {
-    for (i = 0; i < num; i++)
+    for (i = 0; i < num; i++) {
       pc[i] = buf[i];
+    }
   } else {
-    for (i = 0; i < nint; i++)
+    for (i = 0; i < nint; i++) {
       pi[i] = 0;
+    }
   }
   MPI_Allreduce((int *)mpcBuf, (int *)buf, nint, MPI_INT, MPI_SUM,
                 MPI_COMM_WORLD);
@@ -279,16 +295,19 @@ void mpc_bcast_d(double *buf, int num)
 #else
   int i;
   double *p = (double *)mpcBuf;
-  if (mpcRank < 0)
+  if (mpcRank < 0) {
     MPI_Comm_rank(MPI_COMM_WORLD, &mpcRank);
+  }
   error_root(num * sizeof(double) > MPC_BUF_LEN * sizeof(int), 0,
              "mpc_bcast_d [utils.c]", "Too many elements: %d", num);
   if (mpcRank == 0) {
-    for (i = 0; i < num; i++)
+    for (i = 0; i < num; i++) {
       p[i] = buf[i];
+    }
   } else {
-    for (i = 0; i < num; i++)
+    for (i = 0; i < num; i++) {
       p[i] = 0;
+    }
   }
   MPI_Allreduce((double *)mpcBuf, buf, num, MPI_DOUBLE, MPI_SUM,
                 MPI_COMM_WORLD);
@@ -301,16 +320,19 @@ void mpc_bcast_i(int *buf, int num)
   MPI_Bcast(buf, num, MPI_INT, 0, MPI_COMM_WORLD);
 #else
   int i;
-  if (mpcRank < 0)
+  if (mpcRank < 0) {
     MPI_Comm_rank(MPI_COMM_WORLD, &mpcRank);
+  }
   error_root(num > MPC_BUF_LEN, 0, "mpc_bcast_i [utils.c]",
              "Too many elements: %d", num);
   if (mpcRank == 0) {
-    for (i = 0; i < num; i++)
+    for (i = 0; i < num; i++) {
       mpcBuf[i] = buf[i];
+    }
   } else {
-    for (i = 0; i < num; i++)
+    for (i = 0; i < num; i++) {
       mpcBuf[i] = 0;
+    }
   }
   MPI_Allreduce(mpcBuf, buf, num, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 #endif
@@ -328,7 +350,10 @@ void mpc_gsum_d(double const *src, double *dst, int num)
 
 /* Generic mathematical functions */
 
-double square_dble(double d) { return d * d; }
+double square_dble(double d)
+{
+  return d * d;
+}
 
 double sinc_dble(double d)
 {
@@ -342,7 +367,10 @@ double sinc_dble(double d)
   }
 }
 
-double smear_xi0_dble(double d) { return sinc_dble(d); }
+double smear_xi0_dble(double d)
+{
+  return sinc_dble(d);
+}
 
 double smear_xi1_dble(double d)
 {
@@ -386,15 +414,30 @@ typedef union
   int64_t i;
 } double_as_int;
 
-static float fabs_float(float f) { return (f < 0.0f) ? -f : f; }
+static float fabs_float(float f)
+{
+  return (f < 0.0f) ? -f : f;
+}
 
-static int isnan_float(float f) { return (f != f); }
+static int isnan_float(float f)
+{
+  return (f != f);
+}
 
-static int isnan_double(double d) { return (d != d); }
+static int isnan_double(double d)
+{
+  return (d != d);
+}
 
-static int isinf_float(float f) { return (f > FLT_MAX || f < -FLT_MAX); }
+static int isinf_float(float f)
+{
+  return (f > FLT_MAX || f < -FLT_MAX);
+}
 
-static int isinf_double(double d) { return (d > DBL_MAX || d < -DBL_MAX); }
+static int isinf_double(double d)
+{
+  return (d > DBL_MAX || d < -DBL_MAX);
+}
 
 static int32_t max32(void)
 {
@@ -417,29 +460,34 @@ static int32_t ulp_distance_f(float f1, float f2)
   int32_t max, distance;
   float_as_int if1, if2;
 
-  if (f1 == f2)
+  if (f1 == f2) {
     return 0;
+  }
 
   max = max32();
 
-  if (isnan_float(f1) || isnan_double(f2))
+  if (isnan_float(f1) || isnan_double(f2)) {
     return max;
+  }
 
-  if (isinf_float(f1) || isinf_float(f2))
+  if (isinf_float(f1) || isinf_float(f2)) {
     return max;
+  }
 
   if1.f = f1;
   if2.f = f2;
 
   /* Do not compare floats of different signs */
-  if ((if1.i < 0) != (if2.i < 0))
+  if ((if1.i < 0) != (if2.i < 0)) {
     return max;
+  }
 
   distance = if1.i - if2.i;
 
   /* Absolute value of distance */
-  if (distance < 0)
+  if (distance < 0) {
     distance = -distance;
+  }
 
   return distance;
 }
@@ -451,49 +499,62 @@ static int64_t ulp_distance_d(double d1, double d2)
   int64_t max, distance;
   double_as_int id1, id2;
 
-  if (d1 == d2)
+  if (d1 == d2) {
     return 0;
+  }
 
   max = max64();
 
-  if (isnan_double(d1) || isnan_double(d2))
+  if (isnan_double(d1) || isnan_double(d2)) {
     return max;
+  }
 
-  if (isinf_double(d1) || isinf_double(d2))
+  if (isinf_double(d1) || isinf_double(d2)) {
     return max;
+  }
 
   id1.d = d1;
   id2.d = d2;
 
   /* Do not compare doubles of different signs */
-  if ((id1.i < 0) != (id2.i < 0))
+  if ((id1.i < 0) != (id2.i < 0)) {
     return max;
+  }
 
   distance = id1.i - id2.i;
 
   /* Absolute value of distance */
-  if (distance < 0)
+  if (distance < 0) {
     distance = -distance;
+  }
 
   return distance;
 }
 
 int is_equal_f(float f1, float f2)
 {
-  if (fabs_float(f1 - f2) < fixed_epsilon_float)
+  if (fabs_float(f1 - f2) < fixed_epsilon_float) {
     return 1;
-  else
+  } else {
     return ulp_distance_f(f1, f2) <= ulp_epsilon_float;
+  }
 }
 
-int not_equal_f(float f1, float f2) { return !is_equal_f(f1, f2); }
+int not_equal_f(float f1, float f2)
+{
+  return !is_equal_f(f1, f2);
+}
 
 int is_equal_d(double d1, double d2)
 {
-  if (fabs(d1 - d2) < fixed_epsilon_double)
+  if (fabs(d1 - d2) < fixed_epsilon_double) {
     return 1;
-  else
+  } else {
     return ulp_distance_d(d1, d2) <= ulp_epsilon_double;
+  }
 }
 
-int not_equal_d(double d1, double d2) { return !is_equal_d(d1, d2); }
+int not_equal_d(double d1, double d2)
+{
+  return !is_equal_d(d1, d2);
+}

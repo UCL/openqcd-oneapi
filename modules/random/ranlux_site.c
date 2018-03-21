@@ -53,8 +53,9 @@ static int alloc_state(int x)
     rlxd_state = malloc(VOLUME * sizeof(int *));
     state = malloc(VOLUME * sizeof(stdint_t *));
 
-    for (i = 0; i < VOLUME; i++)
+    for (i = 0; i < VOLUME; i++) {
       rlxs_state[i] = NULL;
+    }
 
     error((rlxs_state == NULL) || (rlxd_state == NULL) || (state == NULL), 1,
           "alloc_state [ranlux.c]", "Unable to allocate arrays");
