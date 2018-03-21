@@ -56,9 +56,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check6.c]",
                  "Syntax: check6 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -96,16 +97,18 @@ int main(int argc, char *argv[])
   swp = set_sw_parms(-0.0123);
   mu = 0.0376;
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("m0 = %.4e, csw = %.4e, cF = %.4e, cF' = %.4e\n\n", swp.m0, swp.csw,
            swp.cF[0], swp.cF[1]);
+  }
 
   random_ud();
   set_ud_phase();
   sw_term(NO_PTS);
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_sd(NSPIN, psd[i], 1.0);
+  }
 
   Dw_dble(mu, psd[0], psd[2]);
   mulg5_dble(VOLUME, psd[2]);
@@ -119,11 +122,13 @@ int main(int argc, char *argv[])
            (z1.im - z2.im) * (z1.im - z2.im));
   d /= sqrt((double)(12 * NPROC) * (double)(VOLUME));
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Deviation from gamma5-Hermiticity             = %.1e\n", d);
+  }
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_sd(NSPIN, psd[i], 1.0);
+  }
 
   assign_sd2sd(VOLUME, psd[0], psd[1]);
   assign_sd2sd(VOLUME, psd[2], psd[3]);
@@ -146,8 +151,9 @@ int main(int argc, char *argv[])
   error(d != 0.0, 1, "main [check6.c]",
         "Dwee_dble() changes the output field where it should not");
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_sd(NSPIN, psd[i], 1.0);
+  }
 
   assign_sd2sd(VOLUME, psd[0], psd[1]);
   assign_sd2sd(VOLUME, psd[2], psd[3]);
@@ -170,8 +176,9 @@ int main(int argc, char *argv[])
   error(d != 0.0, 1, "main [check6.c]",
         "Dwoo_dble() changes the output field where it should not");
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_sd(NSPIN, psd[i], 1.0);
+  }
 
   assign_sd2sd(VOLUME, psd[0], psd[1]);
   assign_sd2sd(VOLUME, psd[2], psd[3]);
@@ -194,8 +201,9 @@ int main(int argc, char *argv[])
   error(d != 0.0, 1, "main [check6.c]",
         "Dwoe_dble() changes the output field where it should not");
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_sd(NSPIN, psd[i], 1.0);
+  }
 
   assign_sd2sd(VOLUME, psd[0], psd[1]);
   assign_sd2sd(VOLUME, psd[2], psd[3]);
@@ -218,8 +226,9 @@ int main(int argc, char *argv[])
   error(d != 0.0, 1, "main [check6.c]",
         "Dweo_dble() changes the output field where it should not");
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_sd(NSPIN, psd[i], 1.0);
+  }
 
   assign_sd2sd(VOLUME, psd[0], psd[1]);
   assign_sd2sd(VOLUME, psd[2], psd[3]);
@@ -242,8 +251,9 @@ int main(int argc, char *argv[])
   error(d != 0.0, 1, "main [check6.c]",
         "Dwhat_dble() changes the output field where it should not");
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_sd(NSPIN, psd[i], 1.0);
+  }
 
   assign_sd2sd(VOLUME, psd[0], psd[2]);
   Dw_dble(mu, psd[0], psd[1]);
@@ -263,11 +273,13 @@ int main(int argc, char *argv[])
   d = norm_square_dble(VOLUME, 1, psd[3]) / norm_square_dble(VOLUME, 1, psd[1]);
   d = sqrt(d);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Deviation of Dw_dble() from Dwee_dble(),..    = %.1e\n", d);
+  }
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_sd(NSPIN, psd[i], 1.0);
+  }
 
   assign_sd2sd(NSPIN, psd[0], psd[1]);
   Dwhat_dble(mu, psd[0], psd[2]);
@@ -282,11 +294,13 @@ int main(int argc, char *argv[])
       norm_square_dble(VOLUME / 2, 1, psd[2]);
   d = sqrt(d);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Deviation of Dwhat_dble() from Dwee_dble(),.. = %.1e\n", d);
+  }
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_sd(NSPIN, psd[i], 1.0);
+  }
 
   assign_sd2sd(VOLUME, psd[0], psd[2]);
 

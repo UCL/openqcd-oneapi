@@ -68,8 +68,9 @@ static int check_u(int vol, su3 *u)
   for (; m < mm; m++) {
     for (i = 0; i < 18; i++) {
       if ((((i % 8) == 0) && ((*m).r[i] != 1.0f)) ||
-          (((i % 8) != 0) && ((*m).r[i] != 0.0f)))
+          (((i % 8) != 0) && ((*m).r[i] != 0.0f))) {
         return 1;
+      }
     }
   }
 
@@ -87,8 +88,9 @@ static int check_ud(int vol, su3_dble *u)
   for (; m < mm; m++) {
     for (i = 0; i < 18; i++) {
       if ((((i % 8) == 0) && ((*m).r[i] != 1.0)) ||
-          (((i % 8) != 0) && ((*m).r[i] != 0.0)))
+          (((i % 8) != 0) && ((*m).r[i] != 0.0))) {
         return 1;
+      }
     }
   }
 
@@ -105,8 +107,9 @@ static int check_sw(int vol, pauli *sw)
   for (; sw < sm; sw++) {
     for (i = 0; i < 36; i++) {
       if (((i < 6) && ((*sw).u[i] != 1.0f)) ||
-          (((i >= 6) && ((*sw).u[i] != 0.0f))))
+          (((i >= 6) && ((*sw).u[i] != 0.0f)))) {
         return 1;
+      }
     }
   }
 
@@ -123,8 +126,9 @@ static int check_swd(int vol, pauli_dble *swd)
   for (; swd < sm; swd++) {
     for (i = 0; i < 36; i++) {
       if (((i < 6) && ((*swd).u[i] != 1.0)) ||
-          (((i >= 6) && ((*swd).u[i] != 0.0))))
+          (((i >= 6) && ((*swd).u[i] != 0.0)))) {
         return 1;
+      }
     }
   }
 
@@ -142,8 +146,9 @@ static int check_s(int ns, int vol, spinor **s)
 
     for (; sp < sm; sp++) {
       for (i = 0; i < 24; i++) {
-        if ((*sp).r[i] != 0.0f)
+        if ((*sp).r[i] != 0.0f) {
           return 1;
+        }
       }
     }
   }
@@ -162,8 +167,9 @@ static int check_sd(int nsd, int vol, spinor_dble **sd)
 
     for (; sp < sm; sp++) {
       for (i = 0; i < 24; i++) {
-        if ((*sp).r[i] != 0.0)
+        if ((*sp).r[i] != 0.0) {
           return 1;
+        }
       }
     }
   }
@@ -182,8 +188,9 @@ static int check_w(int nw, int vol, weyl **w)
 
     for (; wp < wm; wp++) {
       for (i = 0; i < 12; i++) {
-        if ((*wp).r[i] != 0.0f)
+        if ((*wp).r[i] != 0.0f) {
           return 1;
+        }
       }
     }
   }
@@ -202,8 +209,9 @@ static int check_wd(int nwd, int vol, weyl_dble **wd)
 
     for (; wp < wm; wp++) {
       for (i = 0; i < 12; i++) {
-        if ((*wp).r[i] != 0.0)
+        if ((*wp).r[i] != 0.0) {
           return 1;
+        }
       }
     }
   }
@@ -218,69 +226,89 @@ static int check_blk(block_t *b0, block_t *b, int iu, int iud, int ns, int nsd,
 
   vol = (*b).vol;
 
-  if ((*b).shf != shf)
+  if ((*b).shf != shf) {
     return 1;
+  }
 
   if (shf & 0x2) {
     if (((*b0).ipt != (*b).ipt) || ((*b0).iup != (*b).iup) ||
-        ((*b0).idn != (*b).idn))
+        ((*b0).idn != (*b).idn)) {
       return 2;
+    }
   }
 
   if (iu == 1) {
-    if (((*b).u == NULL) || ((shf & 0x4) && ((*b0).u != (*b).u)))
+    if (((*b).u == NULL) || ((shf & 0x4) && ((*b0).u != (*b).u))) {
       return 3;
-    if (check_u(4 * vol, (*b).u))
+    }
+    if (check_u(4 * vol, (*b).u)) {
       return 3;
+    }
 
-    if (((*b).sw == NULL) || ((shf & 0x4) && ((*b0).sw != (*b).sw)))
+    if (((*b).sw == NULL) || ((shf & 0x4) && ((*b0).sw != (*b).sw))) {
       return 3;
-    if (check_sw(2 * vol, (*b).sw))
+    }
+    if (check_sw(2 * vol, (*b).sw)) {
       return 3;
+    }
   } else {
-    if (((*b).u != NULL) || ((*b).sw != NULL))
+    if (((*b).u != NULL) || ((*b).sw != NULL)) {
       return 2;
+    }
   }
 
   if (iud == 1) {
-    if (((*b).ud == NULL) || ((shf & 0x8) && ((*b0).ud != (*b).ud)))
+    if (((*b).ud == NULL) || ((shf & 0x8) && ((*b0).ud != (*b).ud))) {
       return 4;
-    if (check_ud(4 * vol, (*b).ud))
+    }
+    if (check_ud(4 * vol, (*b).ud)) {
       return 4;
+    }
 
-    if (((*b).swd == NULL) || ((shf & 0x8) && ((*b0).swd != (*b).swd)))
+    if (((*b).swd == NULL) || ((shf & 0x8) && ((*b0).swd != (*b).swd))) {
       return 4;
-    if (check_swd(2 * vol, (*b).swd))
+    }
+    if (check_swd(2 * vol, (*b).swd)) {
       return 4;
+    }
   } else {
-    if (((*b).ud != NULL) || ((*b).swd != NULL))
+    if (((*b).ud != NULL) || ((*b).swd != NULL)) {
       return 3;
+    }
   }
 
-  if ((*b).ns != ns)
+  if ((*b).ns != ns) {
     return 5;
+  }
 
   if (ns > 0) {
-    if (((*b).s == NULL) || ((shf & 0x10) && ((*b0).s != (*b).s)))
+    if (((*b).s == NULL) || ((shf & 0x10) && ((*b0).s != (*b).s))) {
       return 5;
-    if (check_s(ns, vol, (*b).s))
+    }
+    if (check_s(ns, vol, (*b).s)) {
       return 5;
+    }
   } else {
-    if ((*b).s != NULL)
+    if ((*b).s != NULL) {
       return 5;
+    }
   }
 
-  if ((*b).nsd != nsd)
+  if ((*b).nsd != nsd) {
     return 6;
+  }
 
   if (nsd > 0) {
-    if (((*b).sd == NULL) || ((shf & 0x20) && ((*b0).sd != (*b).sd)))
+    if (((*b).sd == NULL) || ((shf & 0x20) && ((*b0).sd != (*b).sd))) {
       return 6;
-    if (check_sd(nsd, vol, (*b).sd))
+    }
+    if (check_sd(nsd, vol, (*b).sd)) {
       return 6;
+    }
   } else {
-    if ((*b).sd != NULL)
+    if ((*b).sd != NULL) {
       return 6;
+    }
   }
 
   return 0;
@@ -299,49 +327,63 @@ static int check_bnd(block_t *b0, block_t *b, int iub, int iudb, int nw,
     vol = (*bb).vol;
 
     if (iub == 1) {
-      if (((*bb).u == NULL) || ((shf & 0x4) && ((*bb0).u != (*bb).u)))
+      if (((*bb).u == NULL) || ((shf & 0x4) && ((*bb0).u != (*bb).u))) {
         return 7;
-      if (check_u(vol, (*bb).u))
+      }
+      if (check_u(vol, (*bb).u)) {
         return 7;
+      }
     } else {
-      if ((*bb).u != NULL)
+      if ((*bb).u != NULL) {
         return 7;
+      }
     }
 
     if (iudb == 1) {
-      if (((*bb).ud == NULL) || ((shf & 0x8) && ((*bb0).ud != (*bb).ud)))
+      if (((*bb).ud == NULL) || ((shf & 0x8) && ((*bb0).ud != (*bb).ud))) {
         return 8;
-      if (check_ud(vol, (*bb).ud))
+      }
+      if (check_ud(vol, (*bb).ud)) {
         return 8;
+      }
     } else {
-      if ((*bb).ud != NULL)
+      if ((*bb).ud != NULL) {
         return 8;
+      }
     }
 
-    if ((*bb).nw != nw)
+    if ((*bb).nw != nw) {
       return 9;
+    }
 
     if (nw > 0) {
-      if (((*bb).w == NULL) || ((shf & 0x40) && ((*bb0).w != (*bb).w)))
+      if (((*bb).w == NULL) || ((shf & 0x40) && ((*bb0).w != (*bb).w))) {
         return 9;
-      if (check_w(nw, vol, (*bb).w))
+      }
+      if (check_w(nw, vol, (*bb).w)) {
         return 9;
+      }
     } else {
-      if ((*bb).w != NULL)
+      if ((*bb).w != NULL) {
         return 9;
+      }
     }
 
-    if ((*bb).nwd != nwd)
+    if ((*bb).nwd != nwd) {
       return 10;
+    }
 
     if (nwd > 0) {
-      if (((*bb).wd == NULL) || ((shf & 0x80) && ((*bb0).wd != (*bb).wd)))
+      if (((*bb).wd == NULL) || ((shf & 0x80) && ((*bb0).wd != (*bb).wd))) {
         return 10;
-      if (check_wd(nwd, vol, (*bb).wd))
+      }
+      if (check_wd(nwd, vol, (*bb).wd)) {
         return 10;
+      }
     } else {
-      if ((*bb).wd != NULL)
+      if ((*bb).wd != NULL) {
         return 10;
+      }
     }
 
     bb0 += 1;
@@ -424,8 +466,9 @@ int main(int argc, char *argv[])
       ns = 3;
       nsd = 3;
       shud = 1;
-    } else
+    } else {
       error_root(1, 1, "main [check2.c]", "Unknown block grid");
+    }
 
     shf = 0x1 | (shg << 1) | (shu << 2) | (shud << 3) | (shs << 4) |
           (shsd << 5) | (shw << 6) | (shwd << 7);
@@ -476,15 +519,17 @@ int main(int argc, char *argv[])
             1, "main [check2.c]", "Blocks are not locally even-odd ordered");
 
       itest = check_blk(b0, b, iu, iud, ns, nsd, shf);
-      if (itest != 0)
+      if (itest != 0) {
         break;
+      }
 
       error((*b).bb == NULL, 1, "main [check2.c]",
             "Block boundaries are not allocated");
 
       itest = check_bnd(b0, b, iub, iudb, nw, nwd, shf);
-      if (itest != 0)
+      if (itest != 0) {
         break;
+      }
     }
 
     error(itest == 1, 1, "main [check2.c]", "Unexpected share flag");

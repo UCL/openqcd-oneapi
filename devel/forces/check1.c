@@ -68,12 +68,14 @@ static double bnd_action(void)
 
     act = c0 * cG[1] * d0[1] + c1 * d0[1] + c1 * 1.5 * d1[1];
 
-    if (bc == 1)
+    if (bc == 1) {
       act += (c0 * cG[0] * d0[0] + c1 * d0[0] + c1 * 1.5 * d1[0]);
+    }
 
     return (lat.beta / 3.0) * (double)(N1 * N2 * N3) * act;
-  } else
+  } else {
     return 0.0;
+  }
 }
 
 static void pack_gbuf(void)
@@ -150,10 +152,11 @@ static void random_g(void)
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
 
-    if ((t > 0) || (bc != 1))
+    if ((t > 0) || (bc != 1)) {
       random_su3_dble(gx);
-    else
+    } else {
       (*gx) = unity;
+    }
 
     gx += 1;
   }
@@ -266,8 +269,9 @@ static void random_vec(int *svec)
 
   for (mu = 0; mu < 4; mu++) {
     svec[mu] = (int)((double)(bs[mu]) * r[mu]);
-    if (svec[mu] > (bs[mu] / 2))
+    if (svec[mu] > (bs[mu] / 2)) {
       svec[mu] -= bs[mu];
+    }
   }
 
   MPI_Bcast(svec, 4, MPI_INT, 0, MPI_COMM_WORLD);
@@ -296,9 +300,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check1.c]",
                  "Syntax: check1 [-bc <type>]");
+    }
 
     no_tts = find_opt(argc, argv, "-no-tts");
 
@@ -339,8 +344,9 @@ int main(int argc, char *argv[])
   geometry();
 
   g = amalloc(NSPIN * sizeof(*g), ALIGN);
-  if (BNDRY != 0)
+  if (BNDRY != 0) {
     gbuf = amalloc((BNDRY / 2) * sizeof(*gbuf), ALIGN);
+  }
 
   error((g == NULL) || ((BNDRY != 0) && (gbuf == NULL)), 1, "main [check1.c]",
         "Unable to allocate auxiliary arrays");
@@ -366,15 +372,17 @@ int main(int argc, char *argv[])
            fabs(1.0 - p2 / p1));
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Translation invariance:\n");
+  }
 
   p1 = action0(1);
 
   for (n = 0; n < 8; n++) {
     random_vec(s);
-    if (bc != 3)
+    if (bc != 3) {
       s[0] = 0;
+    }
     shift_ud(s);
     p2 = action0(1);
 

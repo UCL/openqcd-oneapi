@@ -87,11 +87,11 @@ void assign_s2sblk(blk_grid_t grid, int n, ptset_t set, spinor const *s, int k)
   sb = (*b).s[k];
   sm = sb;
 
-  if (set == ALL_PTS)
+  if (set == ALL_PTS) {
     sm += vol;
-  else if (set == EVEN_PTS)
+  } else if (set == EVEN_PTS) {
     sm += vol / 2;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     imb += vol / 2;
     sb += vol / 2;
     sm += vol;
@@ -164,11 +164,11 @@ void assign_sblk2s(blk_grid_t grid, int n, ptset_t set, int k, spinor *s)
   sb = (*b).s[k];
   sm = sb;
 
-  if (set == ALL_PTS)
+  if (set == ALL_PTS) {
     sm += vol;
-  else if (set == EVEN_PTS)
+  } else if (set == EVEN_PTS) {
     sm += vol / 2;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     imb += vol / 2;
     sb += vol / 2;
     sm += vol;
@@ -236,11 +236,11 @@ void assign_s2sdblk(blk_grid_t grid, int n, ptset_t set, spinor const *s, int k)
   sb = (*b).sd[k];
   sm = sb;
 
-  if (set == ALL_PTS)
+  if (set == ALL_PTS) {
     sm += vol;
-  else if (set == EVEN_PTS)
+  } else if (set == EVEN_PTS) {
     sm += vol / 2;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     imb += vol / 2;
     sb += vol / 2;
     sm += vol;
@@ -348,11 +348,11 @@ void assign_sd2sdblk(blk_grid_t grid, int n, ptset_t set, spinor_dble const *sd,
   sb = (*b).sd[k];
   sm = sb;
 
-  if (set == ALL_PTS)
+  if (set == ALL_PTS) {
     sm += vol;
-  else if (set == EVEN_PTS)
+  } else if (set == EVEN_PTS) {
     sm += vol / 2;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     imb += vol / 2;
     sb += vol / 2;
     sm += vol;
@@ -438,11 +438,11 @@ void assign_sdblk2sd(blk_grid_t grid, int n, ptset_t set, int k,
   sb = (*b).sd[k];
   sm = sb;
 
-  if (set == ALL_PTS)
+  if (set == ALL_PTS) {
     sm += vol;
-  else if (set == EVEN_PTS)
+  } else if (set == EVEN_PTS) {
     sm += vol / 2;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     imb += vol / 2;
     sb += vol / 2;
     sm += vol;
@@ -523,11 +523,11 @@ void assign_s2sblk(blk_grid_t grid, int n, ptset_t set, spinor const *s, int k)
   sb = (*b).s[k];
   sm = sb;
 
-  if (set == ALL_PTS)
+  if (set == ALL_PTS) {
     sm += vol;
-  else if (set == EVEN_PTS)
+  } else if (set == EVEN_PTS) {
     sm += vol / 2;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     imb += vol / 2;
     sb += vol / 2;
     sm += vol;
@@ -564,11 +564,11 @@ void assign_sblk2s(blk_grid_t grid, int n, ptset_t set, int k, spinor *s)
   sb = (*b).s[k];
   sm = sb;
 
-  if (set == ALL_PTS)
+  if (set == ALL_PTS) {
     sm += vol;
-  else if (set == EVEN_PTS)
+  } else if (set == EVEN_PTS) {
     sm += vol / 2;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     imb += vol / 2;
     sb += vol / 2;
     sm += vol;
@@ -606,11 +606,11 @@ void assign_s2sdblk(blk_grid_t grid, int n, ptset_t set, spinor const *s, int k)
   sb = (*b).sd[k];
   sm = sb;
 
-  if (set == ALL_PTS)
+  if (set == ALL_PTS) {
     sm += vol;
-  else if (set == EVEN_PTS)
+  } else if (set == EVEN_PTS) {
     sm += vol / 2;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     imb += vol / 2;
     sb += vol / 2;
     sm += vol;
@@ -677,11 +677,11 @@ void assign_sd2sdblk(blk_grid_t grid, int n, ptset_t set, spinor_dble const *sd,
   sb = (*b).sd[k];
   sm = sb;
 
-  if (set == ALL_PTS)
+  if (set == ALL_PTS) {
     sm += vol;
-  else if (set == EVEN_PTS)
+  } else if (set == EVEN_PTS) {
     sm += vol / 2;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     imb += vol / 2;
     sb += vol / 2;
     sm += vol;
@@ -719,11 +719,11 @@ void assign_sdblk2sd(blk_grid_t grid, int n, ptset_t set, int k,
   sb = (*b).sd[k];
   sm = sb;
 
-  if (set == ALL_PTS)
+  if (set == ALL_PTS) {
     sm += vol;
-  else if (set == EVEN_PTS)
+  } else if (set == EVEN_PTS) {
     sm += vol / 2;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     imb += vol / 2;
     sb += vol / 2;
     sm += vol;

@@ -61,11 +61,13 @@ static int is_unity(pauli *p)
   ie = 1;
   u = (*p).u;
 
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < 6; i++) {
     ie |= (u[i] == 1.0f);
+  }
 
-  for (i = 7; i < 36; i++)
+  for (i = 7; i < 36; i++) {
     ie |= (u[i] == 0.0f);
+  }
 
   return ie;
 }
@@ -78,11 +80,13 @@ static int is_unity_dble(pauli_dble *p)
   ie = 1;
   u = (*p).u;
 
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < 6; i++) {
     ie |= (u[i] == 1.0);
+  }
 
-  for (i = 7; i < 36; i++)
+  for (i = 7; i < 36; i++) {
     ie |= (u[i] == 0.0);
+  }
 
   return ie;
 }
@@ -99,10 +103,11 @@ static int check_swbnd(void)
   for (ix = 0; ix < (2 * VOLUME); ix++) {
     t = global_time(ix / 2);
 
-    if (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0)))
+    if (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0))) {
       ie |= is_unity_dble(swd);
-    else
+    } else {
       ie |= (is_unity_dble(swd) ^ 0x1);
+    }
 
     swd += 1;
   }
@@ -120,14 +125,15 @@ static double cmp_swd(ptset_t set)
   pb = sswd;
   pm = pa;
 
-  if (set == EVEN_PTS)
+  if (set == EVEN_PTS) {
     pm = pa + VOLUME;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     pa += VOLUME;
     pb += VOLUME;
     pm = pa + VOLUME;
-  } else if (set == ALL_PTS)
+  } else if (set == ALL_PTS) {
     pm = pa + 2 * VOLUME;
+  }
 
   dmax = 0.0;
 
@@ -135,8 +141,9 @@ static double cmp_swd(ptset_t set)
     for (k = 0; k < 36; k++) {
       d = fabs((*pa).u[k] - (*pb).u[k]);
 
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
     }
 
     pb += 1;
@@ -155,14 +162,15 @@ static double cmp_iswd(ptset_t set)
   pb = sswd;
   pm = pa;
 
-  if (set == EVEN_PTS)
+  if (set == EVEN_PTS) {
     pm = pa + VOLUME;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     pa += VOLUME;
     pb += VOLUME;
     pm = pa + VOLUME;
-  } else if (set == ALL_PTS)
+  } else if (set == ALL_PTS) {
     pm = pa + 2 * VOLUME;
+  }
 
   dmax = 0.0;
 
@@ -177,8 +185,9 @@ static double cmp_iswd(ptset_t set)
 
       for (l = 0; l < 6; l++) {
         d = vd.c[l].re * vd.c[l].re + vd.c[l].im * vd.c[l].im;
-        if (d > dmax)
+        if (d > dmax) {
           dmax = d;
+        }
       }
     }
 
@@ -199,14 +208,15 @@ static double cmp_sw2swd(ptset_t set)
   pb = swdfld();
   pm = pa;
 
-  if (set == EVEN_PTS)
+  if (set == EVEN_PTS) {
     pm = pa + VOLUME;
-  else if (set == ODD_PTS) {
+  } else if (set == ODD_PTS) {
     pa += VOLUME;
     pb += VOLUME;
     pm = pa + VOLUME;
-  } else if (set == ALL_PTS)
+  } else if (set == ALL_PTS) {
     pm = pa + 2 * VOLUME;
+  }
 
   dmax = 0.0;
 
@@ -214,8 +224,9 @@ static double cmp_sw2swd(ptset_t set)
     for (k = 0; k < 36; k++) {
       d = fabs((double)((*pa).u[k]) - (*pb).u[k]);
 
-      if (d > dmax)
+      if (d > dmax) {
         dmax = d;
+      }
     }
 
     pb += 1;
@@ -248,9 +259,10 @@ int main(int argc, char *argv[])
     printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check1.c]",
                  "Syntax: check1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -326,8 +338,9 @@ int main(int argc, char *argv[])
   d = cmp_swd(ODD_PTS);
   MPI_Reduce(&d, &dmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Maximal deviation of swd_o = %.1e\n\n", dmax);
+  }
 
   print_flags();
   random_ud();
@@ -347,8 +360,9 @@ int main(int argc, char *argv[])
   d = cmp_iswd(ODD_PTS);
   MPI_Reduce(&d, &dmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Maximal deviation of swd_o = %.1e\n\n", dmax);
+  }
 
   print_flags();
   assign_swd2sw();
@@ -377,8 +391,9 @@ int main(int argc, char *argv[])
 
   print_flags();
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

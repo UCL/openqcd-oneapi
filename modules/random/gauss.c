@@ -46,8 +46,9 @@ void gauss(float r[], int n)
 
   for (k = 0; k < n;) {
 #ifdef SITERANDOM
-    if (ix == -1)
+    if (ix == -1) {
       ranlxs(u, 2);
+    }
     ranlxs_site(u, 2, ix);
 #else
     ranlxs(u, 2);
@@ -62,8 +63,9 @@ void gauss(float r[], int n)
     y2 = rho * cos(x2);
 
     r[k++] = (float)(y1);
-    if (k < n)
+    if (k < n) {
       r[k++] = (float)(y2);
+    }
   }
 }
 
@@ -84,8 +86,9 @@ void gauss_dble(double rd[], int n)
 
   for (k = 0; k < n;) {
 #ifdef SITERANDOM
-    if (ix == -1)
+    if (ix == -1) {
       ranlxd(ud, 2);
+    }
     ranlxd_site(ud, 2, ix);
 #else
     ranlxd(ud, 2);
@@ -100,7 +103,8 @@ void gauss_dble(double rd[], int n)
     y2 = rho * cos(x2);
 
     rd[k++] = y1;
-    if (k < n)
+    if (k < n) {
       rd[k++] = y2;
+    }
   }
 }

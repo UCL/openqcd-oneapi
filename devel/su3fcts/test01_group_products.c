@@ -397,8 +397,9 @@ int main(int argc, char *argv[])
     printf("\n-----\n\n");
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     report_test_results();
+  }
 
   MPI_Finalize();
   return 0;

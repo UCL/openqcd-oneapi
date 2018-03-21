@@ -265,13 +265,15 @@ static int iswd(int vol, pauli_dble *sw)
   ifail = 0;
   sm = sw + vol;
 
-  for (; sw < sm; sw++)
+  for (; sw < sm; sw++) {
     ifail |= inv_pauli_dble(0.0, sw, sw);
+  }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     MPI_Allreduce(&ifail, &n, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
-  else
+  } else {
     n = ifail;
+  }
 
   return n;
 }
@@ -340,11 +342,13 @@ int sw_term(ptset_t set)
 
   set_flags(COMPUTED_SWD);
 
-  if (ie == 1)
+  if (ie == 1) {
     set_flags(INVERTED_SWD_E);
+  }
 
-  if (io == 1)
+  if (io == 1) {
     set_flags(INVERTED_SWD_O);
+  }
 
   return ifail;
 }

@@ -60,9 +60,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check1.c]",
                  "Syntax: check1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -100,8 +101,9 @@ int main(int argc, char *argv[])
   ps = reserve_ws(4);
 
   for (itm = 0; itm < 2; itm++) {
-    if (itm == 1)
+    if (itm == 1) {
       set_tm_parms(1);
+    }
 
     random_ud();
     set_ud_phase();
@@ -113,8 +115,9 @@ int main(int argc, char *argv[])
     vol = (*b).vol;
     volh = vol / 2;
 
-    for (k = 0; k < 8; k++)
+    for (k = 0; k < 8; k++) {
       res_max[k] = 0.0f;
+    }
 
     random_s(VOLUME, ps[0], 1.0f);
     bnd_s2zero(ALL_PTS, ps[0]);
@@ -136,16 +139,18 @@ int main(int argc, char *argv[])
         mulr_spinor_add(vol, b[n].s[2], b[n].s[0], -1.0f);
         res[k] = norm_square(vol, 0, b[n].s[2]) / res0;
 
-        if (res[k] > res_max[k])
+        if (res[k] > res_max[k]) {
           res_max[k] = res[k];
+        }
       }
     }
 
     if (NPROC > 1) {
       MPI_Reduce(res_max, res, 8, MPI_FLOAT, MPI_MAX, 0, MPI_COMM_WORLD);
 
-      for (k = 0; k < 8; k++)
+      for (k = 0; k < 8; k++) {
         res_max[k] = res[k];
+      }
     }
 
     if (my_rank == 0) {
@@ -153,13 +158,15 @@ int main(int argc, char *argv[])
       printf("Twisted-mass flag = %d\n", tm.eoflg);
       printf("Check of blk_mres():\n");
 
-      for (k = 0; k < 8; k++)
+      for (k = 0; k < 8; k++) {
         printf("nmr = %2d, res_max = %.1e\n", 4 * (k + 1),
                sqrt((double)(res_max[k])));
+      }
     }
 
-    for (k = 0; k < 8; k++)
+    for (k = 0; k < 8; k++) {
       res_max[k] = 0.0f;
+    }
 
     ie = assign_swd2swbgr(SAP_BLOCKS, ODD_PTS);
     error_root(ie, 1, "main [check1.c]",
@@ -185,31 +192,35 @@ int main(int argc, char *argv[])
         mulr_spinor_add(volh, b[n].s[2], b[n].s[0], -1.0f);
         res[k] = norm_square(volh, 0, b[n].s[2]) / res0;
 
-        if (res[k] > res_max[k])
+        if (res[k] > res_max[k]) {
           res_max[k] = res[k];
+        }
       }
     }
 
     if (NPROC > 1) {
       MPI_Reduce(res_max, res, 8, MPI_FLOAT, MPI_MAX, 0, MPI_COMM_WORLD);
 
-      for (k = 0; k < 8; k++)
+      for (k = 0; k < 8; k++) {
         res_max[k] = res[k];
+      }
     }
 
     if (my_rank == 0) {
       printf("Check of blk_eo_mres():\n");
 
-      for (k = 0; k < 8; k++)
+      for (k = 0; k < 8; k++) {
         printf("nmr = %2d, res_max = %.1e\n", 3 * (k + 1),
                sqrt((double)(res_max[k])));
+      }
 
       printf("\n");
     }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

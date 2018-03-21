@@ -29,19 +29,22 @@ static void write_state(void)
   base = (float)(ldexp(1.0, 24));
   rlxs_init(1, 1234567);
 
-  for (k = 0; k < 10; k++)
+  for (k = 0; k < 10; k++) {
     ranlxs(r, N);
+  }
 
   rlxs_get(state);
   ranlxs(r, N);
 
   fp = fopen(".tmp", "w");
 
-  for (k = 0; k < ns; k++)
+  for (k = 0; k < ns; k++) {
     fprintf(fp, "%d\n", state[k]);
+  }
 
-  for (k = 0; k < N; k++)
+  for (k = 0; k < N; k++) {
     fprintf(fp, "%12.1f\n", base * r[k]);
+  }
 
   fclose(fp);
 }
@@ -60,11 +63,13 @@ static void read_state(void)
   error(fp == NULL, 1, "read_state [check2.c]", "Unable to open file");
   ir = 0;
 
-  for (k = 0; k < ns; k++)
+  for (k = 0; k < ns; k++) {
     ir += fscanf(fp, "%d", &state[k]);
+  }
 
-  for (k = 0; k < N; k++)
+  for (k = 0; k < N; k++) {
     ir += fscanf(fp, "%f", &r_old[k]);
+  }
 
   error(ir != (ns + N), 1, "read_state [check2.c]", "Read error");
   fclose(fp);

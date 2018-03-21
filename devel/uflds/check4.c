@@ -107,10 +107,11 @@ static void random_g(void)
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
 
-    if ((t > 0) || (bc != 1))
+    if ((t > 0) || (bc != 1)) {
       random_su3_dble(gx);
-    else
+    } else {
       (*gx) = unity;
+    }
 
     gx += 1;
   }
@@ -223,8 +224,9 @@ static void random_vec(int *svec)
 
   for (mu = 0; mu < 4; mu++) {
     svec[mu] = (int)((double)(bs[mu]) * r[mu]);
-    if (svec[mu] > (bs[mu] / 2))
+    if (svec[mu] > (bs[mu] / 2)) {
       svec[mu] -= bs[mu];
+    }
   }
 
   MPI_Bcast(svec, 4, MPI_INT, 0, MPI_COMM_WORLD);
@@ -255,9 +257,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check4.c]",
                  "Syntax: check4 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -276,8 +279,9 @@ int main(int argc, char *argv[])
 
   g = amalloc(NSPIN * sizeof(*g), 4);
 
-  if (BNDRY > 0)
+  if (BNDRY > 0) {
     gbuf = amalloc((BNDRY / 2) * sizeof(*gbuf), 4);
+  }
 
   error((g == NULL) || ((BNDRY > 0) && (gbuf == NULL)), 1, "main [check4.c]",
         "Unable to allocate auxiliary arrays");
@@ -337,18 +341,20 @@ int main(int argc, char *argv[])
   d1 = act1;
 
   if ((bc == 0) || (bc == 3)) {
-    for (t = 0; t < N0; t++)
+    for (t = 0; t < N0; t++) {
       d1 -= asl1[t];
+    }
   }
 
   if (my_rank == 0) {
     printf("Comparison of plaq_wsum_dble() with plaq_action_slices():\n");
     printf("Absolute difference of total action = %.1e\n",
            fabs(3.0 * nplaq2 - 0.5 * act1 - p2));
-    if ((bc == 0) || (bc == 3))
+    if ((bc == 0) || (bc == 3)) {
       printf("Deviation from sum of action slices = %.1e\n\n", fabs(d1));
-    else
+    } else {
       printf("\n");
+    }
   }
 
   random_g();
@@ -358,8 +364,9 @@ int main(int argc, char *argv[])
   plaq_action_slices(asl2);
   d3 = 0.0;
 
-  for (t = 0; t < N0; t++)
+  for (t = 0; t < N0; t++) {
     d3 += fabs(asl1[t] - asl2[t]);
+  }
 
   if (my_rank == 0) {
     printf("Gauge invariance:\n");
@@ -369,8 +376,9 @@ int main(int argc, char *argv[])
            d3 / ((double)(N0)*asl2[1]));
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Translation invariance:\n");
+  }
 
   random_ud();
   p1 = plaq_sum_dble(1);
@@ -379,19 +387,22 @@ int main(int argc, char *argv[])
 
   for (n = 0; n < 8; n++) {
     random_vec(s);
-    if (bc != 3)
+    if (bc != 3) {
       s[0] = 0;
+    }
     shift_ud(s);
     d1 = fabs(p1 - plaq_sum_dble(1));
     d2 = fabs(p2 - plaq_wsum_dble(1));
     plaq_action_slices(asl2);
     d3 = 0.0;
 
-    for (t = 0; t < N0; t++)
+    for (t = 0; t < N0; t++) {
       d3 += fabs(asl1[safe_mod(t - s[0], N0)] - asl2[t]);
+    }
 
-    for (t = 0; t < N0; t++)
+    for (t = 0; t < N0; t++) {
       asl1[t] = asl2[t];
+    }
 
     if (my_rank == 0) {
       printf("s=(% 3d,% 3d,% 3d,% 3d):\n", s[0], s[1], s[2], s[3]);
@@ -415,8 +426,9 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

@@ -58,11 +58,13 @@ static int check_ranlux(void)
   rlxd_get(rlxd_state[1]);
   ie = 0;
 
-  for (k = 0; k < nlxs; k++)
+  for (k = 0; k < nlxs; k++) {
     ie |= (rlxs_state[0][k] != rlxs_state[1][k]);
+  }
 
-  for (k = 0; k < nlxd; k++)
+  for (k = 0; k < nlxd; k++) {
     ie |= (rlxd_state[0][k] != rlxd_state[1][k]);
+  }
 
   return ie;
 }
@@ -141,9 +143,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check1.c]",
                  "Syntax: check1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(loc_dir, NAME_SIZE, MPI_CHAR, 0, MPI_COMM_WORLD);

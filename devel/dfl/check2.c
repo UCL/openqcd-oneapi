@@ -43,11 +43,13 @@ static void check_basis(int Ns, double *dev0, double *dev1)
         z = spinor_prod_dble((*b).vol, 0, (*b).sd[i], (*b).sd[j]);
         dev = sqrt(z.re * z.re + z.im * z.im);
 
-        if (i == j)
+        if (i == j) {
           dev = fabs(1.0 - dev);
+        }
 
-        if (dev > x[0])
+        if (dev > x[0]) {
           x[0] = dev;
+        }
       }
 
       assign_s2sd((*b).vol, (*b).s[i], (*b).sd[0]);
@@ -55,8 +57,9 @@ static void check_basis(int Ns, double *dev0, double *dev1)
       dev = norm_square_dble((*b).vol, 0, (*b).sd[0]);
       dev = sqrt(dev);
 
-      if (dev > x[1])
+      if (dev > x[1]) {
         x[1] = dev;
+      }
     }
   }
 
@@ -109,9 +112,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check2.c]",
                  "Syntax: check2 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);
@@ -162,15 +166,17 @@ int main(int argc, char *argv[])
     mulr_spinor_add(VOLUME, ws[Ns], ws[i], -1.0f);
     dev = (double)(norm_square(VOLUME, 1, ws[Ns]) /
                    norm_square(VOLUME, 1, ws[i]));
-    if (dev > dev0)
+    if (dev > dev0) {
       dev0 = dev;
+    }
 
     assign_s2s(VOLUME, ws[i], ws[Ns]);
     dfl_sub_v2s(vm[i], ws[Ns]);
     dev = (double)(norm_square(VOLUME, 1, ws[Ns]) /
                    norm_square(VOLUME, 1, ws[i]));
-    if (dev > dev1)
+    if (dev > dev1) {
       dev1 = dev;
+    }
   }
 
   if (my_rank == 0) {
@@ -200,8 +206,9 @@ int main(int argc, char *argv[])
 
   dfl_sub_vd2sd(wvd[1], wsd[0]);
   dev = norm_square_dble(VOLUME, 1, wsd[0]) / vnorm_square_dble(nv, 1, wvd[1]);
-  if (dev > dev1)
+  if (dev > dev1) {
     dev1 = dev;
+  }
 
   if (my_rank == 0) {
     printf("Check of\n");
@@ -209,8 +216,9 @@ int main(int argc, char *argv[])
     printf("dfl_sd2vd,..: %.1e\n\n", sqrt(dev1));
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

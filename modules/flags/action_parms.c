@@ -129,8 +129,9 @@ static void init_ap(void)
 {
   int i;
 
-  for (i = 1; i <= IACMAX; i++)
+  for (i = 1; i <= IACMAX; i++) {
     ap[i] = ap[0];
+  }
 
   init = 1;
 }
@@ -142,11 +143,13 @@ action_parms_t set_action_parms(int iact, action_t action, int ipf, int im0,
   int iprms[16], i, ie;
   int rat[3], mu[4], sp[4];
 
-  if (init == 0)
+  if (init == 0) {
     init_ap();
+  }
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++) {
     rat[i] = 0;
+  }
 
   for (i = 0; i < 4; i++) {
     mu[i] = 0;
@@ -178,8 +181,9 @@ action_parms_t set_action_parms(int iact, action_t action, int ipf, int im0,
     iprms[2] = ipf;
     iprms[3] = im0;
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++) {
       iprms[4 + i] = rat[i];
+    }
 
     for (i = 0; i < 4; i++) {
       iprms[7 + i] = mu[i];
@@ -196,8 +200,9 @@ action_parms_t set_action_parms(int iact, action_t action, int ipf, int im0,
     ie |= (iprms[2] != ipf);
     ie |= (iprms[3] != im0);
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++) {
       ie |= (iprms[4 + i] != rat[i]);
+    }
 
     for (i = 0; i < 4; i++) {
       ie |= (iprms[7 + i] != mu[i]);
@@ -215,11 +220,13 @@ action_parms_t set_action_parms(int iact, action_t action, int ipf, int im0,
   ie |= (action == ACTIONS);
   ie |= ((ipf < 0) || (im0 < 0));
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++) {
     ie |= (rat[i] < 0);
+  }
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     ie |= ((mu[i] < 0) || (sp[i] < 0));
+  }
 
   error_root(ie != 0, 1, "set_action_parms [action_parms.c]",
              "Parameters are out of range");
@@ -231,8 +238,9 @@ action_parms_t set_action_parms(int iact, action_t action, int ipf, int im0,
   ap[iact].ipf = ipf;
   ap[iact].im0 = im0;
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++) {
     ap[iact].irat[i] = rat[i];
+  }
 
   for (i = 0; i < 4; i++) {
     ap[iact].imu[i] = mu[i];
@@ -246,12 +254,13 @@ action_parms_t set_action_parms(int iact, action_t action, int ipf, int im0,
 
 action_parms_t action_parms(int iact)
 {
-  if (init == 0)
+  if (init == 0) {
     init_ap();
+  }
 
-  if ((iact >= 0) && (iact < IACMAX))
+  if ((iact >= 0) && (iact < IACMAX)) {
     return ap[iact];
-  else {
+  } else {
     error_loc(1, 1, "action_parms [action_parms.c]",
               "Action index is out of range");
     return ap[IACMAX];
@@ -274,8 +283,9 @@ void read_action_parms(int iact)
   im0 = 0;
   smear = 0;
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++) {
     irat[i] = 0;
+  }
 
   for (i = 0; i < 4; i++) {
     imu[i] = 0;
@@ -330,9 +340,10 @@ void read_action_parms(int iact)
       read_line("im0", "%d", &im0);
       read_line("irat", "%d %d %d", irat, irat + 1, irat + 2);
       read_line("isp", "%d", isp);
-    } else if (strcmp(line, "ACG") != 0)
+    } else if (strcmp(line, "ACG") != 0) {
       error_root(1, 1, "read_action_parms [action_parms.c]",
                  "Unknown action %s", line);
+    }
 
     if ((ida == 0) && (smear_params.smear_gauge == 1)) {
       smear = 1;
@@ -365,9 +376,9 @@ void print_action_parms(void)
       if (ap[i].action != ACTIONS) {
         printf("Action %d:\n", i);
 
-        if (ap[i].action == ACG)
+        if (ap[i].action == ACG) {
           printf("ACG action\n");
-        else if (ap[i].action == ACF_TM1) {
+        } else if (ap[i].action == ACF_TM1) {
           printf("ACF_TM1 action\n");
           printf("ipf = %d\n", ap[i].ipf);
           printf("im0 = %d\n", ap[i].im0);
@@ -438,8 +449,9 @@ void write_action_parms(FILE *fdat)
         istd[2] = (stdint_t)(ap[i].ipf);
         istd[3] = (stdint_t)(ap[i].im0);
 
-        for (j = 0; j < 3; j++)
+        for (j = 0; j < 3; j++) {
           istd[4 + j] = (stdint_t)(ap[i].irat[j]);
+        }
 
         for (j = 0; j < 4; j++) {
           istd[7 + j] = (stdint_t)(ap[i].imu[j]);
@@ -448,8 +460,9 @@ void write_action_parms(FILE *fdat)
 
         istd[15] = (stdint_t)(ap[i].smear);
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_int(16, istd);
+        }
 
         iw = fwrite(istd, sizeof(stdint_t), 16, fdat);
         error_root(iw != 16, 1, "write_action_parms [action_parms.c]",
@@ -477,16 +490,18 @@ void check_action_parms(FILE *fdat)
         error_root(ir != 16, 1, "check_action_parms [action_parms.c]",
                    "Incorrect read count");
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_int(16, istd);
+        }
 
         ie |= (istd[0] != (stdint_t)(i));
         ie |= (istd[1] != (stdint_t)(ap[i].action));
         ie |= (istd[2] != (stdint_t)(ap[i].ipf));
         ie |= (istd[3] != (stdint_t)(ap[i].im0));
 
-        for (j = 0; j < 3; j++)
+        for (j = 0; j < 3; j++) {
           ie |= (istd[4 + j] != (stdint_t)(ap[i].irat[j]));
+        }
 
         for (j = 0; j < 4; j++) {
           ie |= (istd[7 + j] != (stdint_t)(ap[i].imu[j]));

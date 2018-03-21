@@ -113,8 +113,9 @@ static void ch_init(void)
             "Unable to allocate auxiliary array");
   c[0] = 1.0;
 
-  for (k = 0; k < N; k++)
+  for (k = 0; k < N; k++) {
     c[k + 1] = c[k] / (double)(k + 1);
+  }
 
   init = 1;
 }
@@ -333,8 +334,9 @@ void chexp_drv0(su3_alg_dble const *X, ch_drv0_t *s)
 {
   int n;
 
-  if (init == 0)
+  if (init == 0) {
     ch_init();
+  }
 
   eval_td(X);
 
@@ -382,8 +384,9 @@ void chexp_drv1(su3_alg_dble const *X, ch_drv1_t *s)
 {
   int n;
 
-  if (init == 0)
+  if (init == 0) {
     ch_init();
+  }
 
   eval_td(X);
 
@@ -461,8 +464,9 @@ void chexp_drv2(su3_alg_dble const *X, ch_drv2_t *s)
 {
   int n;
 
-  if (init == 0)
+  if (init == 0) {
     ch_init();
+  }
 
   eval_td(X);
 
@@ -592,8 +596,9 @@ void chexp_drv0(su3_alg_dble const *X, ch_drv0_t *s)
   int n;
   complex_dble q0, q1, q2;
 
-  if (init == 0)
+  if (init == 0) {
     ch_init();
+  }
 
   eval_td(X);
 
@@ -626,8 +631,9 @@ void chexp_drv1(su3_alg_dble const *X, ch_drv1_t *s)
   complex_dble q0, q1, q2;
   complex_dble q0d, q1d, q2d;
 
-  if (init == 0)
+  if (init == 0) {
     ch_init();
+  }
 
   eval_td(X);
 
@@ -683,8 +689,9 @@ void chexp_drv2(su3_alg_dble const *X, ch_drv2_t *s)
   complex_dble q0d, q1d, q2d;
   complex_dble q0dd, q1dd, q2dd;
 
-  if (init == 0)
+  if (init == 0) {
     ch_init();
+  }
 
   eval_td(X);
 
@@ -885,8 +892,9 @@ void expXsu3_w_factors(double eps, su3_alg_dble const *X, su3_dble *u,
 
   /* Using coeffs p_i computes for the normalised matrix, compute the coeffs for
    * a matrix ^2 using the CH theorem */
-  for (k = 0; k < n; ++k)
+  for (k = 0; k < n; ++k) {
     square_ch_drv0_coeffs(s_in);
+  }
 
   /* Note! You cannot use umat1 for this, the SSE2 variant of ch2mat uses this
    * for intrinsic storage */

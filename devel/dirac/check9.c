@@ -41,10 +41,11 @@ static void blk_s2zero(int ic, spinor *s)
   nbh = nb / 2;
   vol = (*b).vol;
 
-  if (ic ^ isw)
+  if (ic ^ isw) {
     n = nbh;
-  else
+  } else {
     n = 0;
+  }
 
   nm = n + nbh;
 
@@ -61,8 +62,9 @@ static void random_weyl(int vol, weyl *w)
 
   ws = (spin_t *)(w);
 
-  for (ix = 0; ix < vol; ix++)
+  for (ix = 0; ix < vol; ix++) {
     gauss(ws[ix].r, 12);
+  }
 }
 
 static void random_bnd(int ic)
@@ -76,22 +78,25 @@ static void random_bnd(int ic)
   b = blk_list(SAP_BLOCKS, &nb, &isw);
   nbh = nb / 2;
 
-  if (ic ^ isw)
+  if (ic ^ isw) {
     n = nbh;
-  else
+  } else {
     n = 0;
+  }
 
   nm = n + nbh;
 
   for (; n < nm; n++) {
     bb = b[n].bb;
 
-    if ((cpr[0] == 0) && (b[n].bo[0] == 0) && (bc != 3))
+    if ((cpr[0] == 0) && (b[n].bo[0] == 0) && (bc != 3)) {
       random_weyl(bb[0].vol, bb[0].w[0]);
+    }
 
     if ((cpr[0] == (NPROC0 - 1)) && ((b[n].bo[0] + b[n].bs[0]) == L0) &&
-        (bc == 0))
+        (bc == 0)) {
       random_weyl(bb[1].vol, bb[1].w[0]);
+    }
   }
 }
 
@@ -130,9 +135,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check9.c]",
                  "Syntax: check9 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -172,9 +178,10 @@ int main(int argc, char *argv[])
   swp = set_sw_parms(0.05);
   mu = 0.123f;
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("m0 = %.4e, mu = %.4e, csw = %.4e, cF = %.4e, cF' = %.4e\n\n",
            swp.m0, mu, swp.csw, swp.cF[0], swp.cF[1]);
+  }
 
   random_ud();
   set_ud_phase();
@@ -196,10 +203,11 @@ int main(int argc, char *argv[])
     random_s(VOLUME, ps[0], 1.0f);
     assign_s2s(VOLUME, ps[0], ps[3]);
 
-    if (ic ^ isw)
+    if (ic ^ isw) {
       n = nbh;
-    else
+    } else {
       n = 0;
+    }
     nm = n + nbh;
 
     for (; n < nm; n++) {
@@ -220,13 +228,15 @@ int main(int argc, char *argv[])
     mulr_spinor_add(VOLUME, ps[1], ps[2], -1.0f);
     d = norm_square(VOLUME, 1, ps[1]) / norm_square(VOLUME, 1, ps[2]);
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
 
-    if (ic ^ isw)
+    if (ic ^ isw) {
       n = nbh;
-    else
+    } else {
       n = 0;
+    }
     nm = n + nbh;
 
     for (; n < nm; n++) {
@@ -236,8 +246,9 @@ int main(int argc, char *argv[])
       mulr_spinor_add(vol, b[n].s[0], b[n].s[1], -1.0f);
       d = norm_square(vol, 0, b[n].s[0]);
 
-      if (d != 0.0f)
+      if (d != 0.0f) {
         ie = 1;
+      }
     }
   }
 

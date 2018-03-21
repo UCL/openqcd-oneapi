@@ -105,24 +105,28 @@ int main(int argc, char *argv[])
 
       for (ieo = 0; ieo < 3; ieo++) {
         if (my_rank == 0) {
-          if (ieo == 0)
+          if (ieo == 0) {
             printf("First case: full lattice\n\n");
-          else if (ieo == 1)
+          } else if (ieo == 1) {
             printf("Second case: even points\n\n");
-          else
+          } else {
             printf("Third case: odd points\n\n");
+          }
         }
 
         vol = VOLUME / 2;
         off = 0;
 
-        if (ieo == 0)
+        if (ieo == 0) {
           vol = VOLUME;
-        if (ieo == 2)
+        }
+        if (ieo == 2) {
           off = VOLUME / 2;
+        }
 
-        for (i = 0; i < 10; i++)
+        for (i = 0; i < 10; i++) {
           random_sd(vol, psd[i] + off, 1.0);
+        }
 
         dmax = 0.0;
 
@@ -134,37 +138,43 @@ int main(int argc, char *argv[])
             z = sp(vol, pk, pl);
             MPI_Reduce(&z.re, &w.re, 2, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
             MPI_Bcast(&w.re, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-          } else
+          } else {
             w = sp(vol, pk, pl);
+          }
 
           z = spinor_prod_dble(vol, icom, pk, pl);
           r = norm_square_dble(vol, icom, pk) * norm_square_dble(vol, icom, pl);
           d = (z.re - w.re) * (z.re - w.re) + (z.im - w.im) * (z.im - w.im);
           d = sqrt(d / r);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
 
           r = spinor_prod_re_dble(vol, icom, pk, pl);
 
           d = fabs(z.re / r - 1.0);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
 
           z = spinor_prod_dble(vol, icom, pk, pk);
           r = norm_square_dble(vol, icom, pk);
 
           d = fabs(z.im / r);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
 
           d = fabs(z.re / r - 1.0);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
 
         if (my_rank == 0) {
-          if (dmax > dall)
+          if (dmax > dall) {
             dall = dmax;
+          }
           printf("Check of spinor_prod, spinor_prod_re\n");
           printf("and norm_square: %.2e\n\n", dmax);
         }
@@ -182,13 +192,15 @@ int main(int argc, char *argv[])
           r = norm_square_dble(vol, icom, pk) * norm_square_dble(vol, icom, pl);
           d = (z.re - w.re) * (z.re - w.re) + (z.im - w.im) * (z.im - w.im);
           d = sqrt(d / r);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
 
         if (my_rank == 0) {
-          if (dmax > dall)
+          if (dmax > dall) {
             dall = dmax;
+          }
           printf("Consistency check of spinor_prod5, mulg5\n");
           printf("and spinor_prod: %.2e\n\n", dmax);
         }
@@ -209,19 +221,22 @@ int main(int argc, char *argv[])
           mulc_spinor_add_dble(vol, pk, pl, z);
 
           d = fabs(r / norm_square_dble(vol, icom, pk) - 1.0);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
 
         if (my_rank == 0) {
-          if (dmax > dall)
+          if (dmax > dall) {
             dall = dmax;
+          }
           printf("Consistency of spinor_prod, norm_square\n");
           printf("and mulc_spinor_add: %.2e\n\n", dmax);
         }
 
-        for (i = 0; i < 10; i++)
+        for (i = 0; i < 10; i++) {
           random_sd(vol, psd[i] + off, 1.0);
+        }
 
         dmax = 0.0;
         r = -1.234;
@@ -240,8 +255,9 @@ int main(int argc, char *argv[])
 
           d = norm_square_dble(vol, icom, pk) / norm_square_dble(vol, icom, pj);
           d = sqrt(d);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
 
           assign_sd2sd(vol, pl, pk);
           scale_dble(vol, r, pk);
@@ -249,19 +265,22 @@ int main(int argc, char *argv[])
 
           d = norm_square_dble(vol, icom, pk) / norm_square_dble(vol, icom, pl);
           d = sqrt(d);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
 
         if (my_rank == 0) {
-          if (dmax > dall)
+          if (dmax > dall) {
             dall = dmax;
+          }
           printf("Consistency of mulr_spinor_add, scale\n");
           printf("and mulc_spinor_add: %.2e\n\n", dmax);
         }
 
-        for (i = 0; i < 10; i++)
+        for (i = 0; i < 10; i++) {
           random_sd(vol, psd[i] + off, 1.0);
+        }
 
         dmax = 0.0;
         cs = 0.785;
@@ -280,19 +299,22 @@ int main(int argc, char *argv[])
 
           d = norm_square_dble(vol, icom, pk) / norm_square_dble(vol, icom, pj);
           d = sqrt(d);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
 
         if (my_rank == 0) {
-          if (dmax > dall)
+          if (dmax > dall) {
             dall = dmax;
+          }
           printf("Consistency of mulr_spinor_add, scale\n");
           printf("and combine_spinor: %.2e\n\n", dmax);
         }
 
-        for (i = 0; i < 10; i++)
+        for (i = 0; i < 10; i++) {
           random_sd(vol, psd[i] + off, 1.0);
+        }
 
         dmax = 0.0;
 
@@ -307,21 +329,24 @@ int main(int argc, char *argv[])
             d = (fabs(z.re) + fabs(z.im)) /
                 sqrt(norm_square_dble(vol, icom, pk));
 
-            if (d > dmax)
+            if (d > dmax) {
               dmax = d;
+            }
           }
 
           normalize_dble(vol, icom, pk);
           r = norm_square_dble(vol, icom, pk);
 
           d = fabs(r - 1.0);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
 
         if (my_rank == 0) {
-          if (dmax > dall)
+          if (dmax > dall) {
             dall = dmax;
+          }
           printf("Consistency of spinor_prod, norm_square,\n");
           printf("normalize and project: %.2e\n\n", dmax);
         }
@@ -358,16 +383,18 @@ int main(int argc, char *argv[])
           r = norm_square_dble(vol, icom, pk);
 
           d = fabs(r);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
 
         dmax /= norm_square_dble(vol, icom, psd[0] + off);
         dmax = sqrt(dmax);
 
         if (my_rank == 0) {
-          if (dmax > dall)
+          if (dmax > dall) {
             dall = dmax;
+          }
           printf("Consistency of mulc_spinor_add\n");
           printf("and rotate: %.2e\n\n", dmax);
         }
@@ -388,8 +415,9 @@ int main(int argc, char *argv[])
           mulc_spinor_add_dble(vol, pl, pk, z);
           r = norm_square_dble(vol, icom, pl) / norm_square_dble(vol, icom, pk);
           d = sqrt(r);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
 
           random_sd(vol, pl, 1.0);
           z = spinor_prod_dble(vol, icom, pk, pl);
@@ -399,8 +427,9 @@ int main(int argc, char *argv[])
 
           d = (fabs(z.re - w.re) + fabs(z.im - w.im)) /
               (fabs(z.re) + fabs(z.im));
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
 
           random_sd(vol, pk, 1.0);
           assign_sd2sd(vol, pk, pl);
@@ -413,13 +442,15 @@ int main(int argc, char *argv[])
           mulc_spinor_add_dble(vol, pl, pk, z);
           r = norm_square_dble(vol, icom, pl) / norm_square_dble(vol, icom, pk);
           d = sqrt(r);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
 
         if (my_rank == 0) {
-          if (dmax > dall)
+          if (dmax > dall) {
             dall = dmax;
+          }
           printf("Check of mulg5 and mulmg5: %.2e\n\n", dmax);
         }
       }

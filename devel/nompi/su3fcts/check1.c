@@ -73,8 +73,9 @@ static double max_dev(su3_dble *u, su3_dble *v)
     nrm += r[i] * r[i];
     d += (r[i] - s[i]) * (r[i] - s[i]);
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   return sqrt(dmax / nrm);

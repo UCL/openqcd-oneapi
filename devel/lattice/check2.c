@@ -30,17 +30,20 @@ static void new_fld(int ibnd)
   ud = udfld();
   udm = ud + 4 * VOLUME;
 
-  for (; ud < udm; ud++)
+  for (; ud < udm; ud++) {
     random_su3_dble(ud);
+  }
 
   if (ibnd) {
     udm += 7 * (BNDRY / 4);
 
-    if ((cpr[0] == (NPROC0 - 1)) && ((bc_type() == 1) || (bc_type() == 2)))
+    if ((cpr[0] == (NPROC0 - 1)) && ((bc_type() == 1) || (bc_type() == 2))) {
       udm += 3;
+    }
 
-    for (; ud < udm; ud++)
+    for (; ud < udm; ud++) {
       random_su3_dble(ud);
+    }
   }
 
   set_flags(UPDATED_UD);
@@ -74,8 +77,9 @@ static int cmp_ud(su3_dble *u, su3_dble *v)
   r[17] = (*u).c33.im - (*v).c33.im;
 
   for (i = 0; i < 18; i++) {
-    if (r[i] != 0.0)
+    if (r[i] != 0.0) {
       return 1;
+    }
   }
 
   return 0;
@@ -95,8 +99,9 @@ static int cmp_active(su3_dble *u, su3_dble *v)
       if (((t > 0) && (t < (N0 - 1))) ||
           ((t == 0) && ((ifc == 0) || ((ifc == 1) && (bc != 0)) ||
                         ((ifc >= 2) && (bc != 1)))) ||
-          ((t == (N0 - 1)) && (bc != 0)))
+          ((t == (N0 - 1)) && (bc != 0))) {
         ie |= cmp_ud(u, v);
+      }
 
       u += 1;
       v += 1;
@@ -145,8 +150,9 @@ static int check_diag(su3_dble *u)
   ie |= (fabs(z.re * r[17] + z.im * r[16]) > (16.0 * DBL_EPSILON));
 
   for (i = 0; i < 18; i++) {
-    if (((i > 1) && (i < 8)) || ((i > 9) && (i < 16)))
+    if (((i > 1) && (i < 8)) || ((i > 9) && (i < 16))) {
       ie |= (r[i] != 0.0);
+    }
   }
 
   return ie;
@@ -171,9 +177,10 @@ static int check_bval(su3_dble *u)
       ie |= check_diag(u + 8 * (pts[0] - (VOLUME / 2)) + 6);
 
       for (ipt = 0; ipt < (npts / 2); ipt++) {
-        for (ifc = 2; ifc < 8; ifc++)
+        for (ifc = 2; ifc < 8; ifc++) {
           ie |= cmp_ud(u + 8 * (pts[0] - (VOLUME / 2)) + 2 * (ifc / 2),
                        u + 8 * (pts[ipt] - (VOLUME / 2)) + ifc);
+        }
       }
     }
   }
@@ -214,9 +221,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check2.c]",
                  "Syntax: check2 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);

@@ -55,9 +55,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [time2.c]",
                  "Syntax: time2 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -88,8 +89,9 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
 
-    for (count = 0; count < nt; ++count)
+    for (count = 0; count < nt; ++count) {
       copy_boundary_su3_field(udfld());
+    }
 
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();
@@ -115,8 +117,9 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
 
-    for (count = 0; count < nt; ++count)
+    for (count = 0; count < nt; ++count) {
       add_boundary_su3_field(udfld());
+    }
 
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();
@@ -132,8 +135,9 @@ int main(int argc, char *argv[])
     printf("%4.3f micro sec\n\n", wdt);
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

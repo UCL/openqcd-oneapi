@@ -73,8 +73,9 @@ static spinor *psi;
 
 static void alloc_wrotate(int n)
 {
-  if (nrot > 0)
+  if (nrot > 0) {
     afree(psi);
+  }
 
   psi = amalloc(n * sizeof(*psi), ALIGN);
   error_loc(psi == NULL, 1, "alloc_wrotate [salg.c]",
@@ -335,8 +336,9 @@ float spinor_prod_re(int vol, int icom, spinor const *s, spinor const *r)
     MPI_Reduce(&x, &y, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Bcast(&y, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     return (float)(y);
-  } else
+  } else {
     return (float)(x);
+  }
 }
 
 float norm_square(int vol, int icom, spinor const *s)
@@ -396,8 +398,9 @@ float norm_square(int vol, int icom, spinor const *s)
     MPI_Reduce(&x, &y, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Bcast(&y, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     return (float)(y);
-  } else
+  } else {
     return (float)(x);
+  }
 }
 
 void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
@@ -457,8 +460,9 @@ void rotate(int vol, int n, spinor **ppk, complex const *v)
   complex const *z;
   spinor *pk, *pj;
 
-  if (n > nrot)
+  if (n > nrot) {
     alloc_wrotate(n);
+  }
 
   for (ix = 0; ix < vol; ix++) {
     for (k = 0; k < n; k++) {
@@ -770,8 +774,9 @@ float spinor_prod_re(int vol, int icom, spinor const *s, spinor const *r)
   if ((icom == 1) && (NPROC > 1)) {
     mpc_gsum_d(&x, &y, 1);
     return (float)(y);
-  } else
+  } else {
     return (float)(x);
+  }
 }
 
 float norm_square(int vol, int icom, spinor const *s)
@@ -836,8 +841,9 @@ float norm_square(int vol, int icom, spinor const *s)
   if ((icom == 1) && (NPROC > 1)) {
     mpc_gsum_d(&x, &y, 1);
     return (float)(y);
-  } else
+  } else {
     return (float)(x);
+  }
 }
 
 void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
@@ -891,8 +897,9 @@ void rotate(int vol, int n, spinor **ppk, complex const *v)
   complex const *z;
   spinor *pk, *pj;
 
-  if (n > nrot)
+  if (n > nrot) {
     alloc_wrotate(n);
+  }
 
   for (ix = 0; ix < vol; ix++) {
     for (k = 0; k < n; k++) {
@@ -1355,9 +1362,9 @@ float spinor_prod_re(int vol, int icom, spinor const *s, spinor const *r)
     r += 1;
   }
 
-  if ((icom != 1) || (NPROC == 1))
+  if ((icom != 1) || (NPROC == 1)) {
     return (float)(x);
-  else {
+  } else {
     mpc_gsum_d(&x, &y, 1);
     return (float)(y);
   }
@@ -1378,9 +1385,9 @@ float norm_square(int vol, int icom, spinor const *s)
          (double)(_vector_prod_re((*s).c4, (*s).c4));
   }
 
-  if ((icom != 1) || (NPROC == 1))
+  if ((icom != 1) || (NPROC == 1)) {
     return (float)(x);
-  else {
+  } else {
     mpc_gsum_d(&x, &y, 1);
     return (float)(y);
   }
@@ -1438,8 +1445,9 @@ void rotate(int vol, int n, spinor **ppk, complex const *v)
   complex const *z;
   spinor *pk, *pj;
 
-  if (n > nrot)
+  if (n > nrot) {
     alloc_wrotate(n);
+  }
 
   for (ix = 0; ix < vol; ix++) {
     for (k = 0; k < n; k++) {
@@ -1463,8 +1471,9 @@ void rotate(int vol, int n, spinor **ppk, complex const *v)
       }
     }
 
-    for (k = 0; k < n; k++)
+    for (k = 0; k < n; k++) {
       ppk[k][ix] = psi[k];
+    }
   }
 }
 
@@ -1531,10 +1540,11 @@ float normalize(int vol, int icom, spinor *s)
   r = norm_square(vol, icom, s);
   r = (float)(sqrt((double)(r)));
 
-  if (not_equal_f(r, 0.0f))
+  if (not_equal_f(r, 0.0f)) {
     scale(vol, 1.0f / r, s);
-  else
+  } else {
     error_loc(1, 1, "normalize [salg.c]", "Vector has vanishing norm");
+  }
 
   return r;
 }

@@ -73,10 +73,11 @@ static double (*fsv)(int n, double *x);
 
 static int relative_sign(double f1, double f2)
 {
-  if (((f1 >= 0.0) && (f2 <= 0.0)) || ((f1 <= 0.0) && (f2 >= 0.0)))
+  if (((f1 >= 0.0) && (f2 <= 0.0)) || ((f1 <= 0.0) && (f2 >= 0.0))) {
     return 1;
-  else
+  } else {
     return 0;
+  }
 }
 
 double inverse_fct(double x1, double x2, double (*f)(double x), double y,
@@ -98,13 +99,15 @@ double inverse_fct(double x1, double x2, double (*f)(double x), double y,
   while ((dx > omega1) && (dx > (omega2 * (x1 + x2)))) {
     if (fabs(f1) < fabs(f2)) {
       lambda = f1 / (f1 - f2);
-      if (lambda < eps)
+      if (lambda < eps) {
         lambda = eps;
+      }
       x3 = x1 + dx * lambda;
     } else {
       lambda = f2 / (f2 - f1);
-      if (lambda < eps)
+      if (lambda < eps) {
         lambda = eps;
+      }
       x3 = x2 - dx * lambda;
     }
 
@@ -121,10 +124,11 @@ double inverse_fct(double x1, double x2, double (*f)(double x), double y,
     dx = x2 - x1;
   }
 
-  if (fabs(f1) < fabs(f2))
+  if (fabs(f1) < fabs(f2)) {
     return x1;
-  else
+  } else {
     return x2;
+  }
 }
 
 static int find_bracket(double *x0, double *x1, double *x2,
@@ -147,8 +151,9 @@ static int find_bracket(double *x0, double *x1, double *x2,
   f1 = f(*x1);
   f2 = f(*x2);
 
-  if ((f0 > f1) && (f2 > f1))
+  if ((f0 > f1) && (f2 > f1)) {
     return 0;
+  }
 
   if ((f(y0) > f1) && (f(y2) > f1)) {
     (*x0) = y0;
@@ -167,13 +172,15 @@ static int find_bracket(double *x0, double *x1, double *x2,
 
     (*x0) += d0;
 
-    if ((*x0) < y0)
+    if ((*x0) < y0) {
       (*x0) = y0;
+    }
 
     f0 = f(*x0);
 
-    if ((f0 > f1) && (f2 > f1))
+    if ((f0 > f1) && (f2 > f1)) {
       return 0;
+    }
   }
 
   (*x0) = y1 + d0;
@@ -195,13 +202,15 @@ static int find_bracket(double *x0, double *x1, double *x2,
 
     (*x2) += d2;
 
-    if ((*x2) > y2)
+    if ((*x2) > y2) {
       (*x2) = y2;
+    }
 
     f2 = f(*x2);
 
-    if ((f0 > f1) && (f2 > f1))
+    if ((f0 > f1) && (f2 > f1)) {
       return 0;
+    }
   }
 
   return 1;
@@ -246,10 +255,11 @@ static double mini_fct(double x0, double x1, double x2, double (*f)(double x),
     dx = x3 - x0;
   }
 
-  if (f1 < f2)
+  if (f1 < f2) {
     return x1;
-  else
+  } else {
     return x2;
+  }
 }
 
 double minimize_fct(double x0, double x1, double x2, double (*f)(double x),
@@ -284,8 +294,9 @@ static void alloc_arrays(int n)
       psv = osv + n;
       vsv[0] = psv + n;
 
-      for (i = 1; i < n; i++)
+      for (i = 1; i < n; i++) {
         vsv[i] = vsv[i - 1] + n;
+      }
 
       xsv = vsv[n - 1] + n;
       nsv = n;
@@ -298,8 +309,9 @@ static void alloc_arrays(int n)
   }
 
   for (i = 0; i < n; i++) {
-    for (j = 0; j < n; j++)
+    for (j = 0; j < n; j++) {
       vsv[i][j] = 0.0;
+    }
 
     vsv[i][i] = 1.0;
   }
@@ -339,19 +351,24 @@ static void find_bnds(double *x0, double *x2, double *r0, double *r2,
     pa = fabs(psv[j]);
     va = fabs(v[j]);
 
-    if (((*rom2) * va) > pa)
+    if (((*rom2) * va) > pa) {
       (*rom2) = pa / va;
+    }
 
     if (v[j] > 0.0) {
-      if ((psv[j] + (*r0) * v[j]) < x0[j])
+      if ((psv[j] + (*r0) * v[j]) < x0[j]) {
         (*r0) = (x0[j] - psv[j]) / v[j];
-      if ((psv[j] + (*r2) * v[j]) > x2[j])
+      }
+      if ((psv[j] + (*r2) * v[j]) > x2[j]) {
         (*r2) = (x2[j] - psv[j]) / v[j];
+      }
     } else {
-      if ((psv[j] + (*r0) * v[j]) > x2[j])
+      if ((psv[j] + (*r0) * v[j]) > x2[j]) {
         (*r0) = (x2[j] - psv[j]) / v[j];
-      if ((psv[j] + (*r2) * v[j]) < x0[j])
+      }
+      if ((psv[j] + (*r2) * v[j]) < x0[j]) {
         (*r2) = (x0[j] - psv[j]) / v[j];
+      }
     }
   }
 }
@@ -360,8 +377,9 @@ static double fline(double r)
 {
   int j;
 
-  for (j = 0; j < nsv; j++)
+  for (j = 0; j < nsv; j++) {
     xsv[j] = psv[j] + r * vsv[isv][j];
+  }
 
   return fsv(nsv, xsv);
 }
@@ -378,8 +396,9 @@ void powell(int n, double *x0, double *x1, double *x2,
   ifn = 0;
 
   for (j = 0; j < n; j++) {
-    if ((x0[j] >= x1[j]) || (x2[j] <= x1[j]))
+    if ((x0[j] >= x1[j]) || (x2[j] <= x1[j])) {
       ifn = 1;
+    }
   }
 
   error(ifn, 1, "powell [fsolve.c]", "Improper parameter arrays x0,x1,x2");
@@ -409,8 +428,9 @@ void powell(int n, double *x0, double *x1, double *x2,
       if (ifn == 0) {
         r1 = mini_fct(r0, r1, r2, fline, rom1 * omega1, rom2 * omega2);
 
-        for (j = 0; j < n; j++)
+        for (j = 0; j < n; j++) {
           psv[j] += r1 * vsv[isv][j];
+        }
 
         fe = f(n, psv);
         r0 = fabs(fe - fp);
@@ -422,8 +442,9 @@ void powell(int n, double *x0, double *x1, double *x2,
 
         fp = fe;
       } else if (i >= 2) {
-        for (j = 0; j < n; j++)
+        for (j = 0; j < n; j++) {
           xmin[j] = psv[j];
+        }
 
         (*status) = -2;
         return;
@@ -435,8 +456,9 @@ void powell(int n, double *x0, double *x1, double *x2,
     for (j = 0; j < n; j++) {
       xsv[j] = psv[j] + (psv[j] - osv[j]);
 
-      if ((xsv[j] <= x0[j]) || (xsv[j] >= x2[j]))
+      if ((xsv[j] <= x0[j]) || (xsv[j] >= x2[j])) {
         ifn = 1;
+      }
     }
 
     if (ifn == 0) {
@@ -447,8 +469,9 @@ void powell(int n, double *x0, double *x1, double *x2,
 
       if ((r0 < (-4.0 * DBL_EPSILON * fabs(fo))) && (r2 < 0.0)) {
         for (j = 0; j < n; j++) {
-          if (k > 0)
+          if (k > 0) {
             vsv[k][j] = vsv[0][j];
+          }
           vsv[0][j] = psv[j] - osv[j];
         }
       }
@@ -460,25 +483,30 @@ void powell(int n, double *x0, double *x1, double *x2,
     for (j = 0; j < n; j++) {
       r0 = fabs(psv[j] - osv[j]);
 
-      if (r0 > omega1)
+      if (r0 > omega1) {
         io1 = 0;
-      if (r0 > (omega2 * psv[j]))
+      }
+      if (r0 > (omega2 * psv[j])) {
         io2 = 0;
+      }
 
       osv[j] = psv[j];
     }
 
     fo = fp;
 
-    if ((i >= 3) && ((io1 == 1) || (io2 == 1)))
+    if ((i >= 3) && ((io1 == 1) || (io2 == 1))) {
       break;
+    }
   }
 
-  for (j = 0; j < n; j++)
+  for (j = 0; j < n; j++) {
     xmin[j] = psv[j];
+  }
 
-  if (i < imx)
+  if (i < imx) {
     (*status) = i + 1;
-  else
+  } else {
     (*status) = -1;
+  }
 }

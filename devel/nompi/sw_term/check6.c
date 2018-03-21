@@ -72,8 +72,9 @@ int main(void)
   for (n = 0; n < NM; n++) {
     gauss_dble((*md).u, 36);
 
-    for (k = 0; k < 6; k++)
+    for (k = 0; k < 6; k++) {
       (*md).u[k] *= fact;
+    }
 
     is[n] = (inv_pauli_dble(0.0, md, imd) | inv_pauli_dble(mu, md, imd + NM));
 
@@ -91,12 +92,14 @@ int main(void)
 
         for (l = 0; l < 6; l++) {
           d = vd.c[l].re * vd.c[l].re + vd.c[l].im * vd.c[l].im;
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
       }
-    } else
+    } else {
       itot += 1;
+    }
 
     md += 1;
     imd += 1;
@@ -129,8 +132,9 @@ int main(void)
 
         for (l = 0; l < 6; l++) {
           d = (double)(vs.c[l].re * vs.c[l].re + vs.c[l].im * vs.c[l].im);
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
       }
     }

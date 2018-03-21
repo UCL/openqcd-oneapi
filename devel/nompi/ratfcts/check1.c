@@ -54,8 +54,9 @@ int main(void)
 
     dev = fabs(1.0 - Ksmall(rk) / ellipticK(rk));
 
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   printf("Small k region: maximal relative error = %.1e\n", dmax);
@@ -72,8 +73,9 @@ int main(void)
     dev = fabs(1.0 - ellipticK(2.0 * sqrt(k) * (1.0 + k) / (kp * kp)) /
                          ((1.0 + k) * ellipticK(rk)));
 
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   printf("Gauss transformation: maximal relative error = %.1e\n\n", dmax);

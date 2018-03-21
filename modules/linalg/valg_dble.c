@@ -65,8 +65,9 @@ static complex_dble *psi;
 
 static void alloc_wrotate(int n)
 {
-  if (nrot > 0)
+  if (nrot > 0) {
     afree(psi);
+  }
 
   psi = amalloc(n * sizeof(*psi), ALIGN);
   error_loc(psi == NULL, 1, "alloc_wrotate [valg_dble.c]",
@@ -91,8 +92,9 @@ complex_dble vprod_dble(int n, int icom, complex_dble const *v,
 
   for (vb = v; vb < vm;) {
     vb += 32;
-    if (vb > vm)
+    if (vb > vm) {
       vb = vm;
+    }
     smz.re = 0.0;
     smz.im = 0.0;
 
@@ -105,10 +107,11 @@ complex_dble vprod_dble(int n, int icom, complex_dble const *v,
     add_to_hsum(isz, (double *)(&smz));
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isz, (double *)(&smz));
-  else
+  } else {
     local_hsum(isz, (double *)(&smz));
+  }
 
   return smz;
 }
@@ -128,20 +131,23 @@ double vnorm_square_dble(int n, int icom, complex_dble const *v)
 
   for (vb = v; vb < vm;) {
     vb += 32;
-    if (vb > vm)
+    if (vb > vm) {
       vb = vm;
+    }
     smx = 0.0;
 
-    for (; v < vb; v++)
+    for (; v < vb; v++) {
       smx += ((*v).re * (*v).re + (*v).im * (*v).im);
+    }
 
     add_to_hsum(isx, &smx);
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isx, &smx);
-  else
+  } else {
     local_hsum(isx, &smx);
+  }
 
   return smx;
 }
@@ -189,11 +195,12 @@ double vnormalize_dble(int n, int icom, complex_dble *v)
   r = vnorm_square_dble(n, icom, v);
   r = sqrt(r);
 
-  if (not_equal_d(r, 0.0))
+  if (not_equal_d(r, 0.0)) {
     vscale_dble(n, 1.0 / r, v);
-  else
+  } else {
     error_loc(1, 1, "vnormalize_dble [valg_dble.c]",
               "Vector field has vanishing norm");
+  }
 
   return r;
 }
@@ -204,8 +211,9 @@ void vrotate_dble(int n, int nv, complex_dble **pv, complex_dble const *a)
   complex_dble const *z;
   complex_dble s, *vj;
 
-  if (nv > nrot)
+  if (nv > nrot) {
     alloc_wrotate(nv);
+  }
 
   for (i = 0; i < n; i++) {
     for (k = 0; k < nv; k++) {

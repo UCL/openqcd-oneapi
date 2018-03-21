@@ -27,8 +27,9 @@ static int cmp_sw(pauli *r, pauli *s)
   int i;
 
   for (i = 0; i < 36; i++) {
-    if ((r[0].u[i] != s[0].u[i]) || (r[1].u[i] != s[1].u[i]))
+    if ((r[0].u[i] != s[0].u[i]) || (r[1].u[i] != s[1].u[i])) {
       return 1;
+    }
   }
 
   return 0;
@@ -39,8 +40,9 @@ static int cmp_swd(pauli_dble *r, pauli_dble *s)
   int i;
 
   for (i = 0; i < 36; i++) {
-    if ((r[0].u[i] != s[0].u[i]) || (r[1].u[i] != s[1].u[i]))
+    if ((r[0].u[i] != s[0].u[i]) || (r[1].u[i] != s[1].u[i])) {
       return 1;
+    }
   }
 
   return 0;
@@ -71,8 +73,9 @@ static int check_sw(block_t *b)
           ix = ipt_blk(b, x);
           iy = ipt[y3 + L3 * y2 + L2 * L3 * y1 + L1 * L2 * L3 * y0];
 
-          if (cmp_sw((*b).sw + 2 * ix, sw + 2 * iy))
+          if (cmp_sw((*b).sw + 2 * ix, sw + 2 * iy)) {
             return 1;
+          }
         }
       }
     }
@@ -90,8 +93,9 @@ static int check_swbgr(blk_grid_t grid)
   bm = b + nb;
 
   for (; b < bm; b++) {
-    if (check_sw(b))
+    if (check_sw(b)) {
       return 1;
+    }
   }
 
   return 0;
@@ -122,8 +126,9 @@ static int check_swd(block_t *b)
           ix = ipt_blk(b, x);
           iy = ipt[y3 + L3 * y2 + L2 * L3 * y1 + L1 * L2 * L3 * y0];
 
-          if (cmp_swd((*b).swd + 2 * ix, swd + 2 * iy))
+          if (cmp_swd((*b).swd + 2 * ix, swd + 2 * iy)) {
             return 1;
+          }
         }
       }
     }
@@ -164,9 +169,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check4.c]",
                  "Syntax: check4 [-bc <type>]");
+    }
   }
 
   set_ani_parms(1, 1.5, 4.3, 1.5, 0.9, 0.7, 0.9, 0.91, 0.81);
@@ -200,14 +206,15 @@ int main(int argc, char *argv[])
   ifail = 0;
 
   for (iset = 0; iset < (int)(PT_SETS); iset++) {
-    if (iset == 0)
+    if (iset == 0) {
       set = ALL_PTS;
-    else if (iset == 1)
+    } else if (iset == 1) {
       set = EVEN_PTS;
-    else if (iset == 2)
+    } else if (iset == 2) {
       set = ODD_PTS;
-    else
+    } else {
       set = NO_PTS;
+    }
 
     sw_term(NO_PTS);
     ifail += assign_swd2swbgr(SAP_BLOCKS, set);

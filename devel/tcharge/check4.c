@@ -106,10 +106,11 @@ static void random_g(void)
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
 
-    if ((t > 0) || (bc != 1))
+    if ((t > 0) || (bc != 1)) {
       random_su3_dble(gx);
-    else
+    } else {
       (*gx) = unity;
+    }
 
     gx += 1;
   }
@@ -222,8 +223,9 @@ static void random_vec(int *svec)
 
   for (mu = 0; mu < 4; mu++) {
     svec[mu] = (int)((double)(bs[mu]) * r[mu]);
-    if (svec[mu] > (bs[mu] / 2))
+    if (svec[mu] > (bs[mu] / 2)) {
       svec[mu] -= bs[mu];
+    }
   }
 
   MPI_Bcast(svec, 4, MPI_INT, 0, MPI_COMM_WORLD);
@@ -253,9 +255,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check4.c]",
                  "Syntax: check4 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -274,8 +277,9 @@ int main(int argc, char *argv[])
 
   g = amalloc(NSPIN * sizeof(*g), 4);
 
-  if (BNDRY > 0)
+  if (BNDRY > 0) {
     gbuf = amalloc((BNDRY / 2) * sizeof(*gbuf), 4);
+  }
 
   error((g == NULL) || ((BNDRY > 0) && (gbuf == NULL)), 1, "main [check4.c]",
         "Unable to allocate auxiliary arrays");
@@ -288,22 +292,25 @@ int main(int argc, char *argv[])
 
     A1 = ym_action();
     random_vec(s);
-    if (bc != 3)
+    if (bc != 3) {
       s[0] = 0;
+    }
     shift_ud(s);
     A2 = ym_action();
 
     d = fabs(A1 - A2) / A1;
-    if (d > dmax1)
+    if (d > dmax1) {
       dmax1 = d;
+    }
 
     random_g();
     transform_ud();
     A2 = ym_action();
 
     d = fabs(A1 - A2) / A1;
-    if (d > dmax2)
+    if (d > dmax2) {
       dmax2 = d;
+    }
 
     a1 = A1;
     a2 = A2;

@@ -125,8 +125,9 @@ int find_opt(int argc, char *argv[], char *opt)
   int k;
 
   for (k = 1; k < argc; k++) {
-    if (strcmp(argv[k], opt) == 0)
+    if (strcmp(argv[k], opt) == 0) {
       return k;
+    }
   }
 
   return 0;
@@ -138,19 +139,21 @@ int digits(double x, double dx, char *fmt)
         "Improper input data (negative error)");
 
   if (strcmp(fmt, "e") == 0) {
-    if (is_equal_d(dx, 0.0))
+    if (is_equal_d(dx, 0.0)) {
       return DBL_DIG;
-    else if (dx >= fabs(x))
+    } else if (dx >= fabs(x)) {
       return 1;
-    else
+    } else {
       return (int)(floor(1.0 + log10(fabs(x))) - floor(log10(dx)));
+    }
   } else if (strcmp(fmt, "f") == 0) {
     error((is_equal_d(dx, 0.0)) || (dx >= 1.0), 1, "digits [mutils.c]",
           "Improper input data (error out of range for fixed format)");
 
     return (int)(1.0 - floor(log10(dx)));
-  } else
+  } else {
     error(1, 1, "digits [mutils.c]", "Unknown data format");
+  }
 
   return 0;
 }
@@ -160,8 +163,9 @@ int fdigits(double x)
   int m, n, ne, k;
   double y, z;
 
-  if (is_equal_d(x, 0.0))
+  if (is_equal_d(x, 0.0)) {
     return 0;
+  }
 
   y = fabs(x);
   z = DBL_EPSILON * y;
@@ -172,8 +176,9 @@ int fdigits(double x)
   for (k = 0; k < (DBL_DIG - m); k++) {
     z = sqrt((double)(ne)) * DBL_EPSILON * y;
 
-    if (((y - floor(y)) <= z) || ((ceil(y) - y) <= z))
+    if (((y - floor(y)) <= z) || ((ceil(y) - y) <= z)) {
       break;
+    }
 
     y *= 10.0;
     ne += 1;
@@ -199,14 +204,15 @@ int name_size(char *format, ...)
   for (;;) {
     pp = strchr(pc, '%');
 
-    if (pp == NULL)
+    if (pp == NULL) {
       break;
+    }
 
     pc = pp + 1;
 
-    if (pc[0] == 's')
+    if (pc[0] == 's') {
       nlen += (strlen(va_arg(args, char *)) - 2);
-    else if (pc[0] == 'd') {
+    } else if (pc[0] == 'd') {
       sprintf(inum, "%d", va_arg(args, int));
       nlen += (strlen(inum) - 2);
     } else if (pc[0] == '.') {
@@ -225,8 +231,9 @@ int name_size(char *format, ...)
 
       nlen += (n + 1 - strlen(inum));
       dmy = va_arg(args, double);
-      if (dmy < 0.0)
+      if (dmy < 0.0) {
         nlen += 1;
+      }
     } else {
       ie = 3;
       break;
@@ -253,12 +260,15 @@ static int cmp_text(char *text1, char *text2)
     n1 = strcspn(p1, " \t\n");
     n2 = strcspn(p2, " \t\n");
 
-    if (n1 != n2)
+    if (n1 != n2) {
       return 0;
-    if (n1 == 0)
+    }
+    if (n1 == 0) {
       return 1;
-    if (strncmp(p1, p2, n1) != 0)
+    }
+    if (strncmp(p1, p2, n1) != 0) {
       return 0;
+    }
 
     p1 += n1;
     p2 += n1;
@@ -276,8 +286,9 @@ static char *get_line(FILE *stream)
           "Input line is longer than NAME_SIZE-1");
 
     c = strchr(line, '#');
-    if (c != NULL)
+    if (c != NULL) {
       c[0] = '\0';
+    }
   }
 
   return s;
@@ -325,8 +336,9 @@ long find_section(FILE *stream, char *title)
 
 static void check_tag(char *tag)
 {
-  if (tag[0] == '\0')
+  if (tag[0] == '\0') {
     return;
+  }
 
   error((strspn(tag, " 0123456789.") != 0L) ||
             (strcspn(tag, " \n") != strlen(tag)),
@@ -354,16 +366,18 @@ static long find_tag(FILE *stream, char *tag)
       if (ofs < lofs) {
         ie = 0;
         tofs = -1L;
-      } else
+      } else {
         break;
+      }
     } else {
       pl = line + strspn(line, " \t");
       pr = pl + strcspn(pl, " \t\n");
       pr[0] = '\0';
 
       if (strcmp(pl, tag) == 0) {
-        if (tofs != -1L)
+        if (tofs != -1L) {
           ie = 1;
+        }
         tofs = ofs;
       }
     }
@@ -413,20 +427,21 @@ long read_line(FILE *stream, char *tag, char *format, ...)
     ic = 0;
     is = 2;
 
-    if ((p[0] == '\0') || (p[0] == '\n'))
+    if ((p[0] == '\0') || (p[0] == '\n')) {
       break;
-    else if (p == strstr(p, "%s"))
+    } else if (p == strstr(p, "%s")) {
       ic = sscanf(pl, "%s", va_arg(args, char *));
-    else if (p == strstr(p, "%d"))
+    } else if (p == strstr(p, "%d")) {
       ic = sscanf(pl, "%d", va_arg(args, int *));
-    else if (p == strstr(p, "%f"))
+    } else if (p == strstr(p, "%f")) {
       ic = sscanf(pl, "%f", va_arg(args, float *));
-    else if (p == strstr(p, "%lf")) {
+    } else if (p == strstr(p, "%lf")) {
       is = 3;
       ic = sscanf(pl, "%lf", va_arg(args, double *));
-    } else
+    } else {
       error(1, 1, "read_line [mutils.c]",
             "Incorrect format string %s on line with tag %s", format, tag);
+    }
 
     error(ic != 1, 1, "read_line [mutils.c]",
           "Missing data item(s) on line with tag %s", tag);
@@ -453,8 +468,9 @@ int count_tokens(FILE *stream, char *tag)
     s = get_line(stream);
     s += strspn(s, " \t");
     s += strcspn(s, " \t\n");
-  } else
+  } else {
     s = get_line(stream);
+  }
 
   s += strspn(s, " \t\n");
   n = 0;
@@ -480,8 +496,9 @@ void read_iprms(FILE *stream, char *tag, int n, int *iprms)
     s = get_line(stream);
     s += strspn(s, " \t");
     s += strcspn(s, " \t\n");
-  } else
+  } else {
     s = get_line(stream);
+  }
 
   s += strspn(s, " \t\n");
   nc = 0;
@@ -494,8 +511,9 @@ void read_iprms(FILE *stream, char *tag, int n, int *iprms)
       nc += 1;
       s += strcspn(s, " \t\n");
       s += strspn(s, " \t\n");
-    } else
+    } else {
       break;
+    }
   }
 
   error(nc != n, 1, "read_iprms [mutils.c]", "Incorrect read count");
@@ -514,8 +532,9 @@ void read_dprms(FILE *stream, char *tag, int n, double *dprms)
     s = get_line(stream);
     s += strspn(s, " \t");
     s += strcspn(s, " \t\n");
-  } else
+  } else {
     s = get_line(stream);
+  }
 
   s += strspn(s, " \t\n");
   nc = 0;
@@ -528,8 +547,9 @@ void read_dprms(FILE *stream, char *tag, int n, double *dprms)
       nc += 1;
       s += strcspn(s, " \t\n");
       s += strspn(s, " \t\n");
-    } else
+    } else {
       break;
+    }
   }
 
   error(nc != n, 1, "read_dprms [mutils.c]", "Incorrect read count");

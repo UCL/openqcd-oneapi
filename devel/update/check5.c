@@ -120,9 +120,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check6.c]",
                  "Syntax: check6 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -154,8 +155,9 @@ int main(int argc, char *argv[])
     read_solver_parms(isp);
     sp = solver_parms(isp);
 
-    if (sp.nkv > mnkv)
+    if (sp.nkv > mnkv) {
       mnkv = sp.nkv;
+    }
   }
 
   if (my_rank == 0) {
@@ -214,10 +216,12 @@ int main(int argc, char *argv[])
   geometry();
 
   mnkv = 2 * mnkv + 2;
-  if (mnkv < (Ns + 2))
+  if (mnkv < (Ns + 2)) {
     mnkv = Ns + 2;
-  if (mnkv < 5)
+  }
+  if (mnkv < 5) {
     mnkv = 5;
+  }
 
   alloc_ws(mnkv);
   alloc_wsd(6);
@@ -230,24 +234,27 @@ int main(int argc, char *argv[])
     for (isp = 0; isp < 3; isp++) {
       if (isp == 0) {
         set_sw_parms(1.0877);
-        if (irw < 3)
+        if (irw < 3) {
           mu1 = 1.0;
-        else
+        } else {
           mu1 = 0.0;
+        }
         mu2 = 1.23;
       } else if (isp == 1) {
         set_sw_parms(0.0877);
-        if (irw < 3)
+        if (irw < 3) {
           mu1 = 0.1;
-        else
+        } else {
           mu1 = 0.0;
+        }
         mu2 = 0.123;
       } else {
         set_sw_parms(-0.0123);
-        if (irw < 3)
+        if (irw < 3) {
           mu1 = 0.01;
-        else
+        } else {
           mu1 = 0.0;
+        }
         mu2 = 0.0123;
       }
 
@@ -262,13 +269,14 @@ int main(int argc, char *argv[])
       start_ranlux(0, 8910 + isp);
       sqn0 = random_pf();
 
-      if ((irw & 0x1) == 1)
+      if ((irw & 0x1) == 1) {
         act0 = (mu2 * mu2 - mu1 * mu1) * action1(mu1, 0, isp, 1, status);
-      else {
-        if ((isp == 0) || (isp == 1))
+      } else {
+        if ((isp == 0) || (isp == 1)) {
           divide_pf(mu1, isp, status + 1);
-        else
+        } else {
           divide_pf(mu1, isp, status + 3);
+        }
 
         act0 = mu1 * mu1 * (mu2 * mu2 - mu1 * mu1) *
                action1(mu1, 0, isp, 1, status);
@@ -281,43 +289,49 @@ int main(int argc, char *argv[])
         printf("Solver number %d, mu1 = %.2e, mu2 = %.2e\n", isp, mu1, mu2);
         printf("action1(): ");
 
-        if ((isp == 0) || (isp == 1))
+        if ((isp == 0) || (isp == 1)) {
           printf("status = %d\n", status[0]);
-        else if (isp == 2)
+        } else if (isp == 2) {
           printf("status = (%d,%d,%d)\n", status[0], status[1], status[2]);
+        }
       }
 
       start_ranlux(0, 8910 + isp);
 
-      if ((irw & 0x1) == 1)
+      if ((irw & 0x1) == 1) {
         act1 = rwtm1(mu1, mu2, isp, &sqn1, status);
-      else
+      } else {
         act1 = rwtm2(mu1, mu2, isp, &sqn1, status);
+      }
 
       da = fabs(1.0 - act1 / act0);
       ds = fabs(1.0 - sqn1 / sqn0);
 
-      if (da > damx)
+      if (da > damx) {
         damx = da;
-      if (ds > dsmx)
+      }
+      if (ds > dsmx) {
         dsmx = ds;
+      }
 
       if (my_rank == 0) {
         if ((irw & 0x1) == 1) {
           printf("rwtm1(): ");
 
-          if ((isp == 0) || (isp == 1))
+          if ((isp == 0) || (isp == 1)) {
             printf("status = %d\n", status[0]);
-          else if (isp == 2)
+          } else if (isp == 2) {
             printf("status = (%d,%d,%d)\n", status[0], status[1], status[2]);
+          }
         } else {
           printf("rwtm2(): ");
 
-          if ((isp == 0) || (isp == 1))
+          if ((isp == 0) || (isp == 1)) {
             printf("status = %d,%d\n", status[0], status[1]);
-          else if (isp == 2)
+          } else if (isp == 2) {
             printf("status = (%d,%d,%d),(%d,%d,%d)\n", status[0], status[1],
                    status[2], status[3], status[4], status[5]);
+          }
         }
 
         printf("|1-act1/act0| = %.1e, |1-sqn1/sqn0| = %.1e\n\n", da, ds);

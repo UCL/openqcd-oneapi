@@ -39,11 +39,13 @@ int main(void)
   ranlxd((*m).u, 36);
   mu = 0.1234;
 
-  for (n = 0; n < 6; n++)
+  for (n = 0; n < 6; n++) {
     (*m).u[n] = 1.0;
+  }
 
-  for (n = 6; n < 36; n++)
+  for (n = 6; n < 36; n++) {
     (*m).u[n] = 0.01 * ((*m).u[n] - 0.5);
+  }
 
   n = (int)(1.0e5);
   dt = 0.0;
@@ -51,8 +53,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       itest = inv_pauli_dble(mu, m, m + 1);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -70,8 +73,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       det_pauli_dble(mu, m);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;

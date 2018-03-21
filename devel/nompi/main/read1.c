@@ -47,8 +47,9 @@ static int read_dat(int n, dat_t *ndat, FILE *fin)
     ir = fread(istd, sizeof(stdint_t), 2, fin);
     ir += fread(dstd, sizeof(double), 2, fin);
 
-    if (ir != 4)
+    if (ir != 4) {
       return ic;
+    }
 
     if (endian == BIG_ENDIAN) {
       bswap_int(2, istd);
@@ -81,8 +82,9 @@ static void read_file(char *fin)
   ipos = ftell(fdat);
   nms = 0;
 
-  while (read_dat(1, &ndat, fdat) == 1)
+  while (read_dat(1, &ndat, fdat) == 1) {
     nms += 1;
+  }
 
   error(nms == 0, 1, "read_file [read1.c]", "Empty data file");
 
@@ -114,11 +116,13 @@ static void select_range(void)
   for (n = 0; n < nms; n++) {
     no = adat[n].nt;
 
-    if (no < nfirst)
+    if (no < nfirst) {
       nf += 1;
+    }
 
-    if (no <= nlast)
+    if (no <= nlast) {
       nl += 1;
+    }
   }
 
   nfirst = nf;
@@ -134,9 +138,9 @@ static void select_range(void)
   np = adat[nfirst].nt;
   dn = adat[nfirst + 1].nt - adat[nfirst].nt;
 
-  if (dn <= 0)
+  if (dn <= 0) {
     ie = 1;
-  else {
+  } else {
     ie = 0;
 
     for (n = (nfirst + 1); n < nlast; n++) {
@@ -161,13 +165,17 @@ static double tail(int n, double *a, double amx)
 
   ic = 0;
 
-  for (ia = 0; ia < n; ia++)
+  for (ia = 0; ia < n; ia++) {
     ic += (fabs(a[ia]) > amx);
+  }
 
   return (double)(ic) / (double)(n);
 }
 
-static double f(int nx, double x[]) { return x[0]; }
+static double f(int nx, double x[])
+{
+  return x[0];
+}
 
 static void print_plot(char *fin)
 {
@@ -181,10 +189,11 @@ static void print_plot(char *fin)
   n = p - fin;
 
   p = strrchr(fin, '/');
-  if (p == NULL)
+  if (p == NULL) {
     p = fin;
-  else
+  } else {
     p += 1;
+  }
   n -= (p - fin);
 
   error(n >= NAME_SIZE, 1, "print_plot [read1.c]", "File name is too long");
@@ -244,8 +253,9 @@ int main(int argc, char *argv[])
   a = malloc(neff * sizeof(double));
   error(a == NULL, 1, "main [read1.c]", "Unable to allocate data array");
 
-  for (n = 0; n < neff; n++)
+  for (n = 0; n < neff; n++) {
     a[n] = fabs(adat[nfirst + n].dH);
+  }
 
   printf("Fraction of trajectories with |dH| larger than\n\n");
   printf("    1.0: %.4f\n", tail(neff, a, 1.0));
@@ -255,47 +265,53 @@ int main(int argc, char *argv[])
   printf(" 1000.0: %.4f\n", tail(neff, a, 1000.0));
   printf("\n");
 
-  for (n = 0; n < neff; n++)
+  for (n = 0; n < neff; n++) {
     a[n] = exp(-adat[nfirst + n].dH);
+  }
 
   printf("<exp(-dH)> = %.3f (%.3f)\n", average(neff, a), sigma0(neff, a));
 
   for (n = 0; n < neff; n++) {
-    if (adat[nfirst + n].dH > 0.0)
+    if (adat[nfirst + n].dH > 0.0) {
       a[n] = exp(-adat[nfirst + n].dH);
-    else
+    } else {
       a[n] = 1.0;
+    }
   }
 
   printf("<min{1,exp(-dH)}> = %.3f (%.3f)\n", average(neff, a),
          sigma0(neff, a));
 
-  for (n = 0; n < neff; n++)
+  for (n = 0; n < neff; n++) {
     a[n] = (double)(adat[nfirst + n].iac);
+  }
 
   printf("<iac> = %.3f (%.3f)\n\n", average(neff, a), sigma0(neff, a));
 
-  for (n = 0; n < neff; n++)
+  for (n = 0; n < neff; n++) {
     a[n] = adat[nfirst + n].avpl;
+  }
 
   printf("The integrated autocorrelation time and the associated"
          "\nstatistical error sigma of the plaquette is estimated ");
 
-  if (neff > 100)
+  if (neff > 100) {
     printf("using the\nnumerically determined "
            "autocorrelation function.\n\n");
-  else
+  } else {
     printf("by binning the\ndata and by calculating "
            "the jackknife errors of the binned series.\n\n");
+  }
 
   printf("The autocorrelation times are given in numbers of measurements\n"
          "separated by %d trajectories.\n\n",
          adat[nfirst + 1].nt - adat[nfirst].nt);
 
-  if (neff >= 100)
+  if (neff >= 100) {
     abar = print_auto(neff, a);
-  else
+  } else {
     abar = print_jack(1, neff, &a, f);
+  }
 
   printf(" <tr{U(p)}> = %1.6f\n\n", abar);
 

@@ -311,8 +311,9 @@ int main(int argc, char *argv[])
   coeff_pair.coeff.d = ch_exp_coeffs.d;
   coeff_pair.coeff.t = ch_exp_coeffs.t;
 
-  for (i = 0; i < 3; ++i)
+  for (i = 0; i < 3; ++i) {
     coeff_pair.coeff.p[i] = ch_exp_coeffs.p[i];
+  }
 
   construct_b_matrices(&coeff_pair, &b1_mat, &b2_mat);
 
@@ -363,8 +364,9 @@ int main(int argc, char *argv[])
     printf("\n-----\n\n");
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     report_test_results();
+  }
 
   MPI_Finalize();
   return 0;

@@ -81,8 +81,9 @@ static void init_rp(void)
 {
   int irp;
 
-  for (irp = 1; irp <= IRPMAX; irp++)
+  for (irp = 1; irp <= IRPMAX; irp++) {
     rp[irp] = rp[0];
+  }
 
   init = 1;
 }
@@ -92,8 +93,9 @@ rat_parms_t set_rat_parms(int irp, int degree, double const *range)
   int ie, iprms[2];
   double dprms[2];
 
-  if (init == 0)
+  if (init == 0) {
     init_rp();
+  }
 
   if (NPROC > 1) {
     iprms[0] = irp;
@@ -135,12 +137,13 @@ rat_parms_t set_rat_parms(int irp, int degree, double const *range)
 
 rat_parms_t rat_parms(int irp)
 {
-  if (init == 0)
+  if (init == 0) {
     init_rp();
+  }
 
-  if ((irp >= 0) && (irp < IRPMAX))
+  if ((irp >= 0) && (irp < IRPMAX)) {
     return rp[irp];
-  else {
+  } else {
     error_loc(1, 1, "rat_parms [rat_parms.c]",
               "Rational function index is out of range");
     return rp[IRPMAX];

@@ -24,7 +24,10 @@ static int check_state(cfg_state_t const *state1, cfg_state_t const *state2)
 
 static int (*query_fcts[(int)(QUERIES) + 1])(void) = {NULL};
 
-static int QueryUMatchUd(void) { return check_state(&lat.u, &lat.ud); }
+static int QueryUMatchUd(void)
+{
+  return check_state(&lat.u, &lat.ud);
+}
 static int QueryUdbufUp2date(void)
 {
   return ((lat.ud.tag > 0) && check_state(&lat.udbuf, &lat.ud));
@@ -45,18 +48,30 @@ static int QuerySwUp2date(void)
   return ((lat.u.tag > 0) && check_state(&lat.sw.state, &lat.u));
 }
 
-static int QuerySwEInverted(void) { return (lat.sw.even_flag == 1); }
+static int QuerySwEInverted(void)
+{
+  return (lat.sw.even_flag == 1);
+}
 
-static int QuerySwOInverted(void) { return (lat.sw.odd_flag == 1); }
+static int QuerySwOInverted(void)
+{
+  return (lat.sw.odd_flag == 1);
+}
 
 static int QuerySwdUp2date(void)
 {
   return ((lat.ud.tag > 0) && check_state(&lat.swd.state, &lat.ud));
 }
 
-static int QuerySwdEInverted(void) { return (lat.swd.even_flag == 1); }
+static int QuerySwdEInverted(void)
+{
+  return (lat.swd.even_flag == 1);
+}
 
-static int QuerySwdOInverted(void) { return (lat.swd.odd_flag == 1); }
+static int QuerySwdOInverted(void)
+{
+  return (lat.swd.odd_flag == 1);
+}
 
 static int QueryAwUp2date(void)
 {
@@ -68,7 +83,10 @@ static int QueryAwhatUp2date(void)
   return ((lat.ud.tag > 0) && check_state(&lat.awh, &lat.ud));
 }
 
-static int QueryUdIsClean(void) { return lat.ud.state == 0; }
+static int QueryUdIsClean(void)
+{
+  return lat.ud.state == 0;
+}
 
 static int QueryUdIsSmeared(void)
 {

@@ -52,8 +52,9 @@ static int is_zero_dble(su3_dble *ud)
   r[17] = (*ud).c33.im;
 
   for (i = 0; i < 18; i++) {
-    if (r[i] != 0.0)
+    if (r[i] != 0.0) {
       return 0;
+    }
   }
 
   return 1;
@@ -124,8 +125,9 @@ static double dev_uudag_dble(su3_dble *u, su3_dble *v)
 
   for (i = 0; i < 18; i++) {
     d = fabs(r[i]);
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   return dmax;
@@ -140,11 +142,13 @@ static double dev_detu_dble(su3_dble *u)
   dmax = 0.0;
 
   d = fabs(1.0 - detu.re);
-  if (d > dmax)
+  if (d > dmax) {
     dmax = d;
+  }
   d = fabs(detu.im);
-  if (d > dmax)
+  if (d > dmax) {
     dmax = d;
+  }
 
   return dmax;
 }
@@ -175,10 +179,12 @@ static void check_ud(double *dev1, double *dev2)
       d2 = dev_detu_dble(u);
     }
 
-    if (d1 > dmax1)
+    if (d1 > dmax1) {
       dmax1 = d1;
-    if (d2 > dmax2)
+    }
+    if (d2 > dmax2) {
       dmax2 = d2;
+    }
   }
 
   MPI_Reduce(&dmax1, dev1, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
@@ -205,13 +211,15 @@ static double cmp_ud(su3_dble *usv)
     x0 = global_time(ix);
 
     if ((bc == 0) &&
-        (((x0 == 0) && (ifc == 1)) || ((x0 == (N0 - 1)) && (ifc == 0))))
+        (((x0 == 0) && (ifc == 1)) || ((x0 == (N0 - 1)) && (ifc == 0)))) {
       d1 = (double)(2 - is_zero_dble(u) - is_zero_dble(v));
-    else
+    } else {
       d1 = dev_uudag_dble(u, v);
+    }
 
-    if (d1 > dmax1)
+    if (d1 > dmax1) {
       dmax1 = d1;
+    }
 
     v += 1;
   }
@@ -292,9 +300,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check2.c]",
                  "Syntax: check2 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);

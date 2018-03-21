@@ -112,24 +112,28 @@ int main(int argc, char *argv[])
 
       for (ieo = 0; ieo < 3; ieo++) {
         if (my_rank == 0) {
-          if (ieo == 0)
+          if (ieo == 0) {
             printf("First case: full lattice\n\n");
-          else if (ieo == 1)
+          } else if (ieo == 1) {
             printf("Second case: even points\n\n");
-          else
+          } else {
             printf("Third case: odd points\n\n");
+          }
         }
 
         vol = nv / 2;
         off = 0;
 
-        if (ieo == 0)
+        if (ieo == 0) {
           vol = nv;
-        if (ieo == 2)
+        }
+        if (ieo == 2) {
           off = nv / 2;
+        }
 
-        for (i = 0; i < 10; i++)
+        for (i = 0; i < 10; i++) {
           random_v(vol, wv[i] + off, 1.0f);
+        }
 
         dmax = 0.0;
 
@@ -141,32 +145,37 @@ int main(int argc, char *argv[])
             z = sp(vol, pk, pl);
             MPI_Reduce(&z.re, &w.re, 2, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
             MPI_Bcast(&w.re, 2, MPI_FLOAT, 0, MPI_COMM_WORLD);
-          } else
+          } else {
             w = sp(vol, pk, pl);
+          }
 
           z = vprod(vol, icom, pk, pl);
           r = vnorm_square(vol, icom, pk) * vnorm_square(vol, icom, pl);
           d = (double)((z.re - w.re) * (z.re - w.re) +
                        (z.im - w.im) * (z.im - w.im));
           d = sqrt(d / (double)(r));
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
 
           z = vprod(vol, icom, pk, pk);
           r = vnorm_square(vol, icom, pk);
 
           d = fabs((double)(z.im / r));
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
 
           d = fabs((double)(z.re / r - 1.0f));
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
 
         if (my_rank == 0) {
-          if (dmax > dall)
+          if (dmax > dall) {
             dall = dmax;
+          }
           printf("Check of vprod and vnorm_square: %.2e\n\n", dmax);
         }
 
@@ -185,19 +194,22 @@ int main(int argc, char *argv[])
           mulc_vadd(vol, pk, pl, z);
 
           d = fabs((double)(r / vnorm_square(vol, icom, pk) - 1.0f));
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
 
         if (my_rank == 0) {
-          if (dmax > dall)
+          if (dmax > dall) {
             dall = dmax;
+          }
           printf("Consistency of vprod, vnorm_square\n");
           printf("and mulc_vadd: %.2e\n\n", dmax);
         }
 
-        for (i = 0; i < 10; i++)
+        for (i = 0; i < 10; i++) {
           random_v(vol, wv[i] + off, 1.0f);
+        }
 
         dmax = 0.0;
 
@@ -212,21 +224,24 @@ int main(int argc, char *argv[])
             d = (fabs((double)(z.re)) + fabs((double)(z.im))) /
                 sqrt((double)(vnorm_square(vol, icom, pk)));
 
-            if (d > dmax)
+            if (d > dmax) {
               dmax = d;
+            }
           }
 
           vnormalize(vol, icom, pk);
           r = vnorm_square(vol, icom, pk);
 
           d = fabs((double)(r - 1.0f));
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
 
         if (my_rank == 0) {
-          if (dmax > dall)
+          if (dmax > dall) {
             dall = dmax;
+          }
           printf("Consistency of vprod, vnorm_square,\n");
           printf("vnormalize and vproject: %.2e\n\n", dmax);
         }
@@ -263,16 +278,18 @@ int main(int argc, char *argv[])
           r = vnorm_square(vol, icom, pk);
 
           d = fabs((double)(r));
-          if (d > dmax)
+          if (d > dmax) {
             dmax = d;
+          }
         }
 
         dmax /= (double)(vnorm_square(vol, icom, wv[0] + off));
         dmax = sqrt(dmax);
 
         if (my_rank == 0) {
-          if (dmax > dall)
+          if (dmax > dall) {
             dall = dmax;
+          }
           printf("Consistency of mulc_vadd\n");
           printf("and vrotate: %.2e\n\n", dmax);
         }

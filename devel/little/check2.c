@@ -39,8 +39,9 @@ static void set_ud(void)
   ud = udfld();
   um = ud + 4 * VOLUME;
 
-  for (; ud < um; ud++)
+  for (; ud < um; ud++) {
     (*ud) = unity;
+  }
 }
 
 static void set_sd(spinor_dble *sd)
@@ -82,8 +83,9 @@ static void chk_sde0(int mu, int vol, int ibn, int *bo, spinor_dble *sd)
   }
 
   a[mu] = cpr[mu] * l[mu] + bo[mu] + bs[mu] - 1;
-  if (ibn)
+  if (ibn) {
     a[mu] = safe_mod(a[mu] - l[mu], np[mu] * l[mu]);
+  }
   b[mu] = a[mu] + 1;
   ie = 0;
 
@@ -93,12 +95,14 @@ static void chk_sde0(int mu, int vol, int ibn, int *bo, spinor_dble *sd)
     y[2] = sd[ix].c3.c2.im;
     y[3] = sd[ix].c4.c2.im;
 
-    if (((y[0] + y[1] + y[2] + y[3]) & 0x1) != 0)
+    if (((y[0] + y[1] + y[2] + y[3]) & 0x1) != 0) {
       ie = 1;
+    }
 
     for (nu = 0; nu < 4; nu++) {
-      if ((y[nu] < a[nu]) || (y[nu] >= b[nu]))
+      if ((y[nu] < a[nu]) || (y[nu] >= b[nu])) {
         ie = 2;
+      }
     }
   }
 
@@ -116,8 +120,9 @@ static void chk_sde1(int mu, int vol, int ibn, int *bo, spinor_dble *sd)
   }
 
   a[mu] = cpr[mu] * l[mu] + bo[mu];
-  if (ibn)
+  if (ibn) {
     a[mu] = safe_mod(a[mu] + l[mu], np[mu] * l[mu]);
+  }
   b[mu] = a[mu] + 1;
   ie = 0;
 
@@ -127,12 +132,14 @@ static void chk_sde1(int mu, int vol, int ibn, int *bo, spinor_dble *sd)
     y[2] = sd[ix].c3.c2.im;
     y[3] = sd[ix].c4.c2.im;
 
-    if (((y[0] + y[1] + y[2] + y[3]) & 0x1) != 0)
+    if (((y[0] + y[1] + y[2] + y[3]) & 0x1) != 0) {
       ie = 1;
+    }
 
     for (nu = 0; nu < 4; nu++) {
-      if ((y[nu] < a[nu]) || (y[nu] >= b[nu]))
+      if ((y[nu] < a[nu]) || (y[nu] >= b[nu])) {
         ie = 2;
+      }
     }
   }
 
@@ -159,12 +166,14 @@ static void chk_sdo0(int mu, int vol, int *bo, spinor_dble *sd)
     y[2] = sd[ix].c3.c2.im;
     y[3] = sd[ix].c4.c2.im;
 
-    if (((y[0] + y[1] + y[2] + y[3]) & 0x1) != 1)
+    if (((y[0] + y[1] + y[2] + y[3]) & 0x1) != 1) {
       ie = 1;
+    }
 
     for (nu = 0; nu < 4; nu++) {
-      if ((y[nu] < a[nu]) || (y[nu] >= b[nu]))
+      if ((y[nu] < a[nu]) || (y[nu] >= b[nu])) {
         ie = 2;
+      }
     }
   }
 
@@ -191,12 +200,14 @@ static void chk_sdo1(int mu, int vol, int *bo, spinor_dble *sd)
     y[2] = sd[ix].c3.c2.im;
     y[3] = sd[ix].c4.c2.im;
 
-    if (((y[0] + y[1] + y[2] + y[3]) & 0x1) != 1)
+    if (((y[0] + y[1] + y[2] + y[3]) & 0x1) != 1) {
       ie = 1;
+    }
 
     for (nu = 0; nu < 4; nu++) {
-      if ((y[nu] < a[nu]) || (y[nu] >= b[nu]))
+      if ((y[nu] < a[nu]) || (y[nu] >= b[nu])) {
         ie = 2;
+      }
     }
   }
 
@@ -223,11 +234,13 @@ static void cmp_sde0_sdo1(int mu, int vol, int *bo, spinor_dble *sde,
     yo[3] = sdo[ix].c4.c2.im;
 
     for (nu = 0; nu < 4; nu++) {
-      if ((nu != mu) && (ye[nu] != yo[nu]))
+      if ((nu != mu) && (ye[nu] != yo[nu])) {
         ie = 1;
+      }
 
-      if ((nu == mu) && (ye[nu] != safe_mod(yo[nu] - 1, np[mu] * l[mu])))
+      if ((nu == mu) && (ye[nu] != safe_mod(yo[nu] - 1, np[mu] * l[mu]))) {
         ie = 2;
+      }
     }
   }
 
@@ -254,11 +267,13 @@ static void cmp_sde1_sdo0(int mu, int vol, int *bo, spinor_dble *sde,
     yo[3] = sdo[ix].c4.c2.im;
 
     for (nu = 0; nu < 4; nu++) {
-      if ((nu != mu) && (ye[nu] != yo[nu]))
+      if ((nu != mu) && (ye[nu] != yo[nu])) {
         ie = 1;
+      }
 
-      if ((nu == mu) && (ye[nu] != safe_mod(yo[nu] + 1, np[mu] * l[mu])))
+      if ((nu == mu) && (ye[nu] != safe_mod(yo[nu] + 1, np[mu] * l[mu]))) {
         ie = 2;
+      }
     }
   }
 
@@ -298,12 +313,14 @@ static void chk_b2b(int n, int mu, b2b_flds_t *b2b)
   ie = 0;
 
   for (nu = 0; nu < 4; nu++) {
-    if ((nu != mu) && (bo0[nu] != bo1[nu]))
+    if ((nu != mu) && (bo0[nu] != bo1[nu])) {
       ie = 1;
+    }
   }
 
-  if (bo1[mu] != ((bo0[mu] + bs[mu]) % l[mu]))
+  if (bo1[mu] != ((bo0[mu] + bs[mu]) % l[mu])) {
     ie = 2;
+  }
 
   error(ie != 0, 1, "chk_b2b [check2.c]", "Blocks are not neighbours");
 
@@ -350,9 +367,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check2.c]",
                  "Syntax: check2 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -390,12 +408,14 @@ int main(int argc, char *argv[])
   wsd = reserve_wsd(Ns);
   set_ud();
 
-  for (k = 0; k < Ns; k++)
+  for (k = 0; k < Ns; k++) {
     set_sd(wsd[k]);
+  }
 
   for (n = 0; n < nb; n++) {
-    for (k = 0; k < Ns; k++)
+    for (k = 0; k < Ns; k++) {
       assign_sd2sdblk(DFL_BLOCKS, n, ALL_PTS, wsd[k], k + 1);
+    }
   }
 
   for (n = 0; n < nb; n++) {

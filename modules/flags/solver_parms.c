@@ -120,8 +120,9 @@ static void init_sp(void)
 {
   int i;
 
-  for (i = 1; i <= ISPMAX; i++)
+  for (i = 1; i <= ISPMAX; i++) {
     sp[i] = sp[0];
+  }
 
   init = 1;
 }
@@ -132,8 +133,9 @@ solver_parms_t set_solver_parms(int isp, solver_t solver, int nkv, int isolv,
   int ie, iprms[7];
   double dprms[1];
 
-  if (init == 0)
+  if (init == 0) {
     init_sp();
+  }
 
   if ((solver == CGNE) || (solver == MSCG)) {
     nkv = 0;
@@ -199,12 +201,13 @@ solver_parms_t set_solver_parms(int isp, solver_t solver, int nkv, int isolv,
 
 solver_parms_t solver_parms(int isp)
 {
-  if (init == 0)
+  if (init == 0) {
     init_sp();
+  }
 
-  if ((isp >= 0) && (isp < ISPMAX))
+  if ((isp >= 0) && (isp < ISPMAX)) {
     return sp[isp];
-  else {
+  } else {
     error_loc(1, 1, "solver_parms [solver_parms.c]",
               "Solver index is out of range");
     return sp[ISPMAX];
@@ -233,9 +236,9 @@ void read_solver_parms(int isp)
 
     read_line("solver", "%s", line);
 
-    if (strcmp(line, "MSCG") == 0)
+    if (strcmp(line, "MSCG") == 0) {
       ids = 1;
-    else if (strcmp(line, "SAP_GCR") == 0) {
+    } else if (strcmp(line, "SAP_GCR") == 0) {
       ids = 2;
       read_line("nkv", "%d", &nkv);
       read_line("isolv", "%d", &isolv);
@@ -247,9 +250,10 @@ void read_solver_parms(int isp)
       read_line("isolv", "%d", &isolv);
       read_line("nmr", "%d", &nmr);
       read_line("ncy", "%d", &ncy);
-    } else if (strcmp(line, "CGNE") != 0)
+    } else if (strcmp(line, "CGNE") != 0) {
       error_root(1, 1, "read_solver_parms [solver_parms.c]",
                  "Unknown solver %s", line);
+    }
 
     read_line("nmx", "%d", &nmx);
     read_line("res", "%lf", &res);
@@ -308,8 +312,9 @@ void print_solver_parms(int *isap, int *idfl)
           printf("ncy = %d\n", sp[i].ncy);
           printf("nmx = %d\n", sp[i].nmx);
           printf("res = %.1e\n\n", sp[i].res);
-        } else
+        } else {
           printf("UNKNOWN solver\n\n");
+        }
       }
     }
   }

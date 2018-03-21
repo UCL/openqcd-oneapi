@@ -107,10 +107,11 @@ static void random_g(void)
   for (ix = 0; ix < VOLUME; ix++) {
     t = global_time(ix);
 
-    if ((t > 0) || (bc != 1))
+    if ((t > 0) || (bc != 1)) {
       random_su3_dble(gx);
-    else
+    } else {
       (*gx) = unity;
+    }
 
     gx += 1;
   }
@@ -239,8 +240,9 @@ static double cmp_ud(su3_dble *u, su3_dble *v)
 
   for (i = 0; i < 18; i += 2) {
     dev = r[i] * r[i] + r[i + 1] * r[i + 1];
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   return dmax;
@@ -258,8 +260,9 @@ static double max_dev_ud(su3_dble *v)
   for (; u < um; u++) {
     d = cmp_ud(u, v);
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
 
     v += 1;
   }
@@ -306,9 +309,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check2.c]",
                  "Syntax: check2 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -334,8 +338,9 @@ int main(int argc, char *argv[])
 
   g = amalloc(NSPIN * sizeof(*g), 4);
 
-  if (BNDRY > 0)
+  if (BNDRY > 0) {
     gbuf = amalloc((BNDRY / 2) * sizeof(*gbuf), 4);
+  }
 
   error((g == NULL) || ((BNDRY > 0) && (gbuf == NULL)), 1, "main [check2.c]",
         "Unable to allocate auxiliary arrays");

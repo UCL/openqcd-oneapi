@@ -122,8 +122,9 @@ static int alloc_arrays(int nkv)
   b = amalloc(nkv * sizeof(*b), ALIGN);
   cs1 = amalloc(2 * (nkv + 2) * sizeof(*cs1), ALIGN);
 
-  if ((a == NULL) || (b == NULL) || (cs1 == NULL))
+  if ((a == NULL) || (b == NULL) || (cs1 == NULL)) {
     return 1;
+  }
 
   c = a + nkv * nkv;
   cs2 = cs1 + nkv + 2;
@@ -199,8 +200,9 @@ static void gcr_step(int vol, int icom, int k, int nkv,
 
   b[k] = (float)(sqrt(cs2[0].re));
 
-  if (is_equal_f(b[k], 0.0f))
+  if (is_equal_f(b[k], 0.0f)) {
     return;
+  }
 
   r = 1.0f / b[k];
   vscale(vol, r, chi[k]);
@@ -238,8 +240,9 @@ static void update_psi(int vol, int icom, int k, int nkv, complex_dble *eta,
 
   set_v2zero(vol, rho);
 
-  for (l = k; l >= 0; l--)
+  for (l = k; l >= 0; l--) {
     mulc_vadd(vol, rho, phi[l], c[l]);
+  }
 
   add_v2vd(vol, rho, psi);
   (*Dop)(psi, wrk);
@@ -315,8 +318,9 @@ double fgcr4vd(int vol, int icom, void (*Dop)(complex_dble *v, complex_dble *w),
       message("[fgcr4vd]: k = %d, rn = %.2e\n", k, rn);
 #endif
       if ((rn <= tol) || (rn < (PRECISION_LIMIT * rn_old)) ||
-          ((k + 1) == nkv) || ((*status) == nmx))
+          ((k + 1) == nkv) || ((*status) == nmx)) {
         break;
+      }
     }
 
     update_psi(vol, icom, k, nkv, eta, psi, Dop);

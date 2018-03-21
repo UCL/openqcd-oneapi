@@ -59,8 +59,9 @@ static void print_dirs(int const *dirs)
 
 static void init_arrays(void)
 {
-  if (init == 1)
+  if (init == 1) {
     return;
+  }
 
   num_type_one[0] = FACE0 / 2;
   num_type_one[1] = FACE1 / 2;
@@ -106,8 +107,9 @@ static void diff_su3_dble_bndry(su3_dble const *x, su3_dble const *y,
     /* Type two link diffs */
     for (ix = 0; ix < num_type_two[mu];) {
       for (nu = 0; nu < 4; ++nu) {
-        if (nu == mu)
+        if (nu == mu) {
           continue;
+        }
 
         if (dirs[nu]) {
           res[1] +=
@@ -139,8 +141,9 @@ static void off_boundary_norm(su3_dble const *x, int const *dirs, double *res)
     /* Type two link diffs */
     for (ix = 0; ix < num_type_two[mu];) {
       for (nu = 0; nu < 4; ++nu) {
-        if (nu == mu)
+        if (nu == mu) {
           continue;
+        }
 
         if (!dirs[nu]) {
           res[1] += norm_su3(x + two_offsets[mu] + ix);
@@ -263,11 +266,11 @@ int main(int argc, char *argv[])
     if (my_rank == 0) {
       printf("\n-------------------------------------------\n\n");
     }
-
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     report_test_results();
+  }
 
   MPI_Finalize();
   exit(0);

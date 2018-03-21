@@ -50,9 +50,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [time1.c]",
                  "Syntax: time1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -84,8 +85,9 @@ int main(int argc, char *argv[])
   random_ud();
 
   nt = (int)(5.0e5 / (double)(VOLUME));
-  if (nt < 2)
+  if (nt < 2) {
     nt = 2;
+  }
   wdt = 0.0;
 
   while (wdt < 5.0) {
@@ -111,8 +113,9 @@ int main(int argc, char *argv[])
   }
 
   nt = (int)(2.0e6 / (double)(VOLUME));
-  if (nt < 2)
+  if (nt < 2) {
     nt = 2;
+  }
   wdt = 0.0;
 
   while (wdt < 5.0) {

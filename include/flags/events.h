@@ -38,11 +38,20 @@ static void LatUpdatedUd(void)
   lat.ud.tag = next_tag();
 }
 
-static void LatAssignedUd2u(void) { lat.u = lat.ud; }
+static void LatAssignedUd2u(void)
+{
+  lat.u = lat.ud;
+}
 
-static void LatCopiedBndUd(void) { lat.udbuf = lat.ud; }
+static void LatCopiedBndUd(void)
+{
+  lat.udbuf = lat.ud;
+}
 
-static void LatSetBstap(void) { lat.bstap = lat.ud; }
+static void LatSetBstap(void)
+{
+  lat.bstap = lat.ud;
+}
 
 static void LatShiftedUd(void)
 {
@@ -51,7 +60,10 @@ static void LatShiftedUd(void)
   lat.udbuf.state = 0;
 }
 
-static void LatComputedFts(void) { lat.fts = lat.ud; }
+static void LatComputedFts(void)
+{
+  lat.fts = lat.ud;
+}
 
 static void LatErasedSw(void)
 {
@@ -76,11 +88,20 @@ static void LatComputedSwd(void)
   lat.swd.odd_flag = 0;
 }
 
-static void LatAssignedSwd2sw(void) { lat.sw = lat.swd; }
+static void LatAssignedSwd2sw(void)
+{
+  lat.sw = lat.swd;
+}
 
-static void LatInvertedSwdE(void) { lat.swd.even_flag ^= 0x1; }
+static void LatInvertedSwdE(void)
+{
+  lat.swd.even_flag ^= 0x1;
+}
 
-static void LatInvertedSwdO(void) { lat.swd.odd_flag ^= 0x1; }
+static void LatInvertedSwdO(void)
+{
+  lat.swd.odd_flag ^= 0x1;
+}
 
 static void LatErasedAw(void)
 {
@@ -94,9 +115,15 @@ static void LatErasedAwhat(void)
   lat.awh.state = 0;
 }
 
-static void LatComputedAw(void) { lat.aw = lat.ud; }
+static void LatComputedAw(void)
+{
+  lat.aw = lat.ud;
+}
 
-static void LatComputedAwhat(void) { lat.awh = lat.ud; }
+static void LatComputedAwhat(void)
+{
+  lat.awh = lat.ud;
+}
 
 static void LatUdFieldSmeared(void)
 {

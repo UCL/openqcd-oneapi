@@ -49,10 +49,11 @@ int main(int argc, char *argv[])
     printf("%dx%dx%dx%d process grid, ", NPROC0, NPROC1, NPROC2, NPROC3);
     printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
 
-    if (NPROC > 1)
+    if (NPROC > 1) {
       printf("There are %d MPI processes\n", NPROC);
-    else
+    } else {
       printf("There is 1 MPI process\n");
+    }
 
     if ((VOLUME * sizeof(double)) < (64 * 1024)) {
       printf("The local size of the gauge field is %d KB\n",
@@ -91,9 +92,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [time3.c]",
                  "Syntax: time3 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -143,8 +145,9 @@ int main(int argc, char *argv[])
   random_sd((*b).vol, (*b).sd[0], 1.0);
 
   nt = (int)(2.0e6f / (double)(VOLUME));
-  if (nt < 2)
+  if (nt < 2) {
     nt = 2;
+  }
   wdt = 0.0;
 
   while (wdt < 5.0) {
@@ -171,8 +174,9 @@ int main(int argc, char *argv[])
   }
 
   nt = (int)(2.0e6f / (double)(VOLUME));
-  if (nt < 2)
+  if (nt < 2) {
     nt = 2;
+  }
   wdt = 0.0;
 
   while (wdt < 5.0) {

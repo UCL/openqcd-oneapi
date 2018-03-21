@@ -74,8 +74,9 @@ static void wait(int s)
 
   t0 = time(NULL);
 
-  if (t0 == (time_t)(-1))
+  if (t0 == (time_t)(-1)) {
     return;
+  }
 
   dt = 0.0;
 
@@ -120,8 +121,9 @@ void error(int test, int no, char const *name, char const *format, ...)
   i = (test != 0);
   MPI_Allreduce(&i, &all, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
 
-  if (all == 0)
+  if (all == 0) {
     return;
+  }
 
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
@@ -147,8 +149,9 @@ void error(int test, int no, char const *name, char const *format, ...)
     fflush(NULL);
     wait(1);
     MPI_Abort(MPI_COMM_WORLD, no);
-  } else
+  } else {
     wait(60);
+  }
 }
 
 void error_root(int test, int no, char const *name, char const *format, ...)

@@ -65,8 +65,9 @@ static double cmp_ud(su3_dble *u, su3_dble *v)
 
   for (i = 0; i < 18; i += 2) {
     dev = r[i] * r[i] + r[i + 1] * r[i + 1];
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   return sqrt(dmax);
@@ -84,8 +85,9 @@ static double max_dev_ud(su3_dble *v)
   for (; u < um; u++) {
     d = cmp_ud(u, v);
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
 
     v += 1;
   }
@@ -117,8 +119,9 @@ static double cmp_fd(su3_alg_dble *f, su3_alg_dble *g)
 
   for (i = 0; i < 8; i++) {
     dev = fabs(r[i]);
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   return dmax;
@@ -138,8 +141,9 @@ static double max_dev_frc(su3_alg_dble *g)
   for (; f < fm; f++) {
     d = cmp_fd(f, g);
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
 
     g += 1;
   }
@@ -198,17 +202,20 @@ static int check_bnd_fld(su3_alg_dble *fld)
         ie |= is_zero(f + 1);
       }
 
-      for (ifc = 2; ifc < 8; ifc++)
+      for (ifc = 2; ifc < 8; ifc++) {
         ie |= is_zero(f + ifc);
+      }
     } else if (bc == 1) {
       ie |= is_zero(f);
       ie |= is_zero(f + 1);
 
-      for (ifc = 2; ifc < 8; ifc++)
+      for (ifc = 2; ifc < 8; ifc++) {
         ie |= (is_zero(f + ifc) ^ 0x1);
+      }
     } else {
-      for (ifc = 0; ifc < 8; ifc++)
+      for (ifc = 0; ifc < 8; ifc++) {
         ie |= is_zero(f + ifc);
+      }
     }
   }
 
@@ -223,8 +230,9 @@ static int ofs(int ix, int mu)
     iy = iup[ix][mu];
 
     return 8 * (iy - (VOLUME / 2)) + 2 * mu + 1;
-  } else
+  } else {
     return 8 * (ix - (VOLUME / 2)) + 2 * mu;
+  }
 }
 
 static double chkfrc(void)
@@ -284,15 +292,17 @@ static double chkfrc(void)
 
             prod2su3alg(udb + ofs(ix, mu), &mm, &XX);
 
-            if (ix < (VOLUME / 2))
+            if (ix < (VOLUME / 2)) {
               frc = (*mdfs).frc + 8 * (iy - (VOLUME / 2)) + 2 * mu + 1;
-            else
+            } else {
               frc = (*mdfs).frc + 8 * (ix - (VOLUME / 2)) + 2 * mu;
+            }
 
             d = cmp_fd(&XX, frc);
 
-            if (d > dmax)
+            if (d > dmax) {
               dmax = d;
+            }
           }
         }
       }
@@ -368,9 +378,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check1.c]",
                  "Syntax: check1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -408,10 +419,11 @@ int main(int argc, char *argv[])
   fsv = reserve_wfd(1);
   udb = udfld();
 
-  if (bc == 0)
+  if (bc == 0) {
     nplaq = (double)(6 * N0 - 6) * (double)(N1 * N2 * N3);
-  else
+  } else {
     nplaq = (double)(6 * N0) * (double)(N1 * N2 * N3);
+  }
 
   ani = ani_parms();
 
@@ -459,8 +471,9 @@ int main(int argc, char *argv[])
   um = u + 4 * VOLUME;
 
   for (; u < um; u++) {
-    if (is_zero(frc) == 0)
+    if (is_zero(frc) == 0) {
       expXsu3(eps, frc, u);
+    }
     frc += 1;
   }
 
@@ -477,8 +490,9 @@ int main(int argc, char *argv[])
   random_ud();
   act0 = 3.0 * nplaq - plaq_wsum_dble(1);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("k =  0: %.8e\n", 2.0 * act0 / nplaq);
+  }
 
   for (k = 1; k <= n; k++) {
     fwd_euler(1, eps);
@@ -489,8 +503,9 @@ int main(int argc, char *argv[])
 
     act0 = act1;
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("k = %2d: %.8e\n", k, 2.0 * act0 / nplaq);
+    }
   }
 
   ie = check_bc(0.0);
@@ -520,8 +535,9 @@ int main(int argc, char *argv[])
   dev0 = max_dev_ud(usv[0]);
   cm3x3_assign(4 * VOLUME, udb, usv[0]);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Comparison of fwd_euler() and fwd_rk2(): |dU| = %.1e\n", dev0);
+  }
 
   start_ranlux(0, 1234);
   random_ud();

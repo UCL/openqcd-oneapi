@@ -56,8 +56,9 @@ static void random_X(void)
       mu[1] = 2.0 * mu[1] - 1.0;
       mu[2] = -mu[0] - mu[1];
 
-      if (fabs(mu[2]) <= 1.0)
+      if (fabs(mu[2]) <= 1.0) {
         break;
+      }
     }
 
     cm3x3_zero(1, u);
@@ -110,8 +111,9 @@ static int find_N(void)
 
   r = 1.0;
 
-  for (i = 1; r > DBL_EPSILON; i++)
+  for (i = 1; r > DBL_EPSILON; i++) {
     r /= (double)(i);
+  }
 
   i += 7;
 

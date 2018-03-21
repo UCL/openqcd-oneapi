@@ -41,8 +41,9 @@ static void random_pauli_dble(void)
     u = m[i].u;
     gauss_dble(u, 36);
 
-    for (j = 0; j < 6; j++)
+    for (j = 0; j < 6; j++) {
       u[j] += 10.0;
+    }
   }
 }
 
@@ -50,8 +51,9 @@ static void random_spin(void)
 {
   int i;
 
-  for (i = 0; i < NM; i++)
+  for (i = 0; i < NM; i++) {
     gauss_dble(sp1[i].r, 24);
+  }
 }
 
 static void cp_spin(spin_t *sp, spin_t *rp)
@@ -59,8 +61,9 @@ static void cp_spin(spin_t *sp, spin_t *rp)
   int i, j;
 
   for (i = 0; i < NM; i++) {
-    for (j = 0; j < 24; j++)
+    for (j = 0; j < 24; j++) {
       rp[i].r[j] = sp[i].r[j];
+    }
   }
 }
 
@@ -74,10 +77,12 @@ static double diff_spin(spin_t *sp, spin_t *rp)
   for (i = 0; i < NM; i++) {
     for (j = 0; j < 24; j++) {
       d = sp[i].r[j] - rp[i].r[j];
-      if (d < 0.0)
+      if (d < 0.0) {
         d = -d;
-      if (d > dmax)
+      }
+      if (d > dmax) {
         dmax = d;
+      }
     }
   }
 

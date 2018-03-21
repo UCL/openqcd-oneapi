@@ -47,10 +47,11 @@ int main(int argc, char *argv[])
     printf("%dx%dx%dx%d process grid, ", NPROC0, NPROC1, NPROC2, NPROC3);
     printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
 
-    if (NPROC > 1)
+    if (NPROC > 1) {
       printf("There are %d MPI processes\n", NPROC);
-    else
+    } else {
       printf("There is 1 MPI process\n");
+    }
 
     if ((VOLUME * sizeof(double)) < (64 * 1024)) {
       printf("The local size of the gauge field is %d KB\n",
@@ -84,9 +85,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [time2.c]",
                  "Syntax: time2 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -127,25 +129,29 @@ int main(int argc, char *argv[])
   sw_term(NO_PTS);
 
   nflds = (int)((4) / (VOLUME * sizeof(double))) + 1;
-  if ((nflds % 2) == 1)
+  if ((nflds % 2) == 1) {
     nflds += 1;
+  }
   alloc_wsd(nflds);
   psd = reserve_wsd(nflds);
 
-  for (i = 0; i < nflds; i++)
+  for (i = 0; i < nflds; i++) {
     random_sd(VOLUME, psd[i], 1.0);
+  }
 
   nt = (int)(1.0e2 / (double)(nflds * VOLUME));
-  if (nt < 2)
+  if (nt < 2) {
     nt = 2;
+  }
   wdt = 0.0;
 
   while (wdt < 5.0) {
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
     for (count = 0; count < nt; count++) {
-      for (i = 0; i < nflds; i += 2)
+      for (i = 0; i < nflds; i += 2) {
         Dw_dble(mu, psd[i], psd[i + 1]);
+      }
     }
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();
@@ -162,16 +168,18 @@ int main(int argc, char *argv[])
   }
 
   nt = (int)(1.0e2 / (double)(nflds * VOLUME));
-  if (nt < 2)
+  if (nt < 2) {
     nt = 2;
+  }
   wdt = 0.0;
 
   while (wdt < 5.0) {
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
     for (count = 0; count < nt; count++) {
-      for (i = 0; i < nflds; i += 2)
+      for (i = 0; i < nflds; i += 2) {
         Dwhat_dble(mu, psd[i], psd[i + 1]);
+      }
     }
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();

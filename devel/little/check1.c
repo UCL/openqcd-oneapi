@@ -35,8 +35,9 @@ static void random_imb(int vol)
   int i, j, a, b;
   float r[2], rvol;
 
-  for (i = 0; i < vol; i++)
+  for (i = 0; i < vol; i++) {
     imb[i] = i;
+  }
 
   rvol = (float)(vol);
 
@@ -44,11 +45,13 @@ static void random_imb(int vol)
     ranlxs(r, 2);
 
     a = (int)(rvol * r[0]);
-    if (a >= vol)
+    if (a >= vol) {
       a = vol - 1;
+    }
     b = (int)(rvol * r[1]);
-    if (b >= vol)
+    if (b >= vol) {
       b = vol - 1;
+    }
 
     j = imb[a];
     imb[a] = imb[b];
@@ -80,8 +83,9 @@ static void permute_sd(int vol, spinor_dble *s, spinor_dble *r)
 {
   int i;
 
-  for (i = 0; i < vol; i++)
+  for (i = 0; i < vol; i++) {
     r[i] = s[imb[i]];
+  }
 }
 
 static void apply_ud(int vol, su3_dble *u, spinor_dble *s, spinor_dble *r)
@@ -181,12 +185,13 @@ int main(int argc, char *argv[])
   start_ranlux(0, 123456);
 
   for (iv = 0; iv < 3; iv++) {
-    if (iv == 0)
+    if (iv == 0) {
       vol = 256;
-    else if (iv == 1)
+    } else if (iv == 1) {
       vol = 111;
-    else
+    } else {
       vol = 2023;
+    }
 
     if (my_rank == 0) {
       printf("\n");
@@ -245,8 +250,9 @@ int main(int argc, char *argv[])
       spinor_prod_gamma[mu](vol, sd[0], sd[1], sp0);
       sp1[0] = spinor_prod_dble(vol, 0, sd[0], sd[1]);
 
-      for (ix = 0; ix < vol; ix++)
+      for (ix = 0; ix < vol; ix++) {
         sd[2][ix] = mul_gamma(mu, sd[1][ix]);
+      }
 
       sp1[1] = spinor_prod_dble(vol, 0, sd[0], sd[2]);
 

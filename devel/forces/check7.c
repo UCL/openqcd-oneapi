@@ -47,20 +47,23 @@ static void rot_ud(double eps)
       mom += 1;
       u += 1;
 
-      if (bc != 0)
+      if (bc != 0) {
         expXsu3(eps, mom, u);
+      }
       mom += 1;
       u += 1;
 
       for (ifc = 2; ifc < 8; ifc++) {
-        if (bc != 1)
+        if (bc != 1) {
           expXsu3(eps, mom, u);
+        }
         mom += 1;
         u += 1;
       }
     } else if (t == (N0 - 1)) {
-      if (bc != 0)
+      if (bc != 0) {
         expXsu3(eps, mom, u);
+      }
       mom += 1;
       u += 1;
 
@@ -196,9 +199,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check7.c]",
                  "Syntax: check7 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -277,12 +281,14 @@ int main(int argc, char *argv[])
     read_solver_parms(isp);
     sp = solver_parms(isp);
 
-    if (sp.nkv > mnkv)
+    if (sp.nkv > mnkv) {
       mnkv = sp.nkv;
+    }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(fin);
+  }
 
   print_solver_parms(&isap, &idfl);
   print_sap_parms(1);
@@ -293,10 +299,12 @@ int main(int argc, char *argv[])
 
   set_sw_parms(-0.0123);
   mnkv = 2 * mnkv + 2;
-  if (mnkv < (Ns + 2))
+  if (mnkv < (Ns + 2)) {
     mnkv = Ns + 2;
-  if (mnkv < 5)
+  }
+  if (mnkv < 5) {
     mnkv = 5;
+  }
 
   alloc_ws(mnkv);
   alloc_wsd(6);
@@ -348,13 +356,14 @@ int main(int argc, char *argv[])
     if (my_rank == 0) {
       printf("Solver number %d, mu0 = %.2e, mu1 = %.2e\n", isp, mu0, mu1);
 
-      if (isp == 0)
+      if (isp == 0) {
         printf("Status = %d\n", status[0]);
-      else if (isp == 1)
+      } else if (isp == 1) {
         printf("Status = %d,%d\n", status[0], status[1]);
-      else
+      } else {
         printf("Status = (%d,%d,%d),(%d,%d,%d)\n", status[0], status[1],
                status[2], status[3], status[4], status[5]);
+      }
 
       printf("Absolute action difference |setpf2-action2| = %.1e,",
              fabs(dev_act[1]));
@@ -401,8 +410,9 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

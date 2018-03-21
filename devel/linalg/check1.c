@@ -78,8 +78,9 @@ int main(int argc, char *argv[])
 
     for (i = 0; i < 8; i++) {
       dev = fabs(r[i]);
-      if (dev > dmax)
+      if (dev > dmax) {
         dmax = dev;
+      }
     }
 
     X[n].c3 = 1.0;
@@ -136,8 +137,9 @@ int main(int argc, char *argv[])
     nsq2 = -2.0 * (w.c11.re + w.c22.re + w.c33.re);
 
     dev = fabs(1.0 - nsq2 / nsq1);
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
 
     sm += nsq2;
   }
@@ -188,8 +190,9 @@ int main(int argc, char *argv[])
   random_alg(NMOM, X);
 
   for (i = 0; i < 8; i++) {
-    for (j = 0; j < 8; j++)
+    for (j = 0; j < 8; j++) {
       var[8 * i + j] = 0.0;
+    }
   }
 
   for (n = 0; n < NMOM; n++) {
@@ -203,8 +206,9 @@ int main(int argc, char *argv[])
     r[7] = X[n].c8;
 
     for (i = 0; i < 8; i++) {
-      for (j = i; j < 8; j++)
+      for (j = i; j < 8; j++) {
         var[8 * i + j] += r[i] * r[j];
+      }
     }
   }
 
@@ -242,8 +246,9 @@ int main(int argc, char *argv[])
         } else {
           dev = fabs(var_all[8 * i + j]) / eij;
 
-          if (dev > dmax)
+          if (dev > dmax) {
             dmax = dev;
+          }
         }
       }
     }

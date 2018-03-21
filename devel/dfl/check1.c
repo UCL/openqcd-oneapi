@@ -56,9 +56,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check1.c]",
                  "Syntax: check1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);
@@ -93,18 +94,22 @@ int main(int argc, char *argv[])
   ie = 0;
   nbb = (nbbe[0] + nbbo[0]);
 
-  if (obbe[0] != 0)
+  if (obbe[0] != 0) {
     ie = 1;
-  if (obbo[0] != (obbe[7] + nbbe[7]))
+  }
+  if (obbo[0] != (obbe[7] + nbbe[7])) {
     ie = 2;
+  }
 
   for (ifc = 1; ifc < 8; ifc++) {
     nbb += (nbbe[ifc] + nbbo[ifc]);
 
-    if (obbe[ifc] != (obbe[ifc - 1] + nbbe[ifc - 1]))
+    if (obbe[ifc] != (obbe[ifc - 1] + nbbe[ifc - 1])) {
       ie = 1;
-    if (obbo[ifc] != (obbo[ifc - 1] + nbbo[ifc - 1]))
+    }
+    if (obbo[ifc] != (obbo[ifc - 1] + nbbo[ifc - 1])) {
       ie = 2;
+    }
   }
 
   error(nbb != dfl_grid.nbb, 1, "main [check1.c]", "nbb is incorrect");
@@ -121,11 +126,13 @@ int main(int argc, char *argv[])
     for (ix = obbe[ifc]; ix < (obbe[ifc] + nbbe[ifc]); ix++) {
       iy = ipp[ix];
 
-      if ((ix > obbe[ifc]) && (iy <= iz))
+      if ((ix > obbe[ifc]) && (iy <= iz)) {
         ie = 1;
+      }
 
-      if (inn[iy][ifc] != (nb + ix))
+      if (inn[iy][ifc] != (nb + ix)) {
         ie = 3;
+      }
 
       iz = iy;
     }
@@ -133,11 +140,13 @@ int main(int argc, char *argv[])
     for (ix = obbo[ifc]; ix < (obbo[ifc] + nbbo[ifc]); ix++) {
       iy = ipp[ix];
 
-      if ((ix > obbo[ifc]) && (iy <= iz))
+      if ((ix > obbo[ifc]) && (iy <= iz)) {
         ie = 2;
+      }
 
-      if (inn[iy][ifc] != (nb + ix))
+      if (inn[iy][ifc] != (nb + ix)) {
         ie = 3;
+      }
 
       iz = iy;
     }
@@ -148,20 +157,23 @@ int main(int argc, char *argv[])
   error(ie == 3, 1, "main [check1.c]", "ipp and inn are inconsistent");
 
   for (ix = 0; ix < nb; ix++) {
-    if (idx[idx[ix]] != ix)
+    if (idx[idx[ix]] != ix) {
       ie = 1;
+    }
 
     if (((ix > 0) && (ix < (nb / 2))) || (ix > (nb / 2))) {
-      if (idx[ix] != idx[ix - 1] + 1)
+      if (idx[ix] != idx[ix - 1] + 1) {
         ie = 2;
+      }
     }
 
     if (((ix == 0) && (isw == 0)) || ((ix == (nb / 2)) && (isw == 1))) {
       bo1 = b[idx[ix]].bo;
 
       for (mu = 0; mu < 4; mu++) {
-        if (bo1[mu] != 0)
+        if (bo1[mu] != 0) {
           ie = 3;
+        }
       }
     }
   }
@@ -175,16 +187,18 @@ int main(int argc, char *argv[])
     for (ifc = 0; ifc < 8; ifc++) {
       iy = inn[ix][ifc];
 
-      if ((iy < 0) || (iy >= (nb + nbb)))
+      if ((iy < 0) || (iy >= (nb + nbb))) {
         ie = 1;
-      else {
-        if (iy < nb)
+      } else {
+        if (iy < nb) {
           iz = inn[iy][ifc ^ 0x1];
-        else
+        } else {
           iz = ipp[iy - nb];
+        }
 
-        if (iz != ix)
+        if (iz != ix) {
           ie = 2;
+        }
       }
     }
   }
@@ -208,34 +222,39 @@ int main(int argc, char *argv[])
 
         for (mu = 0; mu < 4; mu++) {
           if (mu != (ifc / 2)) {
-            if (bo2[mu] != bo1[mu])
+            if (bo2[mu] != bo1[mu]) {
               ie = 1;
+            }
           } else {
             is = 2 * (ifc & 0x1) - 1;
             is = (bo1[mu] + is * bs[mu] + l[mu]) % l[mu];
 
-            if (bo2[mu] != is)
+            if (bo2[mu] != is) {
               ie = 1;
+            }
           }
         }
       } else {
         mu = ifc / 2;
 
         if ((((ifc & 0x1) == 1) && ((bo1[mu] + bs[mu]) != l[mu])) ||
-            (((ifc & 0x1) == 0) && (bo1[mu] != 0)))
+            (((ifc & 0x1) == 0) && (bo1[mu] != 0))) {
           ie = 2;
+        }
 
         iy = map[iy - nb];
         bo2 = b[idx[iy]].bo;
 
         for (mu = 0; mu < 4; mu++) {
           if (mu != (ifc / 2)) {
-            if (bo2[mu] != bo1[mu])
+            if (bo2[mu] != bo1[mu]) {
               ie = 3;
+            }
           } else {
             if ((((ifc & 0x1) == 1) && (bo2[mu] != 0)) ||
-                (((ifc & 0x1) == 0) && (bo2[mu] != (l[mu] - bs[mu]))))
+                (((ifc & 0x1) == 0) && (bo2[mu] != (l[mu] - bs[mu])))) {
               ie = 3;
+            }
           }
         }
       }

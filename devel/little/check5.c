@@ -55,13 +55,15 @@ static double check_vd(int Ns, int nvh)
     for (j = 0; j <= i; j++) {
       z = vprod_dble(nvh, 1, vd[i], vd[j]);
 
-      if (i == j)
+      if (i == j) {
         z.re -= 1.0;
+      }
 
       d = z.re * z.re + z.im * z.im;
 
-      if (d > dev)
+      if (d > dev) {
         dev = d;
+      }
     }
   }
 
@@ -88,8 +90,9 @@ static double check_Awvd(int Ns, int nvh)
     d = vnorm_square_dble(nvh, 1, wvd[1]) /
         vnorm_square_dble(nvh, 1, vd[i] + nvh);
 
-    if (d > dev)
+    if (d > dev) {
       dev = d;
+    }
   }
 
   release_wvd();
@@ -111,8 +114,9 @@ static double check_ltl_matrix(int Ns, int nvh)
   cmat = bmat + Ns * Ns;
 
   for (i = 0; i < Ns; i++) {
-    for (j = 0; j < Ns; j++)
+    for (j = 0; j < Ns; j++) {
       bmat[i * Ns + j] = vprod_dble(nvh, 1, vd[i], vd[j] + nvh);
+    }
   }
 
   cmat_mul_dble(Ns, amat, bmat, cmat);
@@ -123,8 +127,9 @@ static double check_ltl_matrix(int Ns, int nvh)
       z.re = cmat[i * Ns + j].re;
       z.im = cmat[i * Ns + j].im;
 
-      if (i == j)
+      if (i == j) {
         z.re -= 1.0;
+      }
 
       dev += (z.re * z.re + z.im * z.im);
     }
@@ -135,9 +140,11 @@ static double check_ltl_matrix(int Ns, int nvh)
 
   ie = 0;
 
-  for (i = 0; i < (Ns * Ns); i++)
-    if ((amat[i].re != bmat[i].re) || (amat[i].im != bmat[i].im))
+  for (i = 0; i < (Ns * Ns); i++) {
+    if ((amat[i].re != bmat[i].re) || (amat[i].im != bmat[i].im)) {
       ie = 1;
+    }
+  }
 
   error(ie != 0, 1, "check_ltl_matrix [check5.c]",
         "Little matrix is not globally the same");
@@ -165,8 +172,9 @@ static double check_vflds(int Ns, int nvh)
     mulc_vadd_dble(nvh, wvd[0], vd[i], z);
     d = vnorm_square_dble(nvh, 1, wvd[0]);
     d /= vnorm_square_dble(nvh, 1, vd[i]);
-    if (d > dev)
+    if (d > dev) {
       dev = d;
+    }
   }
 
   for (i = 0; i < Ns; i++) {
@@ -174,8 +182,9 @@ static double check_vflds(int Ns, int nvh)
     mulc_vadd_dble(nvh, wvd[0], vd[i] + nvh, z);
     d = vnorm_square_dble(nvh, 1, wvd[0]);
     d /= vnorm_square_dble(nvh, 1, vd[i] + nvh);
-    if (d > dev)
+    if (d > dev) {
       dev = d;
+    }
   }
 
   release_wvd();
@@ -203,8 +212,9 @@ static double check_mds(int Ns, int nvh)
 
     d = (double)(norm_square(VOLUME, 1, ws[0]) /
                  vnorm_square(nv, 1, vs[Ns + k]));
-    if (d > dev)
+    if (d > dev) {
       dev = d;
+    }
   }
 
   release_ws();
@@ -216,13 +226,15 @@ static double check_mds(int Ns, int nvh)
   for (k = 0; k < Ns; k++) {
     assign_v2vd(nvh, vs[Ns + k], wvd[0]);
 
-    for (l = 0; l < Ns; l++)
+    for (l = 0; l < Ns; l++) {
       vproject_dble(nvh, 1, wvd[0], vd[l]);
+    }
 
     d = vnorm_square_dble(nvh, 1, wvd[0]);
     d /= (double)(vnorm_square(nvh, 1, vs[Ns + k]));
-    if (d > dev)
+    if (d > dev) {
       dev = d;
+    }
   }
 
   release_wvd();
@@ -263,9 +275,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check5.c]",
                  "Syntax: check5 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -313,28 +326,33 @@ int main(int argc, char *argv[])
   error_root(ifail != 0, 1, "main [check5.c]",
              "Computation of the little Dirac operator failed");
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Maximal relative deviations found:\n\n");
+  }
 
   dev = check_vd(Ns, nvh);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Orthonormality of vdflds: %.2e\n", dev);
+  }
 
   dev = check_Awvd(Ns, nvh);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Awhat*vdflds:             %.2e\n", dev);
+  }
 
   dev = check_ltl_matrix(Ns, nvh);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Little-little matrix:     %.2e\n\n", dev);
+  }
 
   dev = check_vflds(Ns, nvh);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Single-precision fields:  %.2e\n", dev);
+  }
 
   dev = check_mds(Ns, nvh);
 

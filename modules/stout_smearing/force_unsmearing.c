@@ -258,8 +258,9 @@ static void compute_lambda_field(su3_alg_dble const *force,
   su3_dble gamma_tmp;
   su3_dble g_force;
 
-  if (lambda_field == NULL)
+  if (lambda_field == NULL) {
     alloc_lambda_field();
+  }
 
   smear = stout_smearing_parms();
 
@@ -456,8 +457,9 @@ static void compute_xi_field(su3_alg_dble const *force, su3_dble const *gfield,
 
   compute_lambda_field(force, gfield, sgfield, ch_coeffs);
 
-  if (xi_field == NULL)
+  if (xi_field == NULL) {
     alloc_xi_field();
+  }
 
   num_links = 4 * VOLUME + 7 * (BNDRY / 4);
   cm3x3_zero(num_links, xi_field);
@@ -553,8 +555,9 @@ void unsmear_force(su3_alg_dble *force)
 
   sign_flipped_q = query_flags(UD_PHASE_SET);
 
-  if (sign_flipped_q)
+  if (sign_flipped_q) {
     unset_ud_phase();
+  }
 
   sfields = smeared_fields();
   ch_coeffs = smearing_ch_coeff_fields();
@@ -567,8 +570,9 @@ void unsmear_force(su3_alg_dble *force)
     unsmear_single_force(force, sfields[i], sfields[i + 1], ch_coeffs[i]);
   }
 
-  if (sign_flipped_q == 1)
+  if (sign_flipped_q == 1) {
     set_ud_phase();
+  }
 }
 
 /* Summary:
@@ -580,4 +584,7 @@ void unsmear_force(su3_alg_dble *force)
  *   * (possibly changes a flag that indicates whether the forces have been
  *     unsmeared)
  */
-void unsmear_mdforce(void) { unsmear_force((*mdflds()).frc); }
+void unsmear_mdforce(void)
+{
+  unsmear_force((*mdflds()).frc);
+}

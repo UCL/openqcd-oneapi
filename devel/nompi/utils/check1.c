@@ -83,12 +83,13 @@ int main(void)
   printf("sizeof(double) = %d\n", (int)(sizeof(double)));
 
   ie = endianness();
-  if (ie == LITTLE_ENDIAN)
+  if (ie == LITTLE_ENDIAN) {
     printf("The machine is little endian\n\n");
-  else if (ie == BIG_ENDIAN)
+  } else if (ie == BIG_ENDIAN) {
     printf("The machine is big endian\n\n");
-  else
+  } else {
     printf("The machine has unknown endianness\n\n");
+  }
 
   ci[0] = (char *)(i);
   ci[1] = (char *)(i + 1);
@@ -147,9 +148,11 @@ int main(void)
 
   it = 0;
 
-  for (k = 0; k < N; k++)
-    if ((istds[k] - istd[k]) != 0)
+  for (k = 0; k < N; k++) {
+    if ((istds[k] - istd[k]) != 0) {
       it += 1;
+    }
+  }
 
   printf("2x(byte swap) %d integer random numbers:\n", N);
   printf("Number of failures = %d\n\n", it);
@@ -159,29 +162,35 @@ int main(void)
 
   it = 0;
 
-  for (k = 0; k < N; k++)
-    if ((dstds[k] - dstd[k]) != 0.0)
+  for (k = 0; k < N; k++) {
+    if ((dstds[k] - dstd[k]) != 0.0) {
       it += 1;
+    }
+  }
 
   printf("2x(byte swap) %d double-precision random numbers:\n", N);
   printf("Number of failures = %d\n\n", it);
 
   gauss_dble(dstd, N);
 
-  for (k = 0; k < (N / 18); k++)
+  for (k = 0; k < (N / 18); k++) {
     set_v2u(dstd + 18 * k, ufld + k);
+  }
 
   bswap_double(N, ufld);
 
-  for (k = 0; k < (N / 18); k++)
+  for (k = 0; k < (N / 18); k++) {
     set_u2v(ufld + k, dstds + 18 * k);
+  }
 
   bswap_double(N, dstds);
   it = 0;
 
-  for (k = 0; k < N; k++)
-    if ((dstds[k] - dstd[k]) != 0.0)
+  for (k = 0; k < N; k++) {
+    if ((dstds[k] - dstd[k]) != 0.0) {
       it += 1;
+    }
+  }
 
   printf("Byte swap %d random su3_dble matrices:\n", N / 18);
   printf("Number of failures = %d\n\n", it);

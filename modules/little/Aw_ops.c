@@ -98,30 +98,35 @@ static void alloc_Awd(Aw_dble_t *Aw)
   int n, k, nmat, nbee, nboe;
   complex_dble **ww, *w;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     set_constants();
+  }
 
   nmat = Ns * Ns;
   nbee = 0;
   nboe = 0;
-  if (Aw == (&Awd))
+  if (Aw == (&Awd)) {
     nboe = nbbh;
-  if (Aw == (&Awdhat))
+  }
+  if (Aw == (&Awdhat)) {
     nbee = nbbh;
+  }
   n = 18 * nbh + nbee + 2 * nboe;
   ww = malloc(n * sizeof(*ww));
   w = amalloc(n * nmat * sizeof(*w), ALIGN);
   error((ww == NULL) || (w == NULL), 1, "alloc_Awd [Aw_ops.c]",
         "Unable to allocate matrix arrays");
 
-  for (k = 0; k < n; k++)
+  for (k = 0; k < n; k++) {
     ww[k] = w + k * nmat;
+  }
 
   set_vd2zero(n * nmat, w);
 
   for (n = 0; n < (nb + nbee); n++) {
-    for (k = 0; k < Ns; k++)
+    for (k = 0; k < Ns; k++) {
       ww[n][Ns * k + k].re = 1.0;
+    }
   }
 
   (*Aw).Ns = Ns;
@@ -140,8 +145,9 @@ static void alloc_Aws(Aw_t *Aw)
   int n, k, nmat;
   complex **ww, *w;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     set_constants();
+  }
 
   nmat = Ns * Ns;
   n = 18 * nbh;
@@ -150,14 +156,16 @@ static void alloc_Aws(Aw_t *Aw)
   error((ww == NULL) || (w == NULL), 1, "alloc_Aws [Aw_ops.c]",
         "Unable to allocate matrix arrays");
 
-  for (k = 0; k < n; k++)
+  for (k = 0; k < n; k++) {
     ww[k] = w + k * nmat;
+  }
 
   set_v2zero(n * nmat, w);
 
   for (n = 0; n < nb; n++) {
-    for (k = 0; k < Ns; k++)
+    for (k = 0; k < Ns; k++) {
       ww[n][Ns * k + k].re = 1.0f;
+    }
   }
 
   (*Aw).Ns = Ns;
@@ -173,32 +181,36 @@ static void alloc_Aws(Aw_t *Aw)
 
 Aw_dble_t Awop_dble(void)
 {
-  if (Awd.Ns == 0)
+  if (Awd.Ns == 0) {
     alloc_Awd(&Awd);
+  }
 
   return Awd;
 }
 
 Aw_dble_t Awophat_dble(void)
 {
-  if (Awdhat.Ns == 0)
+  if (Awdhat.Ns == 0) {
     alloc_Awd(&Awdhat);
+  }
 
   return Awdhat;
 }
 
 Aw_t Awop(void)
 {
-  if (Aws.Ns == 0)
+  if (Aws.Ns == 0) {
     alloc_Aws(&Aws);
+  }
 
   return Aws;
 }
 
 Aw_t Awophat(void)
 {
-  if (Awshat.Ns == 0)
+  if (Awshat.Ns == 0) {
     alloc_Aws(&Awshat);
+  }
 
   return Awshat;
 }
@@ -228,15 +240,17 @@ static void update_Awdiag(double m0, double mu, int eo)
   dme = mu - old_mu[0];
 
   if (eo == 1) {
-    if (old_eo[0] == 1)
+    if (old_eo[0] == 1) {
       dmo = 0.0;
-    else
+    } else {
       dmo = -old_mu[0];
+    }
   } else {
-    if (old_eo[0] == 1)
+    if (old_eo[0] == 1) {
       dmo = mu;
-    else
+    } else {
       dmo = dme;
+    }
   }
 
   b = blk_list(DFL_BLOCKS, &nbs, &isw);
@@ -248,10 +262,11 @@ static void update_Awdiag(double m0, double mu, int eo)
     for (n = 0; n < nb; n++) {
       nsw = idx[n];
 
-      if (nsw < nbh)
+      if (nsw < nbh) {
         z = Awd.Aee[nsw];
-      else
+      } else {
         z = Awd.Aoo[nsw - nbh];
+      }
 
       sd = (*b).sd;
 
@@ -267,8 +282,9 @@ static void update_Awdiag(double m0, double mu, int eo)
               z[Ns * k + l].im += dme * w.re;
               z[Ns * l + k].re += dme * w.im;
               z[Ns * l + k].im += dme * w.re;
-            } else
+            } else {
               z[Ns * k + k].im += dme * w.re;
+            }
           }
         }
 
@@ -281,8 +297,9 @@ static void update_Awdiag(double m0, double mu, int eo)
               z[Ns * k + l].im += dmo * w.re;
               z[Ns * l + k].re += dmo * w.im;
               z[Ns * l + k].im += dmo * w.re;
-            } else
+            } else {
               z[Ns * k + k].im += dmo * w.re;
+            }
           }
         }
       }
@@ -299,18 +316,20 @@ static void update_Awdiag(double m0, double mu, int eo)
       assign_swd2swdblk(DFL_BLOCKS, n, NO_PTS);
       nsw = idx[n];
 
-      if (nsw < nbh)
+      if (nsw < nbh) {
         z = Awd.Aee[nsw];
-      else
+      } else {
         z = Awd.Aoo[nsw - nbh];
+      }
 
       sd = (*b).sd;
 
       for (l = 0; l < Ns; l++) {
         Dw_blk_dble(DFL_BLOCKS, n, mu, l + 1, 0);
 
-        for (k = 0; k < Ns; k++)
+        for (k = 0; k < Ns; k++) {
           z[Ns * k + l] = spinor_prod_dble(vol, 0, sd[k + 1], sd[0]);
+        }
       }
 
       b += 1;
@@ -345,8 +364,9 @@ void set_Aw(double mu)
     error(dprms[0] != mu, 1, "set_Aw [Aw_ops.c]", "Parameters are not global");
   }
 
-  if (Awd.Ns == 0)
+  if (Awd.Ns == 0) {
     alloc_Awd(&Awd);
+  }
 
   sw = sw_parms();
   m0 = sw.m0;
@@ -370,10 +390,11 @@ void set_Aw(double mu)
     assign_swd2swdblk(DFL_BLOCKS, n, NO_PTS);
     nsw = idx[n];
 
-    if (nsw < nbh)
+    if (nsw < nbh) {
       z = Awd.Aee[nsw];
-    else
+    } else {
       z = Awd.Aoo[nsw - nbh];
+    }
 
     vol = (*b).vol;
     sd = (*b).sd;
@@ -381,8 +402,9 @@ void set_Aw(double mu)
     for (l = 0; l < Ns; l++) {
       Dw_blk_dble(DFL_BLOCKS, n, mu, l + 1, 0);
 
-      for (k = 0; k < Ns; k++)
+      for (k = 0; k < Ns; k++) {
         z[Ns * k + l] = spinor_prod_dble(vol, 0, sd[k + 1], sd[0]);
+      }
     }
 
     for (nu = 0; nu < 4; nu++) {
@@ -470,8 +492,9 @@ void set_Aw(double mu)
 
   cpAoe_ext_bnd();
 
-  if (Aws.Ns == 0)
+  if (Aws.Ns == 0) {
     alloc_Aws(&Aws);
+  }
   assign_Awd2Aw(&Awd, &Aws);
 
   nupd = 0;
@@ -495,19 +518,22 @@ int set_Awhat(double mu)
   eo = tm.eoflg;
 
   if (query_flags(AWHAT_UP2DATE) == 1) {
-    if ((m0 == old_m0[1]) && (mu == old_mu[1]) && (eo == old_eo[1]))
+    if ((m0 == old_m0[1]) && (mu == old_mu[1]) && (eo == old_eo[1])) {
       return 0;
+    }
   }
 
-  if (Awdhat.Ns == 0)
+  if (Awdhat.Ns == 0) {
     alloc_Awd(&Awdhat);
+  }
 
   ifail = 0;
 
   for (n = 0; n < nbh; n++) {
     ifail |= cmat_inv_dble(Ns, Awd.Aee[n], Awdhat.Aee[n], &cn);
-    if (cn > MAX_FROBENIUS)
+    if (cn > MAX_FROBENIUS) {
       ifail = 1;
+    }
   }
 
   cpAee_int_bnd();
@@ -516,8 +542,9 @@ int set_Awhat(double mu)
     for (ifc = 0; ifc < 8; ifc++) {
       m = inn[n + nbh][ifc];
 
-      if (m >= nb)
+      if (m >= nb) {
         m -= nbh;
+      }
 
       cmat_mul_dble(Ns, Awdhat.Aee[m], Awd.Aeo[8 * n + ifc],
                     Awdhat.Aeo[8 * n + ifc]);
@@ -526,16 +553,19 @@ int set_Awhat(double mu)
 
   for (n = 0; n < nbh; n++) {
     ifail |= cmat_inv_dble(Ns, Awd.Aoo[n], Awdhat.Aoo[n], &cn);
-    if (cn > MAX_FROBENIUS)
+    if (cn > MAX_FROBENIUS) {
       ifail = 1;
+    }
 
-    for (ifc = 0; ifc < 8; ifc++)
+    for (ifc = 0; ifc < 8; ifc++) {
       cmat_mul_dble(Ns, Awdhat.Aoo[n], Awd.Aoe[8 * n + ifc],
                     Awdhat.Aoe[8 * n + ifc]);
+    }
   }
 
-  if (Awshat.Ns == 0)
+  if (Awshat.Ns == 0) {
     alloc_Aws(&Awshat);
+  }
   assign_Awd2Aw(&Awdhat, &Awshat);
   set_flags(COMPUTED_AWHAT);
 

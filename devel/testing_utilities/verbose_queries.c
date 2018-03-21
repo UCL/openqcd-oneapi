@@ -8,8 +8,8 @@
 #include "verbose_queries.h"
 #include "printing_macros.h"
 #include "test_counter.h"
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
 #include <string.h>
 
 char const *query_t_to_char(query_t qflag)

@@ -87,8 +87,9 @@ static spinor_dble *psi;
 
 static void alloc_wrotate(int n)
 {
-  if (nrot > 0)
+  if (nrot > 0) {
     afree(psi);
+  }
 
   psi = amalloc(n * sizeof(*psi), ALIGN);
   error_loc(psi == NULL, 1, "alloc_wrotate [salg_dble.c]",
@@ -118,8 +119,9 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     __asm__ __volatile__("vxorpd %%ymm0, %%ymm0, %%ymm0 \n\t"
                          "vxorpd %%ymm1, %%ymm1, %%ymm1 \n\t"
@@ -225,10 +227,11 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
     add_to_hsum(isz, (double *)(&smz));
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isz, (double *)(&smz));
-  else
+  } else {
     local_hsum(isz, (double *)(&smz));
+  }
 
   return smz;
 }
@@ -249,8 +252,9 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     __asm__ __volatile__("vxorpd %%ymm0, %%ymm0, %%ymm0 \n\t"
                          "vxorpd %%ymm1, %%ymm1, %%ymm1 \n\t"
@@ -324,10 +328,11 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
     add_to_hsum(isx, &smx);
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isx, &smx);
-  else
+  } else {
     local_hsum(isx, &smx);
+  }
 
   return smx;
 }
@@ -348,8 +353,9 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     __asm__ __volatile__("vxorpd %%ymm0, %%ymm0, %%ymm0 \n\t"
                          "vxorpd %%ymm1, %%ymm1, %%ymm1 \n\t"
@@ -455,10 +461,11 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
     add_to_hsum(isz, (double *)(&smz));
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isz, (double *)(&smz));
-  else
+  } else {
     local_hsum(isz, (double *)(&smz));
+  }
 
   return smz;
 }
@@ -478,8 +485,9 @@ double norm_square_dble(int vol, int icom, spinor_dble const *s)
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     __asm__ __volatile__("vxorpd %%ymm6, %%ymm6, %%ymm6 \n\t"
                          "vxorpd %%ymm7, %%ymm7, %%ymm7 \n\t"
@@ -523,10 +531,11 @@ double norm_square_dble(int vol, int icom, spinor_dble const *s)
     add_to_hsum(isx, &smx);
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isx, &smx);
-  else
+  } else {
     local_hsum(isx, &smx);
+  }
 
   return smx;
 }
@@ -549,8 +558,9 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     __asm__ __volatile__("vxorpd %%ymm0, %%ymm0, %%ymm0 \n\t"
                          "vxorpd %%ymm1, %%ymm1, %%ymm1 \n\t"
@@ -654,10 +664,11 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
     add_to_hsum(isz, (double *)(&smz));
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isz, (double *)(&smz));
-  else
+  } else {
     local_hsum(isz, (double *)(&smz));
+  }
 
   return smz;
 }
@@ -678,8 +689,9 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     __asm__ __volatile__("vxorpd %%ymm0, %%ymm0, %%ymm0 \n\t"
                          "vxorpd %%ymm1, %%ymm1, %%ymm1 \n\t"
@@ -758,10 +770,11 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
     add_to_hsum(isx, &smx);
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isx, &smx);
-  else
+  } else {
     local_hsum(isx, &smx);
+  }
 
   return smx;
 }
@@ -782,8 +795,9 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     __asm__ __volatile__("vxorpd %%ymm0, %%ymm0, %%ymm0 \n\t"
                          "vxorpd %%ymm1, %%ymm1, %%ymm1 \n\t"
@@ -887,10 +901,11 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
     add_to_hsum(isz, (double *)(&smz));
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isz, (double *)(&smz));
-  else
+  } else {
     local_hsum(isz, (double *)(&smz));
+  }
 
   return smz;
 }
@@ -910,8 +925,9 @@ double norm_square_dble(int vol, int icom, spinor_dble const *s)
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     __asm__ __volatile__("vxorpd %%ymm6, %%ymm6, %%ymm6 \n\t"
                          "vxorpd %%ymm7, %%ymm7, %%ymm7 \n\t"
@@ -961,10 +977,11 @@ double norm_square_dble(int vol, int icom, spinor_dble const *s)
     add_to_hsum(isx, &smx);
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isx, &smx);
-  else
+  } else {
     local_hsum(isx, &smx);
+  }
 
   return smx;
 }
@@ -1050,8 +1067,9 @@ void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble const *v)
   complex_dble const *z;
   spinor_dble *pk, *pj;
 
-  if (n > nrot)
+  if (n > nrot) {
     alloc_wrotate(n);
+  }
 
   for (ix = 0; ix < vol; ix++) {
     for (k = 0; k < n; k++) {
@@ -1175,8 +1193,9 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     __asm__ __volatile__("xorpd %%xmm6, %%xmm6 \n\t"
                          "xorpd %%xmm7, %%xmm7 \n\t"
@@ -1323,10 +1342,11 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
     add_to_hsum(isz, (double *)(&smz));
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isz, (double *)(&smz));
-  else
+  } else {
     local_hsum(isz, (double *)(&smz));
+  }
 
   smz.im = -smz.im;
 
@@ -1349,8 +1369,9 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     __asm__ __volatile__("xorpd %%xmm6, %%xmm6 \n\t"
                          "xorpd %%xmm7, %%xmm7 \n\t"
@@ -1422,10 +1443,11 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
     add_to_hsum(isx, &smx);
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isx, &smx);
-  else
+  } else {
     local_hsum(isx, &smx);
+  }
 
   return smx;
 }
@@ -1446,8 +1468,9 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     __asm__ __volatile__("xorpd %%xmm6, %%xmm6 \n\t"
                          "xorpd %%xmm7, %%xmm7 \n\t"
@@ -1594,10 +1617,11 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
     add_to_hsum(isz, (double *)(&smz));
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isz, (double *)(&smz));
-  else
+  } else {
     local_hsum(isz, (double *)(&smz));
+  }
 
   smz.im = -smz.im;
 
@@ -1619,8 +1643,9 @@ double norm_square_dble(int vol, int icom, spinor_dble const *s)
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     __asm__ __volatile__("xorpd %%xmm6, %%xmm6 \n\t"
                          "xorpd %%xmm7, %%xmm7 \n\t"
@@ -1688,10 +1713,11 @@ double norm_square_dble(int vol, int icom, spinor_dble const *s)
     add_to_hsum(isx, &smx);
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isx, &smx);
-  else
+  } else {
     local_hsum(isx, &smx);
+  }
 
   return smx;
 }
@@ -1904,8 +1930,9 @@ void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble const *v)
   complex_dble const *z;
   spinor_dble *pk, *pj;
 
-  if (n > nrot)
+  if (n > nrot) {
     alloc_wrotate(n);
+  }
 
   for (ix = 0; ix < vol; ix++) {
     for (k = 0; k < n; k++) {
@@ -2523,8 +2550,9 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     smz.re = 0.0;
     smz.im = 0.0;
@@ -2546,10 +2574,11 @@ complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
     add_to_hsum(isz, (double *)(&smz));
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isz, (double *)(&smz));
-  else
+  } else {
     local_hsum(isz, (double *)(&smz));
+  }
 
   return smz;
 }
@@ -2570,8 +2599,9 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     smx = 0.0;
 
@@ -2587,10 +2617,11 @@ double spinor_prod_re_dble(int vol, int icom, spinor_dble const *s,
     add_to_hsum(isx, &smx);
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isx, &smx);
-  else
+  } else {
     local_hsum(isx, &smx);
+  }
 
   return smx;
 }
@@ -2611,8 +2642,9 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     smz.re = 0.0;
     smz.im = 0.0;
@@ -2636,10 +2668,11 @@ complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
     add_to_hsum(isz, (double *)(&smz));
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isz, (double *)(&smz));
-  else
+  } else {
     local_hsum(isz, (double *)(&smz));
+  }
 
   return smz;
 }
@@ -2659,8 +2692,9 @@ double norm_square_dble(int vol, int icom, spinor_dble const *s)
 
   while (s < sm) {
     smb = s + 8;
-    if (smb > sm)
+    if (smb > sm) {
       smb = sm;
+    }
 
     smx = 0.0;
 
@@ -2674,10 +2708,11 @@ double norm_square_dble(int vol, int icom, spinor_dble const *s)
     add_to_hsum(isx, &smx);
   }
 
-  if ((icom == 1) && (NPROC > 1))
+  if ((icom == 1) && (NPROC > 1)) {
     global_hsum(isx, &smx);
-  else
+  } else {
     local_hsum(isx, &smx);
+  }
 
   return smx;
 }
@@ -2753,8 +2788,9 @@ void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble const *v)
   complex_dble const *z;
   spinor_dble *pk, *pj;
 
-  if (n > nrot)
+  if (n > nrot) {
     alloc_wrotate(n);
+  }
 
   for (ix = 0; ix < vol; ix++) {
     for (k = 0; k < n; k++) {
@@ -2778,8 +2814,9 @@ void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble const *v)
       }
     }
 
-    for (k = 0; k < n; k++)
+    for (k = 0; k < n; k++) {
       *(ppk[k] + ix) = psi[k];
+    }
   }
 }
 
@@ -2846,11 +2883,12 @@ double normalize_dble(int vol, int icom, spinor_dble *s)
   r = norm_square_dble(vol, icom, s);
   r = sqrt(r);
 
-  if (not_equal_d(r, 0.0))
+  if (not_equal_d(r, 0.0)) {
     scale_dble(vol, 1.0 / r, s);
-  else
+  } else {
     error_loc(1, 1, "normalize_dble [salg_dble.c]",
               "Vector has vanishing norm");
+  }
 
   return r;
 }

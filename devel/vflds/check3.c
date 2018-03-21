@@ -119,27 +119,31 @@ static int chk_ext_bnd(complex *v)
             if ((ifc & 0x1) == 0x0) {
               c[mu] += 1.0f;
 
-              if (cpr[mu] == 0)
+              if (cpr[mu] == 0) {
                 c[mu] -= n[mu];
+              }
             } else {
               c[mu] -= 1.0f;
 
-              if (cpr[mu] == (np[mu] - 1))
+              if (cpr[mu] == (np[mu] - 1)) {
                 c[mu] += n[mu];
+              }
             }
           }
         }
 
         if ((c[0] != 0.0f) || (c[1] != 0.0f) || (c[2] != 0.0f) ||
-            (c[3] != 0.0f))
+            (c[3] != 0.0f)) {
           ie = 1;
+        }
       }
     } else {
       for (ibb = obbe[ifc]; ibb < (obbe[ifc] + nbbe[ifc]); ibb++) {
         for (i = 0; i < Ns; i++) {
           if ((v[nv + Ns * ibb + i].re != 0.0f) ||
-              (v[nv + Ns * ibb + i].im != 0.0f))
+              (v[nv + Ns * ibb + i].im != 0.0f)) {
             ie = 2;
+          }
         }
       }
     }
@@ -179,8 +183,9 @@ static int chk_int_bnd(complex *v, complex *w)
   ie = 0;
 
   for (; vv < vm; vv++) {
-    if (((*vv).re != (*ww).re) || ((*vv).im != (*ww).im))
+    if (((*vv).re != (*ww).re) || ((*vv).im != (*ww).im)) {
       ie = 1;
+    }
     ww += 1;
   }
 
@@ -221,9 +226,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check3.c]",
                  "Syntax: check3 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);

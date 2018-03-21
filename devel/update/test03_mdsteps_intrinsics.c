@@ -22,15 +22,17 @@
 void get_steplist(mdstep_t const *begin, mdstep_t const *end, int *out)
 {
   int i = 0;
-  for (; begin < end; ++begin)
+  for (; begin < end; ++begin) {
     out[i++] = begin->iop;
+  }
 }
 
 void get_epslist(mdstep_t const *begin, mdstep_t const *end, double *out)
 {
   int i = 0;
-  for (; begin < end; ++begin)
+  for (; begin < end; ++begin) {
     out[i++] = begin->eps;
+  }
 }
 
 void set_steplists2zero(int n, int *steps, double *eps)
@@ -105,8 +107,9 @@ int main(int argc, char *argv[])
   itu = iunsmear + 1;
   iend = itu + 1;
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++) {
     irat[i] = 0;
+  }
 
   for (i = 0; i < 4; i++) {
     imu[i] = 0;
@@ -961,8 +964,9 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     report_test_results();
+  }
 
   MPI_Finalize();
   return 0;

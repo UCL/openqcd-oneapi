@@ -427,8 +427,9 @@ double cgne(int vol, int icom, void (*Dop)(spinor *s, spinor *r),
       message("[cgne]: ncg = %d, xn = %.2e, rn = %.2e\n", (*status), xn, rn);
 #endif
       if ((rn <= tol) || (rn <= (PRECISION_LIMIT * xn)) || (ncg >= 100) ||
-          ((*status) >= nmx))
+          ((*status) >= nmx)) {
         break;
+      }
     }
 
     add_s2sd(vol, psx, pdx);

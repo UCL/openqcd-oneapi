@@ -42,14 +42,16 @@ static double afld(int *x, int mu)
 
   phi = 0.0;
 
-  for (nu = 0; nu < mu; nu++)
+  for (nu = 0; nu < mu; nu++) {
     phi -= inp[nu] * mt[mu][nu] * xt[nu];
+  }
 
   phi *= inp[mu];
 
   if (safe_mod(x[mu], np[mu]) == (np[mu] - 1)) {
-    for (nu = (mu + 1); nu < 4; nu++)
+    for (nu = (mu + 1); nu < 4; nu++) {
       phi -= inp[nu] * mt[mu][nu] * xt[nu];
+    }
   }
 
   return twopi * phi;
@@ -292,8 +294,9 @@ static void choose_mt(void)
   for (mu = 0; mu < 4; mu++) {
     mt[mu][mu] = 0.0;
 
-    for (nu = 0; nu < mu; nu++)
+    for (nu = 0; nu < mu; nu++) {
       mt[mu][nu] = -mt[nu][mu];
+    }
   }
 }
 
@@ -322,13 +325,15 @@ static void set_ud(void)
             u = udb + 8 * (ix - (VOLUME / 2));
 
             for (ifc = 0; ifc < 8; ifc++) {
-              if (ifc & 0x1)
+              if (ifc & 0x1) {
                 x[ifc / 2] -= 1;
+              }
 
               phi = afld(x, ifc / 2);
 
-              if (ifc & 0x1)
+              if (ifc & 0x1) {
                 x[ifc / 2] += 1;
+              }
 
               (*u) = ud0;
               (*u).c11.re = cos(phi);
@@ -373,9 +378,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check2.c]",
                  "Syntax: check2 [-bc <type>]");
+    }
 
     no_tts = find_opt(argc, argv, "-no-tts");
 
@@ -441,12 +447,14 @@ int main(int argc, char *argv[])
     A1 = Amt();
     A2 = action0(1);
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Field no = %2d, A1 = %12.6e, A2 = %12.6e\n", i + 1, A1, A2);
+    }
 
     d = fabs(A1 - A2) / A1;
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   if (my_rank == 0) {

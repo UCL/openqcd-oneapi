@@ -173,11 +173,13 @@ u3_alg_dble **xtensor(void)
 {
   int n;
 
-  if (xts == NULL)
+  if (xts == NULL) {
     alloc_xts();
+  }
 
-  for (n = 0; n < 6; n++)
+  for (n = 0; n < 6; n++) {
     xt[n] = xts[n];
+  }
 
   return xt;
 }
@@ -186,11 +188,12 @@ void set_xt2zero(void)
 {
   int n;
 
-  if (xts == NULL)
+  if (xts == NULL) {
     alloc_xts();
-  else {
-    for (n = 0; n < 6; n++)
+  } else {
+    for (n = 0; n < 6; n++) {
       set_ualg2zero(VOLUME, xts[n]);
+    }
   }
 }
 
@@ -199,33 +202,39 @@ int add_det2xt(double c, ptset_t set)
   int n, ifail;
   pauli_dble *m, *mm;
 
-  if (set == NO_PTS)
+  if (set == NO_PTS) {
     return 0;
+  }
 
   ifail = sw_term(set);
 
-  if (ifail != 0)
+  if (ifail != 0) {
     return ifail;
+  }
 
-  if (xts == NULL)
+  if (xts == NULL) {
     alloc_xts();
+  }
 
   if (set == ODD_PTS) {
-    for (n = 0; n < 6; n++)
+    for (n = 0; n < 6; n++) {
       xt[n] = xts[n] + (VOLUME / 2);
+    }
 
     m = swdfld() + VOLUME;
   } else {
-    for (n = 0; n < 6; n++)
+    for (n = 0; n < 6; n++) {
       xt[n] = xts[n];
+    }
 
     m = swdfld();
   }
 
-  if (set == ALL_PTS)
+  if (set == ALL_PTS) {
     mm = m + (2 * VOLUME);
-  else
+  } else {
     mm = m + VOLUME;
+  }
 
   for (; m < mm; m += 2) {
     det2xt(m, X);
@@ -244,11 +253,13 @@ void add_prod2xt(double c, spinor_dble *r, spinor_dble *s)
   int n;
   spinor_dble *rm;
 
-  if (xts == NULL)
+  if (xts == NULL) {
     alloc_xts();
+  }
 
-  for (n = 0; n < 6; n++)
+  for (n = 0; n < 6; n++) {
     xt[n] = xts[n];
+  }
 
   rm = r + VOLUME;
 
@@ -272,14 +283,16 @@ static void alloc_xvs(void)
   error(xvs == NULL, 1, "alloc_xvs [xtensor.c]",
         "Unable to allocate field array");
 
-  for (ix = 0; ix < (4 * VOLUME); ix++)
+  for (ix = 0; ix < (4 * VOLUME); ix++) {
     xvs[ix] = ud0;
+  }
 }
 
 su3_dble *xvector(void)
 {
-  if (xvs == NULL)
+  if (xvs == NULL) {
     alloc_xvs();
+  }
 
   return xvs;
 }
@@ -288,11 +301,12 @@ void set_xv2zero(void)
 {
   int ix;
 
-  if (xvs == NULL)
+  if (xvs == NULL) {
     alloc_xvs();
-  else {
-    for (ix = 0; ix < (4 * VOLUME); ix++)
+  } else {
+    for (ix = 0; ix < (4 * VOLUME); ix++) {
       xvs[ix] = ud0;
+    }
   }
 }
 
@@ -302,8 +316,9 @@ void add_prod2xv(double c, spinor_dble *r, spinor_dble *s)
   su3_dble *xvm;
   spinor_dble *ro, *so;
 
-  if (xvs == NULL)
+  if (xvs == NULL) {
     alloc_xvs();
+  }
 
   cpsd_int_bnd(0x1, r);
   cpsd_int_bnd(0x1, s);

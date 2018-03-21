@@ -106,16 +106,18 @@ static void alloc_u(void)
   u = ub;
   um = ub + n;
 
-  for (; u < um; u++)
+  for (; u < um; u++) {
     (*u) = unity;
+  }
 
   set_flags(UPDATED_U);
 }
 
 su3 *ufld(void)
 {
-  if (ub == NULL)
+  if (ub == NULL) {
     alloc_u();
+  }
 
   return ub;
 }
@@ -134,8 +136,9 @@ static void alloc_ud(void)
   bc = bc_type();
   n = 4 * VOLUME + 7 * (BNDRY / 4);
 
-  if ((cpr[0] == (NPROC0 - 1)) && ((bc == 1) || (bc == 2)))
+  if ((cpr[0] == (NPROC0 - 1)) && ((bc == 1) || (bc == 2))) {
     n += 3;
+  }
 
   udb = amalloc(n * sizeof(*udb), ALIGN);
   error(udb == NULL, 1, "alloc_ud [uflds.c]",
@@ -148,8 +151,9 @@ static void alloc_ud(void)
   ud = udb;
   um = udb + n;
 
-  for (; ud < um; ud++)
+  for (; ud < um; ud++) {
     (*ud) = unity;
+  }
 
   set_flags(UPDATED_UD);
   set_flags(UNSET_UD_PHASE);
@@ -158,8 +162,9 @@ static void alloc_ud(void)
 
 su3_dble *udfld(void)
 {
-  if (udb == NULL)
+  if (udb == NULL) {
     alloc_ud();
+  }
 
   return udb;
 }
@@ -172,8 +177,9 @@ void apply_ani_ud(void)
 
   ani = ani_parms();
 
-  if (!ani.has_ani)
+  if (!ani.has_ani) {
     return;
+  }
 
   ani_t = 1.0 / (ani.ut_fermion);
   ani_s = (ani.nu) / (ani.xi * ani.ut_fermion);
@@ -200,8 +206,9 @@ void remove_ani_ud(void)
 
   ani = ani_parms();
 
-  if (!ani.has_ani)
+  if (!ani.has_ani) {
     return;
+  }
 
   ani_inv_t = ani.ut_fermion;
   ani_inv_s = (ani.xi * ani.ut_fermion) / ani.nu;
@@ -351,16 +358,19 @@ static void mult_ud_phase(int bc)
   ud = udfld() + 4 * VOLUME + FACE0 / 2;
 
   um = ud + FACE1 / 2;
-  for (; ud < um; ud++)
+  for (; ud < um; ud++) {
     cm3x3_mulc(phase + 0, ud, ud);
+  }
 
   um = ud + FACE2 / 2;
-  for (; ud < um; ud++)
+  for (; ud < um; ud++) {
     cm3x3_mulc(phase + 1, ud, ud);
+  }
 
   um = ud + FACE3 / 2;
-  for (; ud < um; ud++)
+  for (; ud < um; ud++) {
     cm3x3_mulc(phase + 2, ud, ud);
+  }
 
   /* Then multiply type 2 boundary links */
   um = ud + 3 * FACE0;
@@ -547,18 +557,21 @@ void renormalize_ud(void)
         project_to_su3_dble(ud);
         ud += 1;
 
-        if (bc != 0)
+        if (bc != 0) {
           project_to_su3_dble(ud);
+        }
         ud += 1;
 
         for (ifc = 2; ifc < 8; ifc++) {
-          if (bc != 1)
+          if (bc != 1) {
             project_to_su3_dble(ud);
+          }
           ud += 1;
         }
       } else if (t == (N0 - 1)) {
-        if (bc != 0)
+        if (bc != 0) {
           project_to_su3_dble(ud);
+        }
         ud += 1;
 
         for (ifc = 1; ifc < 8; ifc++) {
@@ -574,11 +587,12 @@ void renormalize_ud(void)
     }
 
     set_flags(UPDATED_UD);
-  } else
+  } else {
     error(1, 1, "renormalize_ud [udflds.c]",
           "Attempt to renormalize dirty "
           "(smeared or phase transformed) "
           "link variables");
+  }
 }
 
 void assign_ud2u(void)

@@ -2,8 +2,8 @@
 
 #include "test_counter.h"
 #include "printing_macros.h"
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 #define MAX_NUM_TESTS 64
 #define MAX_NAME_LENGTH 256

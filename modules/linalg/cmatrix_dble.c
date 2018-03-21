@@ -1178,21 +1178,24 @@ static int fwd_house(int n, complex_dble const *a, complex_dble *b,
   }
 
   eps = (double)(n)*DBL_EPSILON * (*fnsq);
-  if (eps == 0.0)
+  if (eps == 0.0) {
     return 2;
+  }
 
   for (k = 0; k < (n - 1); k++) {
     r1 = b[n * k + k].re * b[n * k + k].re + b[n * k + k].im * b[n * k + k].im;
     r2 = sqrt(r1);
 
-    for (j = (k + 1); j < n; j++)
+    for (j = (k + 1); j < n; j++) {
       r1 += (b[n * j + k].re * b[n * j + k].re +
              b[n * j + k].im * b[n * j + k].im);
+    }
 
-    if (r1 >= eps)
+    if (r1 >= eps) {
       r1 = sqrt(r1);
-    else
+    } else {
       return 3;
+    }
 
     if (r2 >= (DBL_EPSILON * r1)) {
       r3 = 1.0 / r2;
@@ -1241,10 +1244,11 @@ static int fwd_house(int n, complex_dble const *a, complex_dble *b,
   bb = bm - 1;
   r1 = (*bb).re * (*bb).re + (*bb).im * (*bb).im;
 
-  if (r1 >= eps)
+  if (r1 >= eps) {
     r1 = 1.0 / r1;
-  else
+  } else {
     return 3;
+  }
 
   dsv[n - 1].re = r1 * (*bb).re;
   dsv[n - 1].im = -r1 * (*bb).im;
@@ -1334,13 +1338,15 @@ int cmat_inv_dble(int n, complex_dble const *a, complex_dble *b, double *k)
   double fnsq, fnsqi;
   complex_dble *bb, *bm;
 
-  if (n > nmax)
+  if (n > nmax) {
     alloc_arrays(n);
+  }
 
   ie = fwd_house(n, a, b, &fnsq);
 
-  if (ie != 0)
+  if (ie != 0) {
     return ie;
+  }
 
   solv_sys(n, b);
   bck_house(n, b);
@@ -1349,8 +1355,9 @@ int cmat_inv_dble(int n, complex_dble const *a, complex_dble *b, double *k)
   bm = bb + n * n;
   fnsqi = 0.0;
 
-  for (; bb < bm; bb++)
+  for (; bb < bm; bb++) {
     fnsqi += ((*bb).re * (*bb).re + (*bb).im * (*bb).im);
+  }
 
   (*k) = sqrt(fnsq * fnsqi);
 

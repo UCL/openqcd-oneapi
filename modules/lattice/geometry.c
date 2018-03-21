@@ -136,9 +136,9 @@ void ipt_global(int const *x, int *ip, int *ix)
 
 int global_time(int ix)
 {
-  if ((tms != NULL) && (ix >= 0) && (ix < VOLUME))
+  if ((tms != NULL) && (ix >= 0) && (ix < VOLUME)) {
     return tms[ix];
-  else {
+  } else {
     error_loc(1, 1, "global_time [geometry.c]",
               "Time array is not set or the argument is out of range");
     return 0;
@@ -182,8 +182,9 @@ static void set_npr(void)
 {
   int mu, n[4];
 
-  for (mu = 0; mu < 4; mu++)
+  for (mu = 0; mu < 4; mu++) {
     n[mu] = cpr[mu];
+  }
 
   for (mu = 0; mu < 4; mu++) {
     n[mu] -= 1;
@@ -202,20 +203,22 @@ static void cache_block(int *bs)
   cbn[0] = 1;
 
   for (mu = 1; mu < 4; mu++) {
-    if ((bs[mu] % 4) == 0)
+    if ((bs[mu] % 4) == 0) {
       cbs[mu] = 4;
-    else if ((bs[mu] % 3) == 0)
+    } else if ((bs[mu] % 3) == 0) {
       cbs[mu] = 3;
-    else if ((bs[mu] % 2) == 0)
+    } else if ((bs[mu] % 2) == 0) {
       cbs[mu] = 2;
-    else
+    } else {
       cbs[mu] = 1;
+    }
 
     cbn[mu] = bs[mu] / cbs[mu];
   }
 
-  if (cbix != NULL)
+  if (cbix != NULL) {
     free(cbix);
+  }
 
   cbix = malloc(cbs[0] * cbs[1] * cbs[2] * cbs[3] * sizeof(*cbix));
   error(cbix == NULL, 1, "cache_block [geometry.c]",
@@ -277,8 +280,9 @@ static int index(int *bo, int *bs, int x0, int x1, int x2, int x3)
   is = y0 + y1 + y2 + y3;
   is += (bo[0] + bo[1] + bo[2] + bo[3]);
 
-  if ((is % 2) != 0)
+  if ((is % 2) != 0) {
     ib += ((bs[0] * bs[1] * bs[2] * bs[3]) / 2);
+  }
 
   return ib + (cbs[0] * cbs[1] * cbs[2] * cbs[3] * in) / 2;
 }
@@ -287,8 +291,9 @@ static void set_tms(void)
 {
   int ix, iy, x0;
 
-  if (tms != NULL)
+  if (tms != NULL) {
     free(tms);
+  }
 
   tms = malloc(VOLUME * sizeof(*tms));
   error(tms == NULL, 1, "set_tms [geometry.c]",
@@ -344,25 +349,33 @@ void geometry(void)
           iup[ix][3] = index(bo, bs, x0, x1, x2, x3 + 1);
           idn[ix][3] = index(bo, bs, x0, x1, x2, x3 - 1);
 
-          if ((x0 == (L0 - 1)) && (NPROC0 > 1))
+          if ((x0 == (L0 - 1)) && (NPROC0 > 1)) {
             iup[ix][0] = VOLUME;
-          if ((x0 == 0) && (NPROC0 > 1))
+          }
+          if ((x0 == 0) && (NPROC0 > 1)) {
             idn[ix][0] = VOLUME;
+          }
 
-          if ((x1 == (L1 - 1)) && (NPROC1 > 1))
+          if ((x1 == (L1 - 1)) && (NPROC1 > 1)) {
             iup[ix][1] = VOLUME;
-          if ((x1 == 0) && (NPROC1 > 1))
+          }
+          if ((x1 == 0) && (NPROC1 > 1)) {
             idn[ix][1] = VOLUME;
+          }
 
-          if ((x2 == (L2 - 1)) && (NPROC2 > 1))
+          if ((x2 == (L2 - 1)) && (NPROC2 > 1)) {
             iup[ix][2] = VOLUME;
-          if ((x2 == 0) && (NPROC2 > 1))
+          }
+          if ((x2 == 0) && (NPROC2 > 1)) {
             idn[ix][2] = VOLUME;
+          }
 
-          if ((x3 == (L3 - 1)) && (NPROC3 > 1))
+          if ((x3 == (L3 - 1)) && (NPROC3 > 1)) {
             iup[ix][3] = VOLUME;
-          if ((x3 == 0) && (NPROC3 > 1))
+          }
+          if ((x3 == 0) && (NPROC3 > 1)) {
             idn[ix][3] = VOLUME;
+          }
         }
       }
     }
@@ -399,8 +412,9 @@ void geometry(void)
         idn[iy][mu] = VOLUME + iz;
         iw = iy;
 
-        for (k = 1; k < bs[mu]; k++)
+        for (k = 1; k < bs[mu]; k++) {
           iw = iup[iw][mu];
+        }
 
         map[iz] = iw;
       }
@@ -412,8 +426,9 @@ void geometry(void)
         iup[iy][mu] = VOLUME + iz;
         iw = iy;
 
-        for (k = 1; k < bs[mu]; k++)
+        for (k = 1; k < bs[mu]; k++) {
           iw = idn[iw][mu];
+        }
 
         map[iz] = iw;
       }
@@ -449,45 +464,53 @@ void blk_geometry(block_t *b)
               x3 + bs[3] * x2 + bs[2] * bs[3] * x1 + bs[1] * bs[2] * bs[3] * x0;
           (*b).ipt[iy] = ix;
 
-          if ((x0 + 1) < bs[0])
+          if ((x0 + 1) < bs[0]) {
             (*b).iup[ix][0] = index(bo, bs, x0 + 1, x1, x2, x3);
-          else
+          } else {
             (*b).iup[ix][0] = (*b).vol;
+          }
 
-          if (x0 > 0)
+          if (x0 > 0) {
             (*b).idn[ix][0] = index(bo, bs, x0 - 1, x1, x2, x3);
-          else
+          } else {
             (*b).idn[ix][0] = (*b).vol;
+          }
 
-          if ((x1 + 1) < bs[1])
+          if ((x1 + 1) < bs[1]) {
             (*b).iup[ix][1] = index(bo, bs, x0, x1 + 1, x2, x3);
-          else
+          } else {
             (*b).iup[ix][1] = (*b).vol;
+          }
 
-          if (x1 > 0)
+          if (x1 > 0) {
             (*b).idn[ix][1] = index(bo, bs, x0, x1 - 1, x2, x3);
-          else
+          } else {
             (*b).idn[ix][1] = (*b).vol;
+          }
 
-          if ((x2 + 1) < bs[2])
+          if ((x2 + 1) < bs[2]) {
             (*b).iup[ix][2] = index(bo, bs, x0, x1, x2 + 1, x3);
-          else
+          } else {
             (*b).iup[ix][2] = (*b).vol;
+          }
 
-          if (x2 > 0)
+          if (x2 > 0) {
             (*b).idn[ix][2] = index(bo, bs, x0, x1, x2 - 1, x3);
-          else
+          } else {
             (*b).idn[ix][2] = (*b).vol;
+          }
 
-          if ((x3 + 1) < bs[3])
+          if ((x3 + 1) < bs[3]) {
             (*b).iup[ix][3] = index(bo, bs, x0, x1, x2, x3 + 1);
-          else
+          } else {
             (*b).iup[ix][3] = (*b).vol;
+          }
 
-          if (x3 > 0)
+          if (x3 > 0) {
             (*b).idn[ix][3] = index(bo, bs, x0, x1, x2, x3 - 1);
-          else
+          } else {
             (*b).idn[ix][3] = (*b).vol;
+          }
         }
       }
     }
@@ -556,10 +579,11 @@ void bnd_geometry(block_t *b)
   }
 
   for (ix = 0; ix < vol; ix++) {
-    if (ix < volh)
+    if (ix < volh) {
       iy = ix + volh;
-    else
+    } else {
       iy = ix - volh;
+    }
 
     for (mu = 0; mu < 4; mu++) {
       if ((*b).iup[iy][mu] == vol) {
@@ -622,18 +646,20 @@ void bnd_imbed(block_t *b)
     for (ix = 0; ix < vol; ix++) {
       iy = imb[ipp[ix]];
 
-      if (ifc & 0x1)
+      if (ifc & 0x1) {
         (*bb).imb[ix] = iup[iy][ifc / 2];
-      else
+      } else {
         (*bb).imb[ix] = idn[iy][ifc / 2];
+      }
     }
 
     (*bb).imb[vol] = (*bb).imb[0];
 
-    if ((*bb).imb[0] >= VOLUME)
+    if ((*bb).imb[0] >= VOLUME) {
       (*bb).ibn = 1;
-    else
+    } else {
       (*bb).ibn = 0;
+    }
 
     bb += 1;
   }

@@ -101,8 +101,9 @@ static void set_nsmx(int nlv)
     ifr = mdp.ifr;
 
     for (i = 0; i < nfr; i++) {
-      if (ifr[i] > iend)
+      if (ifr[i] > iend) {
         iend = ifr[i];
+      }
     }
   }
 
@@ -114,15 +115,17 @@ static void alloc_mds(void)
 {
   int k;
 
-  if (mds != NULL)
+  if (mds != NULL) {
     free(mds);
+  }
 
   mds = malloc(4 * nsmx * sizeof(*mds));
   error(mds == NULL, 1, "alloc_mds [mdsteps.c]",
         "Unable to allocate mdsteps array");
 
-  for (k = 0; k < 3; k++)
+  for (k = 0; k < 3; k++) {
     mdw[k] = mds + (k + 1) * nsmx;
+  }
 }
 
 static void set_steps2zero(int n, mdstep_t *s)
@@ -142,8 +145,9 @@ static int nfrc_steps(mdstep_t const *s)
   itu = iend - 1;
   n = 0;
 
-  while (s[n].iop < itu)
+  while (s[n].iop < itu) {
     n += 1;
+  }
 
   return n;
 }
@@ -154,8 +158,9 @@ static int nall_steps(mdstep_t const *s)
 
   n = 0;
 
-  while (s[n].iop < iend)
+  while (s[n].iop < iend) {
     n += 1;
+  }
 
   return n;
 }
@@ -174,8 +179,9 @@ static int smear_block_begin(mdstep_t const *s)
 
   while (s[n].iop < itu) {
 
-    if (s[n].iop == ismear)
+    if (s[n].iop == ismear) {
       return n + 1;
+    }
 
     error(s[n].iop == iunsmear, 1, "smear_block_begin [mdsteps.c]",
           "Unsmear step appears before smearing step.");
@@ -203,8 +209,9 @@ static int smear_block_end(mdstep_t const *s)
 
   while (s[n].iop < iend) {
 
-    if (s[n].iop == iunsmear)
+    if (s[n].iop == iunsmear) {
       return n;
+    }
 
     error(s[n].iop == ismear, 1, "smear_block_end [mdsteps.c]",
           "Another smearing step appears before the last one is completed.");
@@ -251,8 +258,9 @@ static int is_smeared_step(int i, mdstep_t const *s)
   s_begin = smear_block_begin(s);
 
   /* No smearing block in update */
-  if (s_begin == 0)
+  if (s_begin == 0) {
     return 0;
+  }
 
   s_end = smear_block_end(s + s_begin) + s_begin;
 
@@ -334,8 +342,9 @@ static void add_normal_step(double c, mdstep_t const *s, mdstep_t *r)
 
   /* Check if a smearing block exist in the target area,
    * if it does we have to append the normal step to that */
-  if (r_begin != 0)
+  if (r_begin != 0) {
     r_begin += smear_block_end(r + r_begin);
+  }
 
   add_step_in_range(c, s, r + r_begin, r + r_end);
 }
@@ -348,13 +357,15 @@ static void add_steps(int n, double c, mdstep_t *s, mdstep_t *r)
   iunsmear = iend - 2;
 
   for (i = 0; i < n; i++) {
-    if ((s[i].iop == ismear) || (s[i].iop == iunsmear))
+    if ((s[i].iop == ismear) || (s[i].iop == iunsmear)) {
       continue;
+    }
 
-    if (is_smeared_step(i, s))
+    if (is_smeared_step(i, s)) {
       add_smeared_step(c, s + i, r);
-    else
+    } else {
       add_normal_step(c, s + i, r);
+    }
   }
 }
 
@@ -402,8 +413,9 @@ static void expand_level(int ilv, double tau, mdstep_t *s, mdstep_t *ws)
     ws[n++].eps = 0.;
 
     for (i = 0; i < nfr; i++) {
-      if (action_parms(ifr[i]).smear == 0)
+      if (action_parms(ifr[i]).smear == 0) {
         continue;
+      }
 
       for (j = 0; j < n; j++) {
         if (ifr[i] == ws[j].iop) {
@@ -425,8 +437,9 @@ static void expand_level(int ilv, double tau, mdstep_t *s, mdstep_t *ws)
 
   /* Then the unsmeared forces */
   for (i = 0; i < nfr; i++) {
-    if (action_parms(ifr[i]).smear != 0)
+    if (action_parms(ifr[i]).smear != 0) {
       continue;
+    }
 
     for (j = 0; j < n; j++) {
       if (ifr[i] == ws[j].iop) {
@@ -450,10 +463,11 @@ static void expand_level(int ilv, double tau, mdstep_t *s, mdstep_t *ws)
       (*s).iop = itu;
       (*s).eps = eps;
       s += 1;
-      if (i < nstep)
+      if (i < nstep) {
         copy_steps(n, 1.0, ws, s);
-      else
+      } else {
         copy_steps(n, 0.5, ws, s);
+      }
       s += n;
     }
   } else if (mdp.integrator == OMF2) {
@@ -470,10 +484,11 @@ static void expand_level(int ilv, double tau, mdstep_t *s, mdstep_t *ws)
       (*s).iop = itu;
       (*s).eps = 0.5 * eps;
       s += 1;
-      if (i < nstep)
+      if (i < nstep) {
         copy_steps(n, 2.0 * r0, ws, s);
-      else
+      } else {
         copy_steps(n, r0, ws, s);
+      }
       s += n;
     }
   } else if (mdp.integrator == OMF4) {
@@ -508,10 +523,11 @@ static void expand_level(int ilv, double tau, mdstep_t *s, mdstep_t *ws)
       (*s).iop = itu;
       (*s).eps = r2 * eps;
       s += 1;
-      if (i < nstep)
+      if (i < nstep) {
         copy_steps(n, 2.0 * r1, ws, s);
-      else
+      } else {
         copy_steps(n, r1, ws, s);
+      }
       s += n;
     }
   }
@@ -559,8 +575,9 @@ static int sort_force_block(mdstep_t *start, mdstep_t *end)
     fp = force_parms(start[i].iop);
 
     if (fp.force == FRG) {
-      if (i > 0)
+      if (i > 0) {
         swap_steps(start, start + i);
+      }
       k += 1;
     }
   }
@@ -578,8 +595,9 @@ static int sort_force_block(mdstep_t *start, mdstep_t *end)
       }
     }
 
-    if (k != i)
+    if (k != i) {
       swap_steps(start + i, start + k);
+    }
   }
 
   return gauge_pos;
@@ -617,8 +635,9 @@ static void sort_forces(void)
                "Incorrect gauge force count");
 
     s += end;
-    if ((*s).iop == itu)
+    if ((*s).iop == itu) {
       s += 1;
+    }
   }
 }
 
@@ -740,13 +759,16 @@ void print_mdsteps(int ipr)
 
     print_mdint_parms();
 
-    if (ipr & 0x1)
+    if (ipr & 0x1) {
       print_force_parms();
+    }
 
-    if (ipr & 0x2)
+    if (ipr & 0x2) {
       print_ops();
+    }
 
-    if (ipr & 0x4)
+    if (ipr & 0x4) {
       print_times(hmc.tau);
+    }
   }
 }

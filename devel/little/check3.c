@@ -80,9 +80,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check3.c]",
                  "Syntax: check3 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -148,8 +149,9 @@ int main(int argc, char *argv[])
   mulc_vadd_dble(nv, wvd[2], wvd[1], zd);
   dev = vnorm_square_dble(nv, 1, wvd[2]) / vnorm_square_dble(nv, 1, wvd[1]);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Relative deviation (Aw_dble) = %.1e\n", sqrt(dev));
+  }
 
   random_v(nv, wv[0], 1.0f);
   Aw(wv[0], wv[1]);

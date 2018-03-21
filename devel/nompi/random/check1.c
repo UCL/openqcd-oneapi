@@ -196,13 +196,15 @@ int main(void)
   test2 = 0;
 
   for (k = 0; k < 96; k++) {
-    if (xsn[k] != (xs[k + 60] * sbase))
+    if (xsn[k] != (xs[k + 60] * sbase)) {
       test1 = 1;
+    }
   }
 
   for (k = 0; k < 48; k++) {
-    if (xdn[k] != (xd[k + 39] * base))
+    if (xdn[k] != (xd[k + 39] * base)) {
       test2 = 1;
+    }
   }
 
   if (test1 == 1) {
@@ -242,13 +244,15 @@ int main(void)
   }
 
   for (k = 0; k < NXS; k++) {
-    if (xs[k] != ys[k])
+    if (xs[k] != ys[k]) {
       test1 = 2;
+    }
   }
 
   for (k = 0; k < NXD; k++) {
-    if (xd[k] != yd[k])
+    if (xd[k] != yd[k]) {
       test2 = 2;
+    }
   }
 
   if (test1 == 2) {

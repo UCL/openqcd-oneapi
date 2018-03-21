@@ -30,8 +30,9 @@ static double eval_rat1(ratfct_t *rf, double x)
   rmu = (*rf).rmu;
   r = 0.0;
 
-  for (i = 0; i < np; i++)
+  for (i = 0; i < np; i++) {
     r += rmu[i] / (x * x + mu[i] * mu[i]);
+  }
 
   return 1.0 + r;
 }
@@ -70,8 +71,9 @@ static double diff_rat1(double ra, double rb, ratfct_t *rf)
 
     d = fabs(1.0 - (*rf).A * x * eval_rat1(rf, x));
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   d = dmax;
@@ -94,8 +96,9 @@ static double diff_rat2(double ra, double rb, ratfct_t *rf)
 
     d = fabs(1.0 - eval_rat1(rf, x) * eval_rat2(rf, x));
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   d = dmax;
@@ -119,8 +122,9 @@ static double diff_rat3(double ra, double rb, ratfct_t *rf)
     d = fabs(1.0 -
              (eval_rat1(rf + 1, x) * eval_rat1(rf + 2, x)) / eval_rat1(rf, x));
 
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
 
   d = dmax;
@@ -158,8 +162,9 @@ int main(int argc, char *argv[])
 
   read_rat_parms(0);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(fin);
+  }
 
   print_rat_parms();
   start_ranlux(0, 123456);
@@ -176,30 +181,35 @@ int main(int argc, char *argv[])
 
     printf("  i      mu[i]       rmu[i]\n");
 
-    for (i = 0; i < rf[0].np; i++)
+    for (i = 0; i < rf[0].np; i++) {
       printf("  %2d   %.4e  % .4e\n", i, rf[0].mu[i], rf[0].rmu[i]);
+    }
 
     printf("  i      nu[i]       rnu[i]\n");
 
-    for (i = 0; i < rf[0].np; i++)
+    for (i = 0; i < rf[0].np; i++) {
       printf("  %2d   %.4e  % .4e\n", i, rf[0].nu[i], rf[0].rnu[i]);
+    }
   }
 
   dmax = diff_rat1(rp.range[0], rp.range[1], rf);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Check approximation = %.1e (should be at most %.1e)\n", dmax,
            rf[0].delta);
+  }
 
   dmax = diff_rat2(rp.range[0], rp.range[1], rf);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Check decomposition = %.1e\n\n", dmax);
+  }
 
   np1 = 0;
 
-  for (i = 0; i < rf[0].np; i++)
+  for (i = 0; i < rf[0].np; i++) {
     np1 += (rf[0].mu[i] > 0.1);
+  }
 
   if ((np1 > 0) && (np1 < rf[0].np)) {
     irat[0] = 0;
@@ -212,8 +222,9 @@ int main(int argc, char *argv[])
     irat[2] = rf[0].np - 1;
     rf[2] = ratfct(irat);
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Factorization R0=R1*R2:\n\n");
+    }
 
     for (i = 1; i < 3; i++) {
       if (my_rank == 0) {
@@ -223,13 +234,15 @@ int main(int argc, char *argv[])
 
         printf("  i      mu[i]       rmu[i]\n");
 
-        for (j = 0; j < rf[i].np; j++)
+        for (j = 0; j < rf[i].np; j++) {
           printf("  %2d   %.4e  % .4e\n", j, rf[i].mu[j], rf[i].rmu[j]);
+        }
 
         printf("  i      nu[i]       rnu[i]\n");
 
-        for (j = 0; j < rf[i].np; j++)
+        for (j = 0; j < rf[i].np; j++) {
           printf("  %2d   %.4e  % .4e\n", j, rf[i].nu[j], rf[i].rnu[j]);
+        }
 
         printf("\n");
       }
@@ -237,12 +250,14 @@ int main(int argc, char *argv[])
 
     dmax = diff_rat3(rp.range[0], rp.range[1], rf);
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Check factorization = %.1e\n\n", dmax);
+    }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

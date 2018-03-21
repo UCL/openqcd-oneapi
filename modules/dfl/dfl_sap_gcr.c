@@ -152,7 +152,10 @@ static double mud;
 static sap_parms_t spr;
 static dfl_pro_parms_t dpr;
 
-static void Dop(spinor_dble *s, spinor_dble *r) { Dw_dble(mud, s, r); }
+static void Dop(spinor_dble *s, spinor_dble *r)
+{
+  Dw_dble(mud, s, r);
+}
 
 static void Mop(int k, spinor *rho, spinor *phi, spinor *chi)
 {
@@ -175,8 +178,9 @@ static void Mop(int k, spinor *rho, spinor *phi, spinor *chi)
   diff_s2s(VOLUME, rho, chi);
   set_s2zero(VOLUME, phi);
 
-  for (n = 0; n < spr.ncy; n++)
+  for (n = 0; n < spr.ncy; n++) {
     sap(mus, spr.isolv, spr.nmr, phi, chi);
+  }
 
   diff_s2s(VOLUME, rho, chi);
   mulr_spinor_add(VOLUME, phi, ws[0], 1.0f);
@@ -185,8 +189,9 @@ static void Mop(int k, spinor *rho, spinor *phi, spinor *chi)
     if (status >= 0) {
       nit += 1;
       stat += status;
-    } else
+    } else {
       stat = status;
+    }
   }
 
   release_ws();
@@ -220,14 +225,17 @@ double dfl_sap_gcr(int nkv, int nmx, double res, double mu, spinor_dble *eta,
 
   blk_list(SAP_BLOCKS, &nb, &isw);
 
-  if (nb == 0)
+  if (nb == 0) {
     alloc_bgr(SAP_BLOCKS);
+  }
 
-  if (query_grid_flags(SAP_BLOCKS, UBGR_MATCH_UD) != 1)
+  if (query_grid_flags(SAP_BLOCKS, UBGR_MATCH_UD) != 1) {
     assign_ud2ubgr(SAP_BLOCKS);
+  }
 
-  if (query_flags(SWD_UP2DATE) != 1)
+  if (query_flags(SWD_UP2DATE) != 1) {
     sw_term(NO_PTS);
+  }
 
   swde = query_flags(SWD_E_INVERTED);
   swdo = query_flags(SWD_O_INVERTED);
@@ -238,47 +246,55 @@ double dfl_sap_gcr(int nkv, int nmx, double res, double mu, spinor_dble *eta,
   ifail = 0;
 
   if (spr.isolv == 0) {
-    if ((swde == 1) || (swdo == 1))
+    if ((swde == 1) || (swdo == 1)) {
       sw_term(NO_PTS);
+    }
 
-    if ((swu != 1) || (swe == 1) || (swo == 1))
+    if ((swu != 1) || (swe == 1) || (swo == 1)) {
       assign_swd2swbgr(SAP_BLOCKS, NO_PTS);
+    }
   } else if (spr.isolv == 1) {
     if ((swde != 1) && (swdo == 1)) {
-      if ((swu != 1) || (swe == 1) || (swo != 1))
+      if ((swu != 1) || (swe == 1) || (swo != 1)) {
         assign_swd2swbgr(SAP_BLOCKS, NO_PTS);
+      }
 
       sw_term(NO_PTS);
     } else {
-      if ((swde == 1) || (swdo == 1))
+      if ((swde == 1) || (swdo == 1)) {
         sw_term(NO_PTS);
+      }
 
-      if ((swu != 1) || (swe == 1) || (swo != 1))
+      if ((swu != 1) || (swe == 1) || (swo != 1)) {
         ifail = assign_swd2swbgr(SAP_BLOCKS, ODD_PTS);
+      }
     }
-  } else
+  } else {
     error_root(1, 1, "dfl_sap_gcr [dfl_sap_gcr.c]", "Unknown block solver");
+  }
 
-  if (query_flags(U_MATCH_UD) != 1)
+  if (query_flags(U_MATCH_UD) != 1) {
     assign_ud2u();
+  }
 
   if ((query_flags(SW_UP2DATE) != 1) || (query_flags(SW_E_INVERTED) == 1) ||
-      (query_flags(SW_O_INVERTED) == 1))
+      (query_flags(SW_O_INVERTED) == 1)) {
     assign_swd2sw();
+  }
 
   rho0 = sqrt(norm_square_dble(VOLUME, 1, eta));
   rho = rho0;
   status[0] = 0;
   status[1] = 0;
 
-  if (ifail)
+  if (ifail) {
     status[0] = -2;
-  else {
+  } else {
     ifail = set_Awhat(mu);
 
-    if (ifail)
+    if (ifail) {
       status[0] = -3;
-    else {
+    } else {
       ws = reserve_ws(2 * nkv + 1);
       wsd = reserve_wsd(1);
       rsd = reserve_wsd(1);
@@ -300,10 +316,11 @@ double dfl_sap_gcr(int nkv, int nmx, double res, double mu, spinor_dble *eta,
         scale_dble(VOLUME, fact, psi);
         rho *= fact;
 
-        if ((nit > 0) && (stat >= 0))
+        if ((nit > 0) && (stat >= 0)) {
           status[1] = (stat + nit / 2) / nit;
-        else if (stat < 0)
+        } else if (stat < 0) {
           status[1] = stat;
+        }
       } else {
         rho = 0.0;
         set_sd2zero(VOLUME, psi);
@@ -346,8 +363,9 @@ double dfl_sap_gcr2(int nkv, int nmx, double res, double mu, spinor_dble *eta,
                status[2]);
 
     rho = dfl_sap_gcr(nkv, nmx, res, mu, eta, psi, status);
-  } else
+  } else {
     status[2] = 0;
+  }
 
   release_wsd();
 

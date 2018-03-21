@@ -171,11 +171,13 @@ static void set_ud(void)
 
             for (ifc = 0; ifc < 8; ifc++) {
               mu = ifc / 2;
-              if (ifc & 0x1)
+              if (ifc & 0x1) {
                 x[mu] -= 1;
+              }
               r1 = afld(x, mu);
-              if (ifc & 0x1)
+              if (ifc & 0x1) {
                 x[mu] += 1;
+              }
               r2 = t[0] * r1;
               (*u) = ud0;
               (*u).c11.re = cos(r2);
@@ -434,14 +436,16 @@ static void bnd_corr(double *cF, spinor_dble *pk, spinor_dble *pl)
     s = global_time(ix);
     c = 0.0;
 
-    if (((s == 0) && (bc != 3)) || ((s == (N0 - 1)) && (bc == 0)))
+    if (((s == 0) && (bc != 3)) || ((s == (N0 - 1)) && (bc == 0))) {
       pl[ix] = pk[ix];
+    }
 
-    if ((s == 1) && (bc != 3))
+    if ((s == 1) && (bc != 3)) {
       c = cF[0] - 1.0;
-    else if (((s == (N0 - 2)) && (bc == 0)) ||
-             ((s == (N0 - 1)) && ((bc == 1) || (bc == 2))))
+    } else if (((s == (N0 - 2)) && (bc == 0)) ||
+               ((s == (N0 - 1)) && ((bc == 1) || (bc == 2)))) {
       c = cF[1] - 1.0;
+    }
 
     if (c != 0.0) {
       _vector_mulr_assign(pl[ix].c1, c, pk[ix].c1);
@@ -481,9 +485,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check3.c]",
                  "Syntax: check3 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -518,9 +523,10 @@ int main(int argc, char *argv[])
   swp = sw_parms();
   dmax = 0.0;
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("m0=%.4e, csw=%.4e, cF=%.4e, cF'=%.4e\n\n", swp.m0, swp.csw,
            swp.cF[0], swp.cF[1]);
+  }
 
   for (n = 0; n < 4; n++) {
     set_parms();
@@ -537,8 +543,9 @@ int main(int argc, char *argv[])
     d = norm_square_dble(VOLUME, 1, psd[2]) /
         norm_square_dble(VOLUME, 1, psd[0]);
     d = sqrt(d);
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
 
     if (my_rank == 0) {
       printf("Field number %d:\n", n + 1);

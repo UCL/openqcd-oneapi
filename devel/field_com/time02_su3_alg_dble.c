@@ -29,8 +29,9 @@ static void alloc_alg_field(void)
   bc = bc_type();
   n = 4 * VOLUME + 7 * (BNDRY / 4);
 
-  if ((cpr[0] == (NPROC0 - 1)) && ((bc == 1) || (bc == 2)))
+  if ((cpr[0] == (NPROC0 - 1)) && ((bc == 1) || (bc == 2))) {
     n += 3;
+  }
 
   alg_field = amalloc(n * sizeof(*alg_field), ALIGN);
   error(alg_field == NULL, 1, "random_alg_field [time02_su3_alg_dble.c]",
@@ -116,8 +117,9 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
 
-    for (count = 0; count < nt; ++count)
+    for (count = 0; count < nt; ++count) {
       copy_boundary_su3_alg_field(alg_field);
+    }
 
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();
@@ -142,8 +144,9 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
 
-    for (count = 0; count < nt; ++count)
+    for (count = 0; count < nt; ++count) {
       add_boundary_su3_alg_field(alg_field);
+    }
 
     MPI_Barrier(MPI_COMM_WORLD);
     wt2 = MPI_Wtime();
@@ -159,8 +162,9 @@ int main(int argc, char *argv[])
     printf("%4.3f micro sec\n\n", wdt);
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

@@ -60,8 +60,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       cmat_vec(nm, a, v, w);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;
@@ -79,8 +80,9 @@ int main(void)
 
   while (dt < 2.0) {
     t1 = (double)clock();
-    for (count = 0; count < n; count++)
+    for (count = 0; count < n; count++) {
       cmat_mul(nm, a, b, c);
+    }
     t2 = (double)clock();
     dt = (t2 - t1) / (double)(CLOCKS_PER_SEC);
     n *= 2;

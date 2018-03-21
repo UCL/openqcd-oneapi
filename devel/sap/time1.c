@@ -82,9 +82,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [time1.c]",
                  "Syntax: time1 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -134,8 +135,9 @@ int main(int argc, char *argv[])
   blk_list(SAP_BLOCKS, &nb, &isw);
 
   nt = (int)(1.0e7 / (double)(nmr * VOLUME));
-  if (nt < 2)
+  if (nt < 2) {
     nt = 2;
+  }
   wdt = 0.0;
 
   while (wdt < 5.0) {
@@ -169,8 +171,9 @@ int main(int argc, char *argv[])
              "The inversion of the SW term was not safe");
 
   nt = (int)(1.0e7 / (double)(nmr * VOLUME));
-  if (nt < 2)
+  if (nt < 2) {
     nt = 2;
+  }
   wdt = 0.0;
 
   while (wdt < 5.0) {

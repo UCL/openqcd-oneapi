@@ -151,19 +151,23 @@ static void read_bc_section(FILE *fin)
     cF = 1.0;
     cF_prime = 1.0;
 
-    if (bc == 1)
+    if (bc == 1) {
       read_dprms("phi", 2, phi);
+    }
 
-    if ((bc == 1) || (bc == 2))
+    if ((bc == 1) || (bc == 2)) {
       read_dprms("phi'", 2, phi_prime);
+    }
 
-    if (bc != 3)
+    if (bc != 3) {
       read_line("cF", "%lf", &cF);
+    }
 
-    if (bc == 2)
+    if (bc == 2) {
       read_line("cF'", "%lf", &cF_prime);
-    else
+    } else {
       cF_prime = cF;
+    }
 
     read_dprms("theta", 3, theta);
   }
@@ -276,8 +280,9 @@ int main(int argc, char *argv[])
   read_dfl_section(fin);
   read_gcr_section(fin);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(fin);
+  }
 
   set_ani_parms(has_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion,
                 ut_fermion);
@@ -322,10 +327,11 @@ int main(int argc, char *argv[])
   start_ranlux(0, 1234);
   geometry();
 
-  if (Ns <= (2 * nkv_gcr))
+  if (Ns <= (2 * nkv_gcr)) {
     alloc_ws(2 * nkv_gcr + 2);
-  else
+  } else {
     alloc_ws(Ns + 2);
+  }
   alloc_wsd(6);
   alloc_wv(2 * dpr.nkv + 2);
   alloc_wvd(4);
@@ -387,8 +393,9 @@ int main(int argc, char *argv[])
       avgstat[1] += status[1];
       del /= nrm;
 
-      if (del > resm)
+      if (del > resm) {
         resm = del;
+      }
 
       MPI_Barrier(MPI_COMM_WORLD);
       wt1 = MPI_Wtime();
@@ -402,9 +409,10 @@ int main(int argc, char *argv[])
 
       if (my_rank == 0) {
         printf("time = %.2e sec (w/o preparatory steps)\n", wdt);
-        if (status[0] > 0)
+        if (status[0] > 0) {
           printf("     = %.2e usec (per point and GCR iteration)",
                  (1.0e6 * wdt) / ((double)(status[0]) * (double)(VOLUME)));
+        }
         printf("\n\n");
         fflush(flog);
       }
@@ -433,9 +441,10 @@ int main(int argc, char *argv[])
 
     printf("Average status = %d,%d\n", status[0], status[1]);
     printf("Average time = %.2e sec (w/o preparatory steps)\n", wta);
-    if (status[0] > 0)
+    if (status[0] > 0) {
       printf("             = %.2e usec (per point and GCR iteration)",
              (1.0e6 * wta) / ((double)(status[0]) * (double)(VOLUME)));
+    }
     printf("\n\n");
 
     fclose(flog);

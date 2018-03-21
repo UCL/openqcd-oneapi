@@ -18,21 +18,21 @@
 
 #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include "mpi.h"
-#include "flags.h"
-#include "random.h"
-#include "utils.h"
-#include "lattice.h"
-#include "uflds.h"
 #include "archive.h"
 #include "dfl.h"
-#include "update.h"
-#include "version.h"
+#include "flags.h"
 #include "global.h"
+#include "lattice.h"
+#include "mpi.h"
+#include "random.h"
+#include "uflds.h"
+#include "update.h"
+#include "utils.h"
+#include "version.h"
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -125,16 +125,18 @@ static void write_file_head(void)
 
   istd[0] = (stdint_t)(nrw);
 
-  if (endian == BIG_ENDIAN)
+  if (endian == BIG_ENDIAN) {
     bswap_int(1, istd);
+  }
 
   iw = fwrite(istd, sizeof(stdint_t), 1, fdat);
 
   for (irw = 0; irw < nrw; irw++) {
     istd[0] = (stdint_t)(nfct[irw]);
 
-    if (endian == BIG_ENDIAN)
+    if (endian == BIG_ENDIAN) {
       bswap_int(1, istd);
+    }
 
     iw += fwrite(istd, sizeof(stdint_t), 1, fdat);
   }
@@ -142,8 +144,9 @@ static void write_file_head(void)
   for (irw = 0; irw < nrw; irw++) {
     istd[0] = (stdint_t)(nsrc[irw]);
 
-    if (endian == BIG_ENDIAN)
+    if (endian == BIG_ENDIAN) {
       bswap_int(1, istd);
+    }
 
     iw += fwrite(istd, sizeof(stdint_t), 1, fdat);
   }
@@ -164,8 +167,9 @@ static void check_file_head(void)
 
   ir = fread(istd, sizeof(stdint_t), 1, fdat);
 
-  if (endian == BIG_ENDIAN)
+  if (endian == BIG_ENDIAN) {
     bswap_int(1, istd);
+  }
 
   ie = (istd[0] != (stdint_t)(nrw));
 
@@ -175,8 +179,9 @@ static void check_file_head(void)
   for (irw = 0; irw < nrw; irw++) {
     ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-    if (endian == BIG_ENDIAN)
+    if (endian == BIG_ENDIAN) {
       bswap_int(1, istd);
+    }
 
     ie |= (istd[0] != (stdint_t)(nfct[irw]));
   }
@@ -184,8 +189,9 @@ static void check_file_head(void)
   for (irw = 0; irw < nrw; irw++) {
     ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-    if (endian == BIG_ENDIAN)
+    if (endian == BIG_ENDIAN) {
       bswap_int(1, istd);
+    }
 
     ie |= (istd[0] != (stdint_t)(nsrc[irw]));
   }
@@ -206,8 +212,9 @@ static void write_data(void)
 
   istd[0] = (stdint_t)(data.nc);
 
-  if (endian == BIG_ENDIAN)
+  if (endian == BIG_ENDIAN) {
     bswap_int(1, istd);
+  }
 
   iw = fwrite(istd, sizeof(stdint_t), 1, fdat);
 
@@ -221,8 +228,9 @@ static void write_data(void)
       for (isrc = 0; isrc < nsrc[irw]; isrc++) {
         dstd[0] = data.sqn[irw][ifct][isrc];
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_double(1, dstd);
+        }
 
         iw += fwrite(dstd, sizeof(double), 1, fdat);
       }
@@ -230,8 +238,9 @@ static void write_data(void)
       for (isrc = 0; isrc < nsrc[irw]; isrc++) {
         dstd[0] = data.lnr[irw][ifct][isrc];
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_double(1, dstd);
+        }
 
         iw += fwrite(dstd, sizeof(double), 1, fdat);
       }
@@ -253,11 +262,13 @@ static int read_data(void)
 
   ir = fread(istd, sizeof(stdint_t), 1, fdat);
 
-  if (ir != 1)
+  if (ir != 1) {
     return 0;
+  }
 
-  if (endian == BIG_ENDIAN)
+  if (endian == BIG_ENDIAN) {
     bswap_int(1, istd);
+  }
 
   data.nc = (int)(istd[0]);
 
@@ -271,8 +282,9 @@ static int read_data(void)
       for (isrc = 0; isrc < nsrc[irw]; isrc++) {
         ir += fread(dstd, sizeof(double), 1, fdat);
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_double(1, dstd);
+        }
 
         data.sqn[irw][ifct][isrc] = dstd[0];
       }
@@ -280,8 +292,9 @@ static int read_data(void)
       for (isrc = 0; isrc < nsrc[irw]; isrc++) {
         ir += fread(dstd, sizeof(double), 1, fdat);
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_double(1, dstd);
+        }
 
         data.lnr[irw][ifct][isrc] = dstd[0];
       }
@@ -349,13 +362,14 @@ static void read_dirs(void)
 
 static void setup_files(void)
 {
-  if (noexp)
+  if (noexp) {
     error_root(name_size("%s/%sn%d_%d", loc_dir, nbase, last, NPROC - 1) >=
                    NAME_SIZE,
                1, "setup_files [ms1.c]", "loc_dir name is too long");
-  else
+  } else {
     error_root(name_size("%s/%sn%d", cnfg_dir, nbase, last) >= NAME_SIZE, 1,
                "setup_files [ms1.c]", "cnfg_dir name is too long");
+  }
 
   check_dir_root(log_dir);
   check_dir_root(dat_dir);
@@ -394,17 +408,19 @@ static void read_lat_parms(void)
   kappa = malloc(nk * sizeof(*kappa));
   error(kappa == NULL, 1, "read_lat_parms [check2.c]",
         "Unable to allocate parameter array");
-  if (my_rank == 0)
+  if (my_rank == 0) {
     read_dprms("kappa", nk, kappa);
+  }
   MPI_Bcast(kappa, nk, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
   lat = set_lat_parms(0.0, 1.0, nk, kappa, csw);
   free(kappa);
 
-  if (append)
+  if (append) {
     check_lat_parms(fdat);
-  else
+  } else {
     write_lat_parms(fdat);
+  }
 }
 
 static void read_bc_parms(void)
@@ -424,17 +440,21 @@ static void read_bc_parms(void)
     cF = 1.0;
     cF_prime = 1.0;
 
-    if (bc == 1)
+    if (bc == 1) {
       read_dprms("phi", 2, phi);
+    }
 
-    if ((bc == 1) || (bc == 2))
+    if ((bc == 1) || (bc == 2)) {
       read_dprms("phi'", 2, phi_prime);
+    }
 
-    if (bc != 3)
+    if (bc != 3) {
       read_line("cF", "%lf", &cF);
+    }
 
-    if (bc == 2)
+    if (bc == 2) {
       read_line("cF'", "%lf", &cF_prime);
+    }
 
     read_optional_dprms("theta", 3, theta);
   }
@@ -448,10 +468,11 @@ static void read_bc_parms(void)
 
   bcp = set_bc_parms(bc, 1.0, 1.0, cF, cF_prime, phi, phi_prime, theta);
 
-  if (append)
+  if (append) {
     check_bc_parms(fdat);
-  else
+  } else {
     write_bc_parms(fdat);
+  }
 }
 
 static void read_rw_factors(void)
@@ -474,10 +495,12 @@ static void read_rw_factors(void)
       irp = rwp.irp;
       rp = rat_parms(irp);
 
-      if (rp.degree == 0)
+      if (rp.degree == 0) {
         read_rat_parms(irp);
-    } else
+      }
+    } else {
       nfct[irw] = rwp.nfct;
+    }
   }
 
   if (append) {
@@ -501,10 +524,11 @@ static void read_sap_parms(void)
   MPI_Bcast(bs, 4, MPI_INT, 0, MPI_COMM_WORLD);
   set_sap_parms(bs, 1, 4, 5);
 
-  if (append)
+  if (append) {
     check_sap_parms(fdat);
-  else
+  } else {
     write_sap_parms(fdat);
+  }
 }
 
 static void read_dfl_parms(void)
@@ -551,10 +575,11 @@ static void read_dfl_parms(void)
   MPI_Bcast(&res, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   set_dfl_pro_parms(nkv, nmx, res);
 
-  if (append)
+  if (append) {
     check_dfl_parms(fdat);
-  else
+  } else {
     write_dfl_parms(fdat);
+  }
 }
 
 static void read_solvers(void)
@@ -580,9 +605,9 @@ static void read_solvers(void)
         read_solver_parms(isp);
         sp = solver_parms(isp);
 
-        if (sp.solver == SAP_GCR)
+        if (sp.solver == SAP_GCR) {
           isap = 1;
-        else if (sp.solver == DFL_SAP_GCR) {
+        } else if (sp.solver == DFL_SAP_GCR) {
           isap = 1;
           idfl = 1;
         }
@@ -590,16 +615,19 @@ static void read_solvers(void)
     }
   }
 
-  if (append)
+  if (append) {
     check_solver_parms(fdat);
-  else
+  } else {
     write_solver_parms(fdat);
+  }
 
-  if (isap)
+  if (isap) {
     read_sap_parms();
+  }
 
-  if (idfl)
+  if (idfl) {
     read_dfl_parms();
+  }
 }
 
 static void read_ani_parms(void)
@@ -646,10 +674,11 @@ static void read_ani_parms(void)
     set_no_ani_parms();
   }
 
-  if (append)
+  if (append) {
     check_ani_parms(fdat);
-  else
+  } else {
     write_ani_parms(fdat);
+  }
 }
 
 static void read_infile(int argc, char *argv[])
@@ -686,10 +715,11 @@ static void read_infile(int argc, char *argv[])
   setup_files();
 
   if (my_rank == 0) {
-    if (append)
+    if (append) {
       fdat = fopen(par_file, "rb");
-    else
+    } else {
       fdat = fopen(par_file, "wb");
+    }
 
     error_root(fdat == NULL, 1, "read_infile [ms1.c]",
                "Unable to open parameter file");
@@ -714,8 +744,9 @@ static void read_infile(int argc, char *argv[])
     fclose(fin);
     fclose(fdat);
 
-    if (append == 0)
+    if (append == 0) {
       copy_file(par_file, par_save);
+    }
   }
 }
 
@@ -746,25 +777,29 @@ static void check_old_log(int *fst, int *lst, int *stp)
                     (np[2] != NPROC2) || (np[3] != NPROC3));
         ipgrd[1] = ((bp[0] != NPROC0_BLK) || (bp[1] != NPROC1_BLK) ||
                     (bp[2] != NPROC2_BLK) || (bp[3] != NPROC3_BLK));
-      } else
+      } else {
         ie |= 0x1;
+      }
     } else if (strstr(line, "fully processed") != NULL) {
       pc = lc;
 
       if (sscanf(line, "Configuration no %d", &lc) == 1) {
         ic += 1;
         isv = 1;
-      } else
+      } else {
         ie |= 0x1;
+      }
 
-      if (ic == 1)
+      if (ic == 1) {
         fc = lc;
-      else if (ic == 2)
+      } else if (ic == 2) {
         dc = lc - fc;
-      else if ((ic > 2) && (lc != (pc + dc)))
+      } else if ((ic > 2) && (lc != (pc + dc))) {
         ie |= 0x2;
-    } else if (strstr(line, "Configuration no") != NULL)
+      }
+    } else if (strstr(line, "Configuration no") != NULL) {
       isv = 0;
+    }
   }
 
   fclose(fend);
@@ -805,12 +840,13 @@ static void check_old_dat(int fst, int lst, int stp)
     lc = data.nc;
     ic += 1;
 
-    if (ic == 1)
+    if (ic == 1) {
       fc = lc;
-    else if (ic == 2)
+    } else if (ic == 2) {
       dc = lc - fc;
-    else if ((ic > 2) && (lc != (pc + dc)))
+    } else if ((ic > 2) && (lc != (pc + dc))) {
       ie |= 0x1;
+    }
   }
 
   fclose(fdat);
@@ -866,21 +902,23 @@ static void print_info(void)
     ip = ftell(flog);
     fclose(flog);
 
-    if (ip == 0L)
+    if (ip == 0L) {
       remove("STARTUP_ERROR");
+    }
 
-    if (append)
+    if (append) {
       flog = freopen(log_file, "a", stdout);
-    else
+    } else {
       flog = freopen(log_file, "w", stdout);
+    }
 
     error_root(flog == NULL, 1, "print_info [ms1.c]",
                "Unable to open log file");
     printf("\n");
 
-    if (append)
+    if (append) {
       printf("Continuation run\n\n");
-    else {
+    } else {
       printf("Measurement of reweighting factors\n");
       printf("----------------------------------\n\n");
     }
@@ -890,21 +928,24 @@ static void print_info(void)
     printf("Program git SHA: %s\n", build_git_sha);
     printf("Program user CFLAGS: %s\n", build_user_cflags);
 
-    if (endian == LITTLE_ENDIAN)
+    if (endian == LITTLE_ENDIAN) {
       printf("The machine is little endian\n");
-    else
+    } else {
       printf("The machine is big endian\n");
-    if (noexp)
+    }
+    if (noexp) {
       printf("Configurations are read in imported file format\n\n");
-    else
+    } else {
       printf("Configurations are read in exported file format\n\n");
+    }
 
-    if ((ipgrd[0] != 0) && (ipgrd[1] != 0))
+    if ((ipgrd[0] != 0) && (ipgrd[1] != 0)) {
       printf("Process grid and process block size changed:\n");
-    else if (ipgrd[0] != 0)
+    } else if (ipgrd[0] != 0) {
       printf("Process grid changed:\n");
-    else if (ipgrd[1] != 0)
+    } else if (ipgrd[1] != 0) {
       printf("Process block size changed:\n");
+    }
 
     if ((append == 0) || (ipgrd[0] != 0) || (ipgrd[1] != 0)) {
       printf("%dx%dx%dx%d lattice, ", N0, N1, N2, N3);
@@ -917,10 +958,10 @@ static void print_info(void)
     if (append) {
       printf("Random number generator:\n");
 
-      if (norng)
+      if (norng) {
         printf("level = %d, seed = %d, effective seed = %d\n\n", level, seed,
                seed ^ (first - step));
-      else {
+      } else {
         printf("State of ranlxs and ranlxd reset to the\n");
         printf("last exported state\n\n");
       }
@@ -933,10 +974,11 @@ static void print_info(void)
       for (ik = 0; ik < lat.nk; ik++) {
         n = fdigits(lat.kappa[ik]);
 
-        if (lat.nk >= 11)
+        if (lat.nk >= 11) {
           printf("kappa[%2d] = %.*f\n", ik, IMAX(n, 6), lat.kappa[ik]);
-        else
+        } else {
           printf("kappa[%1d] = %.*f\n", ik, IMAX(n, 6), lat.kappa[ik]);
+        }
       }
 
       n = fdigits(lat.csw);
@@ -948,11 +990,13 @@ static void print_info(void)
       print_rat_parms();
       print_solver_parms(&isap, &idfl);
 
-      if (isap)
+      if (isap) {
         print_sap_parms(0);
+      }
 
-      if (idfl)
+      if (idfl) {
         print_dfl_parms(0);
+      }
     }
 
     printf("Configurations no %d -> %d in steps of %d\n\n", first, last, step);
@@ -1023,10 +1067,11 @@ static void reweight_wsize(int *nws, int *nwsd, int *nwv, int *nwvd)
       if (rwp.rwfact == RWRAT) {
         sp = solver_parms(isp[ifct]);
 
-        if (sp.solver == MSCG)
+        if (sp.solver == MSCG) {
           nsd = 3 + np[ifct];
-        else
+        } else {
           nsd = 5;
+        }
 
         solver_wsize(isp[ifct], nsd, np[ifct], nws, nwsd, nwv, nwvd);
       } else {
@@ -1050,8 +1095,9 @@ static void alloc_rwstat(void)
   for (irw = 0; irw < nrw; irw++) {
     rwp = rw_parms(irw);
 
-    if (mfct < rwp.nfct)
+    if (mfct < rwp.nfct) {
       mfct = rwp.nfct;
+    }
   }
 
   mfct *= 2;
@@ -1082,16 +1128,18 @@ static void print_rwstat(int irw)
   nrs = 0;
 
   for (ifct = 0; ifct < nfct; ifct++) {
-    if (ifct == 0)
+    if (ifct == 0) {
       printf("RWF %d: status = ", irw);
-    else
+    } else {
       printf(";");
+    }
 
     sp = solver_parms(isp[ifct]);
 
     if (sp.solver == DFL_SAP_GCR) {
-      for (j = 0; j < 2; j++)
+      for (j = 0; j < 2; j++) {
         rwstat[ifct][j] = (rwstat[ifct][j] + (nsrc / 2)) / nsrc;
+      }
 
       printf("%d,%d", rwstat[ifct][0], rwstat[ifct][1]);
       nrs += rwstat[ifct][2];
@@ -1101,10 +1149,11 @@ static void print_rwstat(int irw)
     }
   }
 
-  if (nrs)
+  if (nrs) {
     printf(" (no of subspace regenerations = %d)\n", nrs);
-  else
+  } else {
     printf("\n");
+  }
 }
 
 static void set_data(int nc)
@@ -1124,8 +1173,9 @@ static void set_data(int nc)
     nfct = rwp.nfct;
 
     for (ifct = 0; ifct < (2 * nfct); ifct++) {
-      for (j = 0; j < 3; j++)
+      for (j = 0; j < 3; j++) {
         rwstat[ifct][j] = 0;
+      }
     }
 
     if (rwp.rwfact == RWRAT) {
@@ -1137,8 +1187,9 @@ static void set_data(int nc)
             rwrat(rwp.irp, nfct, rwp.np, rwp.isp, sqn + isrc, rwstat + nfct);
 
         for (ifct = 0; ifct < nfct; ifct++) {
-          for (j = 0; j < 3; j++)
+          for (j = 0; j < 3; j++) {
             rwstat[ifct][j] += rwstat[nfct + ifct][j];
+          }
         }
       }
     } else {
@@ -1146,26 +1197,29 @@ static void set_data(int nc)
         sqn = data.sqn[irw][ifct];
         lnr = data.lnr[irw][ifct];
 
-        if (ifct > 0)
+        if (ifct > 0) {
           mu1 = rwp.mu[ifct - 1];
-        else
+        } else {
           mu1 = 0.0;
+        }
 
         mu2 = rwp.mu[ifct];
         isp = rwp.isp[ifct];
 
         for (isrc = 0; isrc < nsrc; isrc++) {
-          if (rwp.rwfact == RWTM1)
+          if (rwp.rwfact == RWTM1) {
             lnr[isrc] = rwtm1(mu1, mu2, isp, sqn + isrc, rwstat[nfct]);
-          else if (rwp.rwfact == RWTM1_EO)
+          } else if (rwp.rwfact == RWTM1_EO) {
             lnr[isrc] = rwtm1eo(mu1, mu2, isp, sqn + isrc, rwstat[nfct]);
-          else if (rwp.rwfact == RWTM2)
+          } else if (rwp.rwfact == RWTM2) {
             lnr[isrc] = rwtm2(mu1, mu2, isp, sqn + isrc, rwstat[nfct]);
-          else if (rwp.rwfact == RWTM2_EO)
+          } else if (rwp.rwfact == RWTM2_EO) {
             lnr[isrc] = rwtm2eo(mu1, mu2, isp, sqn + isrc, rwstat[nfct]);
+          }
 
-          for (j = 0; j < 3; j++)
+          for (j = 0; j < 3; j++) {
             rwstat[ifct][j] += rwstat[nfct][j];
+          }
         }
       }
     }
@@ -1173,27 +1227,31 @@ static void set_data(int nc)
     if (my_rank == 0) {
       print_rwstat(irw);
 
-      if (rwp.rwfact == RWRAT)
+      if (rwp.rwfact == RWRAT) {
         nfct = 1;
-      else
+      } else {
         nfct = rwp.nfct;
+      }
 
       for (ifct = 0; ifct < nfct; ifct++) {
         lnr = data.lnr[irw][ifct];
 
-        if (nfct == 1)
+        if (nfct == 1) {
           printf("RWF %d: -ln(r) = %.4e", irw, lnr[0]);
-        else
+        } else {
           printf("RWF %d, factor %d: -ln(r) = %.4e", irw, ifct, lnr[0]);
+        }
 
         if (nsrc <= 4) {
-          for (isrc = 1; isrc < nsrc; isrc++)
+          for (isrc = 1; isrc < nsrc; isrc++) {
             printf(",%.4e", lnr[isrc]);
+          }
         } else {
           printf(",%.4e,...", lnr[1]);
 
-          for (isrc = (nsrc - 2); isrc < nsrc; isrc++)
+          for (isrc = (nsrc - 2); isrc < nsrc; isrc++) {
             printf(",%.4e", lnr[isrc]);
+          }
         }
 
         printf("\n");
@@ -1207,15 +1265,16 @@ static void init_rng(void)
   int ic;
 
   if (append) {
-    if (norng)
+    if (norng) {
       start_ranlux(level, seed ^ (first - step));
-    else {
+    } else {
       ic = import_ranlux(rng_file);
       error_root(ic != (first - step), 1, "init_rng [ms1.c]",
                  "Configuration number mismatch (*.rng file)");
     }
-  } else
+  } else {
     start_ranlux(level, seed);
+  }
 }
 
 static void save_ranlux(void)
@@ -1253,8 +1312,9 @@ static void check_endflag(int *iend)
       remove(end_file);
       (*iend) = 1;
       printf("End flag set, run stopped\n\n");
-    } else
+    } else {
       (*iend) = 0;
+    }
   }
 
   MPI_Bcast(iend, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -1293,8 +1353,9 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
 
-    if (my_rank == 0)
+    if (my_rank == 0) {
       printf("Configuration no %d\n", nc);
+    }
 
     if (noexp) {
       save_ranlux();
@@ -1345,8 +1406,9 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

@@ -279,8 +279,9 @@ void export_sfld(char const *out, spinor_dble const *sd)
     for (x3 = 0; x3 < N3; x3 += L3) {
       np[3] = x3 / L3;
       n = ipr_global(np);
-      if (my_rank == n)
+      if (my_rank == n) {
         get_spinors(iy, sd);
+      }
 
       if (n > 0) {
         if (my_rank == 0) {
@@ -293,8 +294,9 @@ void export_sfld(char const *out, spinor_dble const *sd)
       }
 
       if (my_rank == 0) {
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_double(L3 * 24, (double *)(sbuf));
+        }
         iw = fwrite(sbuf, sizeof(spinor_dble), L3, fout);
         iwa |= (iw != L3);
       }
@@ -349,8 +351,9 @@ void import_sfld(char const *in, spinor_dble *sd)
     error_root((lsize[0] != N0) || (lsize[1] != N1) || (lsize[2] != N2) ||
                    (lsize[3] != N3),
                1, "import_sfld [sarchive.c]", "Lattice sizes do not match");
-  } else
+  } else {
     norm0 = 0.0;
+  }
 
   ira = 0;
 
@@ -376,8 +379,9 @@ void import_sfld(char const *in, spinor_dble *sd)
         ir = fread(sbuf, sizeof(spinor_dble), L3, fin);
         ira |= (ir != L3);
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_double(L3 * 24, (double *)(sbuf));
+        }
       }
 
       if (n > 0) {
@@ -390,8 +394,9 @@ void import_sfld(char const *in, spinor_dble *sd)
         }
       }
 
-      if (my_rank == n)
+      if (my_rank == n) {
         set_spinors(iy, sd);
+      }
     }
   }
 

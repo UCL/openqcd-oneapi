@@ -1,8 +1,8 @@
 #define DIFF_PRINTING_C
 
 #include "diff_printing.h"
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
 #include <string.h>
 
 static const char padder[] = "......................";

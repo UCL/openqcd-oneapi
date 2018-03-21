@@ -44,8 +44,9 @@ static void random_Xu(void)
     mu[1] = 2.0 * mu[1] - 1.0;
     mu[2] = -mu[0] - mu[1];
 
-    if (fabs(mu[2]) <= 1.0)
+    if (fabs(mu[2]) <= 1.0) {
       break;
+    }
   }
 
   t = 0.5 * (mu[0] * mu[0] + mu[1] * mu[1] + mu[2] * mu[2]);
@@ -117,8 +118,9 @@ static double dev_yw(void)
 
   for (i = 0; i < 18; i++) {
     dev = fabs(r[i]);
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   return dmax;
@@ -147,8 +149,9 @@ int main(void)
     expXsu3(eps, X, y);
 
     dev = dev_yw();
-    if (dev > dmax)
+    if (dev > dmax) {
       dmax = dev;
+    }
   }
 
   printf("Maximal deviation of exp(X)*u = %.1e\n\n", dmax);

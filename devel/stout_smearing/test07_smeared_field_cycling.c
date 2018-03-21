@@ -56,8 +56,9 @@ int main(int argc, char *argv[])
   set_flags(SMEARED_UD);
   set_flags(UNSMEARED_UD);
 
-  for (i = 0; i < 6; ++i)
+  for (i = 0; i < 6; ++i) {
     ud_adresses[i] = sfields[i];
+  }
 
   smear_fields();
 
@@ -91,7 +92,8 @@ int main(int argc, char *argv[])
 
   for (i = 0; i < 5; ++i) {
     local_test = (sfields[i + 1] != ud_adresses[i]);
-    MPI_Reduce(&local_test, &total_test, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&local_test, &total_test, 1, MPI_INT, MPI_SUM, 0,
+               MPI_COMM_WORLD);
 
     if (my_rank == 0) {
       printf("sfield[%d] {%p}, ud_adresses[%d] {%p} (should be the same)\n",
@@ -127,7 +129,8 @@ int main(int argc, char *argv[])
 
   for (i = 0; i < 6; ++i) {
     local_test = (sfields[i] != ud_adresses[i]);
-    MPI_Reduce(&local_test, &total_test, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&local_test, &total_test, 1, MPI_INT, MPI_SUM, 0,
+               MPI_COMM_WORLD);
 
     if (my_rank == 0) {
       printf("sfield[%d] {%p}, ud_adresses[%d] {%p} (should be the same)\n", i,

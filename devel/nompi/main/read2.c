@@ -48,8 +48,9 @@ static void read_file_head(FILE *fdat)
   ir = fread(istd, sizeof(stdint_t), 1, fdat);
   error(ir != 1, 1, "read_file_head [read2.c]", "Incorrect read count");
 
-  if (endian == BIG_ENDIAN)
+  if (endian == BIG_ENDIAN) {
     bswap_int(1, istd);
+  }
 
   nrw = (int)(istd[0]);
   error(nrw < 1, 1, "read_file_head [read2.c]", "nrw is out of range");
@@ -63,8 +64,9 @@ static void read_file_head(FILE *fdat)
   for (irw = 0; irw < nrw; irw++) {
     ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-    if (endian == BIG_ENDIAN)
+    if (endian == BIG_ENDIAN) {
       bswap_int(1, istd);
+    }
 
     nfct[irw] = (int)(istd[0]);
     ie |= (nfct[irw] < 1);
@@ -73,8 +75,9 @@ static void read_file_head(FILE *fdat)
   for (irw = 0; irw < nrw; irw++) {
     ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-    if (endian == BIG_ENDIAN)
+    if (endian == BIG_ENDIAN) {
       bswap_int(1, istd);
+    }
 
     nsrc[irw] = (int)(istd[0]);
     ie |= (nsrc[irw] < 1);
@@ -140,11 +143,13 @@ static int read_data(FILE *fdat)
 
   ir = fread(istd, sizeof(stdint_t), 1, fdat);
 
-  if (ir != 1)
+  if (ir != 1) {
     return 0;
+  }
 
-  if (endian == BIG_ENDIAN)
+  if (endian == BIG_ENDIAN) {
     bswap_int(1, istd);
+  }
 
   data.nc = (int)(istd[0]);
 
@@ -158,8 +163,9 @@ static int read_data(FILE *fdat)
       for (isrc = 0; isrc < nsrc[irw]; isrc++) {
         ir += fread(dstd, sizeof(double), 1, fdat);
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_double(1, dstd);
+        }
 
         data.sqn[irw][ifct][isrc] = dstd[0];
       }
@@ -167,8 +173,9 @@ static int read_data(FILE *fdat)
       for (isrc = 0; isrc < nsrc[irw]; isrc++) {
         ir += fread(dstd, sizeof(double), 1, fdat);
 
-        if (endian == BIG_ENDIAN)
+        if (endian == BIG_ENDIAN) {
           bswap_double(1, dstd);
+        }
 
         data.lnr[irw][ifct][isrc] = dstd[0];
       }
@@ -196,12 +203,13 @@ static void cnfg_range(FILE *fdat, int *fst, int *lst, int *stp)
   while (read_data(fdat)) {
     nc += 1;
 
-    if (nc == 1)
+    if (nc == 1) {
       (*fst) = data.nc;
-    else if (nc == 2)
+    } else if (nc == 2) {
       (*stp) = data.nc - (*fst);
-    else
+    } else {
       ie |= ((data.nc - (*lst)) != (*stp));
+    }
 
     (*lst) = data.nc;
   }
@@ -235,14 +243,16 @@ static void select_cnfg_range(FILE *fdat)
 
   if (first < fst) {
     first = first + ((fst - first) / step) * step;
-    if (first < fst)
+    if (first < fst) {
       first += step;
+    }
   }
 
   if (last > lst) {
     last = last - ((last - lst) / step) * step;
-    if (last > lst)
+    if (last > lst) {
       last -= step;
+    }
   }
 
   error((last < first) || (((last - first) % step) != 0) ||
@@ -265,8 +275,9 @@ static void alloc_avrw(void)
   n1 = nrw;
   n2 = 0;
 
-  for (irw = 0; irw < nrw; irw++)
+  for (irw = 0; irw < nrw; irw++) {
     n2 += nfct[irw];
+  }
 
   n3 = n2 * nms + nms;
 
@@ -314,8 +325,9 @@ static void data2avrw(int ims)
       lnm = lnr[0];
 
       for (isrc = 1; isrc < nsrc[irw]; isrc++) {
-        if (lnr[isrc] < lnm)
+        if (lnr[isrc] < lnm) {
           lnm = lnr[isrc];
+        }
       }
 
       lnrw[irw][ifct][ims] = lnm;
@@ -323,8 +335,9 @@ static void data2avrw(int ims)
 
       rw = 0.0;
 
-      for (isrc = 0; isrc < nsrc[ifct]; isrc++)
+      for (isrc = 0; isrc < nsrc[ifct]; isrc++) {
         rw += exp(lnm - lnr[isrc]);
+      }
 
       rw /= (double)(nsrc[ifct]);
 
@@ -355,45 +368,53 @@ static void normalize_avrw(void)
     lnma = lnm[0];
 
     for (ims = 1; ims < nms; ims++) {
-      if (lnm[ims] < lnma)
+      if (lnm[ims] < lnma) {
         lnma = lnm[ims];
+      }
     }
 
     rw = avrw[irw][0];
 
-    for (ims = 0; ims < nms; ims++)
+    for (ims = 0; ims < nms; ims++) {
       rw[ims] *= exp(lnma - lnm[ims]);
+    }
 
     rwa = 0.0;
 
-    for (ims = 0; ims < nms; ims++)
+    for (ims = 0; ims < nms; ims++) {
       rwa += rw[ims];
+    }
 
     rwa /= (double)(nms);
 
-    for (ims = 0; ims < nms; ims++)
+    for (ims = 0; ims < nms; ims++) {
       rw[ims] /= rwa;
+    }
   }
 
   lnma = lntot[0];
 
   for (ims = 1; ims < nms; ims++) {
-    if (lntot[ims] < lnma)
+    if (lntot[ims] < lnma) {
       lnma = lntot[ims];
+    }
   }
 
-  for (ims = 0; ims < nms; ims++)
+  for (ims = 0; ims < nms; ims++) {
     avtot[ims] *= exp(lnma - lntot[ims]);
+  }
 
   rwa = 0.0;
 
-  for (ims = 0; ims < nms; ims++)
+  for (ims = 0; ims < nms; ims++) {
     rwa += avtot[ims];
+  }
 
   rwa /= (double)(nms);
 
-  for (ims = 0; ims < nms; ims++)
+  for (ims = 0; ims < nms; ims++) {
     avtot[ims] /= rwa;
+  }
 }
 
 static void read_file(char *fin)
@@ -432,7 +453,10 @@ static void read_file(char *fin)
   normalize_avrw();
 }
 
-static double f(int nx, double x[]) { return x[0]; }
+static double f(int nx, double x[])
+{
+  return x[0];
+}
 
 static void print_plot(char *fin)
 {
@@ -445,10 +469,11 @@ static void print_plot(char *fin)
   n = p - fin;
 
   p = strrchr(fin, '/');
-  if (p == NULL)
+  if (p == NULL) {
     p = fin;
-  else
+  } else {
     p += 1;
+  }
   n -= (p - fin);
 
   error(n >= NAME_SIZE, 1, "print_plot [read2.c]", "File name is too long");
@@ -474,26 +499,30 @@ static void print_plot(char *fin)
   fprintf(fout, "#\n");
   fprintf(fout, "#  nc");
 
-  for (irw = 0; irw < nrw; irw++)
+  for (irw = 0; irw < nrw; irw++) {
     fprintf(fout, "       W[%d] ", irw);
+  }
 
-  if (nrw == 1)
+  if (nrw == 1) {
     fprintf(fout, "\n");
-  else
+  } else {
     fprintf(fout, "       W[all]\n");
+  }
 
   fprintf(fout, "#\n");
 
   for (ims = 0; ims < nms; ims++) {
     fprintf(fout, " %5d  ", first + ims * step);
 
-    for (irw = 0; irw < nrw; irw++)
+    for (irw = 0; irw < nrw; irw++) {
       fprintf(fout, "  %.4e", avrw[irw][0][ims]);
+    }
 
-    if (nrw == 1)
+    if (nrw == 1) {
       fprintf(fout, "\n");
-    else
+    } else {
       fprintf(fout, "  %.4e\n", avtot[ims]);
+    }
   }
 
   fclose(fout);
@@ -520,26 +549,30 @@ int main(int argc, char *argv[])
   printf("Integrated autocorrelation times and associated errors are ");
   printf("estimated\n");
 
-  if (nms > 100)
+  if (nms > 100) {
     printf("using the numerically determined autocorrelation function.\n");
-  else
+  } else {
     printf("by binning and calculating jackknife errors.\n");
+  }
 
   printf("Autocorrelation times are given in numbers of measurements.\n\n");
 
   for (irw = 0; irw < nrw; irw++) {
     printf("Reweighting factor no %d:\n", irw);
-    if (nfct[irw] > 1)
+    if (nfct[irw] > 1) {
       printf("Factorized into %d factors.\n", nfct[irw]);
-    if (nsrc[irw] > 1)
+    }
+    if (nsrc[irw] > 1) {
       printf("Using %d random source fields.\n\n", nsrc[irw]);
-    else
+    } else {
       printf("Using 1 random source field.\n\n");
+    }
 
-    if (nms >= 100)
+    if (nms >= 100) {
       print_auto(nms, avrw[irw][0]);
-    else
+    } else {
       print_jack(1, nms, avrw[irw], f);
+    }
 
     printf("\n");
   }
@@ -547,10 +580,11 @@ int main(int argc, char *argv[])
   if (nrw != 1) {
     printf("Product of all reweighting factors:\n\n");
 
-    if (nms >= 100)
+    if (nms >= 100) {
       print_auto(nms, avtot);
-    else
+    } else {
       print_jack(1, nms, &avtot, f);
+    }
 
     printf("\n");
   }

@@ -45,8 +45,9 @@ static int is_zero(spinor *s)
   sp = (spin_t *)(s);
   ie = 1;
 
-  for (i = 0; i < 24; i++)
+  for (i = 0; i < 24; i++) {
     ie &= ((*sp).r[i] == 0.0f);
+  }
 
   return ie;
 }
@@ -59,8 +60,9 @@ static int is_zero_dble(spinor_dble *s)
   sp = (spin_dble_t *)(s);
   ie = 1;
 
-  for (i = 0; i < 24; i++)
+  for (i = 0; i < 24; i++) {
     ie &= ((*sp).r[i] == 0.0);
+  }
 
   return ie;
 }
@@ -79,10 +81,11 @@ static int check_sbnd(ptset_t set, spinor *s)
           ((set == ODD_PTS) && (ix >= (VOLUME / 2))));
 
     if ((io != 0) &&
-        (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0))))
+        (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0)))) {
       ie &= is_zero(s);
-    else
+    } else {
       ie &= (is_zero(s) ^ 0x1);
+    }
 
     s += 1;
   }
@@ -104,10 +107,11 @@ static int check_sbnd_dble(ptset_t set, spinor_dble *s)
           ((set == ODD_PTS) && (ix >= (VOLUME / 2))));
 
     if ((io != 0) &&
-        (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0))))
+        (((t == 0) && (bc != 3)) || ((t == (N0 - 1)) && (bc == 0)))) {
       ie &= is_zero_dble(s);
-    else
+    } else {
       ie &= (is_zero_dble(s) ^ 0x1);
+    }
 
     s += 1;
   }
@@ -140,9 +144,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check3.c]",
                  "Syntax: check3 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -166,14 +171,15 @@ int main(int argc, char *argv[])
   ie = 1;
 
   for (is = 0; is < 4; is++) {
-    if (is == 0)
+    if (is == 0) {
       set = EVEN_PTS;
-    else if (is == 1)
+    } else if (is == 1) {
       set = ODD_PTS;
-    else if (is == 2)
+    } else if (is == 2) {
       set = ALL_PTS;
-    else
+    } else {
       set = NO_PTS;
+    }
 
     for (k = 0; k < NFLDS; k++) {
       random_s(NSPIN, ps[k], 1.0f);

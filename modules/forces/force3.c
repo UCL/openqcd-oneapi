@@ -134,16 +134,18 @@ static void set_res(int np, double res)
   int k;
 
   if (np > nps) {
-    if (nps > 0)
+    if (nps > 0) {
       free(rs);
+    }
 
     rs = malloc(np * sizeof(*rs));
     error(rs == NULL, 1, "set_res [force3.c]",
           "Unable to allocate auxiliary array");
   }
 
-  for (k = 0; k < np; k++)
+  for (k = 0; k < np; k++) {
     rs[k] = res;
+  }
 }
 
 static double sdet(void)
@@ -163,10 +165,11 @@ static double sdet(void)
   swp = sw_parms();
   ani = ani_parms();
 
-  if ((1.0 + 3.0 * ani.nu / ani.xi + swp.m0) > 1.0)
+  if ((1.0 + 3.0 * ani.nu / ani.xi + swp.m0) > 1.0) {
     c = pow(1.0 + 3.0 * ani.nu / ani.xi + swp.m0, -6.0);
-  else
+  } else {
     c = 1.0;
+  }
 
   sw_term(NO_PTS);
   reset_hsum(isx);
@@ -178,8 +181,9 @@ static double sdet(void)
   while (ix < VOLUME) {
     p = 1.0;
     iy = ix + 8;
-    if (iy > VOLUME)
+    if (iy > VOLUME) {
       iy = VOLUME;
+    }
 
     for (; ix < iy; ix++) {
       t = global_time(ix);
@@ -187,17 +191,19 @@ static double sdet(void)
       if (((t > 0) || (bc == 3)) && ((t < (N0 - 1)) || (bc != 0))) {
         z = det_pauli_dble(0.0, m);
 
-        if (z.re > 0.0)
+        if (z.re > 0.0) {
           p *= (c * z.re);
-        else
+        } else {
           ie = 1;
+        }
 
         z = det_pauli_dble(0.0, m + 1);
 
-        if (z.re > 0.0)
+        if (z.re > 0.0) {
           p *= (c * z.re);
-        else
+        } else {
           ie = 1;
+        }
       }
 
       m += 2;
@@ -206,8 +212,9 @@ static double sdet(void)
     if (p > 0.0) {
       smx = -log(p);
       add_to_hsum(isx, &smx);
-    } else
+    } else {
       ie = 1;
+    }
   }
 
   error(ie != 0, 1, "sdet [force3.c]",
@@ -230,8 +237,9 @@ double setpf3(int const *irat, int ipf, int isw, int isp, int icom, int *status)
   sap_parms_t sap;
 
   tm = tm_parms();
-  if (tm.eoflg != 1)
+  if (tm.eoflg != 1) {
     set_tm_parms(1);
+  }
 
   mdfs = mdflds();
   phi = (*mdfs).pf[ipf];
@@ -246,10 +254,11 @@ double setpf3(int const *irat, int ipf, int isw, int isp, int icom, int *status)
 
   sp = solver_parms(isp);
 
-  if (isw == 1)
+  if (isw == 1) {
     act = sdet();
-  else
+  } else {
     act = 0.0;
+  }
 
   if (sp.solver == MSCG) {
     rsd = reserve_wsd(np);
@@ -320,8 +329,9 @@ double setpf3(int const *irat, int ipf, int isw, int isp, int icom, int *status)
     set_sd2zero(VOLUME / 2, wsd[0]);
     mulg5_dble(VOLUME / 2, phi);
 
-    for (l = 0; l < 3; l++)
+    for (l = 0; l < 3; l++) {
       status[l] = 0;
+    }
 
     for (k = 0; k < np; k++) {
       dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, nu[k], phi, rsd[0], stat);
@@ -331,15 +341,17 @@ double setpf3(int const *irat, int ipf, int isw, int isp, int icom, int *status)
                  "(irat=%d,%d,%d, isp=%d, status=%d,%d,%d)",
                  irat[0], irat[1], irat[2], isp, stat[0], stat[1], stat[2]);
 
-      for (l = 0; l < 3; l++)
+      for (l = 0; l < 3; l++) {
         status[l] += stat[l];
+      }
 
       mulr_spinor_add_dble(VOLUME / 2, wsd[0], rsd[0], rnu[k]);
       act -= 2.0 * nu[k] * rnu[k] * norm_square_dble(VOLUME / 2, 0, rsd[0]);
     }
 
-    for (l = 0; l < 2; l++)
+    for (l = 0; l < 2; l++) {
       status[l] = (status[l] + (np / 2)) / np;
+    }
 
     mulg5_dble(VOLUME / 2, phi);
     act -= norm_square_dble(VOLUME / 2, 0, wsd[0]);
@@ -349,8 +361,9 @@ double setpf3(int const *irat, int ipf, int isw, int isp, int icom, int *status)
 
     release_wsd();
     release_wsd();
-  } else
+  } else {
     error_root(1, 1, "setpf3 [force3.c]", "Unknown solver");
+  }
 
   if (icom == 1) {
     r = act;
@@ -373,8 +386,9 @@ void force3(int const *irat, int ipf, int isw, int isp, double c, int *status)
   sap_parms_t sap;
 
   tm = tm_parms();
-  if (tm.eoflg != 1)
+  if (tm.eoflg != 1) {
     set_tm_parms(1);
+  }
 
   mdfs = mdflds();
   phi = (*mdfs).pf[ipf];
@@ -426,8 +440,9 @@ void force3(int const *irat, int ipf, int isw, int isp, double c, int *status)
     set_sd2zero(VOLUME / 2, phi + (VOLUME / 2));
     set_sd2zero(VOLUME / 2, wsd[0] + (VOLUME / 2));
 
-    for (l = 0; l < 2; l++)
+    for (l = 0; l < 2; l++) {
       status[l] = 0;
+    }
 
     for (k = 0; k < np; k++) {
       sap_gcr(sp.nkv, sp.nmx, sp.res, mu[k], phi, rsd[0], stat);
@@ -440,15 +455,17 @@ void force3(int const *irat, int ipf, int isw, int isp, double c, int *status)
                  "status=%d;%d)",
                  irat[0], irat[1], irat[2], isp, stat[0], stat[1]);
 
-      for (l = 0; l < 2; l++)
+      for (l = 0; l < 2; l++) {
         status[l] += stat[l];
+      }
 
       add_prod2xt(rmu[k], rsd[1], rsd[0]);
       add_prod2xv(rmu[k], rsd[1], rsd[0]);
     }
 
-    for (l = 0; l < 2; l++)
+    for (l = 0; l < 2; l++) {
       status[l] = (status[l] + (np / 2)) / np;
+    }
 
     mulg5_dble(VOLUME / 2, phi);
     release_wsd();
@@ -463,8 +480,9 @@ void force3(int const *irat, int ipf, int isw, int isp, double c, int *status)
     set_sd2zero(VOLUME / 2, phi + (VOLUME / 2));
     set_sd2zero(VOLUME / 2, wsd[0] + (VOLUME / 2));
 
-    for (l = 0; l < 6; l++)
+    for (l = 0; l < 6; l++) {
       status[l] = 0;
+    }
 
     for (k = 0; k < np; k++) {
       dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, mu[k], phi, rsd[0], stat);
@@ -481,8 +499,9 @@ void force3(int const *irat, int ipf, int isw, int isp, double c, int *status)
                  irat[0], irat[1], irat[2], isp, stat[0], stat[1], stat[2],
                  stat[3], stat[4], stat[5]);
 
-      for (l = 0; l < 6; l++)
+      for (l = 0; l < 6; l++) {
         status[l] += stat[l];
+      }
 
       add_prod2xt(rmu[k], rsd[1], rsd[0]);
       add_prod2xv(rmu[k], rsd[1], rsd[0]);
@@ -496,8 +515,9 @@ void force3(int const *irat, int ipf, int isw, int isp, double c, int *status)
     mulg5_dble(VOLUME / 2, phi);
     release_wsd();
     release_wsd();
-  } else
+  } else {
     error_root(1, 1, "force3 [force3.c]", "Unknown solver");
+  }
 
   if (isw == 1) {
     ifail = add_det2xt(1.0, ODD_PTS);
@@ -523,8 +543,9 @@ double action3(int const *irat, int ipf, int isw, int isp, int icom,
   tm_parms_t tm;
 
   tm = tm_parms();
-  if (tm.eoflg != 1)
+  if (tm.eoflg != 1) {
     set_tm_parms(1);
+  }
 
   mdfs = mdflds();
   phi = (*mdfs).pf[ipf];
@@ -536,10 +557,11 @@ double action3(int const *irat, int ipf, int isw, int isp, int icom,
 
   sp = solver_parms(isp);
 
-  if (isw == 1)
+  if (isw == 1) {
     act = sdet();
-  else
+  } else {
     act = 0.0;
+  }
 
   if (sp.solver == MSCG) {
     rsd = reserve_wsd(np);
@@ -592,8 +614,9 @@ double action3(int const *irat, int ipf, int isw, int isp, int icom,
     mulg5_dble(VOLUME / 2, phi);
     set_sd2zero(VOLUME / 2, phi + (VOLUME / 2));
 
-    for (l = 0; l < 3; l++)
+    for (l = 0; l < 3; l++) {
       status[l] = 0;
+    }
 
     for (k = 0; k < np; k++) {
       dfl_sap_gcr2(sp.nkv, sp.nmx, sp.res, mu[k], phi, rsd[0], stat);
@@ -603,19 +626,22 @@ double action3(int const *irat, int ipf, int isw, int isp, int icom,
                  "status=%d,%d,%d)",
                  irat[0], irat[1], irat[2], isp, stat[0], stat[1], stat[2]);
 
-      for (l = 0; l < 3; l++)
+      for (l = 0; l < 3; l++) {
         status[l] += stat[l];
+      }
 
       act += rmu[k] * norm_square_dble(VOLUME / 2, 0, rsd[0]);
     }
 
-    for (l = 0; l < 2; l++)
+    for (l = 0; l < 2; l++) {
       status[l] = (status[l] + (np / 2)) / np;
+    }
 
     mulg5_dble(VOLUME / 2, phi);
     release_wsd();
-  } else
+  } else {
     error_root(1, 1, "action3 [force3.c]", "Unknown solver");
+  }
 
   if (icom == 1) {
     r = act;

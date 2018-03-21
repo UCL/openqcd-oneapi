@@ -89,8 +89,9 @@ static void random_X(void)
     mu[1] = 2.0 * mu[1] - 1.0;
     mu[2] = -mu[0] - mu[1];
 
-    if (fabs(mu[2]) <= 1.0)
+    if (fabs(mu[2]) <= 1.0) {
       break;
+    }
   }
 
   (*X).c1 = (mu[0] - mu[1]) / 3.0;
@@ -136,12 +137,14 @@ static void diff_exp(void)
 {
   int i, j;
 
-  for (i = 0; i < 2; i++)
+  for (i = 0; i < 2; i++) {
     mul_vec(t[i], ex, dex[i]);
+  }
 
   for (i = 0; i < 2; i++) {
-    for (j = 0; j < 2; j++)
+    for (j = 0; j < 2; j++) {
       mul_vec(t[i], dex[j], ddex[i][j]);
+    }
   }
 }
 
@@ -199,8 +202,9 @@ static void set_prods(void)
   for (i = 0; i < 2; i++) {
     mul_vec(t[i], x, stx[i]);
 
-    for (j = 0; j < 2; j++)
+    for (j = 0; j < 2; j++) {
       mul_vec(t[i], t[j], stt[i][j]);
+    }
   }
 }
 
@@ -278,8 +282,9 @@ static double dev_dex(void)
   for (i = 0; i < 2; i++) {
     for (k = 0; k < 3; k++) {
       dev = dex[i][k].re * dex[i][k].re + dex[i][k].im * dex[i][k].im;
-      if (dev > dmax)
+      if (dev > dmax) {
         dmax = dev;
+      }
     }
   }
 
@@ -298,8 +303,9 @@ static double dev_ddex(void)
       for (k = 0; k < 3; k++) {
         dev = ddex[i][j][k].re * ddex[i][j][k].re +
               ddex[i][j][k].im * ddex[i][j][k].im;
-        if (dev > dmax)
+        if (dev > dmax) {
           dmax = dev;
+        }
       }
     }
   }
@@ -334,12 +340,14 @@ int main(void)
     subtract_chexp();
 
     dev = dev_dex();
-    if (dev > dmax1)
+    if (dev > dmax1) {
       dmax1 = dev;
+    }
 
     dev = dev_ddex();
-    if (dev > dmax2)
+    if (dev > dmax2) {
       dmax2 = dev;
+    }
   }
 
   printf("Maximal deviation of 1st derivatives = %.1e\n", dmax1);

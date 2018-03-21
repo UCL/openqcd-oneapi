@@ -80,8 +80,9 @@ void set_v2zero(int n, complex *v)
 
   vm = v + n;
 
-  for (; v < vm; v++)
+  for (; v < vm; v++) {
     (*v) = v0;
+  }
 }
 
 void set_vd2zero(int n, complex_dble *vd)
@@ -90,8 +91,9 @@ void set_vd2zero(int n, complex_dble *vd)
 
   vm = vd + n;
 
-  for (; vd < vm; vd++)
+  for (; vd < vm; vd++) {
     (*vd) = vd0;
+  }
 }
 
 void random_v(int n, complex *v, float sigma)

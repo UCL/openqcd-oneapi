@@ -842,8 +842,9 @@ void blk_mres(int n, float mu, int nmr)
     Dw_blk(SAP_BLOCKS, n, mu, 1, 2);
     scalar_prods(&r, &z);
 
-    if (r < (2.0f * FLT_MIN))
+    if (r < (2.0f * FLT_MIN)) {
       return;
+    }
 
     linear_cmbs(&r, &z);
   }
@@ -866,8 +867,9 @@ void blk_eo_mres(int n, float mu, int nmr)
     Dwhat_blk(SAP_BLOCKS, n, mu, 1, 2);
     scalar_prods(&r, &z);
 
-    if (r < (2.0f * FLT_MIN))
+    if (r < (2.0f * FLT_MIN)) {
       return;
+    }
 
     linear_cmbs(&r, &z);
   }
@@ -1041,8 +1043,9 @@ void blk_mres(int n, float mu, int nmr)
     Dw_blk(SAP_BLOCKS, n, mu, 1, 2);
     r = norm_square(vol, 0, s[2]);
 
-    if (r < (2.0f * FLT_MIN))
+    if (r < (2.0f * FLT_MIN)) {
       return;
+    }
 
     z = spinor_prod(vol, 0, s[2], s[1]);
 
@@ -1074,8 +1077,9 @@ void blk_eo_mres(int n, float mu, int nmr)
     Dwhat_blk(SAP_BLOCKS, n, mu, 1, 2);
     r = norm_square(vol, 0, s[2]);
 
-    if (r < (2.0f * FLT_MIN))
+    if (r < (2.0f * FLT_MIN)) {
       return;
+    }
 
     z = spinor_prod(vol, 0, s[2], s[1]);
 

@@ -20,11 +20,13 @@ static double As, *ars;
 
 static void alloc_ars(int n)
 {
-  if (n <= ns)
+  if (n <= ns) {
     return;
+  }
 
-  if (ns != 0)
+  if (ns != 0) {
     afree(ars);
+  }
 
   ars = amalloc(2 * n * sizeof(double), 3);
 
@@ -41,8 +43,9 @@ static double Zolo(int n, double y)
 
   p = 1.0;
 
-  for (r = 0; r < n; r++)
+  for (r = 0; r < n; r++) {
     p *= ((y + ars[2 * r]) / (y + ars[2 * r + 1]));
+  }
 
   return As * p;
 }
@@ -90,8 +93,9 @@ int main(void)
 
       dev = fabs(1.0 - sqrt(y) * Zolo(n, y));
 
-      if (dev > dmax)
+      if (dev > dmax) {
         dmax = dev;
+      }
     }
 
     printf("Relative error delta = %.1e (measured: %.1e)\n", delta, dmax);

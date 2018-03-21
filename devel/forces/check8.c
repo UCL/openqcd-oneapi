@@ -22,8 +22,8 @@
 #include "linalg.h"
 #include "mpi.h"
 #include "random.h"
-#include "stout_smearing.h"
 #include "sflds.h"
+#include "stout_smearing.h"
 #include "uflds.h"
 
 static int my_rank, bc, first, last, step;
@@ -169,19 +169,23 @@ static void read_bc_section(FILE *fin)
     cF = 1.0;
     cF_prime = 1.0;
 
-    if (bc == 1)
+    if (bc == 1) {
       read_dprms("phi", 2, phi);
+    }
 
-    if ((bc == 1) || (bc == 2))
+    if ((bc == 1) || (bc == 2)) {
       read_dprms("phi'", 2, phi_prime);
+    }
 
-    if (bc != 3)
+    if (bc != 3) {
       read_line("cF", "%lf", &cF);
+    }
 
-    if (bc == 2)
+    if (bc == 2) {
       read_line("cF'", "%lf", &cF_prime);
-    else
+    } else {
       cF_prime = cF;
+    }
 
     read_dprms("theta", 3, theta);
   }
@@ -257,15 +261,17 @@ int main(int argc, char *argv[])
 
   if (my_rank == 0) {
     printf("mu = %.6f", mu[0]);
-    for (k = 1; k < nmu; k++)
+    for (k = 1; k < nmu; k++) {
       printf(", %.6f", mu[k]);
+    }
     printf("\n\n");
 
     printf("CG parameters:\n");
     printf("nmx = %d\n", nmx);
     printf("res = %.2e", res[0]);
-    for (k = 1; k < nmu; k++)
+    for (k = 1; k < nmu; k++) {
       printf(", %.2e", res[k]);
+    }
     printf("\n\n");
 
     printf("Configurations %sn%d -> %sn%d in steps of %d\n\n", nbase, first,
@@ -273,10 +279,11 @@ int main(int argc, char *argv[])
     fflush(flog);
   }
 
-  if (nmu == 1)
+  if (nmu == 1) {
     alloc_wsd(8);
-  else
+  } else {
     alloc_wsd(5 + 2 * nmu);
+  }
 
   wsd = reserve_wsd(2);
   eta = wsd[0];
@@ -324,9 +331,10 @@ int main(int argc, char *argv[])
     if (my_rank == 0) {
       printf("status = %d\n", status);
       printf("time = %.2e sec (total)\n", wdt);
-      if (status > 0)
+      if (status > 0) {
         printf("     = %.2e usec (per point and CG iteration)\n",
                (1.0e6 * wdt) / ((double)(status) * (double)(VOLUME)));
+      }
       fflush(flog);
       error_root(status < 0, 1, "main [check8.c]", "Solver did not converge");
       printf("residues = ");
@@ -344,14 +352,16 @@ int main(int argc, char *argv[])
       mulr_spinor_add_dble(VOLUME / 2, phi, eta, -1.0);
       del = sqrt(norm_square_dble(VOLUME / 2, 1, phi)) / nrm;
 
-      if (del < res[k])
+      if (del < res[k]) {
         status += 1;
+      }
 
       if (my_rank == 0) {
-        if (k == 0)
+        if (k == 0) {
           printf("%.2e", del);
-        else
+        } else {
           printf(", %.2e", del);
+        }
       }
     }
 
@@ -362,20 +372,22 @@ int main(int argc, char *argv[])
     if (my_rank == 0) {
       printf("\n");
 
-      if (status == nmu)
+      if (status == nmu) {
         printf("All residues are as required\n\n");
-      else
+      } else {
         printf("ERROR: %d residues are too large\n\n", nmu - status);
+      }
 
       fflush(flog);
     }
   }
 
   if (my_rank == 0) {
-    if (ie == 0)
+    if (ie == 0) {
       printf("No errors detected --- all seems fine!\n\n");
-    else
+    } else {
       printf("ERROR: the residues are too large (%d configurations)\n\n", ie);
+    }
     fclose(flog);
   }
 

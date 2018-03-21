@@ -147,9 +147,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check4.c]",
                  "Syntax: check4 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -274,8 +275,9 @@ int main(int argc, char *argv[])
       assign_vd2v(nvh, wvd[1], wv[0]);
       mulc_vadd(nvh, wv[0], wv[1], z);
       d = (double)(vnorm_square(nvh, 1, wv[0]) / vnorm_square(nvh, 1, wv[1]));
-      if (my_rank == 0)
+      if (my_rank == 0) {
         printf("Deviation of %s from %s: %.1e\n", pr, prd, sqrt(d));
+      }
     }
 
     if ((iop == 2) || (iop == 3)) {
@@ -294,16 +296,18 @@ int main(int argc, char *argv[])
       d = (double)(vnorm_square(nvh, 1, wv[0] + nvh) /
                    vnorm_square(nvh, 1, wv[1] + nvh));
 
-      if (my_rank == 0)
+      if (my_rank == 0) {
         printf("Deviation of %s from %s: %.1e\n", pr, prd, sqrt(d));
+      }
     }
 
     if (iop == 5) {
       assign_vd2v(nv, wvd[1], wv[0]);
       mulc_vadd(nv, wv[0], wv[1], z);
       d = (double)(vnorm_square(nv, 1, wv[0]) / vnorm_square(nv, 1, wv[1]));
-      if (my_rank == 0)
+      if (my_rank == 0) {
         printf("Deviation of %s from %s: %.1e\n", pr, prd, sqrt(d));
+      }
     }
   }
 
@@ -328,8 +332,9 @@ int main(int argc, char *argv[])
   d = vnorm_square_dble(nvh, 1, wvd[2] + nvh) /
       vnorm_square_dble(nvh, 1, wvd[1] + nvh);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Comparison of Awoe_dble()    and Aw_dble(): %.1e\n", sqrt(d));
+  }
 
   random_vd(nvh, wvd[0] + nvh, 1.0);
   set_vd2zero(nvh, wvd[0]);
@@ -340,8 +345,9 @@ int main(int argc, char *argv[])
   d = vnorm_square_dble(nvh, 1, wvd[2] + nvh) /
       vnorm_square_dble(nvh, 1, wvd[0] + nvh);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Comparison of Awooinv_dble() and Aw_dble(): %.1e\n", sqrt(d));
+  }
 
   random_vd(nvh, wvd[2], 1.0);
   assign_vd2vd(nvh, wvd[2], wvd[3]);
@@ -350,8 +356,9 @@ int main(int argc, char *argv[])
   mulc_vadd_dble(nvh, wvd[3], wvd[1], zd);
   d = vnorm_square_dble(nvh, 1, wvd[3]) / vnorm_square_dble(nvh, 1, wvd[1]);
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     printf("Comparison of Aweo_dble()    and Aw_dble(): %.1e\n", sqrt(d));
+  }
 
   random_vd(nv, wvd[0], 1.0);
   Awhat_dble(wvd[0], wvd[1]);
@@ -375,8 +382,9 @@ int main(int argc, char *argv[])
   error(ifail != 0, 1, "main [check4.c]",
         "Hopping terms Aoe,Aeo at the lattice boundaries do not vanish");
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     fclose(flog);
+  }
 
   MPI_Finalize();
   exit(0);

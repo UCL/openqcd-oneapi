@@ -152,8 +152,9 @@ void Aw_dble(complex_dble *v, complex_dble *w)
   complex_dble **Aeo, **Aoe;
   Aw_dble_t Aw;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_vs();
+  }
 
   Aw = Awop_dble();
   apply_Aee(Aw.Aee, v, w);
@@ -195,16 +196,18 @@ void Aw_dble(complex_dble *v, complex_dble *w)
     Aeo += 8;
   }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     cpvd_ext_bnd(w);
+  }
 }
 
 void Aweeinv_dble(complex_dble *v, complex_dble *w)
 {
   Aw_dble_t Aw;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_vs();
+  }
 
   Aw = Awophat_dble();
   apply_Aee(Aw.Aee, v, w);
@@ -214,8 +217,9 @@ void Awooinv_dble(complex_dble *v, complex_dble *w)
 {
   Aw_dble_t Aw;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_vs();
+  }
 
   Aw = Awophat_dble();
   apply_Aoo(Aw.Aoo, v, w);
@@ -228,11 +232,13 @@ void Awoe_dble(complex_dble *v, complex_dble *w)
   complex_dble **Aoe;
   Aw_dble_t Aw;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_vs();
+  }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     cpvd_int_bnd(v);
+  }
 
   Aw = Awop_dble();
   Aoe = Aw.Aoe;
@@ -264,11 +270,13 @@ void Aweo_dble(complex_dble *v, complex_dble *w)
   complex_dble **Aeo;
   Aw_dble_t Aw;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_vs();
+  }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     set_vd2zero(nbbh * Ns, w + nb * Ns);
+  }
 
   Aw = Awop_dble();
   Aeo = Aw.Aeo;
@@ -292,8 +300,9 @@ void Aweo_dble(complex_dble *v, complex_dble *w)
     Aeo += 8;
   }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     cpvd_ext_bnd(w);
+  }
 }
 
 void Awhat_dble(complex_dble *v, complex_dble *w)
@@ -303,8 +312,9 @@ void Awhat_dble(complex_dble *v, complex_dble *w)
   complex_dble **Aeo, **Aoe;
   Aw_dble_t Aw;
 
-  if (Ns == 0)
+  if (Ns == 0) {
     alloc_vs();
+  }
 
   assign_vd2vd(nbh * Ns, v, w);
 
@@ -337,6 +347,7 @@ void Awhat_dble(complex_dble *v, complex_dble *w)
     Aeo += 8;
   }
 
-  if (NPROC > 1)
+  if (NPROC > 1) {
     cpvd_ext_bnd(w);
+  }
 }

@@ -65,9 +65,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check3.c]",
                  "Syntax: check3 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -92,10 +93,11 @@ int main(int argc, char *argv[])
   geometry();
   alloc_wfd(2);
 
-  if (bc == 0)
+  if (bc == 0) {
     nplaq = (double)(6 * N0 - 6) * (double)(N1 * N2 * N3);
-  else
+  } else {
     nplaq = (double)(6 * N0) * (double)(N1 * N2 * N3);
+  }
 
   random_ud();
   imax = n / dn;
@@ -119,8 +121,9 @@ int main(int argc, char *argv[])
       printf("n=%3d, act=%.4e, Q=% .2e, dev=%.1e, Q[0...%d]=% .2e",
              (i + 1) * dn, act, Q1, dev, N0 - 1, Q[0]);
 
-      for (t = 1; t < N0; t++)
+      for (t = 1; t < N0; t++) {
         printf(", % .2e", Q[t]);
+      }
 
       printf("\n");
     }
@@ -128,8 +131,9 @@ int main(int argc, char *argv[])
     MPI_Bcast(Q0, N0, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     for (t = 0; t < N0; t++) {
-      if ((Q[t] - Q0[t]) != 0.0)
+      if ((Q[t] - Q0[t]) != 0.0) {
         break;
+      }
     }
 
     error(t != N0, 1, "main [check3.c]",

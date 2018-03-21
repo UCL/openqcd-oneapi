@@ -106,16 +106,17 @@ int main(int argc, char *argv[])
   s = mdsteps(&nop, &ismear, &iunsmear, &itu);
   sm = s + nop;
 
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 4; i++) {
     random_sd(VOLUME, chi[i], 1.0);
+  }
 
   for (; s < sm; s++) {
     iop = (*s).iop;
     eps = (*s).eps;
 
-    if (iop == itu)
+    if (iop == itu) {
       step_mdtime(eps);
-    else if (iop == 1) {
+    } else if (iop == 1) {
       set_psi(chi, wsd[0]);
 
       if (get_chrono(1, wsd[1])) {
@@ -123,8 +124,9 @@ int main(int argc, char *argv[])
         dev = norm_square_dble(VOLUME, 1, wsd[1]) /
               norm_square_dble(VOLUME, 1, wsd[0]);
 
-        if (my_rank == 0)
+        if (my_rank == 0) {
           printf("t = %.3f, dev = %.1e\n", mdtime(), sqrt(dev));
+        }
       }
 
       add_chrono(1, wsd[0]);

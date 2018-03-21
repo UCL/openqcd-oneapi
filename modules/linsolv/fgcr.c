@@ -117,8 +117,9 @@ static int alloc_arrays(int nkv)
   a = amalloc(nkv * (nkv + 1) * sizeof(*a), ALIGN);
   b = amalloc(nkv * sizeof(*b), ALIGN);
 
-  if ((a == NULL) || (b == NULL))
+  if ((a == NULL) || (b == NULL)) {
     return 1;
+  }
 
   c = a + nkv * nkv;
   nkm = nkv;
@@ -190,8 +191,9 @@ static void update_psi(int vol, int icom, int k, int nkv, spinor_dble *eta,
 
   set_s2zero(vol, rho);
 
-  for (l = k; l >= 0; l--)
+  for (l = k; l >= 0; l--) {
     mulc_spinor_add(vol, rho, phi[l], c[l]);
+  }
 
   add_s2sd(vol, rho, psi);
   (*Dop)(psi, wrk);
@@ -264,8 +266,9 @@ double fgcr(int vol, int icom, void (*Dop)(spinor_dble *s, spinor_dble *r),
       message("[fgcr]: k = %d, rn = %.2e\n", k, rn);
 #endif
       if ((rn <= tol) || (rn < (PRECISION_LIMIT * rn_old)) ||
-          ((k + 1) == nkv) || ((*status) == nmx))
+          ((k + 1) == nkv) || ((*status) == nmx)) {
         break;
+      }
     }
 
     update_psi(vol, icom, k, nkv, eta, psi, Dop);

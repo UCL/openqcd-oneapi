@@ -18,8 +18,9 @@
 void get_steplist(mdstep_t const *begin, mdstep_t const *end, int *out)
 {
   int i = 0;
-  for (; begin < end; ++begin)
+  for (; begin < end; ++begin) {
     out[i++] = begin->iop;
+  }
 }
 
 int main(int argc, char *argv[])
@@ -59,8 +60,9 @@ int main(int argc, char *argv[])
     printf("-------------------------------------------\n\n");
   }
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++) {
     irat[i] = 0;
+  }
 
   for (i = 0; i < 4; i++) {
     imu[i] = 0;
@@ -229,8 +231,9 @@ int main(int argc, char *argv[])
     printf("\n-------------------------------------------\n\n");
   }
 
-  for (i = 0; i <= itu; ++i)
+  for (i = 0; i <= itu; ++i) {
     tau_total[i] = 0.;
+  }
 
   n = 0;
   for (; s < sm; ++s) {
@@ -251,33 +254,38 @@ int main(int argc, char *argv[])
       printf("Force %2d:   abs|tau(%2d)  - tau| = %.1e (should be 0.0)\n", i, i,
              diff);
 
-      if (diff > 1e-10)
+      if (diff > 1e-10) {
         fail_test(2);
+      }
     }
 
     diff = abs_diff_double(tau_total[ismear], 0.0);
     printf("Smearing:   abs|tau(sm)  - 0.0| = %.1e (should be 0.0)\n", diff);
 
-    if (diff > 1e-10)
+    if (diff > 1e-10) {
       fail_test(2);
+    }
 
     diff = abs_diff_double(tau_total[iunsmear], 0.0);
     printf("Unsmearing: abs|tau(us)  - 0.0| = %.1e (should be 0.0)\n", diff);
 
-    if (diff > 1e-10)
+    if (diff > 1e-10) {
       fail_test(2);
+    }
 
     diff = abs_diff_double(tau_total[iunsmear], 0.0);
     printf("Total:      abs|tau(tot) - tau| = %.1e (should be 0.0)\n", diff);
 
-    if (diff > 1e-10)
+    if (diff > 1e-10) {
       fail_test(2);
+    }
 
     printf("\n-------------------------------------------\n\n");
   }
 
-  if (my_rank == 0)
+  if (my_rank == 0) {
     report_test_results();
+  }
 
   MPI_Finalize();
   return 0;

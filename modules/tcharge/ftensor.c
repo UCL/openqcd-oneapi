@@ -80,8 +80,9 @@ static void alloc_fts(void)
   idx = ftidx();
   nbf = 0;
 
-  for (n = 0; n < 6; n++)
+  for (n = 0; n < 6; n++) {
     nbf += idx[n].nft[0] + idx[n].nft[1];
+  }
 
   pp = malloc(12 * sizeof(*pp));
   p = amalloc((6 * VOLUME + nbf) * sizeof(*p), ALIGN);
@@ -128,10 +129,12 @@ static void build_fts(void)
     ftn = fts[n];
     set_ualg2zero(VOLUME + idx[n].nft[0] + idx[n].nft[1], ftn);
     tmx = N0;
-    if (bc == 0)
+    if (bc == 0) {
       tmx -= 1;
-    if (n < 3)
+    }
+    if (n < 3) {
       tmx -= 1;
+    }
 
     for (ix = 0; ix < VOLUME; ix++) {
       t = global_time(ix);
@@ -184,18 +187,21 @@ u3_alg_dble **ftensor(void)
   int n;
 
   if (query_flags(FTS_UP2DATE) != 1) {
-    if (fts == NULL)
+    if (fts == NULL) {
       alloc_fts();
+    }
 
-    if (query_flags(UDBUF_UP2DATE) != 1)
+    if (query_flags(UDBUF_UP2DATE) != 1) {
       copy_bnd_ud();
+    }
 
     build_fts();
     set_flags(COMPUTED_FTS);
   }
 
-  for (n = 0; n < 6; n++)
+  for (n = 0; n < 6; n++) {
     ft[n] = fts[n];
+  }
 
   return ft;
 }

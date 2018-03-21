@@ -83,25 +83,30 @@ static void set_psum0(void)
 {
   int ifc, n, ix, mu, nu;
 
-  for (ifc = 0; ifc < 8; ifc++)
+  for (ifc = 0; ifc < 8; ifc++) {
     psum0[ifc] = 0.0;
+  }
 
   for (ix = 0; ix < VOLUME; ix++) {
     for (n = 0; n < 6; n++) {
       mu = plns[n][0];
       nu = plns[n][1];
 
-      if (iup[ix][mu] >= VOLUME)
+      if (iup[ix][mu] >= VOLUME) {
         psum0[2 * mu + 1] += plaq0(n, ix);
+      }
 
-      if (iup[ix][nu] >= VOLUME)
+      if (iup[ix][nu] >= VOLUME) {
         psum0[2 * nu + 1] += plaq0(n, ix);
+      }
 
-      if (idn[ix][mu] >= VOLUME)
+      if (idn[ix][mu] >= VOLUME) {
         psum0[2 * mu] += plaq0(n, ix);
+      }
 
-      if (idn[ix][nu] >= VOLUME)
+      if (idn[ix][nu] >= VOLUME) {
         psum0[2 * nu] += plaq0(n, ix);
+      }
     }
   }
 }
@@ -111,8 +116,9 @@ static void set_psum1(void)
   int ifc, n, ix, mu, nu, ip[4];
   int iy, ib, iu, ih;
 
-  for (ifc = 0; ifc < 8; ifc++)
+  for (ifc = 0; ifc < 8; ifc++) {
     psum1[ifc] = 0.0;
+  }
 
   for (ix = 0; ix < VOLUME; ix++) {
     for (n = 0; n < 6; n++) {
@@ -126,10 +132,11 @@ static void set_psum1(void)
         ifc = 2 * mu + 1;
         iy = iup[ix][mu] - VOLUME;
 
-        if (iy < (BNDRY / 2))
+        if (iy < (BNDRY / 2)) {
           ib = iy - ofs[ifc];
-        else
+        } else {
           ib = iy - ofs[ifc] - (BNDRY / 2) + nfc[ifc];
+        }
 
         ih = hofs[ifc] + 3 * ib + nu - (nu > mu);
 
@@ -143,10 +150,11 @@ static void set_psum1(void)
         ifc = 2 * nu + 1;
         iy = iup[ix][nu] - VOLUME;
 
-        if (iy < (BNDRY / 2))
+        if (iy < (BNDRY / 2)) {
           ib = iy - ofs[ifc];
-        else
+        } else {
           ib = iy - ofs[ifc] - (BNDRY / 2) + nfc[ifc];
+        }
 
         ih = hofs[ifc] + 3 * ib + mu - (mu > nu);
 
@@ -160,10 +168,11 @@ static void set_psum1(void)
         ifc = 2 * mu;
         iy = idn[ix][mu] - VOLUME;
 
-        if (iy < (BNDRY / 2))
+        if (iy < (BNDRY / 2)) {
           ib = iy - ofs[ifc];
-        else
+        } else {
           ib = iy - ofs[ifc] - (BNDRY / 2) + nfc[ifc];
+        }
 
         ih = hofs[ifc] + 3 * ib + nu - (nu > mu);
 
@@ -177,10 +186,11 @@ static void set_psum1(void)
         ifc = 2 * nu;
         iy = idn[ix][nu] - VOLUME;
 
-        if (iy < (BNDRY / 2))
+        if (iy < (BNDRY / 2)) {
           ib = iy - ofs[ifc];
-        else
+        } else {
           ib = iy - ofs[ifc] - (BNDRY / 2) + nfc[ifc];
+        }
 
         ih = hofs[ifc] + 3 * ib + mu - (mu > nu);
 
@@ -216,21 +226,24 @@ static void check_psums(void)
       }
 
       if ((bc != 3) && (((cpr[0] == 0) && (ifc == 1)) ||
-                        ((cpr[0] == (NPROC0 - 1)) && (ifc == 0))))
+                        ((cpr[0] == (NPROC0 - 1)) && (ifc == 0)))) {
         psum1[ifc ^ 0x1] = 0.0;
-      else
+      } else {
         psum1[ifc ^ 0x1] -= rbuf;
+      }
     }
   }
 
-  for (ifc = 0; ifc < 8; ifc++)
+  for (ifc = 0; ifc < 8; ifc++) {
     dmy[ifc] = fabs(psum0[ifc]);
+  }
 
   MPI_Reduce(dmy, psum0, 8, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
   MPI_Bcast(psum0, 8, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-  for (ifc = 0; ifc < 8; ifc++)
+  for (ifc = 0; ifc < 8; ifc++) {
     dmy[ifc] = fabs(psum1[ifc]);
+  }
 
   MPI_Reduce(dmy, psum1, 8, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
   MPI_Bcast(psum1, 8, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -259,9 +272,10 @@ int main(int argc, char *argv[])
 
     bc = find_opt(argc, argv, "-bc");
 
-    if (bc != 0)
+    if (bc != 0) {
       error_root(sscanf(argv[bc + 1], "%d", &bc) != 1, 1, "main [check5.c]",
                  "Syntax: check5 [-bc <type>]");
+    }
   }
 
   MPI_Bcast(&bc, 1, MPI_INT, 0, MPI_COMM_WORLD);

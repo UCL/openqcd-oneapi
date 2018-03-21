@@ -86,10 +86,11 @@ static int iop = 0;
 
 static void Dop_dble(double mu, spinor_dble *s, spinor_dble *r)
 {
-  if (iop == 0)
+  if (iop == 0) {
     Dwhat_dble(mu, s, r);
-  else
+  } else {
     Dwhat_dble(-mu, s, r);
+  }
 
   mulg5_dble(VOLUME / 2, r);
   iop ^= 0x1;
@@ -106,13 +107,15 @@ void tmcgm(int nmx, double *res, int nmu, double *mu, spinor_dble *eta,
   if (ifail) {
     status[0] = -2;
 
-    for (k = 0; k < nmu; k++)
+    for (k = 0; k < nmu; k++) {
       set_sd2zero(VOLUME / 2, psi[k]);
+    }
   } else {
-    if (nmu == 1)
+    if (nmu == 1) {
       wsd = reserve_wsd(5);
-    else
+    } else {
       wsd = reserve_wsd(3 + nmu);
+    }
 
     mscg(VOLUME / 2, 1, nmu, mu, Dop_dble, wsd, nmx, res, eta, psi, status);
     release_wsd();
