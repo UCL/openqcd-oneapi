@@ -1,25 +1,24 @@
 
 /*******************************************************************************
-*
-* File tcharge.h
-*
-* Copyright (C) 2010, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File tcharge.h
+ *
+ * Copyright (C) 2010, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef TCHARGE_H
 #define TCHARGE_H
 
-#ifndef SU3_H
 #include "su3.h"
-#endif
 
 /* FTCOM_C */
-extern void copy_bnd_ft(int n,u3_alg_dble *ft);
-extern void add_bnd_ft(int n,u3_alg_dble *ft);
+extern void copy_bnd_ft(int n, u3_alg_dble *ft);
+extern void add_bnd_ft(int n, u3_alg_dble *ft);
+extern void free_ftcom_bufs(void);
 
 /* FTENSOR_C */
 extern u3_alg_dble **ftensor(void);

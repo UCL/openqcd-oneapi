@@ -60,7 +60,7 @@ b.ns                    Number of single-precision spinor fields on the block.
 
 b.nsd                   Number of double-precision spinor fields on the block.
 
-b.shf                   The bits b1,b2,...,b7 in this number (counting from
+b.shf                   The bits b1,b2,...,b8 in this number (counting from
                         the lowest) indicate that
 
                           b1=1:  The block is protected,

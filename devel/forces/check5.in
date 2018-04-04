@@ -11,12 +11,27 @@ kappa        0.1280
 csw          1.2
 mu           1.0
 
+[Smearing parameters]
+n_smear      2
+rho_t        0.00
+rho_s        0.14
+
+[Anisotropy parameters]
+use_tts     0
+nu          1.5
+xi          4.3
+cR          1.5
+cT          0.9
+us_fermion	0.87
+ut_fermion	1.23
+
 [Boundary conditions]
 type         0
-#phi          0.12 -0.56
-#phi'         0.92 0.76
+phi          0.12 -0.56
+phi'         0.92 0.76
 cF           0.95
-#cF'          0.90
+cF'          0.90
+theta        0.38 -1.25 0.54
 
 [CG]
 nmx          256

@@ -7,61 +7,42 @@ last         7
 step         2
 
 [Lattice parameters]
-beta         6.0
+beta         1.5
 c0           1.6667
-kappa        0.1300 0.12505
-csw          1.234
+kappa        0.12736582 0.127746551
+csw          1.0
+
+[Random number generator]
+level        0
+seed         993
 
 [Boundary conditions]
 type         0
-#phi          0.12 -0.56
-#phi'         0.92 0.76
+phi          0.12 -0.56
+phi'         0.92 0.76
 cG           1.10
-#cG'          1.05
+cG'          1.05
 cF           0.95
-#cF'          0.90
+cF'          0.90
+theta        0.34 -1.25 0.58
+
+[Anisotropy parameters]
+nu           1.265
+xi           4.3
 
 [HMC parameters]
-actions      0 1 2 3 4
-npf          4
-mu           0.1 1.0
+actions      0 1 2 3 4 5 6 7 8 9
+npf          9
+mu           0.001 0.0014142135623731 0.005 0.05 0.5
 nlv          3
-tau          0.5
+tau          1.6
 
-[Action 1]
-action       ACF_TM1
-ipf          0
-im0          0
-imu          1
-isp          0
-
-[Action 0]
-action       ACG
-
-[Action 2]
-action       ACF_TM2
-ipf          1
-im0          0
-imu          0 1
-isp          1 0
-
-[Action 3]
-action       ACF_RAT_SDET
-ipf          2
-im0          1
-irat         0 0 6
-isp          2
-
-[Action 4]
-action       ACF_RAT
-ipf          3
-im0          1
-irat         0 7 11
-isp          2
-
-[Rational 0]
-degree       12
-range        0.001 7.7
+[MD trajectories]
+nth          0
+ntr          10
+dtr_log      1
+dtr_ms       2
+dtr_cnfg     2
 
 [Level 0]
 integrator   OMF4
@@ -71,91 +52,188 @@ forces       0
 [Level 1]
 integrator   OMF4
 nstep        1
-forces       1 2 3
+forces       1 2 3 4 6 7 
 
 [Level 2]
-integrator   LPFR
-nstep        3
-forces       4
+integrator   OMF2
+lambda       0.1666667
+nstep        8
+forces       5 8 9
+
+[Rational 0]
+degree       10
+range        0.02 7.0
+
+[Action 0]
+action       ACG
+
+[Action 1]
+action       ACF_TM1_EO_SDET
+ipf          0
+im0          0
+imu          4
+isp          0
+
+[Action 2]
+action       ACF_TM2_EO
+ipf          1
+im0          0
+imu          3 4
+isp          1 0
+
+[Action 3]
+action       ACF_TM2_EO
+ipf          2
+im0          0
+imu          2 3 
+isp          1 1
+
+[Action 4]
+action       ACF_TM2_EO
+ipf          3
+im0          0
+imu          0 2 
+isp          1 1
+
+
+
+[Action 5]
+action       ACF_TM2_EO
+ipf          4
+im0          0
+imu          0 1 
+isp          1 1
+
+[Action 6]
+action       ACF_RAT_SDET
+ipf          5
+im0          1
+irat         0 0 6
+isp          4
+
+[Action 7]
+action       ACF_RAT
+ipf          6
+im0          1
+irat         0  7 7 
+isp          1
+
+[Action 8]
+action       ACF_RAT
+ipf          7
+im0          1
+irat         0 8 8 
+isp          1
+
+[Action 9]
+action       ACF_RAT
+ipf          8
+im0          1
+irat         0 9 9
+isp          1
 
 [Force 0]
 force        FRG
 
 [Force 1]
-force        FRF_TM1
-isp          3
-ncr          0
+force        FRF_TM1_EO_SDET
+isp          2
+ncr          4
 
 [Force 2]
-force        FRF_TM2
-isp          4
-ncr          0
+force        FRF_TM2_EO
+isp          3
+ncr          3
 
 [Force 3]
+force        FRF_TM2_EO
+isp          3
+ncr          3
+
+[Force 4]
+force        FRF_TM2_EO
+isp          3
+ncr          3
+
+[Force 5]
+force        FRF_TM2_EO
+isp          3
+ncr          1
+
+[Force 6]
 force        FRF_RAT_SDET
 isp          5
 
-[Force 4]
+[Force 7]
 force        FRF_RAT
-isp          5
+isp          3
+
+[Force 8]
+force        FRF_RAT
+isp          3
+
+[Force 9]
+force        FRF_RAT
+isp          3
 
 [Solver 0]
 solver       CGNE
-nmx          256
-res          1.0e-12
+nmx          1024
+res          1.0e-11
 
 [Solver 1]
-solver       SAP_GCR
+solver       DFL_SAP_GCR
+nkv          24
+isolv        1
+nmr          4
+ncy          5
+nmx          1024
+res          1.0e-11
+
+[Solver 2]
+solver       CGNE
+nmx          1024
+res          1.0e-10
+
+[Solver 3]
+solver       DFL_SAP_GCR
 nkv          16
 isolv        1
 nmr          4
 ncy          5
-nmx          24
-res          1.0e-12
-
-[Solver 2]
-solver       MSCG
-nmx          256
-res          1.0e-12
-
-[Solver 3]
-solver       CGNE
-nmx          256
+nmx          2024
 res          1.0e-10
 
 [Solver 4]
-solver       SAP_GCR
-nkv          16
-isolv        1
-nmr          4
-ncy          5
-nmx          24
-res          1.0e-10
+solver       MSCG
+nmx          1024
+res          1.e-11
 
 [Solver 5]
 solver       MSCG
-nmx          256
-res          1.0e-10
+nmx          1024
+res          1.e-10
 
 [SAP]
 bs           4 4 4 4
 
 [Deflation subspace]
-bs           4 4 4 4
-Ns           8
+bs           4 4 4 4 
+Ns           32
 
 [Deflation subspace generation]
-kappa        0.1350
-mu           0.01
-ninv         5
+kappa        0.1370
+mu           0.005
+ninv         10
 nmr          4
-ncy          5
+ncy          4
 
 [Deflation projection]
-nkv          16
-nmx          64
+nkv          24
+nmx          2048
 res          1.0e-2
 
+
 [Deflation update scheme]
-dtau         0.3
+dtau         0.03751
 nsm          1

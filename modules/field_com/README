@@ -1,0 +1,83 @@
+
+********************************************************************************
+
+                        Reusable communication routines
+
+********************************************************************************
+
+
+Files
+-----
+
+communication_buffer.c        Storage buffer for the communication routines
+
+link_communication.c          Communication routines for "link like" problems
+
+link_partial_communication.c  Partial communication routines for "link like"
+                              problems
+
+
+Include file
+------------
+
+The file field_com.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.
+
+
+List of functions
+-----------------
+
+double *communication_buffer(void)
+  Returns the buffer reserved for the communication routines. It is given in
+  terms of a pointer to double and can thus be used to communicate both su3_dble
+  and su3_alg_dble through a simple cast.
+
+void copy_boundary_su3_field(su3_dble *su3_field)
+  Copy the boundaries of an su3_dble field to the neighbouring processes in
+  directions -mu.
+
+void add_boundary_su3_field(su3_dble *su3_field)
+  Add the current value of an su3_field's boundary to its neighbouring processes
+  corresponding links in the +mu direction.
+
+void copy_boundary_su3_alg_field(su3_alg_dble *su3_alg_field)
+  Copy the boundaries of an su3_alg_dble field to the neighbouring processes in
+  directions -mu.
+
+void add_boundary_su3_alg_field(su3_alg_dble *su3_alg_field)
+  Add the current value of an su3_alg_field's boundary to its neighbouring
+  processes corresponding links in the +mu direction.
+
+void copy_partial_boundary_su3_field(su3_dble *su3_field, int const *dirs)
+  Copy the boundaries of an su3_dble field to the neighbouring processes in
+  directions -mu. However, depending on the contents of the dirs array it will
+  ignore certain links. The dirs array is assumed to be a length 4 array with
+  boolean elements (0 or 1), and is so that if e.g. element nu is 1 all boundary
+  links pointing in direction nu will be copied, they will be ignored otherwise.
+
+void add_partial_boundary_su3_field(su3_dble *su3_field, int const *dirs)
+  Add the current value of an su3_field's boundary to its neighbouring processes
+  corresponding links in the +mu direction applying the dirs map as explained.
+
+void copy_partial_boundary_su3_alg_field(su3_alg_dble *su3_alg_field,
+                                         int const *dirs)
+  Copy the boundaries of an su3_alg_dble field to the neighbouring processes in
+  directions -mu applying the dirs map as explained.
+
+void add_partial_boundary_su3_alg_field(su3_alg_dble *su3_alg_field,
+                                        int const *dirs)
+  Add the current value of an su3_alg_field's boundary to its neighbouring
+  processes corresponding links in the +mu direction applying the dirs map as
+  explained.
+
+void copy_spatial_boundary_su3_field(su3_dble *su3_field)
+  A special case of the more general partial variant where dirs={0,1,1,1}.
+
+void add_spatial_boundary_su3_field(su3_dble *su3_field)
+  A special case of the more general partial variant where dirs={0,1,1,1}.
+
+void copy_spatial_boundary_su3_alg_field(su3_alg_dble *su3_alg_field)
+  A special case of the more general partial variant where dirs={0,1,1,1}.
+
+void add_spatial_boundary_su3_alg_field(su3_alg_dble *su3_alg_field)
+  A special case of the more general partial variant where dirs={0,1,1,1}.

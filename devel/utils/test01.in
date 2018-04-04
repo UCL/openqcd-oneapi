@@ -1,0 +1,19 @@
+[Test 01]
+par1_d     -9.24
+par2_i     175154
+par3_s     Hello
+
+[Test 02]
+opt1_d     24.12
+opt2_i     114
+opt3_s     World
+
+[Test 03]
+par1_d     -9.24
+par2_i     8
+par3_s     Hello
+
+[Test Optional 04]
+par1_d     5812.123
+par2_i     -61234
+par3_s     Optional

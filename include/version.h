@@ -1,18 +1,22 @@
 
 /*******************************************************************************
-*
-* File version.h
-*
-* Copyright (C) 2009 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File version.h
+ *
+ * Copyright (C) 2009 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef VERSION_H
 #define VERSION_H
 
-#define openQCD_RELEASE "openQCD-1.4"
+#define openQCD_RELEASE "openQCD-FASTSUM v1.0 (based on openQCD-1.6)"
+
+extern const char *build_date;
+extern const char *build_git_sha;
+extern const char *build_user_cflags;
 
 #endif

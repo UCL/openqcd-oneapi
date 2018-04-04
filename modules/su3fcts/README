@@ -31,85 +31,84 @@ functions that are defined in the *.c files listed above.
 List of functions
 -----------------
 
-void ch2mat(complex_dble *p,su3_alg_dble *X,su3_dble *u)
+void ch2mat(complex_dble const *p, su3_alg_dble const *X, su3_dble *u)
   Computes u=p[0]+p[1]*X+p[2]*X^2 given the Cayley-Hamilton coefficients
-  p[0],p[1],p[2] and the matrix X
+  p[0],p[1],p[2] and the matrix X.
 
-void chexp_drv0(su3_alg_dble *X,ch_drv0_t *s);
-  Assigns the Cayley-Hamilton coefficients of the exponential function
-  exp(X) to the elements of s, assuming the norm of X is not be larger
-  than 1 (an error occurs if this condition is violated)
+void chexp_drv0(su3_alg_dble const *X, ch_drv0_t *s);
+  Assigns the Cayley-Hamilton coefficients of the exponential function exp(X) to
+  the elements of s, assuming the norm of X is not be larger than 1 (an error
+  occurs if this condition is violated).
 
-void chexp_drv1(su3_alg_dble *X,ch_drv1_t *s);
-  Assigns the Cayley-Hamilton coefficients of the exponential function
-  exp(X) and their first derivatives to the elements of s, assuming the
-  the norm of X is not larger than 1 (an error occurs if this condition
-  is violated)
+void chexp_drv1(su3_alg_dble const *X, ch_drv1_t *s);
+  Assigns the Cayley-Hamilton coefficients of the exponential function exp(X)
+  and their first derivatives to the elements of s, assuming the the norm of X
+  is not larger than 1 (an error occurs if this condition is violated).
 
-void chexp_drv2(su3_alg_dble *X,ch_drv2_t *s);
-  Assigns the Cayley-Hamilton coefficients of the exponential function
-  exp(X) and their first and second derivatives to the elements of s,
-  assuming the norm of X is not larger than 1 (an error occurs if this
-  condition is violated)
+void chexp_drv2(su3_alg_dble const *X, ch_drv2_t *s);
+  Assigns the Cayley-Hamilton coefficients of the exponential function exp(X)
+  and their first and second derivatives to the elements of s, assuming the norm
+  of X is not larger than 1 (an error occurs if this condition is violated).
 
-void expXsu3(double eps,su3_alg_dble *X,su3_dble *u)
-  Replaces u by exp(eps*X)*u, where "exp" is the SU(3) exponential
-  function
+void expXsu3(double eps, su3_alg_dble const *X, su3_dble *u)
+  Replaces u by exp(eps*X)*u, where "exp" is the SU(3) exponential function.
 
-void cm3x3_zero(int vol,su3_dble *u)
+void expXsu3_w_factors(double eps, su3_alg_dble const *X, su3_dble *u,
+                              ch_drv0_t *s_in);
+  Does the same as expXsu3 but also stores the accompanying Cayley-Hamilton
+  coefficients in s_in. The algorithm uses the CH relation to carry out the
+  normalisation squaring instead of matrix multiplication and is therefore also
+  faster.
+
+void cm3x3_zero(int vol, su3_dble *u)
   Sets the elements of the array u[] to zero
 
-void cm3x3_unity(int vol,su3_dble *u)
+void cm3x3_unity(int vol, su3_dble *u)
   Sets the elements of the array u[] to the unit matrix
 
-void cm3x3_assign(int vol,su3_dble *u,su3_dble *v)
+void cm3x3_assign(int vol, su3_dble const *u, su3_dble *v)
   Assigns the elements of the array u[] to those of the array v[]
 
-void cm3x3_swap(int vol,su3_dble *u,su3_dble *v)
+void cm3x3_swap(int vol, su3_dble const *u, su3_dble *v)
   Swaps the elements of the array u[] with those of the array v[]
 
-void cm3x3_dagger(su3_dble *u,su3_dble *v)
+void cm3x3_dagger(su3_dble const *u, su3_dble *v)
   Assigns the hermitian conjugate of (*u) to (*v)
 
-void cm3x3_tr(su3_dble *u,su3_dble *v,complex_dble *tr)
+void cm3x3_tr(su3_dble const *u, su3_dble const *v, complex_dble *tr)
   Assigns the trace of (*u)*(*v) to (*tr)
 
-void cm3x3_retr(su3_dble *u,su3_dble *v,double *tr)
+void cm3x3_retr(su3_dble const *u, su3_dble const *v, double *tr)
   Assigns the real part of the trace of (*u)*(*v) to (*tr)
 
-void cm3x3_imtr(su3_dble *u,su3_dble *v,double *tr)
+void cm3x3_imtr(su3_dble const *u, su3_dble const *v, double *tr)
   Assigns the imaginary part of the trace of (*u)*(*v) to (*tr)
 
-void cm3x3_add(su3_dble *u,su3_dble *v)
+void cm3x3_add(su3_dble const *u, su3_dble *v)
   Adds (*u) to (*v). The input matrix is unchanged unless u=v
 
-void cm3x3_mul_add(su3_dble *u,su3_dble *v,su3_dble *w)
-  Adds (*u)*(*v) to (*w) assuming that w!=u. The input matrix (*u)
-  is unchanged and also (*v) unless v=w
+void cm3x3_mul_add(su3_dble const *u, su3_dble const *v, su3_dble *w)
+  Adds (*u)*(*v) to (*w) assuming that w!=u. The input matrix (*u) is unchanged
+  and also (*v) unless v=w
 
-void cm3x3_mulr(double *r,su3_dble *u,su3_dble *v)
-  Assigns (*r)*(*u) to (*v). The input matrix is unchanged
-  unless u=v 
+void cm3x3_mulr(double const *r, su3_dble const *u, su3_dble *v)
+  Assigns (*r)*(*u) to (*v). The input matrix is unchanged unless u=v
 
-void cm3x3_mulr_add(double *r,su3_dble *u,su3_dble *v)
-  Adds (*r)*(*u) to (*v). The input matrix is unchanged 
-  unless u=v
+void cm3x3_mulr_add(double const *r, su3_dble const *u, su3_dble *v)
+  Adds (*r)*(*u) to (*v). The input matrix is unchanged unless u=v
 
-void cm3x3_mulc(complex_dble *c,su3_dble *u,su3_dble *v)
-  Assigns (*c)*(*u) to (*v). The input matrix is unchanged 
-  unless u=v 
+void cm3x3_mulc(complex_dble const *c, su3_dble const *u, su3_dble *v)
+  Assigns (*c)*(*u) to (*v). The input matrix is unchanged unless u=v
 
-void cm3x3_mulc_add(complex_dble *c,su3_dble *u,su3_dble *v)
-  Adds (*c)*(*u) to (*v). The input matrix is unchanged 
-  unless u=v 
+void cm3x3_mulc_add(complex_dble const *c, su3_dble const *u, su3_dble *v)
+  Adds (*c)*(*u) to (*v). The input matrix is unchanged unless u=v
 
-void cm3x3_lc1(complex_dble *c,su3_dble *u,su3_dble *v)
-  Assigns c[0]+c[1]*(*u) to (*v). The input matrix is unchanged
-  unless u=v
+void cm3x3_lc1(complex_dble const *c, su3_dble const *u, su3_dble *v)
+  Assigns c[0]+c[1]*(*u) to (*v). The input matrix is unchanged unless u=v
 
-void cm3x3_lc2(complex_dble *c,su3_dble *u,su3_dble *v)
-  Assigns c[0]+c[1]*u[0]+c[2]*u[1] to (*v) assuming v!=u+1. The
-  input matrix u[1] is unchanged and also u[0] unless u=v
+void cm3x3_lc2(complex_dble const *c, su3_dble const *u, su3_dble *v)
+  Assigns c[0]+c[1]*u[0]+c[2]*u[1] to (*v) assuming v!=u+1. The input matrix
+  u[1] is unchanged and also u[0] unless u=v
 
 void random_su3(su3 *u)
   Generates a random single-precision SU(3) matrix and assigns it to *u
@@ -117,46 +116,62 @@ void random_su3(su3 *u)
 void random_su3_dble(su3_dble *u)
   Generates a random double-precision SU(3) matrix and assigns it to *u
 
-void su3xsu3(su3_dble *u,su3_dble *v,su3_dble *w)
-  Computes w=u*v assuming that w is different from u
+void su3xsu3(su3_dble const *u, su3_dble const *v, su3_dble *w)
+  Computes w=u*v assuming that w is different from u.
 
-void su3dagxsu3(su3_dble *u,su3_dble *v,su3_dble *w)
-  Computes w=u^dag*v assuming that w is different from u
+void su3dagxsu3(su3_dble const *u, su3_dble const *v, su3_dble *w)
+  Computes w=u^dag*v assuming that w is different from u.
 
-void su3xsu3dag(su3_dble *u,su3_dble *v,su3_dble *w)
-  Computes w=u*v^dag assuming that w is different from u and v
+void su3xsu3dag(su3_dble const *u, su3_dble const *v, su3_dble *w)
+  Computes w=u*v^dag assuming that w is different from u and v.
 
-void su3dagxsu3dag(su3_dble *u,su3_dble *v,su3_dble *w)
-  Computes w=u^dag*v^dag assuming that w is different from u and v
+void su3dagxsu3dag(su3_dble const *u, su3_dble const *v, su3_dble *w)
+  Computes w=u^dag*v^dag assuming that w is different from u and v.
 
-void su3xu3alg(su3_dble *u,u3_alg_dble *X,su3_dble *v)
-  Computes v=u*X assuming that v is different from u
+void su3xu3alg(su3_dble const *u, u3_alg_dble const *X, su3_dble *v)
+  Computes v=u*X assuming that v is different from u.
 
-void su3dagxu3alg(su3_dble *u,u3_alg_dble *X,su3_dble *v)
-  Computes v=u^dag*X assuming that v is different from u
+void su3dagxu3alg(su3_dble const *u, u3_alg_dble const *X, su3_dble *v)
+  Computes v=u^dag*X assuming that v is different from u.
 
-void u3algxsu3(u3_alg_dble *X,su3_dble *u,su3_dble *v)
-  Computes v=X*u assuming that v is different from u
+void u3algxsu3(u3_alg_dble const *X, su3_dble const *u, su3_dble *v)
+  Computes v=X*u assuming that v is different from u.
 
-void u3algxsu3dag(u3_alg_dble *X,su3_dble *u,su3_dble *v)
-  Computes v=X*u^dag assuming that v is different from u
+void u3algxsu3dag(u3_alg_dble const *X, su3_dble const *u, su3_dble *v)
+  Computes v=X*u^dag assuming that v is different from u.
 
-double prod2su3alg(su3_dble *u,su3_dble *v,su3_alg_dble *X)
-  Computes the product w=u*v and assigns its traceless antihermitian
-  part (1/2)*[w-w^dag-(1/3)*tr{w-w^dag}] to X. The program returns
-  the real part of tr{w}
+double prod2su3alg(su3_dble const *u, su3_dble const *v, su3_alg_dble *X)
+  Computes the product w=u*v and assigns its traceless antihermitian part
+  (1/2)*[w-w^dag-(1/3)*tr{w-w^dag}] to X. The program returns the real part of
+  tr{w}.
 
-void prod2u3alg(su3_dble *u,su3_dble *v,u3_alg_dble *X)
-  Computes the product w=u*v and assigns w-w^dag to X
+void prod2u3alg(su3_dble const *u, su3_dble const *v, u3_alg_dble *X)
+  Computes the product w=u*v and assigns w-w^dag to X.
 
-void rotate_su3alg(su3_dble *u,su3_alg_dble *X)
-  Replaces X by u*X*u^dag. The matrix u must be unitary but its determinant
-  may be different from 1
+void rotate_su3alg(su3_dble const *u, su3_alg_dble *X)
+  Replaces X by u*X*u^dag. The matrix u must be unitary but its determinant may
+  be different from 1.
+
+void su3xsu3alg(su3_dble const *u, su3_alg_dble const *X, su3_dble *v)
+  Computes the product u*X and assigns the result to v.
+
+void su3algxsu3(su3_alg_dble const *X, su3_dble const *u, su3_dble *v)
+  Computes the product X*u and assigns the result to v.
+
+void su3dagxsu3alg(su3_dble const *u, su3_alg_dble const *X, su3_dble *v)
+  Computes the product u^dag*X and assigns the result to v.
+
+void su3algxsu3dag(su3_alg_dble const *X, su3_dble const *u, su3_dble *v)
+  Computes the product X*u^dag and assigns the result to v.
+  
+void su3algxsu3_tr(su3_alg_dble const *X, su3_dble const *u,
+                   complex_dble *tr)
+  Computes tr(X*u) and assigns the result to tr.
 
 void project_to_su3(su3 *u)
-  Projects an approximate single-precision SU(3) matrix back to SU(3).
-  No action is performed if the matrix is degenerate
+  Projects an approximate single-precision SU(3) matrix back to SU(3). No
+  action is performed if the matrix is degenerate
 
 void project_to_su3_dble(su3_dble *u)
-  Projects an approximate double-precision SU(3) matrix back to SU(3).
-  No action is performed if the matrix is degenerate
+  Projects an approximate double-precision SU(3) matrix back to SU(3). No
+  action is performed if the matrix is degenerate

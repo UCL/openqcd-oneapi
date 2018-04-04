@@ -27,7 +27,10 @@ time1         Timing of plaq_frc(), sw_frc() and hop_frc()
 
 Except for check5 and check8, all programs accept the option -bc <type> that
 allows the type of boundary condition to be chosen at runtime. When the option
-is not set, open boundary conditions are assumed.
+is not set, open boundary conditions are assumed. Whenever periodic boundary
+conditions are chosen (3) anisotropy will also be turned on. The tests involving
+the gauge actions (check1, check2 & check3) also accepts a -no-tts option to
+turn off the temporal rectangulars.
 
 The option may be set but has no effect in the case of check5 and check8 (the
 boundary conditions are selected through the input parameter file in these
