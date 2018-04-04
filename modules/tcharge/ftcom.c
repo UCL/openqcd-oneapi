@@ -13,13 +13,13 @@
  *
  * The externally accessible functions are
  *
- *   void copy_bnd_ft(int n,u3_alg_dble *ft)
+ *   void copy_bnd_ft(int n, u3_alg_dble *ft)
  *     Fetches the boundary values the field ft from the neighbouring MPI
  *     processes (see the notes). The boundary values at time NPROC0*L0
  *     are fetched from the field at time 0 only in the case of periodic
  *     boundary conditions.
  *
- *   void add_bnd_ft(int n,u3_alg_dble *ft)
+ *   void add_bnd_ft(int n, u3_alg_dble *ft)
  *     Adds the boundary values of the field ft to the field on the
  *     neighbouring MPI processes. The boundary values at time NPROC0*L0
  *     are added to the field at time 0 only in the case of periodic

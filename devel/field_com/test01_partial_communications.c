@@ -1,8 +1,16 @@
 
-/*
- * Created: 20-03-2018
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test01_partial_communications.c
+ *
+ * Author (2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the partial communication routines
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

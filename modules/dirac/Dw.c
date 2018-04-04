@@ -13,57 +13,57 @@
  *
  * The externally accessible functions are
  *
- *   void Dw(float mu,spinor *s,spinor *r)
+ *   void Dw(float mu, spinor *s, spinor *r)
  *     Depending on whether the twisted-mass flag is set or not, this
  *     program applies D+i*mu*gamma_5*1e or D+i*mu*gamma_5 to the field
  *     s and assigns the result to the field r.
  *
- *   void Dwee(float mu,spinor *s,spinor *r)
+ *   void Dwee(float mu, spinor *s, spinor *r)
  *     Applies D_ee+i*mu*gamma_5 to the field s on the even points of the
  *     lattice and assigns the result to the field r.
  *
- *   void Dwoo(float mu,spinor *s,spinor *r)
+ *   void Dwoo(float mu, spinor *s, spinor *r)
  *     Depending on whether the twisted-mass flag is set or not, this
  *     program applies D_oo or D_oo+i*mu*gamma_5 to the field s on the
  *     odd points of the lattice and assigns the result to the field r.
  *
- *   void Dwoe(spinor *s,spinor *r)
+ *   void Dwoe(spinor *s, spinor *r)
  *     Applies D_oe to the field s and assigns the result to the field r.
  *
- *   void Dweo(spinor *s,spinor *r)
+ *   void Dweo(spinor *s, spinor *r)
  *     Applies D_eo to the field s and *subtracts* the result from the
  *     field r.
  *
- *   void Dwhat(float mu,spinor *s,spinor *r)
+ *   void Dwhat(float mu, spinor *s, spinor *r)
  *     Applies Dhat+i*mu*gamma_5 to the field s and assigns the result to
  *     the field r.
  *
  * The following programs operate on the fields in the n'th block b of the
  * specified block grid:
  *
- *   void Dw_blk(blk_grid_t grid,int n,float mu,int k,int l)
+ *   void Dw_blk(blk_grid_t grid, int n, float mu, int k, int l)
  *     Depending on whether the twisted-mass flag is set or not, this
  *     program applies D+i*mu*gamma_5*1e or D+i*mu*gamma_5 to the field
  *     b.s[k] and assigns the result to the field b.s[l].
  *
- *   void Dwee_blk(blk_grid_t grid,int n,float mu,int k,int l)
+ *   void Dwee_blk(blk_grid_t grid, int n, float mu, int k, int l)
  *     Applies D_ee+i*mu*gamma_5 to the field b.s[k] on the even points and
  *     assigns the result to the field b.s[l].
  *
- *   void Dwoo_blk(blk_grid_t grid,int n,float mu,int k,int l)
+ *   void Dwoo_blk(blk_grid_t grid, int n, float mu, int k, int l)
  *     Depending on whether the twisted-mass flag is set or not, this
  *     program applies D_oo or D_oo+i*mu*gamma_5 to the field b.s[k] on
  *     the odd points and assigns the result to the field b.s[l].
  *
- *   void Dwoe_blk(blk_grid_t grid,int n,int k,int l)
+ *   void Dwoe_blk(blk_grid_t grid, int n, int k, int l)
  *     Applies D_oe to the field b.s[k] and assigns the result to the field
  *     b.s[l].
  *
- *   void Dweo_blk(blk_grid_t grid,int n,int k,int l)
+ *   void Dweo_blk(blk_grid_t grid, int n, int k, int l)
  *     Applies D_eo to the field b.s[k] and *subtracts* the result from the
  *     field b.s[l].
  *
- *   void Dwhat_blk(blk_grid_t grid,int n,float mu,int k,int l)
+ *   void Dwhat_blk(blk_grid_t grid, int n, float mu, int k, int l)
  *     Applies Dhat+i*mu*gamma_5 to the field b.s[k] and assigns the result
  *     to the field b.s[l].
  *

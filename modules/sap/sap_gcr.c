@@ -1,90 +1,90 @@
 
 /*******************************************************************************
-*
-* File sap_gcr.c
-*
-* Copyright (C) 2005, 2011-2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* SAP+GCR solver for the Wilson-Dirac equation.
-*
-* The externally accessible function is
-*
-*   double sap_gcr(int nkv,int nmx,double res,double mu,
-*                  spinor_dble *eta,spinor_dble *psi,int *status)
-*     Obtains an approximate solution psi of the Wilson-Dirac equation for
-*     given source eta using the SAP-preconditioned GCR algorithm. See the
-*     notes for the explanation of the parameters of the program.
-*
-* Notes:
-*
-* Depending on whether the twisted-mass flag is set or not, the program
-* solves the equation
-*
-*   (Dw+i*mu*gamma_5*1e)*psi=eta  or  (Dw+i*mu*gamma_5)*psi=eta
-*
-* respectively. The twisted-mass flag is retrieved from the parameter data
-* base (see flags/lat_parms.c).
-
-* The program is based on the flexible GCR algorithm (see linsolv/fgcr.c).
-* It assumes that the improvement coefficients, the quark mass in the SW
-* term and the parameters of the SAP preconditioner have been set through
-* set_lat_parms(), set_sw_parms() and set_sap_parms() (see the modules in
-* the modules/flags directory).
-*
-* All other parameters are passed through the argument list:
-*
-*   nkv     Maximal number of Krylov vectors generated before the GCR
-*           algorithm is restarted.
-*
-*   nmx     Maximal total number of Krylov vectors that may be generated.
-*
-*   res     Desired maximal relative residue |eta-D*psi|/|eta| of the
-*           calculated solution.
-*
-*   mu      Value of the twisted mass in the Dirac equation.
-*
-*   eta     Source field. Note that source fields must vanish at global
-*           time 0 and NPR0C0*L0-1, as has to be the case for physical
-*           quark fields. eta is unchanged on exit unless psi=eta (which
-*           is permissible).
-*
-*   psi     Calculated approximate solution of the Dirac equation. psi
-*           vanishes at global time 0 and NPROC0*L0-1.
-*
-*   status  If the program is able to solve the Dirac equation to the
-*           desired accuracy, status reports the total number of Krylov
-*           vectors that were required for the solution. Negative values
-*           indicate that the program failed (-1: the algorithm did not
-*           converge, -2: the inversion of the SW term on the odd points
-*           was not safe).
-*
-* The program returns the norm of the residue of the calculated approximate
-* solution if status[0]>=-1. Otherwise the field psi is set to zero and the
-* program returns the norm of the source eta.
-*
-* The SAP_BLOCKS blocks grid is automatically allocated and the SW term is
-* recalculated when needed. The gauge and SW fields are then copied to the
-* block grid if they are not in the proper condition.
-*
-* Evidently the SAP+GCR solver is a global program that must be called on
-* all processes simultaneously. The required workspaces are
-*
-*  spinor              2*nkv+1
-*  spinor_dble         2
-*
-* (see utils/wspace.c).
-*
-* CONST_CORRECTNESS:
-*   The algorithm should have a signature that represents its const-ness,
-*   however this is currently not possible due to the fact that most callers of
-*   this algorithm specifies Dop and Mop using Dw, which is currently not const
-*   correct (and hard to make const correct). This algorithm will thus be left
-*   until that has been fixed.
-*
-*******************************************************************************/
+ *
+ * File sap_gcr.c
+ *
+ * Copyright (C) 2005, 2011-2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * SAP+GCR solver for the Wilson-Dirac equation.
+ *
+ * The externally accessible function is
+ *
+ *   double sap_gcr(int nkv, int nmx, double res, double mu, 
+ *                  spinor_dble *eta, spinor_dble *psi, int *status)
+ *     Obtains an approximate solution psi of the Wilson-Dirac equation for
+ *     given source eta using the SAP-preconditioned GCR algorithm. See the
+ *     notes for the explanation of the parameters of the program.
+ *
+ * Notes:
+ *
+ * Depending on whether the twisted-mass flag is set or not, the program
+ * solves the equation
+ *
+ *   (Dw+i*mu*gamma_5*1e)*psi=eta  or  (Dw+i*mu*gamma_5)*psi=eta
+ *
+ * respectively. The twisted-mass flag is retrieved from the parameter data
+ * base (see flags/lat_parms.c).
+ *
+ * The program is based on the flexible GCR algorithm (see linsolv/fgcr.c).
+ * It assumes that the improvement coefficients, the quark mass in the SW
+ * term and the parameters of the SAP preconditioner have been set through
+ * set_lat_parms(), set_sw_parms() and set_sap_parms() (see the modules in
+ * the modules/flags directory).
+ *
+ * All other parameters are passed through the argument list:
+ *
+ *   nkv     Maximal number of Krylov vectors generated before the GCR
+ *           algorithm is restarted.
+ *
+ *   nmx     Maximal total number of Krylov vectors that may be generated.
+ *
+ *   res     Desired maximal relative residue |eta-D*psi|/|eta| of the
+ *           calculated solution.
+ *
+ *   mu      Value of the twisted mass in the Dirac equation.
+ *
+ *   eta     Source field. Note that source fields must vanish at global
+ *           time 0 and NPR0C0*L0-1, as has to be the case for physical
+ *           quark fields. eta is unchanged on exit unless psi=eta (which
+ *           is permissible).
+ *
+ *   psi     Calculated approximate solution of the Dirac equation. psi
+ *           vanishes at global time 0 and NPROC0*L0-1.
+ *
+ *   status  If the program is able to solve the Dirac equation to the
+ *           desired accuracy, status reports the total number of Krylov
+ *           vectors that were required for the solution. Negative values
+ *           indicate that the program failed (-1: the algorithm did not
+ *           converge, -2: the inversion of the SW term on the odd points
+ *           was not safe).
+ *
+ * The program returns the norm of the residue of the calculated approximate
+ * solution if status[0]>=-1. Otherwise the field psi is set to zero and the
+ * program returns the norm of the source eta.
+ *
+ * The SAP_BLOCKS blocks grid is automatically allocated and the SW term is
+ * recalculated when needed. The gauge and SW fields are then copied to the
+ * block grid if they are not in the proper condition.
+ *
+ * Evidently the SAP+GCR solver is a global program that must be called on
+ * all processes simultaneously. The required workspaces are
+ *
+ *  spinor              2*nkv+1
+ *  spinor_dble         2
+ *
+ * (see utils/wspace.c).
+ *
+ * CONST_CORRECTNESS:
+ *   The algorithm should have a signature that represents its const-ness,
+ *   however this is currently not possible due to the fact that most callers of
+ *   this algorithm specifies Dop and Mop using Dw, which is currently not const
+ *   correct (and hard to make const correct). This algorithm will thus be left
+ *   until that has been fixed.
+ *
+ *******************************************************************************/
 
 #define SAP_GCR_C
 

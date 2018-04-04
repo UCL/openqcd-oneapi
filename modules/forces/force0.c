@@ -21,7 +21,7 @@
  *
  *   void force0(double c)
  *     Computes the force deriving from the gauge action, including the
- *     prefactor 1/g0^2, multiplies the calculated force by c and assigns
+ *     prefactor 1/g0^2, multiplies the calculated force by c and appends
  *     the result to the MD force field. The coupling g0 and the other
  *     parameters of the gauge action are retrieved from the parameter
  *     data base.
@@ -41,7 +41,9 @@
  * mdflds() (see mdflds/mdflds.c).
  *
  * On the links in the local lattice where the static link variables reside,
- * the programs plaq_frc() and force0() set the force field to zero.
+ * the programs plaq_frc() set the force field to zero.
+ *
+ * The program force0() does not do this however.
  *
  * The programs in this module perform global communications and must be
  * called simultaneously on all MPI processes.

@@ -12,7 +12,8 @@
  *
  * The externally accessible function is
  *
- *   double rwrat(int irp,int n,int *np,int *isp,double *sqn,int **status)
+ *   double rwrat(int irp, int n, int const *np, int const *isp, double *sqn,
+ *                int **status)
  *     Generates a random pseudo-fermion field with normal distribution,
  *     assigns its square norm to sqn and returns -ln(r) (see the notes).
  *

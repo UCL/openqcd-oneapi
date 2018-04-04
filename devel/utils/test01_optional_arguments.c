@@ -1,9 +1,16 @@
 
-/*
- * Created: 14-08-2017
- * Modified: Mon 14 Aug 2017 14:09:28 BST
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test01_optional_arguments.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Checks of read_line and read_optional_line
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

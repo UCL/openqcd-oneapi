@@ -1,3 +1,53 @@
+
+/*******************************************************************************
+ *
+ * File smearing_parms.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Stout smearing parameter database.
+ *
+ * The externally accessible functions are
+ *
+ *   stout_smearing_params_t set_stout_smearing_parms(int n, double pt,
+ *                                                    double ps,
+ *                                                    int smear_gauge,
+ *                                                    int smear_fermion)
+ *     Sets the stout smearing parameters and returns a structure containing
+ *     them. See the documentation with respect to their meanings.
+ *   
+ *   stout_smearing_params_t set_no_stout_smearing_parms(void)
+ *     Sets the parameters so that we do not use stout smearing.
+ *
+ *   void reset_stout_smearing(void)
+ *     Resets the stout smearing parameters to an usmeared state.
+ *
+ *   stout_smearing_params_t stout_smearing_parms(void)
+ *     Returns a structure containing the current (global) stout smearing
+ *     parameters.
+ *
+ *   void print_stout_smearing_parms(void)
+ *     Prints the stout smearing parameters to stdout on MPI process 0.
+ *
+ *   void write_stout_smearing_parms(FILE *fdat)
+ *     Writes the stout smearing parameters to the file fdat on MPI process 0.
+ *
+ *   void check_stout_smearing_parms(FILE *fdat)
+ *     Compares the stout smearing parameters with the values stored on the file
+ *     fdat on MPI process 0, assuming the latter were written to the file by
+ *     the program write_stout_smearing_parms().
+ *
+ * Notes:
+ *
+ * Except for stout_smearing_parms() and print_stout_smearing_parms(), the
+ * programs in this module perform global operations and must be called
+ * simultaneously on all MPI processes.
+ *
+ *******************************************************************************/
+
 #define SMEARING_PARMS_C
 
 #include "flags.h"

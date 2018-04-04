@@ -1,9 +1,16 @@
 
-/*
- * Created: 14-07-2017
- * Modified:
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test05_unsmearing_intrinsics.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Checks of the unsmearing intrinsic functions
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

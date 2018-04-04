@@ -17,7 +17,7 @@
  *     of the field tensor components on the boundaries of the local lattice
  *     (see the file README.ftidx).
  *
- *   void plaq_ftidx(int n,int ix,int *ip)
+ *   void plaq_ftidx(int n, int ix, int *ip)
  *     Calculates the offsets ip[4] of the field tensor components at the
  *     corners of the (mu,nu)-plaquette at the point in the local lattice
  *     with label ix. The indices (mu,nu) are determined by the parameter

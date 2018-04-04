@@ -1,0 +1,9 @@
+
+Tests of flags and parameters
+
+test01_flags_and_states.c  Tests of the configuration state bitmap
+
+test02_check_parms.c       Checks of the write_..._parms check_..._parms
+                           functions
+
+Neither function accepts any arguments.

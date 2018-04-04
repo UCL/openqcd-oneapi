@@ -1,8 +1,16 @@
 
-/*
- * Created: 09-05-2017
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test01_group_products.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of the additional su3 x su3_alg multiplications
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -277,7 +285,7 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf("Checks of the programs in the module su3prod\n");
+    printf("Check of the additional su3 x su3_alg multiplications\n");
     printf("-------------------------------------------\n\n");
 
     printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,

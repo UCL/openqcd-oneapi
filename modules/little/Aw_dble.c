@@ -12,31 +12,31 @@
  *
  * The externally accessible functions are
  *
- *   void Aw_dble(complex_dble *v,complex_dble *w)
+ *   void Aw_dble(complex_dble *v, complex_dble *w)
  *     Applies the little Dirac operator to the field v and assigns the
  *     result to the field w.
  *
- *   void Aweeinv_dble(complex_dble *v,complex_dble *w)
+ *   void Aweeinv_dble(complex_dble *v, complex_dble *w)
  *     Applies the inverse of the even-even part of the little Dirac operator
  *     to the field v and assigns the result to the field w on the even blocks.
  *     On the odd blocks, w is unchanged.
  *
- *   void Awooinv_dble(complex_dble *v,complex_dble *w)
+ *   void Awooinv_dble(complex_dble *v, complex_dble *w)
  *     Applies the inverse of the odd-odd part of the little Dirac operator
  *     to the field v and assigns the result to the field w on the odd blocks.
  *     On the even blocks, w is unchanged.
  *
- *   void Awoe_dble(complex_dble *v,complex_dble *w)
+ *   void Awoe_dble(complex_dble *v, complex_dble *w)
  *     Applies the odd-even part of the little Dirac operator to the field v
  *     and assigns the result to the field w on the odd blocks. On the even
  *     blocks, w is unchanged.
  *
- *   void Aweo_dble(complex_dble *v,complex_dble *w)
+ *   void Aweo_dble(complex_dble *v, complex_dble *w)
  *     Applies the even-odd part of the little Dirac operator to the field v
  *     and *subtracts* the result from the field w on the even blocks. On the
  *     odd blocks, w is unchanged.
  *
- *   void Awhat_dble(complex_dble *v,complex_dble *w)
+ *   void Awhat_dble(complex_dble *v, complex_dble *w)
  *     Applies the even-odd preconditioned little Dirac operator to the field
  *     v and assigns the result to the field w on the even blocks. On the odd
  *     blocks, w is unchanged.

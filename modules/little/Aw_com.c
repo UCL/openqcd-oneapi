@@ -11,7 +11,7 @@
  * Communication functions needed for the computation of the little Dirac
  * operator.
  *
- *   b2b_flds_t *b2b_flds(int n,int mu)
+ *   b2b_flds_t *b2b_flds(int n, int mu)
  *     Extracts the spinor fields on the interior boundaries of the n'th
  *     block of the DFL_BLOCKS grid and its neighbouring block in direction
  *     mu. The spinors on the odd sites are multiplied by the link variables

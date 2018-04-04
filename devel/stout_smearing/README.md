@@ -1,12 +1,20 @@
 # Stout smearing tests
 
 These programs tests that the stout smearing procedures are correctly
-implemented. There are currently 4 tests available:
+implemented. There are currently 8 tests available:
 
  * `test01_omega_matrices`: computes the omega matrices from a known gauge
    configuration
  * `test0[2-4]_smear_nn`: reads a reference config, smears it, and compares with
    a second smeared reference config
+ * `test05_unsmearing_intrinsics`: checks the intermediate computations for the
+     unsmearing against known results
+ * `test06_unsmearing_1`: carries out an unsmearing and checks that the expected
+     links change
+ * `test07_smeared_field_cycling`: checks that the smearing and unsmearing
+     routines correctly keeps track of the locations of all the gauge fields
+ * `test08_xi_matrix_test`: computes the xi matrix for a known setup and looks
+     for discrepancies
 
 Tests 2 to 4 requires reference configurations stored in a `configuration`
 subfolder named in the following way:

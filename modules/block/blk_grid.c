@@ -17,7 +17,7 @@
  *     fields are put in the static memory of this module and are properly
  *     initialized.
  *
- *   block_t *blk_list(blk_grid_t grid,int *nb,int *isw)
+ *   block_t *blk_list(blk_grid_t grid, int *nb, int *isw)
  *     Returns the pointer to the block array of the specified grid. The
  *     number of blocks on the local lattice is assigned to nb and isw is
  *     set to 0 or 1 depending on whether the first block is black or white

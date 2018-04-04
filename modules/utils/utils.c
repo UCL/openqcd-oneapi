@@ -67,6 +67,36 @@
  *   void mpc_print_info()
  *     Print info how mpc functions are implemented
  *
+ *   double square_dble(double x)
+ *     Returns x^2
+ *
+ *   double sinc_dble(double x)
+ *     Returns sinc(x)
+ *
+ *   double smear_xi0_dble(double)
+ *     Computes the smearing function xi0 (see the smearing notes)
+ *
+ *   double smear_xi1_dble(double)
+ *     Computes the smearing function xi1 (see the smearing notes)
+ *
+ *   void mul_icomplex(complex_dble *x)
+ *     Multiplies x by the imaginary unit
+ *
+ *   void mul_assign_scalar_complex(double r, complex_dble *x)
+ *     Sets x = r*x
+ *
+ *   int is_equal_f(float, float)
+ *     Carries out a safe and numerically stabe == operator for floats
+ *
+ *   int not_equal_f(float, float)
+ *     Carries out a safe and numerically stabe != operator for floats
+ *
+ *   int is_equal_d(double, double)
+ *     Carries out a safe and numerically stabe == operator for doubles
+ *
+ *   int not_equal_d(double, double)
+ *     Carries out a safe and numerically stabe != operator for doubles
+ *
  * Notes:
  *
  * If an error is detected in a locally operating program, it is not possible

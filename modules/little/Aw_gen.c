@@ -12,26 +12,27 @@
  *
  * The externally accessible functions are
  *
- *   void gather_ud(int vol,int *imb,su3_dble *ud,su3_dble *vd)
+ *   void gather_ud(int vol, int const *imb, su3_dble const *ud, su3_dble *vd)
  *     Assigns the 3x3 matrices ud[imb[i]] to vd[i] (i=0,..,vol-1).
  *
- *   void gather_sd(int vol,int *imb,spinor_dble *sd,spinor_dble *rd)
+ *   void gather_sd(int vol, int const *imb, spinor_dble const *sd,
+ *                  spinor_dble *rd)
  *     Assigns the spinors sd[imb[i]] to rd[i] (i=0,..,vol-1).
  *
- *   void apply_u2sd(int vol,int *imb,su3_dble *ud,spinor_dble *sd,
- *                   spinor_dble *rd)
+ *   void apply_u2sd(int vol, int const *imb, su3_dble const *ud,
+ *                   spinor_dble const *sd, spinor_dble *rd)
  *     Multiplies the spinors sd[imb[i]] by the 3x3 matrices ud[i] and
  *     assigns the result to rd[i] (i=0,..,vol-1).
  *
- *   void apply_udag2sd(int vol,int *imb,su3_dble *ud,spinor_dble *sd,
- *                      spinor_dble *rd)
+ *   void apply_udag2sd(int vol, int const *imb, su3_dble const *ud,
+ *                      spinor_dble const *sd, spinor_dble *rd)
  *     Multiplies the spinors sd[imb[i]] by the adjoint of the 3x3 matrices
  *     ud[i] and assigns the result to rd[i] (i=0,..,vol-1).
  *
  * The following is an array of functions indexed by the direction mu=0,..,3:
  *
- *   void (*spinor_prod_gamma[])(int vol,spinor_dble *sd,spinor_dble *rd,
- *                               complex_dble *sp)
+ *   void (*spinor_prod_gamma[])(int vol, spinor_dble const *sd,
+ *                               spinor_dble const *rd, complex_dble *sp)
  *      Computes the scalar products (sd,rd) and (sd,gamma_mu*rd), where
  *      gamma_mu denotes the Dirac matrix with index mu and the spinor
  *      fields are assumed to have vol elements. On exit the calculated

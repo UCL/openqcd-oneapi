@@ -1,74 +1,74 @@
 
 /*******************************************************************************
-*
-* File counters.c
-*
-* Copyright (C) 2011, 2012, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Solver iteration counters
-*
-* The externally accessible functions are
-*
-*   void setup_counters(void)
-*     Creates the counters required for counting the solver iteration
-*     numbers along the molecular-dynamics trajectories. The solvers
-*     for the Dirac equation used by the action and force programs in
-*     the course of the HMC algorithm are inferred from the parameter
-*     data base.
-*
-*   void clear_counters(void)
-*     Sets all counters to zero.
-*
-*   void add2counter(char const *type, int idx, int const *status)
-*     Adds the status numbers "status" to the counter characterized by
-*     "type" and index "idx" (see the notes).
-*
-*   int get_count(char const *type, int idx, int *status)
-*     Returns the number of times add2counter(type,idx,status) has been
-*     called since the counter was last cleared. On exit the program
-*     assigns the sum of the accumulated status values to the argument
-*     status [the meaning of the arguments is otherwise the same is in
-*     the case of add2counter()].
-*
-*   void print_avgstat(char const *type, int idx)
-*     Prints the average status values of the counter specified by "type"
-*     and "idx" [as in add2counter()] to stdout on MPI process 0.
-*
-*   void print_all_avgstat(void)
-*     Prints the average status values of all known counters to stdout on
-*     MPI process 0.
-*
-* Notes:
-*
-* In most cases, the computation of the fermion actions and forces requires
-* the Dirac equation to be solved a number of times. Depending on the solver
-* used, the number of status values returned by the solver program may vary.
-
-* The counters administered by this module are set up for all fermion actions
-* and forces that take part in the HMC algorithm according to the parameter
-* data base. In addition, the iteration numbers required for the solution of
-* the little Dirac equation in the course of the generation and updates of
-* the deflation subspace are monitored.
-*
-* The available counter types are "action", "field", "force" and "modes". In
-* the first three cases, the index idx passed to add2counter() is the one of
-* the action, pseudo-fermion field and force in the parameter data base (see
-* flags/{action,force}_parms.c). If type="modes", there are counters for the
-* solver iteration numbers required for the generation of the deflation sub-
-* space (idx=0), the subspace updates (idx=1) and the subspace regeneration
-* (idx=2; see dfl/dfl_sap_gcr.c). The status array passed to add2counter()
-* is expected to contain all status values returned by the associated action,
-* pseudo-fermion field generation, force and mode-generation program.
-*
-* When the HMC parameters or the specifications of the actions and forces
-* are changed, it may be necessary to call setup_counters() again in order
-* to ensure that all counters are properly set up. Except for the program
-* setup_counters(), the programs in this module can be called locally.
-*
-*******************************************************************************/
+ *
+ * File counters.c
+ *
+ * Copyright (C) 2011, 2012, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Solver iteration counters
+ *
+ * The externally accessible functions are
+ *
+ *   void setup_counters(void)
+ *     Creates the counters required for counting the solver iteration
+ *     numbers along the molecular-dynamics trajectories. The solvers
+ *     for the Dirac equation used by the action and force programs in
+ *     the course of the HMC algorithm are inferred from the parameter
+ *     data base.
+ *
+ *   void clear_counters(void)
+ *     Sets all counters to zero.
+ *
+ *   void add2counter(char const *type, int idx, int const *status)
+ *     Adds the status numbers "status" to the counter characterized by
+ *     "type" and index "idx" (see the notes).
+ *
+ *   int get_count(char const *type, int idx, int *status)
+ *     Returns the number of times add2counter(type,idx,status) has been
+ *     called since the counter was last cleared. On exit the program
+ *     assigns the sum of the accumulated status values to the argument
+ *     status [the meaning of the arguments is otherwise the same is in
+ *     the case of add2counter()].
+ *
+ *   void print_avgstat(char const *type, int idx)
+ *     Prints the average status values of the counter specified by "type"
+ *     and "idx" [as in add2counter()] to stdout on MPI process 0.
+ *
+ *   void print_all_avgstat(void)
+ *     Prints the average status values of all known counters to stdout on
+ *     MPI process 0.
+ *
+ * Notes:
+ *
+ * In most cases, the computation of the fermion actions and forces requires
+ * the Dirac equation to be solved a number of times. Depending on the solver
+ * used, the number of status values returned by the solver program may vary.
+ 
+ * The counters administered by this module are set up for all fermion actions
+ * and forces that take part in the HMC algorithm according to the parameter
+ * data base. In addition, the iteration numbers required for the solution of
+ * the little Dirac equation in the course of the generation and updates of
+ * the deflation subspace are monitored.
+ *
+ * The available counter types are "action", "field", "force" and "modes". In
+ * the first three cases, the index idx passed to add2counter() is the one of
+ * the action, pseudo-fermion field and force in the parameter data base (see
+ * flags/{action,force}_parms.c). If type="modes", there are counters for the
+ * solver iteration numbers required for the generation of the deflation sub-
+ * space (idx=0), the subspace updates (idx=1) and the subspace regeneration
+ * (idx=2; see dfl/dfl_sap_gcr.c). The status array passed to add2counter()
+ * is expected to contain all status values returned by the associated action,
+ * pseudo-fermion field generation, force and mode-generation program.
+ *
+ * When the HMC parameters or the specifications of the actions and forces
+ * are changed, it may be necessary to call setup_counters() again in order
+ * to ensure that all counters are properly set up. Except for the program
+ * setup_counters(), the programs in this module can be called locally.
+ *
+ *******************************************************************************/
 
 #define COUNTERS_C
 

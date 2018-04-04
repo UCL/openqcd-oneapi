@@ -12,14 +12,14 @@
  *
  * The externally accessible functions are
  *
- *   int assign_swd2swbgr(blk_grid_t grid,ptset_t set)
+ *   int assign_swd2swbgr(blk_grid_t grid, ptset_t set)
  *     Assigns the global double-precision SW field to the corresponding
  *     single-precision fields in the specified grid. On the given point
  *     set, the copied Pauli matrices are inverted before assignment and
  *     the program returns 0 or 1 depending on whether the inversions were
  *     safe or not.
  *
- *   int assign_swd2swdblk(blk_grid_t grid,int n,ptset_t set)
+ *   int assign_swd2swdblk(blk_grid_t grid, int n, ptset_t set)
  *     Assigns the global double-precision SW field to the corresponding
  *     double-precision field on the n'th block of the specified grid. On
  *     the given point set, the copied Pauli matrices are inverted before

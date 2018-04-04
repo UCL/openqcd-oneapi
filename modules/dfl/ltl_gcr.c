@@ -15,8 +15,8 @@
  *   double ltl_gcr(int nkv,int nmx,double res,double mu,
  *                  complex_dble *eta,complex_dble *psi,int *status)
  *     Obtains an approximate solution psi of the little Dirac equation for
- *     given source eta using the even-odd preconditioned GCR algorithm. See
- *     the notes for the explanation of the parameters of the program.
+ *     given source eta using the even-odd preconditioned GCR algorithm. See the
+ *     notes for the explanation of the parameters of the program.
  *
  * Notes:
  *

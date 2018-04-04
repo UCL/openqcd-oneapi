@@ -1,9 +1,16 @@
 
-/*
- * Created: 14-03-2018
- * Modified:
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File time01_su3_dble.c
+ *
+ * Author (2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Timing of the communication routines for su3_dble
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

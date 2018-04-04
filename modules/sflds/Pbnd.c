@@ -14,19 +14,21 @@
  * The following are arrays of functions indexed by the face number
  * ifc=0,..,7
  *
- *   void (*assign_s2w[8])(int const *imb,int vol,spinor const *s,weyl *r)
+ *   void (*assign_s2w[8])(int const *imb, int vol, spinor const *s, weyl *r)
  *     Applies the projector theta[ifc] to the spinor s[imb[ix]],
  *     ix=0,..,vol-1, and assigns the result to the weyl spinor r[ix].
  *
- *   void (*add_assign_w2s[8])(int const *imb,int vol,weyl const *s,spinor *r)
+ *   void (*add_assign_w2s[8])(int const *imb, int vol, weyl const *s,
+ *                             spinor *r)
  *     Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor
  *     psi satisfying theta[ifc]*psi=psi and adds psi to r[imb[ix]].
  *
- *   void (*sub_assign_w2s[8])(int const *imb,int vol,weyl const *s,spinor *r)
+ *   void (*sub_assign_w2s[8])(int const *imb, int vol, weyl const *s,
+ *                             spinor *r)
  *     Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor
  *     psi satisfying theta[ifc]*psi=psi and subtracts psi from r[imb[ix]].
  *
- *   void (*mulg5_sub_assign_w2s[8])(int const *imb,int vol,weyl const *s,
+ *   void (*mulg5_sub_assign_w2s[8])(int const *imb, int vol, weyl const *s, 
  *                                   spinor *r)
  *    Expands the Weyl spinor s[ix], ix=0,..,vol-1, to a Dirac spinor psi
  *    satisfying theta[ifc]*psi=psi and subtracts gamma5*psi from r[imb[ix]].

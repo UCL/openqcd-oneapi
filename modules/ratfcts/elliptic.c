@@ -16,7 +16,7 @@
  *     Returns the complete elliptic integral K(k) for 0<=k<1. The value
  *     of k is to be passed through the argument rk=k/k' (see the notes).
  *
- *   void sncndn(double u,double rk,double *sn,double *cn,double *dn)
+ *   void sncndn(double u, double rk, double *sn, double *cn, double *dn)
  *     Computes the Jacobi elliptic functions sn(u,k), cn(u,k), dn(u,k)
  *     for specified real u and 0<=k<1. The value of k is to be passed
  *     through the argument rk=k/k' (see the notes).

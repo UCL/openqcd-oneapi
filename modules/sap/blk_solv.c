@@ -12,7 +12,7 @@
  *
  * The externally accessible functions are
  *
- *   void blk_mres(int n,float mu,int nmr)
+ *   void blk_mres(int n, float mu, int nmr)
  *     Depending on whether the twisted-mass flag is set or not, this
  *     program approximately solves (Dw+i*mu*gamma_5*1e)*b.s[0]=b.s[1] or
  *     (Dw+i*mu*gamma_5)*b.s[0]=b.s[1] on the n'th block b of the SAP_BLOCKS
@@ -20,7 +20,7 @@
  *     using b.s[2] as workspace. On exit, the approximate solution and its
  *     residue are in b.s[0] and b.s[1], respectively.
  *
- *   void blk_eo_mres(int n,float mu,int nmr)
+ *   void blk_eo_mres(int n, float mu, int nmr)
  *     Approximate solution of (Dwhat+i*mu*gamma_5)*b.s[0]=b.s[1] for given
  *     b.s[1] on the n'th block b of the SAP_BLOCKS grid. The solution is
  *     obtained by applying nmr minimal residual steps, using b.s[2] as

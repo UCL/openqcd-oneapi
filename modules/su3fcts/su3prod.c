@@ -12,41 +12,57 @@
  *
  * The externally accessible functions are
  *
- *   void su3xsu3(su3_dble *u,su3_dble *v,su3_dble *w)
+ *   void su3xsu3(su3_dble const *u, su3_dble const *v, su3_dble *w)
  *     Computes w=u*v assuming that w is different from u.
  *
- *   void su3dagxsu3(su3_dble *u,su3_dble *v,su3_dble *w)
+ *   void su3dagxsu3(su3_dble const *u, su3_dble const *v, su3_dble *w)
  *     Computes w=u^dag*v assuming that w is different from u.
  *
- *   void su3xsu3dag(su3_dble *u,su3_dble *v,su3_dble *w)
+ *   void su3xsu3dag(su3_dble const *u, su3_dble const *v, su3_dble *w)
  *     Computes w=u*v^dag assuming that w is different from u and v.
  *
- *   void su3dagxsu3dag(su3_dble *u,su3_dble *v,su3_dble *w)
+ *   void su3dagxsu3dag(su3_dble const *u, su3_dble const *v, su3_dble *w)
  *     Computes w=u^dag*v^dag assuming that w is different from u and v.
  *
- *   void su3xu3alg(su3_dble *u,u3_alg_dble *X,su3_dble *v)
+ *   void su3xu3alg(su3_dble const *u, u3_alg_dble const *X, su3_dble *v)
  *     Computes v=u*X assuming that v is different from u.
  *
- *   void su3dagxu3alg(su3_dble *u,u3_alg_dble *X,su3_dble *v)
+ *   void su3dagxu3alg(su3_dble const *u, u3_alg_dble const *X, su3_dble *v)
  *     Computes v=u^dag*X assuming that v is different from u.
  *
- *   void u3algxsu3(u3_alg_dble *X,su3_dble *u,su3_dble *v)
+ *   void u3algxsu3(u3_alg_dble const *X, su3_dble const *u, su3_dble *v)
  *     Computes v=X*u assuming that v is different from u.
  *
- *   void u3algxsu3dag(u3_alg_dble *X,su3_dble *u,su3_dble *v)
+ *   void u3algxsu3dag(u3_alg_dble const *X, su3_dble const *u, su3_dble *v)
  *     Computes v=X*u^dag assuming that v is different from u.
  *
- *   double prod2su3alg(su3_dble *u,su3_dble *v,su3_alg_dble *X)
+ *   double prod2su3alg(su3_dble const *u, su3_dble const *v, su3_alg_dble *X)
  *     Computes the product w=u*v and assigns its traceless antihermitian
  *     part (1/2)*[w-w^dag-(1/3)*tr{w-w^dag}] to X. The program returns
  *     the real part of tr{w}.
  *
- *   void prod2u3alg(su3_dble *u,su3_dble *v,u3_alg_dble *X)
+ *   void prod2u3alg(su3_dble const *u, su3_dble const *v, u3_alg_dble *X)
  *     Computes the product w=u*v and assigns w-w^dag to X.
  *
- *   void rotate_su3alg(su3_dble *u,su3_alg_dble *X)
+ *   void rotate_su3alg(su3_dble const *u, su3_alg_dble *X)
  *     Replaces X by u*X*u^dag. The matrix u must be unitary but its
  *     determinant may be different from 1.
+ *
+ *   void su3xsu3alg(su3_dble const *u, su3_alg_dble const *X, su3_dble *v)
+ *     Computes the product u*X and assigns the result to v.
+ *
+ *   void su3algxsu3(su3_alg_dble const *X, su3_dble const *u, su3_dble *v)
+ *     Computes the product X*u and assigns the result to v.
+ *
+ *   void su3dagxsu3alg(su3_dble const *u, su3_alg_dble const *X, su3_dble *v)
+ *     Computes the product u^dag*X and assigns the result to v.
+ *
+ *   void su3algxsu3dag(su3_alg_dble const *X, su3_dble const *u, su3_dble *v)
+ *     Computes the product X*u^dag and assigns the result to v.
+ *     
+ *   void su3algxsu3_tr(su3_alg_dble const *X, su3_dble const *u,
+ *                      complex_dble *tr)
+ *     Computes tr(X*u) and assigns the result to tr.
  *
  * Notes:
  *

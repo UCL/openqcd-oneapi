@@ -1,3 +1,43 @@
+
+/*******************************************************************************
+ *
+ * File smeared_fields.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Allocation and storage of smeared fields in various states of smearing as
+ * well as necessary information for the unsmearing
+ *
+ * The externally accessible functions are
+ *
+ *   su3_dble **smeared_fields(void)
+ *     Returns a pointer to an array of su3_dble gauge fields. These are full
+ *     gauge fields including the boundary and corresponds to the fields at
+ *     different smearing stages. If the gauge configuration is in a smeared
+ *     state the first element of this array will be a pointer to the original
+ *     field allocated by udfld().
+ *
+ *   void free_smearing_ch_coeff_fields(void)
+ *     Frees the memory taken up by the Cayley-Hamilton coefficients.
+ *
+ *   ch_mat_coeff_pair_t **smearing_ch_coeff_fields(void)
+ *     Returns a pointer to an array of ch_mat_coeff_pair_t "fields". These
+ *     fields are only allocated on the bulk links and contain the parameters
+ *     necessary to later carry out the MD force unsmearing routine.
+ *     Specifically they contain the Cayley-Hamilton coefficients of the staple
+ *     exponentiation procedure as well as the su3_alg_dble matrix X in the
+ *     exponential.
+ *
+ * Notes:
+ *
+ * All routines carries out communication and must therefore be call on all
+ * processes simultaneously.
+ *
+ *******************************************************************************/
+
 #define SMEARED_FIELDS_C
 
 #include "global.h"
@@ -12,7 +52,7 @@ static ch_mat_coeff_pair_t **exp_ch_mat_coeff_pair_field = NULL;
  *   Therefore the size of the smeared fields workspace is:
  *     n_iterations * (4 * vol + 7 * boundary / 4) * sizeof(su3)
  */
-void allocate_smeared_fields(void)
+static void allocate_smeared_fields(void)
 {
   int nsmear, nlinks, i;
   stout_smearing_params_t smear_params;
@@ -63,7 +103,7 @@ su3_dble **smeared_fields(void)
  *   recomputed. There is no real reason to store all of ch_drv0_t as we do not
  *   need t and d, but from a programming perspective it makes more sense.
  */
-void allocate_smearing_ch_coeff_fields(void)
+static void allocate_smearing_ch_coeff_fields(void)
 {
   int nsmear, nlinks, i;
   stout_smearing_params_t smear_params;

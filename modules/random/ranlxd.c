@@ -18,11 +18,11 @@
  *
  * The externally accessible functions are
  *
- *   void ranlxd(double r[],int n)
+ *   void ranlxd(double r[], int n)
  *     Computes the next n double-precision random numbers and
  *     assigns them to the elements r[0],...,r[n-1] of the array r[]
  *
- *   void rlxd_init(int level,int seed)
+ *   void rlxd_init(int level, int seed)
  *     Initialization of the generator
  *
  *   int rlxd_size(void)

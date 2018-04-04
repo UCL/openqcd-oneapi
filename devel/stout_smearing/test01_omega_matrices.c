@@ -1,9 +1,16 @@
 
-/*
- * Created: 01-06-2017
- * Modified:
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test01_omega_matrices.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Checks of the computation of the X matrix with diagonal matrices
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -38,7 +45,7 @@ int main(int argc, char *argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
   if (my_rank == 0) {
-    printf("Checking omega field for identity gauge fields\n");
+    printf("Checking omega field for diagonal gauge fields\n");
     printf("---------------------------------------------------\n\n");
 
     printf("%dx%dx%dx%d lattice,\n", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,

@@ -16,7 +16,7 @@
  *     Allocates and initializes the buffers and index arrays needed for
  *     the program sap_com().
  *
- *   void sap_com(int ic,spinor *r)
+ *   void sap_com(int ic, spinor *r)
  *     Subtracts the Weyl field b.bb.w[0] on the boundaries of all black
  *     (if ic=0) or all white (if ic=1) blocks b of the SAP_BLOCKS grid
  *     from the global spinor field r. Before subtraction, the Weyl fields

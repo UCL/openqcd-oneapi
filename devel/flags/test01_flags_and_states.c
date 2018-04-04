@@ -1,9 +1,16 @@
 
-/*
- * Created: 16-02-2018
- * Modified: Fri 16 Feb 2018 11:36:50 GMT
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test01_flags_and_states.c
+ *
+ * Author (2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Tests of the configuration state bitmap
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -26,7 +33,7 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf("Checks of the programs in the module flags\n");
+    printf("Tests of the configuration state bitmap\n");
     printf("------------------------------------------\n");
 
     printf("%dx%dx%dx%d lattice\n", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,

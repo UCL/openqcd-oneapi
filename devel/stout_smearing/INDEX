@@ -1,0 +1,25 @@
+
+Tests on the stout smearing routines
+
+test01_omega_matrices.c         Checks of the computation of the X matrix with
+                                diagonal matrices
+
+test02_smear_n1.c               Check of n=1 smearing agains a reference
+                                configuration
+
+test03_smear_n2.c               Check of n=2 smearing agains a reference
+                                configuration
+
+test04_smear_n3.c               Check of n=3 smearing agains a reference
+                                configuration
+
+test05_unsmearing_intrinsics.c  Checks of the unsmearing intrinsic functions
+
+test06_unsmearing_1.c           Basic check on force unsmearing routine
+
+test07_smeared_field_cycling.c  Checks for how smear_fields() and unsmear_fields()
+                                behave
+
+test08_xi_matrix_test.c         Checks of the computation of the lambda field
+
+Note that the 8th test is currently not implemented for NPROC > 1.

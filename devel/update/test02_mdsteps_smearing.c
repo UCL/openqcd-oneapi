@@ -1,9 +1,16 @@
 
-/*
- * Created: 08-08-2017
- * Modified:
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test02_mdsteps_smearing.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Test on the mdsteps integrator generation with two smeared actions
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

@@ -33,12 +33,12 @@
  *     the tolerated difference of the boundary values of the gauge field from
  *     the expected ones in the case of SF and open-SF boundary conditions.
  *
- *   void bnd_s2zero(ptset_t set,spinor *s)
+ *   void bnd_s2zero(ptset_t set, spinor *s)
  *     Sets the components of the single-precision spinor field s on the
  *     specified set of points at global time 0 (boundary conditions type
  *     0,1 or 2) and time NPROC0*L0-1 (boundary conditions type 0) to zero.
  *
- *   void bnd_sd2zero(ptset_t set,spinor_dble *sd)
+ *   void bnd_sd2zero(ptset_t set, spinor_dble *sd)
  *     Sets the components of the double-precision spinor field sd on the
  *     specified set of points at global time 0 (boundary conditions type
  *     0,1 or 2) and time NPROC0*L0-1 (boundary conditions type 0) to zero.

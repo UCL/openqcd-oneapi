@@ -12,13 +12,13 @@
  *
  * The externally accessible function is
  *
- *   double tmcg(int nmx,double res,double mu,
- *               spinor_dble *eta,spinor_dble *psi,int *status)
+ *   double tmcg(int nmx, double res, double mu, 
+ *               spinor_dble *eta, spinor_dble *psi, int *status)
  *     Obtains an approximate solution psi of the normal Wilson-Dirac
  *     equation for given source eta (see the notes).
  *
- *   double tmcgeo(int nmx,double res,double mu,
- *                 spinor_dble *eta,spinor_dble *psi,int *status)
+ *   double tmcgeo(int nmx, double res, double mu, 
+ *                 spinor_dble *eta, spinor_dble *psi, int *status)
  *     Obtains an approximate solution psi of the normal even-odd
  *     preconditioned Wilson-Dirac equation for given source eta (see
  *     the notes).

@@ -16,8 +16,8 @@
  *
  *   void (*assign_sd2wd[8])(int const *imb,int vol,
  *                           spinor_dble const *sd,weyl_dble *rd)
- *   Applies the projector theta[ifc] to the spinor sd[imb[ix]], ix=0,..,vol-1,
- *   and assigns the result to the weyl spinor rd[ix]
+ *     Applies the projector theta[ifc] to the spinor sd[imb[ix]],
+ *     ix=0,..,vol-1, and assigns the result to the weyl spinor rd[ix]
  *
  *   void (*add_assign_wd2sd[8])(int const *imb,int vol,
  *                               weyl_dble const *sd,spinor_dble *rd)

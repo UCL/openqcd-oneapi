@@ -1,3 +1,51 @@
+
+/*******************************************************************************
+ *
+ * File anisotropy_parms.c
+ *
+ * Authors (2017, 2018): Jonas Rylund Glesaaen, Benjamin Jäger
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Anisotropy parameter database.
+ *
+ * The externally accessible functions are
+ *
+ *   ani_params_t set_ani_parms(int use_tts, double nu, double xi, double cR,
+ *                              double cT, double us, double ut, double ust,
+ *                              double utt)
+ *     Sets the anisotropy parameters and returns a structure containing them.
+ *     See the documentation with respect to their meanings.
+ *
+ *   ani_params_t set_no_ani_parms(void)
+ *     Sets the parameters as if we had an isotropic simulation.
+ *
+ *   ani_params_t ani_parms(void)
+ *     Return a structure that contains the current anisotropy parameters.
+ *     
+ *   void print_ani_parms(void)
+ *     Prints the anisotropy parameters to stdout on MPI process 0.
+ *
+ *   int ani_params_initialised(void)
+ *     Returns whether the parameters have been initialised or not.
+ *
+ *   void write_ani_parms(FILE *fdat)
+ *     Writes the anisotropy parameters to the file fdat on MPI process 0.
+ *
+ *   void check_ani_parms(FILE *fdat)
+ *     Compares the anisotropy parameters with the values stored on the file
+ *     fdat on MPI process 0, assuming the latter were written to the file by
+ *     the program write_ani_parms().
+ *
+ * Notes:
+ *
+ * Except for ani_parms() and print_ani_parms(), the programs in this module
+ * perform global operations and must be called simultaneously on all MPI
+ * processes.
+ *
+ *******************************************************************************/
+
 #define ANISOTROPY_PARMS_C
 
 #include "flags.h"

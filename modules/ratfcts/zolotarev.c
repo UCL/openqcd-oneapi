@@ -12,7 +12,7 @@
  *
  * The externally accessible function is
  *
- *   void zolotarev(int n,double eps,double *A,double *ar,double *delta)
+ *   void zolotarev(int n, double eps, double *A, double *ar, double *delta)
  *     Computes the amplitude A, the coefficients ar[r-1]=a_r, r=1,..,2n,
  *     and the error delta of the Zolotarev optimal rational approximation
  *     of degree [n,n] to the function f(y)=1/sqrt(y).

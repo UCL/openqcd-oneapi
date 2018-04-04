@@ -1,0 +1,245 @@
+
+################################################################################
+#
+# 2+1 Flavour anisotropic action for the "Generation 2" parameters of the
+# FASTSUM lattice collaboration
+#
+################################################################################
+
+# General configuration
+# {{{
+
+[Run name]
+name  gen2-16x24
+
+[Directories]
+log_dir   ./log
+dat_dir   ./dat
+loc_dir   ./cnfg
+cnfg_dir  ./cnfg
+
+[Lattice parameters]
+beta   1.5
+c0     1.6666667
+kappa  0.278 0.276509
+csw    1.0
+
+[Boundary conditions]
+type   3
+theta  0.0 0.0 0.0
+
+[Random number generator]
+level  0
+seed   42
+
+# }}}
+
+# HMC configuration
+# {{{
+
+[HMC parameters]
+actions  0 1 2 3 4
+npf      4
+mu       0.0 0.1
+nlv      3
+tau      1.0
+
+[MD trajectories]
+nth       0
+ntr       10000
+dtr_log   1
+dtr_ms    10
+dtr_cnfg  100
+
+# }}}
+
+# Integrator settings
+# {{{
+
+[Level 0]
+integrator  OMF4
+nstep       1
+forces      0
+
+[Level 1]
+integrator  OMF4
+nstep       1
+forces      1 3 
+
+[Level 2]
+integrator  OMF2
+lambda      0.1666667
+nstep       4
+forces      2 4
+
+# }}}
+
+# Lattice actions
+# {{{
+
+[Rational 0]
+degree  10
+range   0.002 7.0
+
+[Action 0]
+action  ACG
+
+## Light quarks
+## {{{
+
+[Action 1]
+action  ACF_TM1_EO_SDET
+ipf     0
+im0     0
+imu     1
+isp     1
+
+[Action 2]
+action  ACF_TM2_EO
+ipf     1
+im0     0
+imu     0 1
+isp     1 1
+
+## }}}
+
+## Strange quarks
+## {{{
+
+[Action 3]
+action  ACF_RAT_SDET
+ipf     2
+im0     1
+irat    0 0 6
+isp     2
+
+[Action 4]
+action  ACF_RAT
+ipf     3
+im0     1
+irat    0 7 9 
+isp     2
+
+## }}}
+# }}}
+
+# MD forces
+# {{{
+
+[Force 0]
+force  FRG
+
+## Light quark forces
+## {{{
+
+[Force 1]
+force  FRF_TM1_EO_SDET
+isp    0
+ncr    4
+
+[Force 2]
+force  FRF_TM2_EO
+isp    1
+ncr    3
+
+## }}}
+
+## Stange quark forces
+## {{{
+
+[Force 3]
+force  FRF_RAT_SDET
+isp    2
+
+[Force 4]
+force  FRF_RAT
+isp    2
+
+## }}}
+# }}}
+
+# Solvers
+# {{{
+
+[Solver 0]
+solver  CGNE
+nmx     10000
+res     1.0e-10
+
+[Solver 1]
+solver  DFL_SAP_GCR
+nkv     24
+isolv   0
+nmr     4
+ncy     4
+nmx     1024
+res     1.0e-10
+
+[Solver 2]
+solver  MSCG
+nmx     10000
+res     1.e-10
+
+# }}}
+
+# SAP and deflation
+# {{{
+
+[SAP]
+bs  4 6 6 6
+
+[Deflation projection]
+nkv  8
+nmx  128
+res  1.0e-2
+
+[Deflation subspace]
+bs  4 6 6 6
+Ns  24
+
+[Deflation subspace generation]
+kappa  0.278
+mu     0.00
+ninv   9
+nmr    4
+ncy    4
+
+[Deflation update scheme]
+dtau  0.15
+nsm   1
+
+# }}}
+
+# Wilson flow
+# {{{
+
+[Wilson flow]
+integrator  RK3
+eps         2.0e-2
+nstep       400
+dnms        2
+
+# }}}
+
+# Smearing and anisotropy
+# {{{
+
+[Smearing parameters]
+n_smear  2
+rho_t    0.00
+rho_s    0.14
+gauge    0
+fermion  1
+
+[Anisotropy parameters]
+use_tts     0
+nu          1.265
+xi          4.3
+cR          1.58932722549812
+cT          0.902783591772098
+us_gauge    0.73356648935927
+ut_gauge    1.0
+us_fermion  1.0
+ut_fermion  1.0
+
+# }}}

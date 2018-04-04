@@ -18,10 +18,12 @@
  *     the form of an array of elementary operations (force computations
  *     and gauge-field update steps).
  *
- *   mdstep_t *mdsteps(int *nop,int *ntu,int *itu)
+ *   mdstep_t *mdsteps(size_t *nop, int *ismear, int *iunsmear, int *itu)
  *     Returns the array of elementary operations that describe the current
- *     integrator. On exit the program assigns the total number of operations
- *     to nop and the index of the gauge-field update operation to itu.
+ *     integrator. On exit the program assigns the total number of operations to
+ *     nop, the index of the smearing operation to ismear, index of the
+ *     unsmearing update to iunsmear, and the index of the gauge-field update
+ *     operation to itu.
  *
  *   void print_mdsteps(int ipr)
  *     Prints some information on the current integrator to stdout on MPI

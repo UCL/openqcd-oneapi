@@ -1,3 +1,40 @@
+
+/*******************************************************************************
+ *
+ * File link_communication.c
+ *
+ * Author (2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Communication routines for "link like" problems
+ *
+ * The externally accessible functions are
+ *
+ *   void copy_boundary_su3_field(su3_dble *su3_field)
+ *     Copy the boundaries of an su3_dble field to the neighbouring processes
+ *     in directions -mu.
+ *   
+ *   void add_boundary_su3_field(su3_dble *su3_field)
+ *     Add the current value of an su3_field's boundary to its neighbouring
+ *     processes corresponding links in the +mu direction.
+ *   
+ *   void copy_boundary_su3_alg_field(su3_alg_dble *su3_alg_field)
+ *     Copy the boundaries of an su3_alg_dble field to the neighbouring
+ *     processes in directions -mu.
+ *   
+ *   void add_boundary_su3_alg_field(su3_alg_dble *su3_alg_field)
+ *     Add the current value of an su3_alg_field's boundary to its neighbouring
+ *     processes corresponding links in the +mu direction.
+ *
+ * Notes:
+ *
+ * All routines carries out communication and must therefore be call on all
+ * processes simultaneously.
+ *
+ *******************************************************************************/
+
 #define LINK_COMMUNICATION_C
 
 #include "field_com.h"

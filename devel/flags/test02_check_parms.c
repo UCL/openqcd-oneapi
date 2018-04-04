@@ -1,8 +1,16 @@
 
-/*
- * Created: 13-03-2018
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test02_check_parms.c
+ *
+ * Author (2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Checks of the write_..._parms check_..._parms functions
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -26,7 +34,7 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf("Checks of the programs in the module flags\n");
+    printf("Checks of the write_..._parms check_..._parms functions\n");
     printf("------------------------------------------\n");
 
     printf("%dx%dx%dx%d lattice\n", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
@@ -35,6 +43,7 @@ int main(int argc, char *argv[])
     printf("%dx%dx%dx%d local lattice\n", L0, L1, L2, L3);
     printf("-------------------------------------------\n\n");
   }
+
   theta[0] = 0.11;
   theta[1] = 3.15;
   theta[2] = -0.44;

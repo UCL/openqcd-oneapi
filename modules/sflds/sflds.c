@@ -13,43 +13,43 @@
  *
  * The externally accessible functions are
  *
- *   void set_s2zero(int vol,spinor *s)
+ *   void set_s2zero(int vol, spinor *s)
  *     Sets the single-precision spinor field s to zero.
  *
- *   void set_sd2zero(int vol,spinor_dble *sd)
+ *   void set_sd2zero(int vol, spinor_dble *sd)
  *     Sets the double-precision spinor field sd to zero.
  *
- *   void random_s(int vol,spinor *s,float sigma)
+ *   void random_s(int vol, spinor *s, float sigma)
  *     Initializes the components of the single-precision field s
  *     to (complex) random values z with distribution proportional
  *     to exp{-|z|^2/sigma^2}.
  *
- *   void random_sd(int vol,spinor_dble *sd,double sigma)
+ *   void random_sd(int vol, spinor_dble *sd, double sigma)
  *     Initializes the components of the double-precision field sd
  *     to (complex) random values z with distribution proportional
  *     to exp{-|z|^2/sigma^2}.
  *
- *   void assign_s2s(int vol,spinor const *s,spinor *r)
+ *   void assign_s2s(int vol, spinor const *s, spinor *r)
  *     Assigns the single-precision field s to the single-precision
  *     field r.
  *
- *   void assign_s2sd(int vol,spinor const *s,spinor_dble *rd)
+ *   void assign_s2sd(int vol, spinor const *s, spinor_dble *rd)
  *     Assigns the single-precision field s to the double-precision
  *     field rd.
  *
- *   void assign_sd2s(int vol,spinor_dble const *sd,spinor *r)
+ *   void assign_sd2s(int vol, spinor_dble const *sd, spinor *r)
  *     Assigns the double-precision field sd to the single-precision
  *     field r.
  *
- *   void assign_sd2sd(int vol,spinor_dble const *sd,spinor_dble *rd)
+ *   void assign_sd2sd(int vol, spinor_dble const *sd, spinor_dble *rd)
  *     Assigns the double-precision field sd to the double-precision
  *     field rd.
  *
- *   void diff_s2s(int vol,spinor const *s,spinor *r)
+ *   void diff_s2s(int vol, spinor const *s, spinor *r)
  *     Assigns the difference s-r of the single-precision fields s and
  *     r to r.
  *
- *   void add_s2sd(int vol,spinor const *s,spinor_dble *rd)
+ *   void add_s2sd(int vol, spinor const *s, spinor_dble *rd)
  *     Adds the single-precision field s to the double-precision field
  *     rd.
  *

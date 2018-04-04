@@ -35,8 +35,7 @@
  *     not overlap in this case).
  *
  *   int apply_swinv_dble(int vol, double mu, pauli_dble const *m,
- *                        spinor_dble const *s,
- *                        spinor_dble *r)
+ *                        spinor_dble const *s, spinor_dble *r)
  *     Applies the inverse of the matrix field m[2*vol]+i*mu*gamma_5 to the
  *     spinor field s[vol] and assigns the result to the field r[vol]. The
  *     source field is overwritten if r=s and otherwise left unchanged (the

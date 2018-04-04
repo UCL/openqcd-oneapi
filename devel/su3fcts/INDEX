@@ -1,0 +1,5 @@
+
+Checks of the mathematical expressions in su3fcts
+
+test01_group_products.c  Check of the additional su3 x su3_alg
+                         multiplications

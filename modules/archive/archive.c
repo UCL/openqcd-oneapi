@@ -12,25 +12,25 @@
  *
  * The externally accessible functions are
  *
- *   void write_cnfg(char *out)
+ *   void write_cnfg(char const *out)
  *     Writes the lattice sizes, the process grid sizes, the coordinates
  *     of the calling process, the state of the random number generators,
  *     the local plaquette sum and the local double-precision gauge field
  *     to the file "out".
  *
- *   void read_cnfg(char *in)
+ *   void read_cnfg(char const *in)
  *     Reads the local double-precision gauge field from the file "in",
  *     assuming it was written to the file by the program write_cnfg().
  *     The program then resets the random number generator and checks
  *     that the restored field is compatible with the chosen boundary
  *     conditions.
  *
- *   void export_cnfg(char *out)
+ *   void export_cnfg(char const *out)
  *     Writes the lattice sizes and the global double-precision gauge
  *     field to the file "out" from process 0 in the universal format
  *     specified below (see the notes).
  *
- *   void import_cnfg(char *in)
+ *   void import_cnfg(char const *in)
  *     Reads the global double-precision gauge field from the file "in"
  *     on process 0, assuming the field was written to the file in the
  *     universal format. The field is periodically extended if needed

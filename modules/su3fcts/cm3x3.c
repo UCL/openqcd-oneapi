@@ -12,58 +12,58 @@
  *
  * The externally accessible functions are
  *
- *   void cm3x3_zero(int vol,su3_dble *u)
+ *   void cm3x3_zero(int vol, su3_dble *u)
  *     Sets the elements of the array u[] to zero
  *
- *   void cm3x3_unity(int vol,su3_dble *u)
+ *   void cm3x3_unity(int vol, su3_dble *u)
  *     Sets the elements of the array u[] to the unit matrix
  *
- *   void cm3x3_assign(int vol,su3_dble *u,su3_dble *v)
+ *   void cm3x3_assign(int vol, su3_dble const *u, su3_dble *v)
  *     Assigns the elements of the array u[] to those of the array v[]
  *
- *   void cm3x3_swap(int vol,su3_dble *u,su3_dble *v)
+ *   void cm3x3_swap(int vol, su3_dble const *u, su3_dble *v)
  *     Swaps the elements of the array u[] with those of the array v[]
  *
- *   void cm3x3_dagger(su3_dble *u,su3_dble *v)
+ *   void cm3x3_dagger(su3_dble const *u, su3_dble *v)
  *     Assigns the hermitian conjugate of (*u) to (*v)
  *
- *   void cm3x3_tr(su3_dble *u,su3_dble *v,complex_dble *tr)
+ *   void cm3x3_tr(su3_dble const *u, su3_dble const *v, complex_dble *tr)
  *     Assigns the trace of (*u)*(*v) to (*tr)
  *
- *   void cm3x3_retr(su3_dble *u,su3_dble *v,double *tr)
+ *   void cm3x3_retr(su3_dble const *u, su3_dble const *v, double *tr)
  *     Assigns the real part of the trace of (*u)*(*v) to (*tr)
  *
- *   void cm3x3_imtr(su3_dble *u,su3_dble *v,double *tr)
+ *   void cm3x3_imtr(su3_dble const *u, su3_dble const *v, double *tr)
  *     Assigns the imaginary part of the trace of (*u)*(*v) to (*tr)
  *
- *   void cm3x3_add(su3_dble *u,su3_dble *v)
+ *   void cm3x3_add(su3_dble const *u, su3_dble *v)
  *     Adds (*u) to (*v). The input matrix is unchanged unless u=v
  *
- *   void cm3x3_mul_add(su3_dble *u,su3_dble *v,su3_dble *w)
+ *   void cm3x3_mul_add(su3_dble const *u, su3_dble const *v, su3_dble *w)
  *     Adds (*u)*(*v) to (*w) assuming that w!=u. The input matrix (*u)
  *     is unchanged and also (*v) unless v=w
  *
- *   void cm3x3_mulr(double *r,su3_dble *u,su3_dble *v)
+ *   void cm3x3_mulr(double const *r, su3_dble const *u, su3_dble *v)
  *     Assigns (*r)*(*u) to (*v). The input matrix is unchanged
  *     unless u=v
  *
- *   void cm3x3_mulr_add(double *r,su3_dble *u,su3_dble *v)
+ *   void cm3x3_mulr_add(double const *r, su3_dble const *u, su3_dble *v)
  *     Adds (*r)*(*u) to (*v). The input matrix is unchanged
  *     unless u=v
  *
- *   void cm3x3_mulc(complex_dble *c,su3_dble *u,su3_dble *v)
+ *   void cm3x3_mulc(complex_dble const *c, su3_dble const *u, su3_dble *v)
  *     Assigns (*c)*(*u) to (*v). The input matrix is unchanged
  *     unless u=v
  *
- *   void cm3x3_mulc_add(complex_dble *c,su3_dble *u,su3_dble *v)
+ *   void cm3x3_mulc_add(complex_dble const *c, su3_dble const *u, su3_dble *v)
  *     Adds (*c)*(*u) to (*v). The input matrix is unchanged
  *     unless u=v
  *
- *   void cm3x3_lc1(complex_dble *c,su3_dble *u,su3_dble *v)
+ *   void cm3x3_lc1(complex_dble const *c, su3_dble const *u, su3_dble *v)
  *     Assigns c[0]+c[1]*(*u) to (*v). The input matrix is unchanged
  *     unless u=v
  *
- *   void cm3x3_lc2(complex_dble *c,su3_dble *u,su3_dble *v)
+ *   void cm3x3_lc2(complex_dble const *c, su3_dble const *u, su3_dble *v)
  *     Assigns c[0]+c[1]*u[0]+c[2]*u[1] to (*v) assuming v!=u+1. The
  *     input matrix u[1] is unchanged and also u[0] unless u=v
  *

@@ -12,14 +12,14 @@
  *
  * The externally accessible functions are
  *
- *   void start_ranlux(int level,int seed)
+ *   void start_ranlux(int level, int seed)
  *     Initializes the random number generators ranlxs and ranlxd on all
  *     processes in different ways. The luxury level should be 0 (recommended)
  *     or 1 (exceptional) and the seed can be any positive integer less than
  *     or equal to INT_MAX/NPROC. An error occurs if the seed is not in this
  *     range.
  *
- *   void export_ranlux(int tag,char *out)
+ *   void export_ranlux(int tag, char *out)
  *     Writes the tag, the lattice sizes, the process grid and the state of
  *     the random number generators ranlxs and ranlxd to the file "out" from
  *     process 0. The state of the generators is retrieved from all processes

@@ -148,7 +148,8 @@
  * Moreover, they may not be called after the geometry arrays are set up. The
  * default values of the lattice parameters beta=0.0, c0=1.0, nk=0 and csw=1.0
  * are used if set_lat_parms() is not called. In the case of set_bc_parms(),
- * the default is open boundary conditions and cG=cF=1.0.
+ * the default is open boundary conditions and cG=cF=1.0. Finally,
+ * set_lap_parms() must be called after the anisotropy factors have been set.
  *
  * See the notes doc/gauge_action.pdf and doc/dirac.pdf for the detailed
  * description of the lattice action and the boundary conditions.

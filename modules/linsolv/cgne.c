@@ -1,91 +1,91 @@
 
 /*******************************************************************************
-*
-* File cgne.c
-*
-* Copyright (C) 2005, 2008, 2011 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Generic CG solver program for the lattice Dirac equation
-*
-* The externally accessible function is
-*
-*   double cgne(int vol,int icom,void (*Dop)(spinor *s,spinor *r),
-*               void (*Dop_dble)(spinor_dble *s,spinor_dble *r),
-*               spinor **ws,spinor_dble **wsd,int nmx,double res,
-*               spinor_dble *eta,spinor_dble *psi,int *status)
-*     Solution of the (normal) Dirac equation D^dag*D*psi=eta for given
-*     source eta, using the CG algorithm. See the notes for the explanation
-*     of the parameters of the program.
-
-* Notes:
-*
-* This program uses single-precision arithmetic to reduce the execution
-* time but obtains the solution with double-precision accuracy.
-*
-* The programs for the single- and double-precision implementations of the
-* Dirac operator are assumed to have the following properties:
-*
-*   void Dop(spinor *s,spinor *r)
-*     Application the operator D or its hermitian conjugate D^dag to the
-*     single-precision Dirac field s and assignement of the result to r.
-*     D and D^dag are applied alternatingly, i.e. the first call of the
-*     program applies D, the next call D^dag, then D again and so on. In
-*     all cases the source field s is unchanged.
-*
-*   void Dop_dble(spinor *s,spinor *r)
-*     Application the operator D or its hermitian conjugate D^dag to the
-*     double-precision Dirac field s and assignement of the result to r.
-*     D and D^dag are applied alternatively, i.e. the first call of the
-*     program applies D, the next call D^dag, then D again and so on. In
-*     all cases the source field s is unchanged.
-*
-* The other parameters of the program cgne() are:
-*
-*   vol     Number of spinors in the Dirac fields.
-*
-*   icom    Indicates whether the equation to be solved is a local
-*           equation (icom=0) or a global one (icom=1). Scalar products
-*           are summed over all MPI processes if icom=1, while no
-*           communications are performed if icom=0.
-*
-*   nmx     Maximal total number of CG iterations that may be applied.
-*
-*   res     Desired maximal relative residue |eta-D^dag*D*psi|/|eta| of
-*           the calculated solution.
-*
-*   ws      Array of at least 5 single-precision spinor fields (used
-*           as work space).
-*
-*   wsd     Array of at least 2 double-precision spinor fields (used
-*           as work space).
-*
-*   eta     Source field (unchanged on exit).
-*
-*   psi     Calculated approximate solution of the Dirac equation
-*           D^dag*D*psi=eta.
-*
-*   status  On exit, this parameter reports the total number of CG
-*           iterations that were required, or a negative value if the
-*           program failed.
-*
-* Independently of whether the program succeeds in solving the Dirac equation
-* to the desired accuracy, the program returns the norm of the residue of
-* the field psi.
-*
-* Some debugging output is printed to stdout on process 0 if CGNE_DBG is
-* defined at compilation time.
-*
-* CONST_CORRECTNESS:
-*   The algorithm should have a signature that represents its const-ness,
-*   however this is currently not possible due to the fact that most callers of
-*   this algorithm specifies Dop using Dw, which is currently not const correct
-*   (and hard to make const correct). This algorithm will thus be left until
-*   that has been fixed.
-*
-*******************************************************************************/
+ *
+ * File cgne.c
+ *
+ * Copyright (C) 2005, 2008, 2011 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Generic CG solver program for the lattice Dirac equation
+ *
+ * The externally accessible function is
+ *
+ *   double cgne(int vol, int icom, void (*Dop)(spinor *s, spinor *r), 
+ *               void (*Dop_dble)(spinor_dble *s, spinor_dble *r), 
+ *               spinor **ws, spinor_dble **wsd, int nmx, double res, 
+ *               spinor_dble *eta, spinor_dble *psi, int *status)
+ *     Solution of the (normal) Dirac equation D^dag*D*psi=eta for given
+ *     source eta, using the CG algorithm. See the notes for the explanation
+ *     of the parameters of the program.
+ 
+ * Notes:
+ *
+ * This program uses single-precision arithmetic to reduce the execution
+ * time but obtains the solution with double-precision accuracy.
+ *
+ * The programs for the single- and double-precision implementations of the
+ * Dirac operator are assumed to have the following properties:
+ *
+ *   void Dop(spinor *s,spinor *r)
+ *     Application the operator D or its hermitian conjugate D^dag to the
+ *     single-precision Dirac field s and assignement of the result to r.
+ *     D and D^dag are applied alternatingly, i.e. the first call of the
+ *     program applies D, the next call D^dag, then D again and so on. In
+ *     all cases the source field s is unchanged.
+ *
+ *   void Dop_dble(spinor *s,spinor *r)
+ *     Application the operator D or its hermitian conjugate D^dag to the
+ *     double-precision Dirac field s and assignement of the result to r.
+ *     D and D^dag are applied alternatively, i.e. the first call of the
+ *     program applies D, the next call D^dag, then D again and so on. In
+ *     all cases the source field s is unchanged.
+ *
+ * The other parameters of the program cgne() are:
+ *
+ *   vol     Number of spinors in the Dirac fields.
+ *
+ *   icom    Indicates whether the equation to be solved is a local
+ *           equation (icom=0) or a global one (icom=1). Scalar products
+ *           are summed over all MPI processes if icom=1, while no
+ *           communications are performed if icom=0.
+ *
+ *   nmx     Maximal total number of CG iterations that may be applied.
+ *
+ *   res     Desired maximal relative residue |eta-D^dag*D*psi|/|eta| of
+ *           the calculated solution.
+ *
+ *   ws      Array of at least 5 single-precision spinor fields (used
+ *           as work space).
+ *
+ *   wsd     Array of at least 2 double-precision spinor fields (used
+ *           as work space).
+ *
+ *   eta     Source field (unchanged on exit).
+ *
+ *   psi     Calculated approximate solution of the Dirac equation
+ *           D^dag*D*psi=eta.
+ *
+ *   status  On exit, this parameter reports the total number of CG
+ *           iterations that were required, or a negative value if the
+ *           program failed.
+ *
+ * Independently of whether the program succeeds in solving the Dirac equation
+ * to the desired accuracy, the program returns the norm of the residue of
+ * the field psi.
+ *
+ * Some debugging output is printed to stdout on process 0 if CGNE_DBG is
+ * defined at compilation time.
+ *
+ * CONST_CORRECTNESS:
+ *   The algorithm should have a signature that represents its const-ness,
+ *   however this is currently not possible due to the fact that most callers of
+ *   this algorithm specifies Dop using Dw, which is currently not const correct
+ *   (and hard to make const correct). This algorithm will thus be left until
+ *   that has been fixed.
+ *
+ *******************************************************************************/
 
 #define CGNE_C
 

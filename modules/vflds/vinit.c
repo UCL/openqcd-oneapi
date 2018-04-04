@@ -13,18 +13,18 @@
  *
  * The externally accessible functions are
  *
- *   void set_v2zero(int n,complex *v)
+ *   void set_v2zero(int n, complex *v)
  *     Sets the single-precision field v to zero.
  *
- *   void set_vd2zero(int n,complex_dble *vd)
+ *   void set_vd2zero(int n, complex_dble *vd)
  *     Sets the double-precision field vd to zero.
  *
- *   void random_v(int n,complex *v,float sigma)
+ *   void random_v(int n, complex *v, float sigma)
  *     Initializes the components of the single-precision field v to
  *     (complex) random values z with distribution proportional to
  *     exp{-|z|^2/sigma^2}.
  *
- *   void random_vd(int n,complex_dble *vd,double sigma)
+ *   void random_vd(int n, complex_dble *vd, double sigma)
  *     Initializes the components of the double-precision field vd to
  *     (complex) random values z with distribution proportional to
  *     exp{-|z|^2/sigma^2}.

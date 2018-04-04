@@ -12,7 +12,7 @@
  *
  * The externally accessible functions are
  *
- *   double rwtm1eo(double mu1,double mu2,int isp,double *sqn,int *status)
+ *   double rwtm1eo(double mu1, double mu2, int isp, double *sqn, int *status)
  *     Generates a random pseudo-fermion field with normal distribution,
  *     assigns its square norm to sqn and returns -ln(r1) (see the notes).
  *     The twisted-mass Dirac equation is solved using the solver specified
