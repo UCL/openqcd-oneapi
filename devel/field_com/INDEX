@@ -1,0 +1,15 @@
+
+Tests of the link communication routines.
+
+File test01_partial_communications.c  Check of the partial communication
+                                      routines
+
+File time01_su3_dble.c                Timing of the communication routines for
+                                      su3_dble
+
+File time02_su3_alg_dble.c            Timing of the communication routines for
+                                      su3_alg_dble
+
+The programs time01 and time02 accept the option -bc <type> that allows the
+type of boundary condition to be chosen at runtime. When the option is not
+set, open boundary conditions are assumed.

@@ -1,9 +1,16 @@
 
-/*
- * Created: 06-08-2017
- * Modified:
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test06_unsmearing_1.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Basic check on force unsmearing routine
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

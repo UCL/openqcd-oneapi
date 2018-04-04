@@ -1,9 +1,16 @@
 
-/*
- * Created: 08-06-2017
- * Modified:
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test07_smeared_field_cycling.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Checks for how smear_fields() and unsmear_fields() behave
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -31,7 +38,7 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf("Checks for how smear_fields() and unsmear_fields() behave");
+    printf("Checks for how smear_fields() and unsmear_fields() behave\n");
     printf("-------------------------------------------\n\n");
 
     printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,

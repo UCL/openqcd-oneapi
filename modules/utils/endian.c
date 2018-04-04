@@ -1,43 +1,43 @@
 
 /*******************************************************************************
-*
-* File endian.c
-*
-* Copyright (C) 2007, 2009, 2010 Bjoern Leder, Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Byte swapping programs
-*
-* The externally accessible functions are
-*
-*   int endianness(void)
-*     Returns LITTLE_ENDIAN if the machine is little endian and BIG_ENDIAN
-*     if it is big endian. Otherwise the return value is UNKNOWN_ENDIAN
-*
-*   void bswap_int(int n,void *a)
-*     Inverts the byte order of the array elements a[0],..,a[n-1]
-*     assuming these are 4 byte long
-*
-*   void bswap_double(int n,void *a)
-*     Inverts the byte order of the array elements a[0],..,a[n-1]
-*     assuming these are 8 byte long
-*
-* Notes:
-*
-* The integer types that are guaranteed to be 4 byte long are stdint_t
-* and stduint_t. These are defined in the header file utils.h.
-*
-* On machines complying with the IEEE-754 standard, double precision
-* floating-point numbers are 8 byte long. When the header file utils.h
-* is read, the compiler checks whether the machine complies with the
-* standard.
-
-* The programs in this module do not involve any communications and can
-* be called locally.
-*
-*******************************************************************************/
+ *
+ * File endian.c
+ *
+ * Copyright (C) 2007, 2009, 2010 Bjoern Leder, Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Byte swapping programs
+ *
+ * The externally accessible functions are
+ *
+ *   int endianness(void)
+ *     Returns LITTLE_ENDIAN if the machine is little endian and BIG_ENDIAN
+ *     if it is big endian. Otherwise the return value is UNKNOWN_ENDIAN
+ *
+ *   void bswap_int(int n, void *a)
+ *     Inverts the byte order of the array elements a[0],..,a[n-1]
+ *     assuming these are 4 byte long
+ *
+ *   void bswap_double(int n, void *a)
+ *     Inverts the byte order of the array elements a[0],..,a[n-1]
+ *     assuming these are 8 byte long
+ *
+ * Notes:
+ *
+ * The integer types that are guaranteed to be 4 byte long are stdint_t
+ * and stduint_t. These are defined in the header file utils.h.
+ *
+ * On machines complying with the IEEE-754 standard, double precision
+ * floating-point numbers are 8 byte long. When the header file utils.h
+ * is read, the compiler checks whether the machine complies with the
+ * standard.
+ * 
+ * The programs in this module do not involve any communications and can
+ * be called locally.
+ *
+ *******************************************************************************/
 
 #define ENDIAN_C
 

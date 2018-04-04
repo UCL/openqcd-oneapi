@@ -1,3 +1,41 @@
+
+/*******************************************************************************
+ *
+ * File force_unsmearing.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Routines that unsmear the MD force
+ *
+ * The externally accessible functions are
+ *
+ *   void unsmear_force(su3_alg_dble *force)
+ *     Unsmears the su3_alg_dble field stored in force using the prescriptions
+ *     as they are described in the notes.
+ *
+ *     During an MD trajectory one would first accumulate the force
+ *     contributions from actions using smeared links, call the unsmearing
+ *     routine on the force field, before one finally adds the unsmeared forces
+ *     to it.
+ *
+ *   void unsmear_mdforce(void)
+ *     An alias for unsmear_force((*mdflds()).frc).
+ *
+ * Notes:
+ *
+ * All routines carries out communication and must therefore be call on all
+ * processes simultaneously.
+ *
+ * If the unsmear_force(...) is called with smearing turned off the application
+ * will exit with an error. Also, if the gauge field is at any point updated
+ * before the unsmearing routine is called it will also exit with an error due
+ * to the fact that the unsmeared force is no longer computable.
+ *
+ *******************************************************************************/
+
 #define FORCE_UNSMEARING_C
 
 #include "field_com.h"

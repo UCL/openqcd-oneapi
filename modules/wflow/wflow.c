@@ -12,15 +12,15 @@
  *
  * The externally accessible functions are
  *
- *   void fwd_euler(int n,double eps)
+ *   void fwd_euler(int n, double eps)
  *     Applies n forward Euler integration steps, with step size eps, to the
  *     current gauge field.
  *
- *   void fwd_rk2(int n,double eps)
+ *   void fwd_rk2(int n, double eps)
  *     Applies n forward 2nd-order Runge-Kutta integration steps, with step
  *     size eps, to the current gauge field.
  *
- *   void fwd_rk3(int n,double eps)
+ *   void fwd_rk3(int n, double eps)
  *     Applies n forward 3rd-order Runge-Kutta integration steps, with step
  *     size eps, to the current gauge field.
  *

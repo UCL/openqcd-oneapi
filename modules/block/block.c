@@ -12,8 +12,8 @@
  *
  * The externally accessible functions are
  *
- *   void alloc_blk(block_t *b,int *bo,int *bs,
- *                  int iu,int iud,int ns,int nsd)
+ *   void alloc_blk(block_t *b, int const *bo, int const *bs, int iu, int iud,
+ *                  int ns, int nsd)
  *     Sets the offset and side-lengths of the block b to bo[4] and bs[4],
  *     respectively, and allocates the block fields depending on the values
  *     of the other parameters. The single-precision gauge and SW fields are
@@ -22,7 +22,7 @@
  *     fields that are allocated. All elements of the block are properly
  *     initialized and the share flag b.shf is set to 0x0 (see the notes).
  *
- *   void alloc_bnd(block_t *b,int iu,int iud,int nw,int nwd)
+ *   void alloc_bnd(block_t *b, int iu, int iud, int nw, int nwd)
  *     Allocates the boundary structures b.bb in the block b and the fields
  *     in there depending on the parameters iu,iud,nw and nwd. The single-
  *     and double-precision gauge fields are allocated if iu=1 and iud=1,
@@ -30,7 +30,7 @@
  *     precision Weyl fields that are allocated. All elements of the block
  *     are then properly initialized (see the notes).
  *
- *   void clone_blk(block_t *b,int shf,int *bo,block_t *c)
+ *   void clone_blk(block_t const *b, int shf, int const *bo, block_t *c)
  *     Sets the offset of the block c to bo[4] and its side lengths to
  *     b.bs[4]. The fields in c are then allocated depending on the bits
  *     b1,b2,..,b8 (counting from the lowest) of the share flag shf. The
@@ -57,7 +57,7 @@
  *     boundary structures are then freed too (if they were allocated) and
  *     all entries in the block structure are set to 0 (or NULL).
  *
- *   int ipt_blk(block_t *b,int *x)
+ *   int ipt_blk(block_t const *b, int const *x)
  *     Returns the index of the lattice point in the block b with Cartesian
  *     coordinates x[4] relative to the base point of b.
  *

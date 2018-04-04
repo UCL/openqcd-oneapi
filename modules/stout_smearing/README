@@ -1,0 +1,65 @@
+
+********************************************************************************
+
+                            Stout smearing routines
+
+********************************************************************************
+
+
+Files
+-----
+
+File force_unsmearing.c  Routines that unsmear the MD force
+File smeared_fields.c    Allocation and storage of smeared fields in various
+                         states of smearing as well as necessary information for
+                         the unsmearing
+
+File stout_smearing.c    Routines for smearing the gauge field and cycling
+                         between its smeared and unsmeared state
+
+Include file
+------------
+
+The file stout_smearing.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.
+
+
+List of functions
+-----------------
+
+void unsmear_force(su3_alg_dble *force)
+  Unsmears the su3_alg_dble field stored in force using the prescriptions as
+  they are described in the notes.
+
+  During an MD trajectory one would first accumulate the force contributions
+  from actions using smeared links, call the unsmearing routine on the force
+  field, before one finally adds the unsmeared forces to it.
+
+void unsmear_mdforce(void)
+  An alias for unsmear_force((*mdflds()).frc).
+
+su3_dble **smeared_fields(void)
+  Returns a pointer to an array of su3_dble gauge fields. These are full gauge
+  fields including the boundary and corresponds to the fields at different
+  smearing stages. If the gauge configuration is in a smeared state the first
+  element of this array will be a pointer to the original field allocated by
+  udfld().
+
+void free_smearing_ch_coeff_fields(void)
+  Frees the memory taken up by the Cayley-Hamilton coefficients.
+
+ch_mat_coeff_pair_t **smearing_ch_coeff_fields(void)
+  Returns a pointer to an array of ch_mat_coeff_pair_t "fields". These fields
+  are only allocated on the bulk links and contain the parameters necessary to
+  later carry out the MD force unsmearing routine.  Specifically they contain
+  the Cayley-Hamilton coefficients of the staple exponentiation procedure as
+  well as the su3_alg_dble matrix X in the exponential.
+
+void smear_fields(void)
+  Set the gauge field to be in a smeared state. If the smeared fields aren't up
+  to date these will be computed, if not it will be a simple swap of memory + a
+  possible application of set/unset_ud_phase().
+
+void unsmear_fields(void)
+  Resets the gauge field to its think link state. This does not require any
+  computation and is a simple cycling of memory addresses.

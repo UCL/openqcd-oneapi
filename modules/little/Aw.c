@@ -12,31 +12,31 @@
  *
  * The externally accessible functions are
  *
- *   void Aw(complex *v,complex *w)
+ *   void Aw(complex *v, complex *w)
  *     Applies the little Dirac operator to the field v and assigns the
  *     result to the field w.
  *
- *   void Aweeinv(complex *v,complex *w)
+ *   void Aweeinv(complex *v, complex *w)
  *     Applies the inverse of the even-even part of the little Dirac operator
  *     to the field v and assigns the result to the field w on the even blocks.
  *     On the odd blocks, w is unchanged.
  *
- *   void Awooinv(complex *v,complex *w)
+ *   void Awooinv(complex *v, complex *w)
  *     Applies the inverse of the odd-odd part of the little Dirac operator
  *     to the field v and assigns the result to the field w on the odd blocks.
  *     On the even blocks, w is unchanged.
  *
- *   void Awoe(complex *v,complex *w)
+ *   void Awoe(complex *v, complex *w)
  *     Applies the odd-even part of the little Dirac operator to the field v
  *     and assigns the result to the field w on the odd blocks. On the even
  *     blocks, w is unchanged.
  *
- *   void Aweo(complex *v,complex *w)
+ *   void Aweo(complex *v, complex *w)
  *     Applies the even-odd part of the little Dirac operator to the field v
  *     and *subtracts* the result from the field w on the even blocks. On the
  *     odd blocks, w is unchanged.
  *
- *   void Awhat(complex *v,complex *w)
+ *   void Awhat(complex *v, complex *w)
  *     Applies the even-odd preconditioned little Dirac operator to the field
  *     v and assigns the result to the field w on the even blocks. On the odd
  *     blocks, w is unchanged.

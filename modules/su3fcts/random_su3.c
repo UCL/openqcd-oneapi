@@ -27,6 +27,9 @@
  * to be uniformly random up to systematic deviations from 1 at the level of
  * 10^(-7) and 10^(-14) in the single- and double-precision programs.
  *
+ * If SITERANDOM is set the functions take an additional argument indicating
+ * from which site the random call is made.
+ *
  *******************************************************************************/
 
 #define RANDOM_SU3_C

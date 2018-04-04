@@ -1,9 +1,16 @@
 
-/*
- * Created: 10-08-2017
- * Modified:
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test08_xi_matrix_test.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Checks of the computation of the lambda field
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -158,7 +165,7 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf("Checks of the programs in the module stout_smearing\n");
+    printf("Checks of the computation of the lambda field\n");
     printf("-------------------------------------------\n\n");
 
     printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,

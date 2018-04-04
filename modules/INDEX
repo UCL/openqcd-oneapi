@@ -15,7 +15,9 @@ dirac                Programs for the O(a)-improved Wilson-Dirac operator.
 dfl                  Deflation subspace generation and deflated SAP+GCR
                      solver.
 
-flags                Flags and parameter data base.
+field_com            Reusable communication routines
+
+flags                Flags and parameter data base.  
 
 forces               Molecular-dynamics forces and associated actions.
 
@@ -46,6 +48,8 @@ sap                  Schwarz alternating procedure and SAP+GCR solver.
 
 sflds                Generic initialization and assignment programs for
                      spinor fields. 
+
+stout_smearing       Stout smearing routines
 
 su3fcts              Collection of 3x3 matrix functions.
 

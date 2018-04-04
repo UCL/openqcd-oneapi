@@ -12,22 +12,40 @@
  *
  * The externally accessible functions are
  *
+ *   void plaq_sum_split_dble(int icom, double *result)
+ *     Computes the sum of Re[tr{U(p)}] over all unoriented plaquettes p, where
+ *     U(p) is the product of the double-precision link variables around p. If
+ *     icom=1 the global sum of the local sums is returned and otherwise just
+ *     the local sum. The calculation is stored in result in which the first
+ *     element holds the sum of plaquettes in which temporal links enter and the
+ *     second element has the purely spatial links.
+ *
  *   double plaq_sum_dble(int icom)
- *     Returns the sum of Re[tr{U(p)}] over all unoriented plaquettes p,
- *     where U(p) is the product of the double-precision link variables
- *     around p. If icom=1 the global sum of the local sums is returned
- *     and otherwise just the local sum.
+ *     Returns the sum of the first and second element from calling
+ *     plaq_sum_split_dble.
+ *
+ *   void plaq_wsum_split_dble(int icom, double *result)
+ *     Same as plaq_sum_splut_dble(), but giving weight 1/2 to the contribution
+ *     of the space-like plaquettes at the boundaries of the lattice if boundary
+ *     conditions of type 0, 1 or 2 are chosen.
  *
  *   double plaq_wsum_dble(int icom)
- *     Same as plaq_sum_dble(), but giving weight 1/2 to the contribution
- *     of the space-like plaquettes at the boundaries of the lattice if
- *     boundary conditions of type 0,1 or 2 are chosen.
+ *     Returns the sum of the first and second element from calling
+ *     plaq_wsum_sum_split_dble.
  *
  *   double plaq_action_slices(double *asl)
  *     Computes the time-slice sums asl[x0] of the tree-level O(a)-improved
  *     plaquette action density of the double-precision gauge field. The
  *     factor 1/g0^2 is omitted and the time x0 runs from 0 to NPROC0*L0-1.
  *     The program returns the total action.
+ *
+ *   double spatial_link_sum(int icom)
+ *     Returns the sum of the real trace of all gauge links pointing in a
+ *     spatial direction.
+ *
+ *   double temporal_link_sum(int icom)
+ *     Returns the sum of the real trace of all gauge links pointing in a
+ *     temporal direction.
  *
  * Notes:
  *

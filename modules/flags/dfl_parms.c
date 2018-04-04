@@ -12,7 +12,7 @@
  *
  * The externally accessible functions are
  *
- *   dfl_parms_t set_dfl_parms(int const *bs,int Ns)
+ *   dfl_parms_t set_dfl_parms(int const *bs, int Ns)
  *     Sets the parameters of the deflation subspace. The parameters are
  *
  *       bs[4]          Sizes of the blocks in DFL_BLOCKS block grid.
@@ -26,7 +26,7 @@
  *   dfl_parms_t dfl_parms(void)
  *     Returns the parameters currently set for the deflation subspace.
  *
- *   dfl_pro_parms_t set_dfl_pro_parms(int nkv,int nmx,double res)
+ *   dfl_pro_parms_t set_dfl_pro_parms(int nkv, int nmx, double res)
  *     Sets the parameters used when applying the deflation projection in the
  *     deflated solver program dfl_sap_gcr(). The parameters are
  *
@@ -45,9 +45,9 @@
  *     Returns the parameters currently set for the deflation projectors in
  *     the deflated solver program dfl_sap_gcr().
  *
- *   dfl_gen_parms_t set_dfl_gen_parms(double kappa,double mu,
- *                                     int ninv,int nmr,int ncy,
- *                                     int nkv,int nmx,double res)
+ *   dfl_gen_parms_t set_dfl_gen_parms(double kappa, double mu, 
+ *                                     int ninv, int nmr, int ncy, 
+ *                                     int nkv, int nmx, double res)
  *     Sets the parameters of the inverse iteration procedure that generates
  *     the deflation subspace. The parameters are
  *
@@ -69,7 +69,7 @@
  *     Returns the parameters currently set for the generation of the deflation
  *     subspace plus the corresponding bare mass m0.
  *
- *   dfl_upd_parms_t set_dfl_upd_parms(double dtau,int nsm)
+ *   dfl_upd_parms_t set_dfl_upd_parms(double dtau, int nsm)
  *     Sets the parameters of the deflation subspace update scheme. The
  *     parameters are
  *
@@ -107,6 +107,8 @@
  * To ensure the consistency of the data base, the parameters must be set
  * simultaneously on all processes. The types dfl_parms_t, ... are defined
  * in the file flags.h.
+ *
+ * The anisotropy parameters must be set before calling set_dfl_gen_parms().
  *
  *******************************************************************************/
 

@@ -16,7 +16,10 @@
  *     Returns an array idx[4] of uidx_t structures containing the offsets
  *     of the link variables at the faces of the local lattice.
  *
- *   void plaq_uidx(int n,int ix,int *ip)
+ *   void alloc_uidx(void)
+ *     Allocates the uidx structure without returning it.
+ *
+ *   void plaq_uidx(int n, int ix, int *ip)
  *     Calculates the offsets ip[4] of the links in the (mu,nu)-plaquette at
  *     the point on the local lattice with label ix. The indices (mu,nu) are
  *     determined by the parameter n=0,..,5.

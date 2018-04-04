@@ -18,11 +18,11 @@
  *
  * The externally accessible functions are
  *
- *   void ranlxs(float r[],int n)
+ *   void ranlxs(float r[], int n)
  *     Computes the next n single-precision random numbers and
  *     assigns them to the elements r[0],...,r[n-1] of the array r[]
  *
- *   void rlxs_init(int level,int seed)
+ *   void rlxs_init(int level, int seed)
  *     Initialization of the generator
  *
  *   int rlxs_size(void)

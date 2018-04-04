@@ -1,9 +1,17 @@
 
-/*
- * Created: 08-06-2017
- * Modified:
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test01_chs_bcnd_boundaries.c
+ *
+ * Author (2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Checks of the copy_bnd_ud() function and whether it is correctly applied to
+ * the halo if bc = 3
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -30,7 +38,7 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf("Checks of the programs in the module lattice\n");
+    printf("Test of whether copy_bnd_ud() is correctly applied to the boundary\n");
     printf("-------------------------------------------\n\n");
 
     printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,

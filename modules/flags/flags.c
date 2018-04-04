@@ -16,7 +16,7 @@
  *     Reports an event to the data base, where some of the global field
  *     arrays are changed.
  *
- *   void set_grid_flags(blk_grid_t grid,event_t event)
+ *   void set_grid_flags(blk_grid_t grid, event_t event)
  *     Reports an event to the data base, where some of the field arrays
  *     on the specified block grid are changed.
  *
@@ -26,7 +26,7 @@
  *     specified query is "yes" or "no". If the query is unknown to the
  *     the data base, the program returns -1.
  *
- *   int query_grid_flags(blk_grid_t grid,query_t query)
+ *   int query_grid_flags(blk_grid_t grid, query_t query)
  *     Queries the data base on the status of the field arrays on the
  *     specified block grid. The program returns 1 or 0 depending on
  *     whether the answer to the specified query is "yes" or "no". If

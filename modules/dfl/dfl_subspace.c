@@ -12,46 +12,44 @@
  *
  * The externally accessible functions are
  *
- *   void dfl_sd2vd(spinor_dble const *sd,complex_dble *vd)
- *     Assigns the components of the global double-precision spinor field
- *     sd along the deflation subspace to the double-precision vector
- *     field vd.
+ *   void dfl_sd2vd(spinor_dble const *sd, complex_dble *vd)
+ *     Assigns the components of the global double-precision spinor field sd
+ *     along the deflation subspace to the double-precision vector field vd.
  *
- *   void dfl_vd2sd(complex_dble const *vd,spinor_dble *sd)
+ *   void dfl_vd2sd(complex_dble const *vd, spinor_dble *sd)
  *     Assigns the element of the deflation subspace corresponding to the
  *     double-precision vector field vd to the global double-precision spinor
  *     field sd.
  *
- *   void dfl_sub_vd2sd(complex_dble const *vd,spinor_dble *sd)
+ *   void dfl_sub_vd2sd(complex_dble const *vd, spinor_dble *sd)
  *     Subtracts the element of the deflation subspace corresponding to the
- *     double-precision vector field vd from the global double-precision
- *     spinor field sd.
+ *     double-precision vector field vd from the global double-precision spinor
+ *     field sd.
  *
- *   void dfl_s2v(spinor const *s,complex *v)
- *     Assigns the components of the global single-precision spinor field
- *     s along the deflation subspace to the single-precision vector
- *     field v.
+ *   void dfl_s2v(spinor const *s, complex *v)
+ *     Assigns the components of the global single-precision spinor field s
+ *     along the deflation subspace to the single-precision vector field v.
  *
- *   void dfl_v2s(complex const *v,spinor *s)
+ *   void dfl_v2s(complex const *v, spinor *s)
  *     Assigns the element of the deflation subspace corresponding to the
  *     single-precision vector field v to the global single-precision spinor
  *     field s.
  *
- *   void dfl_sub_v2s(complex const *v,spinor *s)
+ *   void dfl_sub_v2s(complex const *v, spinor *s)
  *     Subtracts the element of the deflation subspace corresponding to the
  *     double-precision vector field v from the global single-precision spinor
  *     field s.
  *
  *   void dfl_subspace(spinor **mds)
- *     Copies the global single-precision spinor fields mds[0],..,mds[Ns-1]
- *     to the fields b.sd[1],..,b.sd[Ns] on the blocks b of the DFL_BLOCKS
- *     grid. The block fields are then orthonormalized and are assigned to
- *     the single-precision block fields b.s[1],..,b.s[Ns].
- *      In this basis of fields, the modes mds[0],..,mds[Ns-1] are given by
- *     fields vmds[0],..,vmds[Ns-1] of Ns*nb complex numbers, where nb is
- *     the number of blocks in the block grid. These fields are assigned to
- *     the last Ns single-precision vector fields of the array returned by
- *     vflds() [vflds/vflds.c].
+ *     Copies the global single-precision spinor fields mds[0],..,mds[Ns-1] to
+ *     the fields b.sd[1],..,b.sd[Ns] on the blocks b of the DFL_BLOCKS grid.
+ *     The block fields are then orthonormalized and are assigned to the
+ *     single-precision block fields b.s[1],..,b.s[Ns]. In this basis of
+ *     fields, the modes mds[0],..,mds[Ns-1] are given by fields
+ *     vmds[0],..,vmds[Ns-1] of Ns*nb complex numbers, where nb is the number of
+ *     blocks in the block grid. These fields are assigned to the last Ns
+ *     single-precision vector fields of the array returned by vflds()
+ *     [vflds/vflds.c].
  *
  * Notes:
  *

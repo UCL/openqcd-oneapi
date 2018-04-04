@@ -12,7 +12,7 @@
  *
  * The externally accessible functions are
  *
- *   double rwtm1(double mu1,double mu2,int isp,double *sqn,int *status)
+ *   double rwtm1(double mu1, double mu2, int isp, double *sqn, int *status)
  *     Generates a random pseudo-fermion field with normal distribution,
  *     assigns its square norm to sqn and returns -ln(r1) (see the notes).
  *     The twisted-mass Dirac equation is solved using the solver specified
@@ -23,7 +23,7 @@
  *     solver program (when the DFL_SAP_GCR solver is used, status[2] reports
  *     the number of deflation subspace regenerations that were required).
  *
- *   double rwtm2(double mu1,double mu2,int isp,double *sqn,int *status)
+ *   double rwtm2(double mu1, double mu2, int isp, double *sqn, int *status)
  *     Generates a random pseudo-fermion field with normal distribution,
  *     assigns its square norm to sqn and returns -ln(r2) (see the notes).
  *     The twisted-mass Dirac equation is solved using the solver specified

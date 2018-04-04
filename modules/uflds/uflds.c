@@ -23,6 +23,16 @@
  *     unity. Then the boundary conditions are set according to the data
  *     base by calling set_bc() [bcnds.c].
  *
+ *   void apply_ani_ud(void)
+ *     Multiply the links by their respective anisotropy factors with respect
+ *     to the hopping term. This means that the temporal links are multiplied by
+ *     (1.0 / (ani.ut_fermion)) while the spatial links are multiplied by (1.0 /
+ *     (gamma_f * ani.ut_fermion)).
+ *
+ *   void remove_ani_ud(void)
+ *     Remove the hopping anisotropy factors from the gauge links by multiplying
+ *     by the inverse anisotropy factors.
+ *
  *   void random_ud(void)
  *     Initializes the active double-precision link variables to uniformly
  *     distributed random SU(3) matrices. Then the boundary conditions are
@@ -52,6 +62,16 @@
  *     Assigns the double-precision gauge field to the single-precision
  *     gauge field. All link variables in the local field, including the
  *     static ones, are copied.
+ *
+ *   extern void swap_udfld(su3_dble **new_field)
+ *     Swaps the addresses of the global udfld with that of new_field. Used when
+ *     cycling between smeared and unsmeared fields.
+ *
+ *   void copy_bnd_ud(void)
+ *     Copies the double-precision link variables from the neighbouring MPI
+ *     processes to the exterior boundaries of the local lattice. The field
+ *     variables on the spatial links at time NPROC0*L0 are fetched only in
+ *     the case of periodic boundary conditions.
  *
  * Notes:
  *

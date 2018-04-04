@@ -12,9 +12,9 @@
  *
  * The externally accessible functions are
  *
- *   solver_parms_t set_solver_parms(int isp,solver_t solver,
- *                                   int nkv,int isolv,int nmr,int ncy,
- *                                   int nmx,double res)
+ *   solver_parms_t set_solver_parms(int isp, solver_t solver, 
+ *                                   int nkv, int isolv, int nmr, int ncy, 
+ *                                   int nmx, double res)
  *     Sets the parameters in the solver parameter set number isp and returns
  *     a structure containing them (see the notes).
  *
@@ -41,7 +41,7 @@
  *     and MSCG solvers (see the notes). The data are then added to the
  *     data base by calling set_solver_parms(isp,...).
  *
- *   void print_solver_parms(int *isap,int *idfl)
+ *   void print_solver_parms(int *isap, int *idfl)
  *     Prints the parameters of the defined solvers to stdout on MPI
  *     process 0. On exit the flag isap is 1 or 0 depending on whether
  *     one of the solvers makes use of the Schwarz Alternating Procedure

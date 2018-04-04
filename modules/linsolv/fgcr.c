@@ -12,11 +12,11 @@
  *
  * The externally accessible function is
  *
- *   double fgcr(int vol,int icom,
- *               void (*Dop)(spinor_dble *s,spinor_dble *r),
- *               void (*Mop)(int k,spinor *rho,spinor *phi,spinor *chi),
- *               spinor **ws,spinor_dble **wsd,int nkv,int nmx,double res,
- *               spinor_dble *eta,spinor_dble *psi,int *status)
+ *   double fgcr(int vol, int icom, 
+ *               void (*Dop)(spinor_dble *s, spinor_dble *r), 
+ *               void (*Mop)(int k, spinor *rho, spinor *phi, spinor *chi), 
+ *               spinor **ws, spinor_dble **wsd, int nkv, int nmx, double res, 
+ *               spinor_dble *eta, spinor_dble *psi, int *status)
  *     Solution of the Dirac equation D*psi=eta for given source eta, using
  *     the preconditioned GCR algorithm. See the notes for the explanation
  *     of the parameters of the program.

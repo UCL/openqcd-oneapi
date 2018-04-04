@@ -10,14 +10,14 @@
  *
  * Communication functions for single-precision spinor fields.
  *
- *   void cps_int_bnd(int is,spinor *s)
+ *   void cps_int_bnd(int is, spinor *s)
  *     Copies the spinors s at the even interior boundary points of the
  *     local lattice to the corresponding points on the neighbouring MPI
  *     processes. Only half of the spinor components are copied, namely
  *     theta[ifc^(is&0x1)]*s, where ifc labels the faces of the local
  *     lattice on the sending process.
  *
- *   void cps_ext_bnd(int is,spinor *s)
+ *   void cps_ext_bnd(int is, spinor *s)
  *     Copies the spinors s at the even exterior boundary points of the
  *     local lattice to the neighbouring MPI processes and *adds* them to
  *     the field on the matching points of the target lattices. Only half

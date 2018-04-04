@@ -1,3 +1,15 @@
+
+/*******************************************************************************
+ *
+ * File field_com.h
+ *
+ * Author (2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
+
 #ifndef FIELD_COM_H
 #define FIELD_COM_H
 

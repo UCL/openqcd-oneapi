@@ -5,6 +5,9 @@
 
 ********************************************************************************
 
+anisotropy.pdf        Definition of the anisotropic action as well as some
+                      implementation details.
+
 dirac.pdf             Implementation of the lattice Dirac operator.
 
 forces.pdf            Molecular-dynamics quark forces.
@@ -26,6 +29,8 @@ rhmc.pdf              Charm and strange quark in openQCD simulations.
 
 stat_fcts.pdf         Statistical tests. Notes accompanying the program files
                       pchi_square.c and ks_test.c in modules/nompi/extras.
+
+stout_smearing.pdf    Implementation of the stout smearing procedure.
 
 su3_fcts.pdf          SU(3) matrix functions.
 

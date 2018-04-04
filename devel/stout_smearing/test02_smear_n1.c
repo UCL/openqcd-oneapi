@@ -1,9 +1,16 @@
 
-/*
- * Created: 08-06-2017
- * Modified:
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test02_smear_n1.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Check of n=1 smearing agains a reference configuration
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 

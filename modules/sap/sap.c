@@ -13,7 +13,7 @@
  *
  * The externally accessible functions are
  *
- *   void sap(float mu,int isolv,int nmr,spinor *psi,spinor *rho)
+ *   void sap(float mu, int isolv, int nmr, spinor *psi, spinor *rho)
  *     Application of one cycle of the multiplicative Schwarz procedure to
  *     the approximate solution psi of the Wilson-Dirac equation, assuming
  *     the associated residue is stored in the field rho (see the notes). The

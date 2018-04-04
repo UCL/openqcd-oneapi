@@ -5,23 +5,31 @@
 
 ********************************************************************************
 
-48x24v1.in             Two-flavour QCD with Wilson plaquette action, open
-                       boundary conditions and twisted-mass reweighting of
-                       the first kind.
+48x24v1.in              Two-flavour QCD with Wilson plaquette action, open
+                        boundary conditions and twisted-mass reweighting of
+                        the first kind.
 
-48x24v2.in             Two-flavour QCD with Wilson plaquette action, periodic
-                       boundary conditions and twisted-mass reweighting of the
-                       second kind.
+48x24v2.in              Two-flavour QCD with Wilson plaquette action, periodic
+                        boundary conditions and twisted-mass reweighting of the
+                        second kind.
 
-48x24v3.in             Two-flavour QCD with Wilson plaquette action, SF
-                       boundary conditions, twisted-mass reweighting of the
-                       second kind and even-odd preconditioning.
+48x24v3.in              Two-flavour QCD with Wilson plaquette action, SF
+                        boundary conditions, twisted-mass reweighting of the
+                        second kind and even-odd preconditioning.
 
-64x32v1.in             2+1 flavour QCD with Iwasaki action, mixed boundary
-                       conditions, second kind of light-quark twisted-mass
-                       reweighting and even-odd preconditioning.
+64x32v1.in              2+1 flavour QCD with Iwasaki action, mixed boundary
+                        conditions, second kind of light-quark twisted-mass
+                        reweighting and even-odd preconditioning.
 
-64x32v2.in             2+1 flavour QCD "at the physical point" with Iwasaki
-                       action, open boundary conditions, second kind of
-                       light-quark twisted-mass reweighting and even-odd
-                       preconditioning.
+64x32v2.in              2+1 flavour QCD "at the physical point" with Iwasaki
+                        action, open boundary conditions, second kind of
+                        light-quark twisted-mass reweighting and even-odd
+                        preconditioning.
+
+FASTSUM-gen2-16x24.in   2+1 flavour QCD using both anisotropy and stout
+                        smearing, corresponds to the "Generation 2" lattice
+                        parameters for the FASTSUM lattice collaboration
+
+FASTSUM-gen2l-32x32.in  2+1 flavour QCD using both anisotropy and stout
+                        smearing, corresponds to the "Generation 2l" lattice
+                        parameters for the FASTSUM lattice collaboration

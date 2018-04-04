@@ -1,3 +1,38 @@
+
+/*******************************************************************************
+ *
+ * File stout_smearing.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Routines for smearing the gauge field and cycling between its smeared and
+ * unsmeared state
+ *
+ * The externally accessible functions are
+ *
+ *   void smear_fields(void)
+ *     Set the gauge field to be in a smeared state. If the smeared fields
+ *     aren't up to date these will be computed, if not it will be a simple swap
+ *     of memory + a possible application of set/unset_ud_phase().
+ *
+ *   void unsmear_fields(void)
+ *     Resets the gauge field to its think link state. This does not require any
+ *     computation and is a simple cycling of memory addresses.
+ *
+ * Notes:
+ *
+ * All routines carries out communication and must therefore be call on all
+ * processes simultaneously.
+ *
+ * If the routine is called with smearing turned off it will simply not do
+ * anything. If it is called with any boundary conditions besides 3 (periodic)
+ * it will exit with an error.
+ *
+ *******************************************************************************/
+
 #define STOUT_SMEARING_C
 
 #include "stout_smearing.h"
@@ -181,12 +216,10 @@ static void cycle_smeared_fields(int direction)
     begin = 0;
     end = smear_params.num_smear;
     dir = 1;
-    /*message("Cycle smearing\n");*/
   } else {
     begin = smear_params.num_smear - 1;
     end = -1;
     dir = -1;
-    /*message("Cycle unsmearing\n");*/
   }
 
   /* Return early if there is no smearing */
@@ -196,6 +229,8 @@ static void cycle_smeared_fields(int direction)
 
   sfields = smeared_fields();
 
+  /* If the field has a phase set this needs to be undone before the memory is
+   * cycled */
   sign_flipped_q = query_flags(UD_PHASE_SET);
   if (sign_flipped_q == 1) {
     unset_ud_phase();

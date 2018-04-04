@@ -12,21 +12,21 @@
  *
  * The externally accessible functions are
  *
- *   void write_sfld(char *out,spinor_dble *sd)
+ *   void write_sfld(char const *out, spinor_dble const *sd)
  *     Writes the lattice sizes, the process grid sizes, the coordinates
  *     of the calling process, the square of the norm of the spinor field
  *     sd and the local part of the latter to the file "out".
  *
- *   void read_sfld(char *in,spinor_dble *sd)
+ *   void read_sfld(char const *in, spinor_dble *sd)
  *     Reads the local part of the spinor field sd from the file "in",
  *     assuming the field was written to the file by write_sfld().
  *
- *   void export_sfld(char *out,spinor_dble *sd)
+ *   void export_sfld(char const *out, spinor_dble const *sd)
  *     Writes the lattice sizes and the spinor field sd to the file "out"
  *     from process 0 in the universal format specified below (see the
  *     notes).
  *
- *   void import_sfld(char *in,spinor_dble *sd)
+ *   void import_sfld(char const *in, spinor_dble *sd)
  *     Reads the spinor field sd from the file "in" on process 0, assuming
  *     the field was written to the file in the universal format (see the
  *     notes).

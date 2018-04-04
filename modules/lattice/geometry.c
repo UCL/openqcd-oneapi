@@ -16,7 +16,7 @@
  *     This program returns the rank of the MPI process with Cartesian
  *     coordinates n[0],..,n[3] in the process grid.
  *
- *   void ipt_global(int *x,int *ip,int *ix)
+ *   void ipt_global(int const *x, int *ip, int *ix)
  *     Given the Cartesian coordinates x[0],..,x[3] of a point on the full
  *     lattice, this program finds the local lattice containing x. On exit
  *     the rank of the associated MPI process is assigned to ip and the

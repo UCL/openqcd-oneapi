@@ -16,7 +16,7 @@
  *     Assigns the global double-precision gauge field to the corresponding
  *     single-precision fields in the specified block grid (see the notes).
  *
- *   void assign_ud2udblk(blk_grid_t grid,int n)
+ *   void assign_ud2udblk(blk_grid_t grid, int n)
  *     Assigns the global double-precision gauge field to the corresponding
  *     double-precision field on the n'th block of the specified block grid
  *     (see the notes).

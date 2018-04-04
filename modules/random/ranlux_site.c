@@ -3,12 +3,17 @@
  *
  * File ranlux_site.c
  *
- * Based on ranlux.c
+ * Authors (2018): Michele Messiti, Jarno Rantaharju
+ *                 (based on the ranlux implementation)
  *
  * This software is distributed under the terms of the GNU General Public
  * License (GPL)
  *
- *   void start_ranlux(int level,int seed)
+ * Initialization and computation of random numbers site-wise
+ *
+ * The externally accessible functions are
+ *
+ *   void start_ranlux(int level, int seed)
  *     Initializes the random number generators ranlxs and ranlxd on all
  *     sites in different ways. The luxury level should be 0 (recommended)
  *     or 1 (exceptional) and the seed can be any positive integer less than
@@ -26,7 +31,6 @@
  *     assigns them to the elements r[0],...,r[n-1] of the array r[]
  *     NOTE: This funcion overwrites the state of the standard generator.
  *           You should not use both ranlxd() and ranlxd_site() in the same run.
- *
  *
  *******************************************************************************/
 

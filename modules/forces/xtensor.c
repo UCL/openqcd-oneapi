@@ -14,14 +14,14 @@
  *
  *   u3_alg_dble **xtensor(void)
  *     Returns the pointers xt[0],..,xt[5] to the X tensor field components
- *     with Lorentz indices (0,1),(0,2),(0,3),(2,3),(3,1),(1,2). The arrays
+ *     with Lorentz indices (0,1), (0,2), (0,3), (2,3), (3,1), (1,2). The arrays
  *     are automatically allocated and initialized to zero if they are not
  *     already allocated.
  *
  *   void set_xt2zero(void)
  *     Sets the X tensor field to zero.
  *
- *   int add_det2xt(double c,ptset_t set)
+ *   int add_det2xt(double c, ptset_t set)
  *     Computes the spin part of the SW force deriving from the action
  *     -Tr{ln(D)}, where D=D_ee,D_oo,D_ee+D_oo or 1 when set=EVEN_PTS,
  *     ODD_PTS,ALL_PTS or NO_PTS (see the notes). The calculated matrices
@@ -29,7 +29,7 @@
  *     needed, the program recomputes and inverts the SW term. The program
  *     returns 0 if all inversions were safe and a non-zero value otherwise.
  *
- *   void add_prod2xt(double c,spinor_dble *r,spinor_dble *s)
+ *   void add_prod2xt(double c, spinor_dble *r, spinor_dble *s)
  *     Computes the spin part of the SW force deriving from the "action"
  *     -2*Re(r,gamma_5*Dw*s), where Dw denotes the lattice Dirac operator
  *     (see the notes). The calculated matrices are then multiplied by c
@@ -44,7 +44,7 @@
  *   void set_xv2zero(void)
  *     Sets the X vector field to zero.
  *
- *   void add_prod2xv(double c,spinor_dble *r,spinor_dble *s)
+ *   void add_prod2xv(double c, spinor_dble *r, spinor_dble *s)
  *     Computes the spin part of the force deriving from the hopping terms
  *     in the "action" -2*Re(r,gamma_5*Dw*s), where Dw denotes the lattice
  *     Dirac operator (see the notes). The calculated matrices are then

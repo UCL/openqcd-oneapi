@@ -18,7 +18,7 @@
  *     algorithm and terminates with an error message if an inconsistency
  *     is discovered.
  *
- *   void hmc_wsize(int *nwud,int *nws,int *nwsd,int *nwv,int *nwvd)
+ *   void hmc_wsize(int *nwud, int *nws, int *nwsd, int *nwv, int *nwvd)
  *     Determines the minimal sizes of the workspaces required for the
  *     HMC algorithm based on the information in the parameter data base.
  *     On exit the program returns the numbers of double-precision gauge
@@ -26,7 +26,7 @@
  *     the numbers of single-precision spinor (nws) and complex vector
  *     (nwv) fields that must be allocated.
  *
- *   int run_hmc(double *act0,double *act1)
+ *   int run_hmc(double *act0, double *act1)
  *     Generates a random momentum field, integrates the MD equations and
  *     applies the HMC acceptance step to the fields at the end of the MD
  *     trajectory (see the notes).

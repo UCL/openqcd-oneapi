@@ -25,11 +25,11 @@
  *   void step_mdtime(double dt)
  *     Advances the molecular-dynamics time by dt.
  *
- *   void add_chrono(int icr,spinor_dble *psi)
+ *   void add_chrono(int icr, spinor_dble *psi)
  *     Adds the solution psi obtained at the current molecular-dynamics
  *     time to the stack number icr of previously calculated solutions.
  *
- *   int get_chrono(int icr,spinor_dble *psi)
+ *   int get_chrono(int icr, spinor_dble *psi)
  *     Extrapolates the solutions stored in the stack number icr to the
  *     current molecular-dynamics time. The program returns 0 and leaves
  *     psi unchanged if the stack does not contain any previous solutions.

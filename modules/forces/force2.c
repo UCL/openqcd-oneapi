@@ -12,18 +12,18 @@
  *
  * The externally accessible functions are
  *
- *   double setpf2(double mu0,double mu1,int ipf,int isp,int icom,
+ *   double setpf2(double mu0, double mu1, int ipf, int isp, int icom, 
  *                 int *status)
  *     Generates a pseudo-fermion field phi with probability proportional
  *     to exp(-Spf) and returns the action Spf-(phi,phi) (see the notes).
  *
- *   void force2(double mu0,int mu1,int ipf,int isp,int icr,double c,
+ *   void force2(double mu0, int mu1, int ipf, int isp, int icr, double c, 
  *               int *status)
  *     Computes the force deriving from the action Spf (see the notes).
  *     The calculated force is multiplied by c and added to the molecular-
  *     dynamics force field.
  *
- *   double action2(double mu0,double mu1,int ipf,int isp,int icom,
+ *   double action2(double mu0, double mu1, int ipf, int isp, int icom, 
  *                  int *status)
  *     Returns the action Spf-(phi,phi) (see the notes).
  *

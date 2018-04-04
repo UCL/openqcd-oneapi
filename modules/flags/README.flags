@@ -28,38 +28,56 @@ consistency of the data base, any program that changes the fields must include
 a corresponding set_flags() statement. There should be no exception to this
 rule.
 
+In addition to tagging every configuration with a number the configuration is
+also tagged with a state. Currently there are two separate states a
+configuration can be in: smeared and phase changed. This additional state is
+implemented as a bitmap in which the first bit tells you whether it is smeared
+or not and the second bit says whether the configuration is phase changed.
+
 
 Full-lattice flags
 ------------------
 
 The flags related to the global fields are stored in a structure
 
+typedef struct
+{
+  int tag;
+  int state;
+} cfg_state_t;
+
+typedef struct
+{
+  cfg_state_t state;
+  int even_flag, odd_flag;
+} sw_state_t;
+
 struct
 {
-   int u,ud;
-   int udbuf,bstap,fts;
-   int sw[3],swd[3];
-   int aw,awh;
-   int phase;
-} lat
+  cfg_state_t u, ud, udbuf;
+  cfg_state_t bstap, fts;
+  sw_state_t sw, swd;
+  cfg_state_t aw, awh;
+  int smeared_tag;
+} lat;
 
 with the following elements:
 
-lat.u                       Tag of the current single-precision gauge field.
+lat.u                       State of the current single-precision gauge field.
 
-lat.ud                      Tag of the current double-precision gauge field.
+lat.ud                      State of the current double-precision gauge field.
 
-lat.udbuf                   Tag of the double-precision field when its values
+lat.udbuf                   State of the double-precision field when its values
                             at the boundaries of the local lattice were last
                             copied from the neighbouring MPI processes.
 
-lat.bstap                   Tag of the double-precision gauge field when the
+lat.bstap                   State of the double-precision gauge field when the
                             boundary staples were last calculated.
 
-lat.fts                     Tag of the double-precision gauge field when the
+lat.fts                     State of the double-precision gauge field when the
                             gauge-field tensor was last calculated.
 
-lat.sw[0]                   Tag of the gauge field from which the current
+lat.sw[0]                   State of the gauge field from which the current
                             single-precision SW-term was calculated.
 
 lat.sw[1]                   Indicates whether the single-precision SW-term on
@@ -70,7 +88,7 @@ lat.sw[2]                   Indicates whether the single-precision SW-term on
                             the odd sites is inverted (lat.sw[2]=1) or not
                             (lat.sw[2]=0).
 
-lat.swd[0]                  Tag of the gauge field from which the current
+lat.swd[0]                  State of the gauge field from which the current
                             double-precision SW-term was calculated.
 
 lat.swd[1]                  Indicates whether the double-precision SW-term on
@@ -81,16 +99,15 @@ lat.swd[2]                  Indicates whether the double-precision SW-term on
                             the odd sites is inverted (lat.swd[2]=1) or not
                             (lat.swd[2]=0).
 
-lat.aw                      Tag of the double-precision gauge field when the
+lat.aw                      State of the double-precision gauge field when the
                             little Dirac operator was last calculated.
 
-lat.awh                     Tag of the double-precision gauge field when the
+lat.awh                     State of the double-precision gauge field when the
                             even-odd preconditioned little Dirac operator was
                             last calculated.
 
-lat.phase                   Indicates whether the double-precision gauge field
-                            is phase shifted (lat.phase=1) or not (lat.phase=0)
-                            [cf. set_ud_phase() in uflds/uflds.c].
+lat.smeared_tag             Tag of the smeared configuration as of the last time
+                            the smearing procedure was carried out.
 
 
 Block-grid flags
@@ -106,12 +123,12 @@ the status of a shared field is an error recorded by the error_loc() function.
 
 For each grid, the associated flags are contained in a structure
 
-typedef struct
+struct
 {
-   int shf;
-   int u,ud;
-   int sw[3],swd[3];
-} gf
+  int shf;
+  cfg_state_t u, ud;
+  sw_state_t sw, swd;
+} gf;
 
 with the following elements:
 
@@ -122,15 +139,15 @@ gf.shf                      Share flags of the blocks on the block grid.
                             b1=1:  b.u and bb.u are shared,
                             b2=1:  b.ud and bb.ud are shared.
 
-			    All other bits are set to zero.
+			                      All other bits are set to zero.
 
-gf.u                        Tag of the single-precision gauge field on the
+gf.u                        State of the single-precision gauge field on the
                             blocks (=0 if the field is shared).
 
-gf.ud                       Tag of the double-precision gauge field on the
+gf.ud                       State of the double-precision gauge field on the
                             blocks (=0 if the field is shared).
 
-gf.sw[0]                    Tag of the gauge field at which the current
+gf.sw[0]                    State of the gauge field at which the current
                             single-precision SW term on the blocks was
                             calculated (=0 if the gauge field is shared).
 
@@ -142,7 +159,7 @@ gf.sw[2]                    Indicates whether the single-precision SW term
                             on the odd sites of the block is inverted
                             (gf.sw[2]=1) or not (gf.sw[2]=0).
 
-gf.swd[0]                   Tag of the gauge field from which the current
+gf.swd[0]                   State of the gauge field from which the current
                             double-precision SW term on the block was
                             calculated (=0 if the gauge field is shared).
 

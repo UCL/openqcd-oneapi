@@ -1,4 +1,46 @@
 
+04. April 2018
+
+FASTSUM Version 1.0: 1st public release of openQCD-FASTSUM
+
+- Added the possibility of using anisotropic lattice actions. See
+  doc/anisotropy.pdf for details.
+
+- Added the option for smearing the gauge fields with the stout smearing
+  technique. See doc/stout_smearing.pdf for details.
+
+- Merged changes by the SA2C which implemented explicit AVX-512 instructions;
+  see README#AVX512.
+
+- Merged the explicit BlueGeneQ optimisations developed by Dalibor Djukanovic,
+  Mauro Papinutto, and Hubert Simma; see README#BlueGeneQ.
+
+- Collected "link like" communication routines in a single module, field_com,
+  which reduces the memory allocation of the program.
+
+- The set_ud_phase and unset_ud_phase functions now also applies its changes to
+  the cached halo, thus making it unnecessary to communicate these changes. This
+  is only implemented for type 3 (periodic) boundary conditions as it is only
+  needed to facilitate stout smearing.
+
+- Changed the flags system to also store the state of the gauge fields (phase
+  shifted, smeared...), see modules/flags/README.flags for details.
+
+- Added the option to make options in the config optional, thus enabling the
+  program to be compatible with all openQCD 1.4 and 1.6 configurations.
+
+- Rewrote the build system so it now builds in a separate folder and organises
+  its contents a bit more naturally. See build/README.md.
+
+- Made the code base "const correct" to the extent possible without making large
+  alterations to the code.
+
+- Reformatted the code base with clang-format and clang-tidy using the
+  specifications in the attached .clang-format file as well as running
+  clang-tidy with the options:
+
+  `-checks="readability-braces-around-statements" -fix`
+
 xx. yyyy 2016
 
 Version 1.6: 4th public release.

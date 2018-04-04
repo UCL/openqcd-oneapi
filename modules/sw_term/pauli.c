@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  *
  * File pauli.c
@@ -11,21 +12,22 @@
  *
  * The externally accessible functions are
  *
- *   void mul_pauli(float mu,pauli *m,weyl *s,weyl *r)
+ *   void mul_pauli(float mu, pauli const *m, weyl const *s, weyl *r)
  *     Multiplies the Weyl spinor s by the matrix m+i*mu and assigns
  *     the result to the Weyl spinor r. The source spinor is overwritten
  *     if r=s and otherwise left unchanged.
  *
- *   void mul_pauli2(float mu,pauli *m,spinor *s,spinor *r)
+ *   void mul_pauli2(float mu, pauli const *m, spinor const *s, spinor *r)
  *     Multiplies the spinor s by the matrix m+i*mu*gamma_5 and assigns
  *     the result to the spinor r. The source spinor is overwritten
  *     if r=s and otherwise left unchanged.
  *
- *   void assign_pauli(int vol,pauli_dble *md,pauli *m)
+ *   void assign_pauli(int vol, pauli_dble const *md, pauli *m)
  *     Assigns the field md[vol] of double-precision matrices to the field
  *     m[vol] of single-precision matrices.
  *
- *   void apply_sw(int vol,float mu,pauli *m,spinor *s,spinor *r)
+ *   void apply_sw(int vol, float mu, pauli const *m, spinor const *s,
+ *                 spinor *r)
  *     Applies the matrix field m[2*vol]+i*mu*gamma_5 to the spinor field
  *     s[vol] and assigns the result to the field r[vol]. The source field
  *     is overwritten if r=s and otherwise left unchanged (the arrays may

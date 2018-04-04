@@ -1,4 +1,29 @@
 
+/*******************************************************************************
+ *
+ * File communication_buffer.c
+ *
+ * Author (2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Storage buffer for the communication routines
+ *
+ * The externally accessible functions are
+ *
+ *   double *communication_buffer(void)
+ *     Returns the buffer reserved for the communication routines. It is given
+ *     in terms of a pointer to double and can thus be used to communicate both
+ *     su3_dble and su3_alg_dble through a simple cast.
+ *
+ * Notes:
+ *
+ * The routine does communication and must therefore be called simultaneously on
+ * all MPI processes.
+ *
+ *******************************************************************************/
+
 #define COMMUNICATION_BUFFER_C
 
 #include "field_com.h"

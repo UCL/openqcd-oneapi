@@ -1,3 +1,66 @@
+
+/*******************************************************************************
+ *
+ * File link_partial_communication.c
+ *
+ * Author (2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Partial communication routines for "link like" problems
+ *
+ * The externally accessible functions are
+ *
+ *   void copy_partial_boundary_su3_field(su3_dble *su3_field, int const *dirs)
+ *      Copy the boundaries of an su3_dble field to the neighbouring processes
+ *      in directions -mu. However, depending on the contents of the dirs array
+ *      it will ignore certain links. The dirs array is assumed to be a length 4
+ *      array with boolean elements (0 or 1), and is so that if e.g. element nu
+ *      is 1 all boundary links pointing in direction nu will be copied, they
+ *      will be ignored otherwise.
+ *   
+ *   void add_partial_boundary_su3_field(su3_dble *su3_field, int const *dirs)
+ *      Add the current value of an su3_field's boundary to its neighbouring
+ *      processes corresponding links in the +mu direction applying the dirs map
+ *      as explained.
+ *   
+ *   void copy_partial_boundary_su3_alg_field(su3_alg_dble *su3_alg_field,
+ *                                            int const *dirs)
+ *      Copy the boundaries of an su3_alg_dble field to the neighbouring
+ *      processes in directions -mu applying the dirs map as explained.
+ *   
+ *   void add_partial_boundary_su3_alg_field(su3_alg_dble *su3_alg_field,
+ *                                           int const *dirs)
+ *      Add the current value of an su3_alg_field's boundary to its neighbouring
+ *      processes corresponding links in the +mu direction applying the dirs map
+ *      as explained.
+ *   
+ *   void copy_spatial_boundary_su3_field(su3_dble *su3_field)
+ *      A special case of the more general partial variant where dirs={0,1,1,1}.
+ *   
+ *   void add_spatial_boundary_su3_field(su3_dble *su3_field)
+ *      A special case of the more general partial variant where dirs={0,1,1,1}.
+ *   
+ *   void copy_spatial_boundary_su3_alg_field(su3_alg_dble *su3_alg_field)
+ *      A special case of the more general partial variant where dirs={0,1,1,1}.
+ *   
+ *   void add_spatial_boundary_su3_alg_field(su3_alg_dble *su3_alg_field)
+ *      A special case of the more general partial variant where dirs={0,1,1,1}.
+ *
+ * Notes:
+ *
+ * The routines requires the allocation of one more memory buffer due to the
+ * fact that the boundaries will no longer be contiguous memory. However it is a
+ * tradeoff in return for smaller communication sizes for problems where certain
+ * links might be left out. An example of this is the stout smearing routines
+ * for parameters such that we do not smear the temporal links.
+ *
+ * All routines carries out communication and must therefore be call on all
+ * processes simultaneously.
+ *
+ *******************************************************************************/
+
 #define LINK_PARTIAL_COMMUNICATION_C
 
 #include "field_com.h"

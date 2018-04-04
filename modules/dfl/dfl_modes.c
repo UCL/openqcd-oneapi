@@ -17,7 +17,7 @@
  *     smoothing procedure to a set of random fields. The subspace is then
  *     initialized by calling the program dfl_subspace().
  *
- *   void dfl_update(int nsm,int *status)
+ *   void dfl_update(int nsm, int *status)
  *     Updates the deflation subspace by applying nsm deflated smoothing
  *     steps to the global fields from which the current subspace was built.
  *
@@ -27,7 +27,7 @@
  *     two elements that report the status values returned in the two calls.
  *     Normally dfl_modes() is called only once in which case status[1]=0.
  *
- *   void dfl_update2(int nsm,int *status)
+ *   void dfl_update2(int nsm, int *status)
  *     Calls the program dfl_update() and, if status[0]=-3 is returned,
  *     call dfl_modes(). The array status must have at least two elements
  *     that report the status values returned in the two calls. Normally

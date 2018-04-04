@@ -13,30 +13,37 @@
  *
  * The externally accessible functions are
  *
- *   void ch2mat(complex_dble *p,su3_alg_dble *X,su3_dble *u)
+ *   void ch2mat(complex_dble const *p, su3_alg_dble const *X, su3_dble *u)
  *     Computes u=p[0]+p[1]*X+p[2]*X^2 given the Cayley-Hamilton coefficients
  *     p[0],p[1],p[2] and the matrix X.
  *
- *   void chexp_drv0(su3_alg_dble *X,ch_drv0_t *s);
+ *   void chexp_drv0(su3_alg_dble const *X, ch_drv0_t *s);
  *     Assigns the Cayley-Hamilton coefficients of the exponential function
  *     exp(X) to the elements of s, assuming the norm of X is not be larger
  *     than 1 (an error occurs if this condition is violated).
  *
- *   void chexp_drv1(su3_alg_dble *X,ch_drv1_t *s);
+ *   void chexp_drv1(su3_alg_dble const *X, ch_drv1_t *s);
  *     Assigns the Cayley-Hamilton coefficients of the exponential function
  *     exp(X) and their first derivatives to the elements of s, assuming the
  *     the norm of X is not larger than 1 (an error occurs if this condition
  *     is violated).
  *
- *   void chexp_drv2(su3_alg_dble *X,ch_drv2_t *s);
+ *   void chexp_drv2(su3_alg_dble const *X, ch_drv2_t *s);
  *     Assigns the Cayley-Hamilton coefficients of the exponential function
  *     exp(X) and their first and second derivatives to the elements of s,
  *     assuming the norm of X is not larger than 1 (an error occurs if this
  *     condition is violated).
  *
- *   void expXsu3(double eps,su3_alg_dble *X,su3_dble *u)
+ *   void expXsu3(double eps, su3_alg_dble const *X, su3_dble *u)
  *     Replaces u by exp(eps*X)*u, where "exp" is the SU(3) exponential
  *     function.
+ *
+ *   void expXsu3_w_factors(double eps, su3_alg_dble const *X, su3_dble *u,
+ *                                 ch_drv0_t *s_in);
+ *     Does the same as expXsu3 but also stores the accompanying Cayley-Hamilton
+ *     coefficients in s_in. The algorithm uses the CH relation to carry out the
+ *     normalisation squaring instead of matrix multiplication and is therefore
+ *     also faster.
  *
  * Notes:
  *

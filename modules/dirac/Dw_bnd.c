@@ -12,7 +12,7 @@
  *
  * The externally accessible function is
  *
- *   void Dw_bnd(blk_grid_t grid,int n,int k,int l)
+ *   void Dw_bnd(blk_grid_t grid, int n, int k, int l)
  *     Applies the boundary part of the Wilson-Dirac operator to the field
  *     b.s[k] on the n'th block b of the specified block grid and assigns
  *     the result to the field bb.w[l] on the boundary bb of the block.

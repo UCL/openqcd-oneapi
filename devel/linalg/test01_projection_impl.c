@@ -1,11 +1,18 @@
 
-/*
- * Created: 09-05-2017
- * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
- */
+/*******************************************************************************
+ *
+ * File test01_projection_impl.c
+ *
+ * Author (2017, 2018): Jonas Rylund Glesaaen
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Tests of the expXsu3 and expXsu3_w_factors functions
+ *
+ *******************************************************************************/
 
-#define MAIN_PROGRAM
-
+#define MAIN_PROGRAM 
 #include "global.h"
 #include "linalg.h"
 #include "mpi.h"
@@ -188,7 +195,7 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf("Checks of the programs in the module liealg\n");
+    printf("Tests of the expXsu3 and expXsu3_w_factors functions\n");
     printf("-------------------------------------------\n\n");
 
     printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
