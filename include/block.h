@@ -40,7 +40,12 @@ typedef struct
   bndry_t *bb;
 } block_t;
 
-typedef enum { SAP_BLOCKS, DFL_BLOCKS, BLK_GRIDS } blk_grid_t;
+typedef enum
+{
+  SAP_BLOCKS,
+  DFL_BLOCKS,
+  BLK_GRIDS
+} blk_grid_t;
 
 /* BLOCK_C */
 extern void alloc_blk(block_t *b, int const *bo, int const *bs, int iu, int iud,

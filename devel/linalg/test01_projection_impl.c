@@ -12,7 +12,8 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM 
+#define MAIN_PROGRAM
+
 #include "global.h"
 #include "linalg.h"
 #include "mpi.h"

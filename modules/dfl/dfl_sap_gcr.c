@@ -12,13 +12,13 @@
 *
 * The externally accessible functions are
 *
-*   double dfl_sap_gcr(int nkv, int nmx, double res, double mu, 
+*   double dfl_sap_gcr(int nkv, int nmx, double res, double mu,
 *                      spinor_dble *eta, spinor_dble *psi, int *status)
 *     Obtains an approximate solution psi of the Wilson-Dirac equation for given
 *     source eta using the deflated SAP-preconditioned GCR algorithm. See the
 *     notes for the explanation of the parameters of the program.
 *
-*   double dfl_sap_gcr2(int nkv, int nmx, double res, double mu, 
+*   double dfl_sap_gcr2(int nkv, int nmx, double res, double mu,
 *                       spinor_dble *eta, spinor_dble *psi, int *status)
 *     This program calls dfl_sap_gcr() with the parameters nkv,..,status. If
 *     the solver fails and status[0]=-3 or status[1]<0, the deflation subspace

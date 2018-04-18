@@ -12,8 +12,8 @@
  *
  * The externally accessible functions are
  *
- *   solver_parms_t set_solver_parms(int isp, solver_t solver, 
- *                                   int nkv, int isolv, int nmr, int ncy, 
+ *   solver_parms_t set_solver_parms(int isp, solver_t solver,
+ *                                   int nkv, int isolv, int nmr, int ncy,
  *                                   int nmx, double res)
  *     Sets the parameters in the solver parameter set number isp and returns
  *     a structure containing them (see the notes).

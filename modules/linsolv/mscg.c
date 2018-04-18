@@ -12,9 +12,9 @@
  *
  * The externally accessible function is
  *
- *   void mscg(int vol, int icom, int nmu, double *mu, 
+ *   void mscg(int vol, int icom, int nmu, double *mu,
  *             void (*Dop_dble)(double mu, spinor_dble *s, spinor_dble *r),
- *             spinor_dble **wsd, int nmx, double *res, 
+ *             spinor_dble **wsd, int nmx, double *res,
  *             spinor_dble *eta, spinor_dble **psi, int *status)
  *     Solution of the Dirac equation (D^dag*D+mu^2)*psi=eta for a given
  *     source eta and one or more values of mu using the multi-shift CG

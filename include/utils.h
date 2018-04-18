@@ -47,7 +47,14 @@ typedef unsigned long int stduint_t;
 #undef IMAX
 #define IMAX(n, m) ((n) + ((m) - (n)) * ((m) > (n)))
 
-typedef enum { ALL_PTS, EVEN_PTS, ODD_PTS, NO_PTS, PT_SETS } ptset_t;
+typedef enum
+{
+  ALL_PTS,
+  EVEN_PTS,
+  ODD_PTS,
+  NO_PTS,
+  PT_SETS
+} ptset_t;
 
 /* ENDIAN_C */
 extern int endianness(void);

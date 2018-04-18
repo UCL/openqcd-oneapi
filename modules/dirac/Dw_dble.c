@@ -156,30 +156,27 @@ static void doe_dble(const int *piup, const int *pidn, const su3_dble *u,
   __m512d a1, a2, a3;
   __m512d b1, b2, b3;
   __m512d w1, w2, w3;
+  __m512d t1, t2, t3, t4, t5, t6;
 
-  /******************************* direction 0
-   * *********************************/
+  /****************************** direction 0 ********************************/
 
   sp = pk + (*(piup++));
   sm = pk + (*(pidn++));
 
-  {
-    register __m512d t1, t2, t3, t4, t5, t6;
-    _avx512_load_2_halfspinor_d(t1, t2, t3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
-    _avx512_load_2_halfspinor_d(t4, t5, t6, &(*sp).c3.c1.re, &(*sm).c3.c1.re);
+  _avx512_load_2_halfspinor_d(t1, t2, t3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
+  _avx512_load_2_halfspinor_d(t4, t5, t6, &(*sp).c3.c1.re, &(*sm).c3.c1.re);
 
-    a1 = _mm512_maskz_add_pd(0b00001111, t1, t4);
-    a1 = _mm512_mask_sub_pd(a1, 0b11110000, t1, t4);
-    a2 = _mm512_maskz_add_pd(0b00001111, t2, t5);
-    a2 = _mm512_mask_sub_pd(a2, 0b11110000, t2, t5);
-    a3 = _mm512_maskz_add_pd(0b00001111, t3, t6);
-    a3 = _mm512_mask_sub_pd(a3, 0b11110000, t3, t6);
-  }
+  a1 = _mm512_maskz_add_pd(0b00001111, t1, t4);
+  a1 = _mm512_mask_sub_pd(a1, 0b11110000, t1, t4);
+  a2 = _mm512_maskz_add_pd(0b00001111, t2, t5);
+  a2 = _mm512_mask_sub_pd(a2, 0b11110000, t2, t5);
+  a3 = _mm512_maskz_add_pd(0b00001111, t3, t6);
+  a3 = _mm512_mask_sub_pd(a3, 0b11110000, t3, t6);
 
   sp = pk + (*(piup++));
-  _prefetch_spinor_dble(sp);
+  _mm_prefetch((char *)sp, _MM_HINT_T0);
   sm = pk + (*(pidn++));
-  _prefetch_spinor_dble(sm);
+  _mm_prefetch((char *)sm, _MM_HINT_T0);
 
   up = u;
   u += 1;
@@ -191,29 +188,25 @@ static void doe_dble(const int *piup, const int *pidn, const su3_dble *u,
   _avx512_to_weyl_1(w2, b2, gamma_8);
   _avx512_to_weyl_1(w3, b3, gamma_8);
 
-  /******************************* direction 1
-   * *********************************/
-  {
-    register __m512d t1, t2, t3, t4, t5, t6;
-    _avx512_load_2_halfspinor_d(t1, t2, t3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
-    _avx512_load_2_halfspinor_d_reverse(t4, t5, t6, &(*sp).c3.c1.re,
-                                        &(*sm).c3.c1.re);
+  /****************************** direction 1 ********************************/
+  _avx512_load_2_halfspinor_d(t1, t2, t3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
+  _avx512_load_2_halfspinor_d_reverse(t4, t5, t6, &(*sp).c3.c1.re,
+                                      &(*sm).c3.c1.re);
 
-    t4 = _mm512_permute_pd(t4, 0b01010101);
-    a1 = _mm512_maskz_add_pd(0b01011010, t1, t4);
-    a1 = _mm512_mask_sub_pd(a1, 0b10100101, t1, t4);
-    t5 = _mm512_permute_pd(t5, 0b01010101);
-    a2 = _mm512_maskz_add_pd(0b01011010, t2, t5);
-    a2 = _mm512_mask_sub_pd(a2, 0b10100101, t2, t5);
-    t6 = _mm512_permute_pd(t6, 0b01010101);
-    a3 = _mm512_maskz_add_pd(0b01011010, t3, t6);
-    a3 = _mm512_mask_sub_pd(a3, 0b10100101, t3, t6);
-  }
+  t4 = _mm512_permute_pd(t4, 0b01010101);
+  a1 = _mm512_maskz_add_pd(0b01011010, t1, t4);
+  a1 = _mm512_mask_sub_pd(a1, 0b10100101, t1, t4);
+  t5 = _mm512_permute_pd(t5, 0b01010101);
+  a2 = _mm512_maskz_add_pd(0b01011010, t2, t5);
+  a2 = _mm512_mask_sub_pd(a2, 0b10100101, t2, t5);
+  t6 = _mm512_permute_pd(t6, 0b01010101);
+  a3 = _mm512_maskz_add_pd(0b01011010, t3, t6);
+  a3 = _mm512_mask_sub_pd(a3, 0b10100101, t3, t6);
 
   sp = pk + (*(piup++));
-  _prefetch_spinor_dble(sp);
+  _mm_prefetch((char *)sp, _MM_HINT_T0);
   sm = pk + (*(pidn++));
-  _prefetch_spinor_dble(sm);
+  _mm_prefetch((char *)sm, _MM_HINT_T0);
   up = ++u;
   u += 1;
 
@@ -223,27 +216,23 @@ static void doe_dble(const int *piup, const int *pidn, const su3_dble *u,
   _avx512_to_weyl_2(w2, b2);
   _avx512_to_weyl_2(w3, b3);
 
-  /******************************* direction 2
-   * *********************************/
+  /****************************** direction 2 ********************************/
 
-  {
-    register __m512d t1, t2, t3, t4, t5, t6;
-    _avx512_load_2_halfspinor_d(t1, t2, t3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
-    _avx512_load_2_halfspinor_d_reverse(t4, t5, t6, &(*sp).c3.c1.re,
-                                        &(*sm).c3.c1.re);
+  _avx512_load_2_halfspinor_d(t1, t2, t3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
+  _avx512_load_2_halfspinor_d_reverse(t4, t5, t6, &(*sp).c3.c1.re,
+                                      &(*sm).c3.c1.re);
 
-    a1 = _mm512_maskz_add_pd(0b11000011, t1, t4);
-    a1 = _mm512_mask_sub_pd(a1, 0b00111100, t1, t4);
-    a2 = _mm512_maskz_add_pd(0b11000011, t2, t5);
-    a2 = _mm512_mask_sub_pd(a2, 0b00111100, t2, t5);
-    a3 = _mm512_maskz_add_pd(0b11000011, t3, t6);
-    a3 = _mm512_mask_sub_pd(a3, 0b00111100, t3, t6);
-  }
+  a1 = _mm512_maskz_add_pd(0b11000011, t1, t4);
+  a1 = _mm512_mask_sub_pd(a1, 0b00111100, t1, t4);
+  a2 = _mm512_maskz_add_pd(0b11000011, t2, t5);
+  a2 = _mm512_mask_sub_pd(a2, 0b00111100, t2, t5);
+  a3 = _mm512_maskz_add_pd(0b11000011, t3, t6);
+  a3 = _mm512_mask_sub_pd(a3, 0b00111100, t3, t6);
 
   sp = pk + (*(piup));
-  _prefetch_spinor_dble(sp);
+  _mm_prefetch((char *)sp, _MM_HINT_T0);
   sm = pk + (*(pidn));
-  _prefetch_spinor_dble(sm);
+  _mm_prefetch((char *)sm, _MM_HINT_T0);
   up = ++u;
   u += 1;
 
@@ -253,23 +242,19 @@ static void doe_dble(const int *piup, const int *pidn, const su3_dble *u,
   _avx512_to_weyl_3(w2, b2);
   _avx512_to_weyl_3(w3, b3);
 
-  /******************************* direction 3
-   * *********************************/
-  {
-    register __m512d t1, t2, t3, t4, t5, t6;
-    _avx512_load_2_halfspinor_d(t1, t2, t3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
-    _avx512_load_2_halfspinor_d(t4, t5, t6, &(*sp).c3.c1.re, &(*sm).c3.c1.re);
+  /****************************** direction 3 ********************************/
+  _avx512_load_2_halfspinor_d(t1, t2, t3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
+  _avx512_load_2_halfspinor_d(t4, t5, t6, &(*sp).c3.c1.re, &(*sm).c3.c1.re);
 
-    t4 = _mm512_permute_pd(t4, 0b01010101);
-    a1 = _mm512_maskz_add_pd(0b10010110, t1, t4);
-    a1 = _mm512_mask_sub_pd(a1, 0b01101001, t1, t4);
-    t5 = _mm512_permute_pd(t5, 0b01010101);
-    a2 = _mm512_maskz_add_pd(0b10010110, t2, t5);
-    a2 = _mm512_mask_sub_pd(a2, 0b01101001, t2, t5);
-    t6 = _mm512_permute_pd(t6, 0b01010101);
-    a3 = _mm512_maskz_add_pd(0b10010110, t3, t6);
-    a3 = _mm512_mask_sub_pd(a3, 0b01101001, t3, t6);
-  }
+  t4 = _mm512_permute_pd(t4, 0b01010101);
+  a1 = _mm512_maskz_add_pd(0b10010110, t1, t4);
+  a1 = _mm512_mask_sub_pd(a1, 0b01101001, t1, t4);
+  t5 = _mm512_permute_pd(t5, 0b01010101);
+  a2 = _mm512_maskz_add_pd(0b10010110, t2, t5);
+  a2 = _mm512_mask_sub_pd(a2, 0b01101001, t2, t5);
+  t6 = _mm512_permute_pd(t6, 0b01010101);
+  a3 = _mm512_maskz_add_pd(0b10010110, t3, t6);
+  a3 = _mm512_mask_sub_pd(a3, 0b01101001, t3, t6);
 
   up = ++u;
   u += 1;
@@ -286,7 +271,6 @@ static void doe_dble(const int *piup, const int *pidn, const su3_dble *u,
   w2 = _mm512_mul_pd(gamma_8, w2);
   w3 = _mm512_mul_pd(gamma_8, w3);
 
-  /*_avx512_store_spinor( w1, w2, w3, &rs.s.c1.c1.re );*/
   _avx512_store_2_halfspinor_d(w1, w2, w3, &rs.s.c1.c1.re, &rs.s.c3.c1.re);
 }
 
@@ -301,13 +285,12 @@ static void deo_dble(const int *piup, const int *pidn, const su3_dble *u,
   __m512d b1, b2, b3;
   __m512d w1, w2, w3;
 
-  /******************************* direction +0
-   * *********************************/
+  /****************************** direction 0 ********************************/
 
   sp = pl + (*(piup++));
-  _prefetch_spinor_dble(sp);
+  _mm_prefetch((char *)sp, _MM_HINT_T0);
   sm = pl + (*(pidn++));
-  _prefetch_spinor_dble(sm);
+  _mm_prefetch((char *)sm, _MM_HINT_T0);
 
   _avx512_load_2_halfspinor_d(w1, w2, w3, &rs.s.c1.c1.re, &rs.s.c3.c1.re);
 
@@ -324,26 +307,14 @@ static void deo_dble(const int *piup, const int *pidn, const su3_dble *u,
   u += 1;
   avx512_su3_mul_quad_dble(*u, *up, b1, b2, b3, a1, a2, a3);
 
-  _avx512_add_to_spinors(b1, (*sm).c1.c1, (*sm).c2.c1, (*sp).c1.c1,
-                         (*sp).c2.c1);
-  _avx512_add_to_spinors(b2, (*sm).c1.c2, (*sm).c2.c2, (*sp).c1.c2,
-                         (*sp).c2.c2);
-  _avx512_add_to_spinors(b3, (*sm).c1.c3, (*sm).c2.c3, (*sp).c1.c3,
-                         (*sp).c2.c3);
+  _avx512_add_to_spinors(b1, b2, b3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
+  _avx512_add_to_spinors_2(b1, b2, b3, &(*sp).c3.c1.re, &(*sm).c3.c1.re);
 
-  _avx512_add_to_spinors_2(b1, (*sm).c3.c1, (*sm).c4.c1, (*sp).c3.c1,
-                           (*sp).c4.c1);
-  _avx512_add_to_spinors_2(b2, (*sm).c3.c2, (*sm).c4.c2, (*sp).c3.c2,
-                           (*sp).c4.c2);
-  _avx512_add_to_spinors_2(b3, (*sm).c3.c3, (*sm).c4.c3, (*sp).c3.c3,
-                           (*sp).c4.c3);
-
-  /******************************* direction +1
-   * *********************************/
+  /****************************** direction 1 ********************************/
   sp = pl + (*(piup++));
-  _prefetch_spinor_dble(sp);
+  _mm_prefetch((char *)sp, _MM_HINT_T0);
   sm = pl + (*(pidn++));
-  _prefetch_spinor_dble(sm);
+  _mm_prefetch((char *)sm, _MM_HINT_T0);
 
   mulc = _mm_load_sd(&one_over_gammaf);
   mulc8 = _mm512_broadcastsd_pd(mulc);
@@ -359,26 +330,14 @@ static void deo_dble(const int *piup, const int *pidn, const su3_dble *u,
   u += 1;
   avx512_su3_mul_quad_dble(*u, *up, b1, b2, b3, a1, a2, a3);
 
-  _avx512_add_to_spinors(b1, (*sm).c1.c1, (*sm).c2.c1, (*sp).c1.c1,
-                         (*sp).c2.c1);
-  _avx512_add_to_spinors(b2, (*sm).c1.c2, (*sm).c2.c2, (*sp).c1.c2,
-                         (*sp).c2.c2);
-  _avx512_add_to_spinors(b3, (*sm).c1.c3, (*sm).c2.c3, (*sp).c1.c3,
-                         (*sp).c2.c3);
+  _avx512_add_to_spinors(b1, b2, b3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
+  _avx512_add_to_spinors_3(b1, b2, b3, &(*sp).c3.c1.re, &(*sm).c3.c1.re);
 
-  _avx512_add_to_spinors_3(b1, (*sm).c3.c1, (*sm).c4.c1, (*sp).c3.c1,
-                           (*sp).c4.c1);
-  _avx512_add_to_spinors_3(b2, (*sm).c3.c2, (*sm).c4.c2, (*sp).c3.c2,
-                           (*sp).c4.c2);
-  _avx512_add_to_spinors_3(b3, (*sm).c3.c3, (*sm).c4.c3, (*sp).c3.c3,
-                           (*sp).c4.c3);
-
-  /******************************* direction +2
-   * *********************************/
+  /****************************** direction 2 ********************************/
   sp = pl + (*(piup++));
-  _prefetch_spinor_dble(sp);
+  _mm_prefetch((char *)sp, _MM_HINT_T0);
   sm = pl + (*(pidn++));
-  _prefetch_spinor_dble(sm);
+  _mm_prefetch((char *)sm, _MM_HINT_T0);
 
   _avx512_expand_weyl_3(a1, w1);
   _avx512_expand_weyl_3(a2, w2);
@@ -388,26 +347,14 @@ static void deo_dble(const int *piup, const int *pidn, const su3_dble *u,
   u += 1;
   avx512_su3_mul_quad_dble(*u, *up, b1, b2, b3, a1, a2, a3);
 
-  _avx512_add_to_spinors(b1, (*sm).c1.c1, (*sm).c2.c1, (*sp).c1.c1,
-                         (*sp).c2.c1);
-  _avx512_add_to_spinors(b2, (*sm).c1.c2, (*sm).c2.c2, (*sp).c1.c2,
-                         (*sp).c2.c2);
-  _avx512_add_to_spinors(b3, (*sm).c1.c3, (*sm).c2.c3, (*sp).c1.c3,
-                         (*sp).c2.c3);
+  _avx512_add_to_spinors(b1, b2, b3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
+  _avx512_add_to_spinors_4(b1, b2, b3, &(*sp).c3.c1.re, &(*sm).c3.c1.re);
 
-  _avx512_add_to_spinors_4(b1, (*sm).c4.c1, (*sm).c3.c1, (*sp).c4.c1,
-                           (*sp).c3.c1);
-  _avx512_add_to_spinors_4(b2, (*sm).c4.c2, (*sm).c3.c2, (*sp).c4.c2,
-                           (*sp).c3.c2);
-  _avx512_add_to_spinors_4(b3, (*sm).c4.c3, (*sm).c3.c3, (*sp).c4.c3,
-                           (*sp).c3.c3);
-
-  /******************************* direction +3
-   * *********************************/
+  /****************************** direction 3 ********************************/
   sp = pl + (*(piup++));
-  _prefetch_spinor_dble(sp);
+  _mm_prefetch((char *)sp, _MM_HINT_T0);
   sm = pl + (*(pidn++));
-  _prefetch_spinor_dble(sm);
+  _mm_prefetch((char *)sm, _MM_HINT_T0);
 
   _avx512_expand_weyl_4(a1, w1);
   _avx512_expand_weyl_4(a2, w2);
@@ -417,19 +364,8 @@ static void deo_dble(const int *piup, const int *pidn, const su3_dble *u,
   u += 1;
   avx512_su3_mul_quad_dble(*u, *up, b1, b2, b3, a1, a2, a3);
 
-  _avx512_add_to_spinors(b1, (*sm).c1.c1, (*sm).c2.c1, (*sp).c1.c1,
-                         (*sp).c2.c1);
-  _avx512_add_to_spinors(b2, (*sm).c1.c2, (*sm).c2.c2, (*sp).c1.c2,
-                         (*sp).c2.c2);
-  _avx512_add_to_spinors(b3, (*sm).c1.c3, (*sm).c2.c3, (*sp).c1.c3,
-                         (*sp).c2.c3);
-
-  _avx512_add_to_spinors_5(b1, (*sm).c3.c1, (*sm).c4.c1, (*sp).c3.c1,
-                           (*sp).c4.c1);
-  _avx512_add_to_spinors_5(b2, (*sm).c3.c2, (*sm).c4.c2, (*sp).c3.c2,
-                           (*sp).c4.c2);
-  _avx512_add_to_spinors_5(b3, (*sm).c3.c3, (*sm).c4.c3, (*sp).c3.c3,
-                           (*sp).c4.c3);
+  _avx512_add_to_spinors(b1, b2, b3, &(*sp).c1.c1.re, &(*sm).c1.c1.re);
+  _avx512_add_to_spinors_5(b1, b2, b3, &(*sp).c3.c1.re, &(*sm).c3.c1.re);
 }
 
 #elif (defined AVX)

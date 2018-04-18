@@ -400,7 +400,6 @@ typedef struct
  * r.c2=(u*s).c2
  * r.c3=(u*s).c3
  */
-
 #define _su3_multiply(r, u, s)                                                 \
   (r).c1.re = (u).c11.re * (s).c1.re - (u).c11.im * (s).c1.im +                \
               (u).c12.re * (s).c2.re - (u).c12.im * (s).c2.im +                \

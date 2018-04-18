@@ -98,7 +98,444 @@ static void alloc_wrotate(int n)
   nrot = n;
 }
 
-#if (defined AVX)
+#if (defined AVX512)
+#include "avx512.h"
+
+complex_dble spinor_prod_dble(int vol, int icom, spinor_dble const *s,
+                              spinor_dble const *r)
+{
+  spinor_dble const *sm, *smb;
+
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
+  }
+
+  reset_hsum(isz);
+  sm = s + vol;
+
+  while (s < sm) {
+    smb = s + 8;
+    if (smb > sm) {
+      smb = sm;
+    }
+
+    smz.re = 0.0;
+    smz.im = 0.0;
+
+    __m512d tr = _mm512_setzero_pd();
+    __m512d ti = _mm512_setzero_pd();
+
+    for (; s < smb; s++) {
+      __m512d s1 = _mm512_loadu_pd(&(*s).c1.c1.re);
+      __m512d s2 = _mm512_loadu_pd(&(*s).c1.c1.re + 8);
+      __m512d s3 = _mm512_loadu_pd(&(*s).c1.c1.re + 16);
+      __m512d r1 = _mm512_loadu_pd(&(*r).c1.c1.re);
+      __m512d r2 = _mm512_loadu_pd(&(*r).c1.c1.re + 8);
+      __m512d r3 = _mm512_loadu_pd(&(*r).c1.c1.re + 16);
+
+      tr = _mm512_fmadd_pd(s1, r1, tr);
+      tr = _mm512_fmadd_pd(s2, r2, tr);
+      tr = _mm512_fmadd_pd(s3, r3, tr);
+
+      r1 = _mm512_permute_pd(r1, 0b01010101);
+      r2 = _mm512_permute_pd(r2, 0b01010101);
+      r3 = _mm512_permute_pd(r3, 0b01010101);
+
+      __m512d sign = _mm512_set_pd(-1, 1, -1, 1, -1, 1, -1, 1);
+      r1 = _mm512_mul_pd(r1, sign);
+      r2 = _mm512_mul_pd(r2, sign);
+      r3 = _mm512_mul_pd(r3, sign);
+
+      ti = _mm512_fmadd_pd(s1, r1, ti);
+      ti = _mm512_fmadd_pd(s2, r2, ti);
+      ti = _mm512_fmadd_pd(s3, r3, ti);
+
+      r += 1;
+    }
+
+    smz.re = _mm512_reduce_add_pd(tr);
+    smz.im = _mm512_reduce_add_pd(ti);
+
+    add_to_hsum(isz, (double *)(&smz));
+  }
+
+  if ((icom == 1) && (NPROC > 1)) {
+    global_hsum(isz, (double *)(&smz));
+  } else {
+    local_hsum(isz, (double *)(&smz));
+  }
+
+  return smz;
+}
+
+complex_dble spinor_prod5_dble(int vol, int icom, spinor_dble const *s,
+                               spinor_dble const *r)
+{
+  spinor_dble const *sm, *smb;
+
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
+  }
+
+  reset_hsum(isz);
+  sm = s + vol;
+
+  while (s < sm) {
+    smb = s + 8;
+    if (smb > sm) {
+      smb = sm;
+    }
+
+    __m512d tr = _mm512_setzero_pd();
+    __m512d ti = _mm512_setzero_pd();
+
+    for (; s < smb; s++) {
+      __m512d s1 = _mm512_loadu_pd(&(*s).c1.c1.re);
+      __m512d s2 = _mm512_loadu_pd(&(*s).c1.c1.re + 8);
+      __m512d s3 = _mm512_loadu_pd(&(*s).c1.c1.re + 16);
+      __m512d r1 = _mm512_loadu_pd(&(*r).c1.c1.re);
+      __m512d r2 = _mm512_loadu_pd(&(*r).c1.c1.re + 8);
+      __m512d r3 = _mm512_loadu_pd(&(*r).c1.c1.re + 16);
+
+      __m512d sign = _mm512_set_pd(-1, -1, -1, -1, 1, 1, 1, 1);
+      s2 = _mm512_mul_pd(s2, sign);
+
+      tr = _mm512_fmadd_pd(s1, r1, tr);
+      tr = _mm512_fmadd_pd(s2, r2, tr);
+      tr = _mm512_fnmadd_pd(s3, r3, tr);
+
+      r1 = _mm512_permute_pd(r1, 0b01010101);
+      r2 = _mm512_permute_pd(r2, 0b01010101);
+      r3 = _mm512_permute_pd(r3, 0b01010101);
+
+      sign = _mm512_set_pd(-1, 1, -1, 1, -1, 1, -1, 1);
+      r1 = _mm512_mul_pd(r1, sign);
+      r2 = _mm512_mul_pd(r2, sign);
+      r3 = _mm512_mul_pd(r3, sign);
+
+      ti = _mm512_fmadd_pd(s1, r1, ti);
+      ti = _mm512_fmadd_pd(s2, r2, ti);
+      ti = _mm512_fnmadd_pd(s3, r3, ti);
+
+      r += 1;
+    }
+
+    smz.re = _mm512_reduce_add_pd(tr);
+    smz.im = _mm512_reduce_add_pd(ti);
+
+    add_to_hsum(isz, (double *)(&smz));
+  }
+
+  if ((icom == 1) && (NPROC > 1)) {
+    global_hsum(isz, (double *)(&smz));
+  } else {
+    local_hsum(isz, (double *)(&smz));
+  }
+
+  return smz;
+}
+
+double norm_square_dble(int vol, int icom, spinor_dble const *s)
+{
+  spinor_dble const *sm, *smb;
+
+  if (init == 0) {
+    isx = init_hsum(1);
+    isz = init_hsum(2);
+    init = 1;
+  }
+
+  reset_hsum(isx);
+  sm = s + vol;
+
+  while (s < sm) {
+    smb = s + 8;
+    if (smb > sm) {
+      smb = sm;
+    }
+
+    __m512d tmp = _mm512_setzero_pd();
+
+    for (; s < smb; s++) {
+      __m512d s1 = _mm512_loadu_pd(&(*s).c1.c1.re);
+      __m512d s2 = _mm512_loadu_pd(&(*s).c1.c1.re + 8);
+      __m512d s3 = _mm512_loadu_pd(&(*s).c1.c1.re + 16);
+
+      tmp = _mm512_fmadd_pd(s1, s1, tmp);
+      tmp = _mm512_fmadd_pd(s2, s2, tmp);
+      tmp = _mm512_fmadd_pd(s3, s3, tmp);
+    }
+
+    smx = _mm512_reduce_add_pd(tmp);
+    add_to_hsum(isx, &smx);
+  }
+
+  if ((icom == 1) && (NPROC > 1)) {
+    global_hsum(isx, &smx);
+  } else {
+    local_hsum(isx, &smx);
+  }
+
+  return smx;
+}
+
+void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
+                          complex_dble z)
+{
+  spinor_dble *sm;
+
+  __m128d tr, ti;
+  __m512d zr, zi, t1, t2;
+  tr = _mm_load_sd(&z.re);
+  ti = _mm_load_sd(&z.im);
+  zr = _mm512_broadcastsd_pd(tr);
+  zi = _mm512_broadcastsd_pd(ti);
+
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    t1 = _mm512_loadu_pd(&(*r).c1.c1.re);
+    t2 = _mm512_mul_pd(zi, t1);
+    t2 = _mm512_permute_pd(t2, 0b01010101);
+    t2 = _mm512_fmaddsub_pd(zr, t1, t2);
+    t1 = _mm512_loadu_pd(&(*s).c1.c1.re);
+    t1 = _mm512_add_pd(t1, t2);
+    _mm512_storeu_pd(&(*s).c1.c1.re, t1);
+
+    t1 = _mm512_loadu_pd(&(*r).c1.c1.re + 8);
+    t2 = _mm512_mul_pd(zi, t1);
+    t2 = _mm512_permute_pd(t2, 0b01010101);
+    t2 = _mm512_fmaddsub_pd(zr, t1, t2);
+    t1 = _mm512_loadu_pd(&(*s).c1.c1.re + 8);
+    t1 = _mm512_add_pd(t1, t2);
+    _mm512_storeu_pd(&(*s).c1.c1.re + 8, t1);
+
+    t1 = _mm512_loadu_pd(&(*r).c1.c1.re + 16);
+    t2 = _mm512_mul_pd(zi, t1);
+    t2 = _mm512_permute_pd(t2, 0b01010101);
+    t2 = _mm512_fmaddsub_pd(zr, t1, t2);
+    t1 = _mm512_loadu_pd(&(*s).c1.c1.re + 16);
+    t1 = _mm512_add_pd(t1, t2);
+    _mm512_storeu_pd(&(*s).c1.c1.re + 16, t1);
+
+    r += 1;
+  }
+}
+
+void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
+                          double c)
+{
+  spinor_dble *sm;
+
+  __m128d t128;
+  __m512d tc, t1, t2;
+  t128 = _mm_load_sd(&c);
+  tc = _mm512_broadcastsd_pd(t128);
+
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    t1 = _mm512_loadu_pd(&(*r).c1.c1.re);
+    t2 = _mm512_mul_pd(tc, t1);
+    t1 = _mm512_loadu_pd(&(*s).c1.c1.re);
+    t1 = _mm512_add_pd(t1, t2);
+    _mm512_storeu_pd(&(*s).c1.c1.re, t1);
+
+    t1 = _mm512_loadu_pd(&(*r).c1.c1.re + 8);
+    t2 = _mm512_mul_pd(tc, t1);
+    t1 = _mm512_loadu_pd(&(*s).c1.c1.re + 8);
+    t1 = _mm512_add_pd(t1, t2);
+    _mm512_storeu_pd(&(*s).c1.c1.re + 8, t1);
+
+    t1 = _mm512_loadu_pd(&(*r).c1.c1.re + 16);
+    t2 = _mm512_mul_pd(tc, t1);
+    t1 = _mm512_loadu_pd(&(*s).c1.c1.re + 16);
+    t1 = _mm512_add_pd(t1, t2);
+    _mm512_storeu_pd(&(*s).c1.c1.re + 16, t1);
+
+    r += 1;
+  }
+}
+
+void combine_spinor_dble(int vol, spinor_dble *s, spinor_dble const *r,
+                         double cs, double cr)
+{
+  spinor_dble *sm;
+
+  __m128d ts128, tr128;
+  __m512d tcs, tcr, t1, t2;
+  ts128 = _mm_load_sd(&cs);
+  tr128 = _mm_load_sd(&cr);
+  tcs = _mm512_broadcastsd_pd(ts128);
+  tcr = _mm512_broadcastsd_pd(tr128);
+
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    t1 = _mm512_loadu_pd(&(*r).c1.c1.re);
+    t2 = _mm512_mul_pd(tcr, t1);
+    t1 = _mm512_loadu_pd(&(*s).c1.c1.re);
+    t1 = _mm512_fmadd_pd(tcs, t1, t2);
+    _mm512_storeu_pd(&(*s).c1.c1.re, t1);
+
+    t1 = _mm512_loadu_pd(&(*r).c1.c1.re + 8);
+    t2 = _mm512_mul_pd(tcr, t1);
+    t1 = _mm512_loadu_pd(&(*s).c1.c1.re + 8);
+    t1 = _mm512_fmadd_pd(tcs, t1, t2);
+    _mm512_storeu_pd(&(*s).c1.c1.re + 8, t1);
+
+    t1 = _mm512_loadu_pd(&(*r).c1.c1.re + 16);
+    t2 = _mm512_mul_pd(tcr, t1);
+    t1 = _mm512_loadu_pd(&(*s).c1.c1.re + 16);
+    t1 = _mm512_fmadd_pd(tcs, t1, t2);
+    _mm512_storeu_pd(&(*s).c1.c1.re + 16, t1);
+
+    r += 1;
+  }
+}
+
+void scale_dble(int vol, double c, spinor_dble *s)
+{
+  spinor_dble *sm;
+
+  __m128d t128;
+  __m512d tc, t1;
+  t128 = _mm_load_sd(&c);
+  tc = _mm512_broadcastsd_pd(t128);
+
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    t1 = _mm512_loadu_pd(&(*s).c1.c1.re);
+    t1 = _mm512_mul_pd(tc, t1);
+    _mm512_storeu_pd(&(*s).c1.c1.re, t1);
+
+    t1 = _mm512_loadu_pd(&(*s).c1.c1.re + 8);
+    t1 = _mm512_mul_pd(tc, t1);
+    _mm512_storeu_pd(&(*s).c1.c1.re + 8, t1);
+
+    t1 = _mm512_loadu_pd(&(*s).c1.c1.re + 16);
+    t1 = _mm512_mul_pd(tc, t1);
+    _mm512_storeu_pd(&(*s).c1.c1.re + 16, t1);
+  }
+}
+
+void rotate_dble(int vol, int n, spinor_dble **ppk, complex_dble const *v)
+{
+  int k, j, ix;
+  complex_dble const *z;
+  spinor_dble *pk, *pj;
+
+  if (n > nrot) {
+    alloc_wrotate(n);
+  }
+
+  for (ix = 0; ix < vol; ix++) {
+    for (k = 0; k < n; k++) {
+      pk = psi + k;
+      pj = ppk[0] + ix;
+      z = v + k;
+
+      __m128d tr, ti;
+      __m512d zr, zi, t1, t2, p1, p2, p3;
+      tr = _mm_load_sd(&z->re);
+      ti = _mm_load_sd(&z->im);
+      zr = _mm512_broadcastsd_pd(tr);
+      zi = _mm512_broadcastsd_pd(ti);
+
+      t1 = _mm512_loadu_pd(&(*pj).c1.c1.re);
+      t2 = _mm512_mul_pd(zi, t1);
+      t2 = _mm512_permute_pd(t2, 0b01010101);
+      p1 = _mm512_fmaddsub_pd(zr, t1, t2);
+
+      t1 = _mm512_loadu_pd(&(*pj).c1.c1.re + 8);
+      t2 = _mm512_mul_pd(zi, t1);
+      t2 = _mm512_permute_pd(t2, 0b01010101);
+      p2 = _mm512_fmaddsub_pd(zr, t1, t2);
+
+      t1 = _mm512_loadu_pd(&(*pj).c1.c1.re + 16);
+      t2 = _mm512_mul_pd(zi, t1);
+      t2 = _mm512_permute_pd(t2, 0b01010101);
+      p3 = _mm512_fmaddsub_pd(zr, t1, t2);
+
+      for (j = 1; j < n; j++) {
+        pj = ppk[j] + ix;
+        z += n;
+
+        tr = _mm_load_sd(&z->re);
+        ti = _mm_load_sd(&z->im);
+        zr = _mm512_broadcastsd_pd(tr);
+        zi = _mm512_broadcastsd_pd(ti);
+
+        t1 = _mm512_loadu_pd(&(*pj).c1.c1.re);
+        t2 = _mm512_mul_pd(zi, t1);
+        t2 = _mm512_permute_pd(t2, 0b01010101);
+        t1 = _mm512_fmaddsub_pd(zr, t1, t2);
+        p1 = _mm512_add_pd(p1, t1);
+
+        t1 = _mm512_loadu_pd(&(*pj).c1.c1.re + 8);
+        t2 = _mm512_mul_pd(zi, t1);
+        t2 = _mm512_permute_pd(t2, 0b01010101);
+        t1 = _mm512_fmaddsub_pd(zr, t1, t2);
+        p2 = _mm512_add_pd(p2, t1);
+
+        t1 = _mm512_loadu_pd(&(*pj).c1.c1.re + 16);
+        t2 = _mm512_mul_pd(zi, t1);
+        t2 = _mm512_permute_pd(t2, 0b01010101);
+        t1 = _mm512_fmaddsub_pd(zr, t1, t2);
+        p3 = _mm512_add_pd(p3, t1);
+      }
+
+      _mm512_storeu_pd(&(*pk).c1.c1.re, p1);
+      _mm512_storeu_pd(&(*pk).c1.c1.re + 8, p2);
+      _mm512_storeu_pd(&(*pk).c1.c1.re + 16, t1);
+    }
+
+    for (k = 0; k < n; k++) {
+      *(ppk[k] + ix) = psi[k];
+    }
+  }
+}
+
+void mulg5_dble(int vol, spinor_dble *s)
+{
+  spinor_dble *sm;
+
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    __m512d s1 = _mm512_loadu_pd(&(*s).c1.c1.re + 12);
+    s1 = _mm512_sub_pd(_mm512_setzero_pd(), s1);
+    _mm512_storeu_pd(&(*s).c1.c1.re + 12, s1);
+
+    __m256d s2 = _mm256_loadu_pd(&(*s).c1.c1.re + 20);
+    s2 = _mm256_sub_pd(_mm256_setzero_pd(), s2);
+    _mm256_storeu_pd(&(*s).c1.c1.re + 20, s2);
+  }
+}
+
+void mulmg5_dble(int vol, spinor_dble *s)
+{
+  spinor_dble *sm;
+
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    __m512d s1 = _mm512_loadu_pd(&(*s).c1.c1.re);
+    s1 = _mm512_sub_pd(_mm512_setzero_pd(), s1);
+    _mm512_storeu_pd(&(*s).c1.c1.re, s1);
+
+    __m256d s2 = _mm256_loadu_pd(&(*s).c1.c1.re + 8);
+    s2 = _mm256_sub_pd(_mm256_setzero_pd(), s2);
+    _mm256_storeu_pd(&(*s).c1.c1.re + 8, s2);
+  }
+}
+
+#elif (defined AVX)
 #include "avx.h"
 
 #if (defined FMA3)
