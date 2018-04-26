@@ -26,20 +26,20 @@
  *     the even, odd or all points is copied.
  *
  *   void assign_s2sdblk(blk_grid_t grid, int n, ptset_t set, spinor const *s,
- *                       int k) 
+ *                       int k)
  *     Assigns the relevant part of the global single-precision spinor field s
  *     to the double-precision field b.sd[k] on the n'th block of the specified
  *     block grid. Depending on the specified point set, the field on the even,
  *     odd or all points is copied.
  *
- *   void assign_sd2sdblk(blk_grid_t grid, int n, ptset_t set, 
+ *   void assign_sd2sdblk(blk_grid_t grid, int n, ptset_t set,
  *                        spinor_dble const *sd, int k)
  *     Assigns the relevant part of the global double-precision spinor field sd
  *     to the double-precision field b.sd[k] on the n'th block of the specified
  *     block grid. Depending on the specified point set, the field on the even,
  *     odd or all points is copied.
  *
- *   void assign_sdblk2sd(blk_grid_t grid, int n, ptset_t set, 
+ *   void assign_sdblk2sd(blk_grid_t grid, int n, ptset_t set,
  *                        int k, spinor_dble *sd)
  *     Assigns the single-precision spinor field b.sd[k] on the n'th block of
  *     the specified block grid to the relevant part of the global single-

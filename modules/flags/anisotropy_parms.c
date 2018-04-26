@@ -23,7 +23,7 @@
  *
  *   ani_params_t ani_parms(void)
  *     Return a structure that contains the current anisotropy parameters.
- *     
+ *
  *   void print_ani_parms(void)
  *     Prints the anisotropy parameters to stdout on MPI process 0.
  *

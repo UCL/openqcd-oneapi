@@ -33,7 +33,7 @@
  * floating-point numbers are 8 byte long. When the header file utils.h
  * is read, the compiler checks whether the machine complies with the
  * standard.
- * 
+ *
  * The programs in this module do not involve any communications and can
  * be called locally.
  *

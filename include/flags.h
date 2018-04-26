@@ -16,7 +16,8 @@
 #include "block.h"
 #include <stdio.h>
 
-typedef enum {
+typedef enum
+{
   UPDATED_U,
   UPDATED_UD,
   ASSIGNED_UD2U,
@@ -48,7 +49,8 @@ typedef enum {
   EVENTS
 } event_t;
 
-typedef enum {
+typedef enum
+{
   U_MATCH_UD,
   UDBUF_UP2DATE,
   BSTAP_UP2DATE,
@@ -70,7 +72,8 @@ typedef enum {
   QUERIES
 } query_t;
 
-typedef enum {
+typedef enum
+{
   ACG,
   ACF_TM1,
   ACF_TM1_EO,
@@ -82,9 +85,16 @@ typedef enum {
   ACTIONS
 } action_t;
 
-typedef enum { LPFR, OMF2, OMF4, INTEGRATORS } integrator_t;
+typedef enum
+{
+  LPFR,
+  OMF2,
+  OMF4,
+  INTEGRATORS
+} integrator_t;
 
-typedef enum {
+typedef enum
+{
   FRG,
   FRF_TM1,
   FRF_TM1_EO,
@@ -96,9 +106,24 @@ typedef enum {
   FORCES
 } force_t;
 
-typedef enum { RWTM1, RWTM1_EO, RWTM2, RWTM2_EO, RWRAT, RWFACTS } rwfact_t;
+typedef enum
+{
+  RWTM1,
+  RWTM1_EO,
+  RWTM2,
+  RWTM2_EO,
+  RWRAT,
+  RWFACTS
+} rwfact_t;
 
-typedef enum { CGNE, MSCG, SAP_GCR, DFL_SAP_GCR, SOLVERS } solver_t;
+typedef enum
+{
+  CGNE,
+  MSCG,
+  SAP_GCR,
+  DFL_SAP_GCR,
+  SOLVERS
+} solver_t;
 
 typedef struct
 {

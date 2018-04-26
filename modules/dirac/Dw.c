@@ -144,7 +144,6 @@ static void set_aniso_hopping_coeffs(void)
 #if (defined AVX512)
 
 #include "avx512.h"
-#include "sse.h"
 
 static void doe(int *piup, int *pidn, su3 *u, spinor *pk)
 {
@@ -154,10 +153,9 @@ static void doe(int *piup, int *pidn, su3 *u, spinor *pk)
   /* 512-bit wide stores for the spinor for each color */
   __m512 a1, a2, a3;
   __m512 b1, b2, b3;
-  __m128 w1, w2, w3, w4, w5, w6;
+  __m256 c1, c2, c3;
 
-  /******************************* direction 0,1
-   * *********************************/
+  /***************************** direction 0,1 *******************************/
 
   sp = pk + (*(piup++));
   sm = pk + (*(pidn++));
@@ -171,13 +169,13 @@ static void doe(int *piup, int *pidn, su3 *u, spinor *pk)
                                          &(*sm2).c3.c1.re);
 
   sp = pk + (*(piup++));
-  _prefetch_spinor(sp);
+  _mm_prefetch((char *)sp, _MM_HINT_T0);
   sm = pk + (*(pidn++));
-  _prefetch_spinor(sm);
+  _mm_prefetch((char *)sm, _MM_HINT_T0);
   sp2 = pk + (*(piup));
-  _prefetch_spinor(sp2);
+  _mm_prefetch((char *)sp2, _MM_HINT_T0);
   sm2 = pk + (*(pidn));
-  _prefetch_spinor(sm2);
+  _mm_prefetch((char *)sm2, _MM_HINT_T0);
 
   up1 = u;
   u1 = u + 1;
@@ -190,15 +188,11 @@ static void doe(int *piup, int *pidn, su3 *u, spinor *pk)
 
   avx512_su3_mixed_multiply_8(*up1, *u1, *up2, *u2, b1, b2, b3, a1, a2, a3);
 
-  _avx512_to_weyl_f_1(w1, b1, gamma_f);
-  _avx512_to_weyl_f_1(w2, b2, gamma_f);
-  _avx512_to_weyl_f_1(w3, b3, gamma_f);
-  _avx512_to_weyl_f_2(w4, b1, gamma_f);
-  _avx512_to_weyl_f_2(w5, b2, gamma_f);
-  _avx512_to_weyl_f_2(w6, b3, gamma_f);
+  _avx512_to_weyl_f_12(c1, b1, gamma_f);
+  _avx512_to_weyl_f_12(c2, b2, gamma_f);
+  _avx512_to_weyl_f_12(c3, b3, gamma_f);
 
-  /******************************* direction 2,3
-   **********************************/
+  /***************************** direction 2,3 *******************************/
 
   _avx512_load_4_halfspinor_f(a1, a2, a3, &(*sp).c1.c1.re, &(*sm).c1.c1.re,
                               &(*sp2).c1.c1.re, &(*sm2).c1.c1.re);
@@ -216,28 +210,18 @@ static void doe(int *piup, int *pidn, su3 *u, spinor *pk)
   u2 = u + 4;
   avx512_su3_mixed_multiply_8(*up1, *u1, *up2, *u2, b1, b2, b3, a1, a2, a3);
 
-  _avx512_to_weyl_f_3(w1, b1);
-  _avx512_to_weyl_f_3(w2, b2);
-  _avx512_to_weyl_f_3(w3, b3);
-  _avx512_to_weyl_f_4(w4, b1);
-  _avx512_to_weyl_f_4(w5, b2);
-  _avx512_to_weyl_f_4(w6, b3);
-
   float gc = one_over_gammaf * coe;
-  register __m128 gamma = _mm_load_ps1(&gc);
-  w1 = _mm_mul_ps(gamma, w1);
-  w2 = _mm_mul_ps(gamma, w2);
-  w3 = _mm_mul_ps(gamma, w3);
-  w4 = _mm_mul_ps(gamma, w4);
-  w5 = _mm_mul_ps(gamma, w5);
-  w6 = _mm_mul_ps(gamma, w6);
+  register __m256 gamma2 = _mm256_broadcast_ss(&gc);
 
-  _avx512_write_2_f(w1, &rs.s.c1.c1.re, &rs.s.c2.c1.re);
-  _avx512_write_2_f(w2, &rs.s.c1.c2.re, &rs.s.c2.c2.re);
-  _avx512_write_2_f(w3, &rs.s.c1.c3.re, &rs.s.c2.c3.re);
-  _avx512_write_2_f(w4, &rs.s.c3.c1.re, &rs.s.c4.c1.re);
-  _avx512_write_2_f(w5, &rs.s.c3.c2.re, &rs.s.c4.c2.re);
-  _avx512_write_2_f(w6, &rs.s.c3.c3.re, &rs.s.c4.c3.re);
+  _avx512_to_weyl_f_34(c1, b1);
+  _avx512_to_weyl_f_34(c2, b2);
+  _avx512_to_weyl_f_34(c3, b3);
+
+  c1 = _mm256_mul_ps(c1, gamma2);
+  c2 = _mm256_mul_ps(c2, gamma2);
+  c3 = _mm256_mul_ps(c3, gamma2);
+
+  _avx512_write_6_hwv_f(c1, c2, c3, &rs.s.c1.c1.re);
 }
 
 static void deo(int *piup, int *pidn, su3 *u, spinor *pl)
@@ -248,50 +232,38 @@ static void deo(int *piup, int *pidn, su3 *u, spinor *pl)
   /* 512-bit wide stores for the spinor for each color */
   __m512 a1, a2, a3;
   __m512 b1, b2, b3;
-  __m128 w1, w2, w3, w4, w5, w6;
+  __m256 c1, c2, c3;
 
-  /******************************* direction +0
-   * *********************************/
+  /****************************** direction 0 ********************************/
 
   sp = pl + (*(piup++));
-  _prefetch_spinor(sp);
+  _mm_prefetch((char *)sp, _MM_HINT_T0);
   sm = pl + (*(pidn++));
-  _prefetch_spinor(sm);
+  _mm_prefetch((char *)sm, _MM_HINT_T0);
   sp2 = pl + (*(piup++));
-  _prefetch_spinor(sp2);
+  _mm_prefetch((char *)sp2, _MM_HINT_T0);
   sm2 = pl + (*(pidn++));
-  _prefetch_spinor(sm2);
+  _mm_prefetch((char *)sm2, _MM_HINT_T0);
 
-  _avx512_load_2_f(w1, &rs.s.c1.c1.re, &rs.s.c2.c1.re);
-  _avx512_load_2_f(w2, &rs.s.c1.c2.re, &rs.s.c2.c2.re);
-  _avx512_load_2_f(w3, &rs.s.c1.c3.re, &rs.s.c2.c3.re);
-  _avx512_load_2_f(w4, &rs.s.c3.c1.re, &rs.s.c4.c1.re);
-  _avx512_load_2_f(w5, &rs.s.c3.c2.re, &rs.s.c4.c2.re);
-  _avx512_load_2_f(w6, &rs.s.c3.c3.re, &rs.s.c4.c3.re);
+  _avx512_load_6_hwv_f(c1, c2, c3, &rs.s.c1.c1.re);
 
-  register __m128 c128 = _mm_load_ps1(&ceo);
-  w1 = _mm_mul_ps(c128, w1);
-  w2 = _mm_mul_ps(c128, w2);
-  w3 = _mm_mul_ps(c128, w3);
-  w4 = _mm_mul_ps(c128, w4);
-  w5 = _mm_mul_ps(c128, w5);
-  w6 = _mm_mul_ps(c128, w6);
+  __m256 c256 = _mm256_broadcast_ss(&ceo);
+  c1 = _mm256_mul_ps(c1, c256);
+  c2 = _mm256_mul_ps(c2, c256);
+  c3 = _mm256_mul_ps(c3, c256);
 
-  _avx512_to_dirac_f_1(a1, w1, w4);
-  _avx512_to_dirac_f_1(a2, w2, w5);
-  _avx512_to_dirac_f_1(a3, w3, w6);
+  _avx512_to_dirac_f_1(a1, c1);
+  _avx512_to_dirac_f_1(a2, c2);
+  _avx512_to_dirac_f_1(a3, c3);
 
-  c128 = _mm_load_ps1(&one_over_gammaf);
-  w1 = _mm_mul_ps(c128, w1);
-  w2 = _mm_mul_ps(c128, w2);
-  w3 = _mm_mul_ps(c128, w3);
-  w4 = _mm_mul_ps(c128, w4);
-  w5 = _mm_mul_ps(c128, w5);
-  w6 = _mm_mul_ps(c128, w6);
+  c256 = _mm256_broadcast_ss(&one_over_gammaf);
+  c1 = _mm256_mul_ps(c1, c256);
+  c2 = _mm256_mul_ps(c2, c256);
+  c3 = _mm256_mul_ps(c3, c256);
 
-  _avx512_to_dirac_f_2(a1, w1, w4);
-  _avx512_to_dirac_f_2(a2, w2, w5);
-  _avx512_to_dirac_f_2(a3, w3, w6);
+  _avx512_to_dirac_f_2(a1, c1);
+  _avx512_to_dirac_f_2(a2, c2);
+  _avx512_to_dirac_f_2(a3, c3);
 
   up1 = u;
   u1 = u + 1;
@@ -318,24 +290,20 @@ static void deo(int *piup, int *pidn, su3 *u, spinor *pl)
                                           &(*sp).c3.c1.re, &(*sm2).c3.c1.re,
                                           &(*sp2).c3.c1.re);
 
-  /******************************* direction +2
-   * *********************************/
+  /****************************** direction 2 ********************************/
 
   sp = pl + (*(piup++));
-  _prefetch_spinor(sp);
+  _mm_prefetch((char *)sp, _MM_HINT_T0);
   sm = pl + (*(pidn++));
-  _prefetch_spinor(sm);
+  _mm_prefetch((char *)sm, _MM_HINT_T0);
   sp2 = pl + (*(piup++));
-  _prefetch_spinor(sp2);
+  _mm_prefetch((char *)sp2, _MM_HINT_T0);
   sm2 = pl + (*(pidn++));
-  _prefetch_spinor(sm2);
+  _mm_prefetch((char *)sm2, _MM_HINT_T0);
 
-  _avx512_to_dirac_f_3(a1, w1, w4);
-  _avx512_to_dirac_f_3(a2, w2, w5);
-  _avx512_to_dirac_f_3(a3, w3, w6);
-  _avx512_to_dirac_f_4(a1, w1, w4);
-  _avx512_to_dirac_f_4(a2, w2, w5);
-  _avx512_to_dirac_f_4(a3, w3, w6);
+  _avx512_to_dirac_f_3(a1, c1);
+  _avx512_to_dirac_f_3(a2, c2);
+  _avx512_to_dirac_f_3(a3, c3);
 
   up1 = u + 1;
   u1 = u + 2;

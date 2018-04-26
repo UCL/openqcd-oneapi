@@ -59,7 +59,7 @@
  *
  *   void su3algxsu3dag(su3_alg_dble const *X, su3_dble const *u, su3_dble *v)
  *     Computes the product X*u^dag and assigns the result to v.
- *     
+ *
  *   void su3algxsu3_tr(su3_alg_dble const *X, su3_dble const *u,
  *                      complex_dble *tr)
  *     Computes tr(X*u) and assigns the result to tr.
