@@ -12,8 +12,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "archive.h"
 #include "dirac.h"
 #include "global.h"

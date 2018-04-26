@@ -12,8 +12,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "archive.h"
 #include "forces.h"
 #include "global.h"

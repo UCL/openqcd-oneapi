@@ -12,8 +12,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "global.h"
 #include "mpi.h"
 #include "random.h"

@@ -12,8 +12,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "dirac.h"
 #include "global.h"
 #include "lattice.h"

@@ -16,8 +16,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "archive.h"
 #include "flags.h"
 #include "global.h"

@@ -13,8 +13,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "dirac.h"
 #include "forces.h"
 #include "global.h"

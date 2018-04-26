@@ -12,8 +12,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "flags.h"
 #include "global.h"
 #include "linalg.h"

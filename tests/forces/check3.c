@@ -12,8 +12,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "forces.h"
 #include "global.h"
 #include "lattice.h"

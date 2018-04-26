@@ -13,8 +13,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "ratfcts.h"
 #include "utils.h"
 #include <stdio.h>

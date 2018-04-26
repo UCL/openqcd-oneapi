@@ -13,8 +13,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "global.h"
 #include "lattice.h"
 #include "mpi.h"

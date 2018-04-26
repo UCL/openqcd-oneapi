@@ -17,8 +17,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "extras.h"
 #include "utils.h"
 #include <string.h>

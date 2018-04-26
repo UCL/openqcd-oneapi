@@ -13,8 +13,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "block.h"
 #include "flags.h"
 #include "global.h"

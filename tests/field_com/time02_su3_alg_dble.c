@@ -12,8 +12,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "field_com.h"
 #include "global.h"
 #include "lattice.h"

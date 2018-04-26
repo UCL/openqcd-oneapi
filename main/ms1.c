@@ -16,8 +16,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "archive.h"
 #include "dfl.h"
 #include "flags.h"

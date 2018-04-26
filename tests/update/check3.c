@@ -13,8 +13,6 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include "archive.h"
 #include "dfl.h"
 #include "forces.h"
