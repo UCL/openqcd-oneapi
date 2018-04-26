@@ -57,6 +57,8 @@ extern int **iup;
 extern int **idn;
 extern int *map;
 
+extern void set_lattice_sizes(int nproc[4], int lat_sizes[4], int block_sizes[4]);
+
 #else /* not defined LIBRARY */
 
 /*
