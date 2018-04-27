@@ -21,7 +21,7 @@ typedef struct
   int nbbe[8], nbbo[8];
   int obbe[8], obbo[8];
   int (*inn)[8];
-  int *idx, *ipp, *map;
+  int *idx, *ipp, *dfl_map;
 } openqcd_dfl__dfl_grid_t;
 
 /* DFL_GEOMETRY_C */

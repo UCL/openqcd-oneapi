@@ -2299,8 +2299,8 @@ void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   ceo = -0.5;
   set_aniso_hopping_coeffs();
 
-  piup = (*b).iup[volh];
-  pidn = (*b).idn[volh];
+  piup = (*b).index_up[volh];
+  pidn = (*b).index_down[volh];
   m += vol;
   u = (*b).ud;
   um = u + 4 * vol;
@@ -2427,8 +2427,8 @@ void Dwee_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   mm = m + vol;
 
   if ((*b).nbp) {
-    piup = (*b).iup[0];
-    pidn = (*b).idn[0];
+    piup = (*b).index_up[0];
+    pidn = (*b).index_down[0];
 
     ibu = ((cpr[0] == (NPROC0 - 1)) && (((*b).bo[0] + (*b).bs[0]) == L0) &&
            (bc_type() == 0));
@@ -2499,8 +2499,8 @@ void Dwoo_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   mm = m + vol;
 
   if ((*b).nbp) {
-    piup = (*b).iup[volh];
-    pidn = (*b).idn[volh];
+    piup = (*b).index_up[volh];
+    pidn = (*b).index_down[volh];
 
     ibu = ((cpr[0] == (NPROC0 - 1)) && (((*b).bo[0] + (*b).bs[0]) == L0) &&
            (bc_type() == 0));
@@ -2567,8 +2567,8 @@ void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l)
   coe = -0.5;
   set_aniso_hopping_coeffs();
 
-  piup = (*b).iup[volh];
-  pidn = (*b).idn[volh];
+  piup = (*b).index_up[volh];
+  pidn = (*b).index_down[volh];
   u = (*b).ud;
   um = u + 4 * vol;
 
@@ -2655,8 +2655,8 @@ void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l)
   ceo = 0.5;
   set_aniso_hopping_coeffs();
 
-  piup = (*b).iup[volh];
-  pidn = (*b).idn[volh];
+  piup = (*b).index_up[volh];
+  pidn = (*b).index_down[volh];
   u = (*b).ud;
   um = u + 4 * vol;
 
@@ -2749,8 +2749,8 @@ void Dwhat_blk_dble(blk_grid_t grid, int n, double mu, int k, int l)
   ceo = 0.5;
   set_aniso_hopping_coeffs();
 
-  piup = (*b).iup[volh];
-  pidn = (*b).idn[volh];
+  piup = (*b).index_up[volh];
+  pidn = (*b).index_down[volh];
   m += vol;
   u = (*b).ud;
   um = u + 4 * vol;

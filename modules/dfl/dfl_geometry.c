@@ -169,7 +169,7 @@ static void alloc_arrays(void)
   idx += nb;
   dfl_grid.ipp = idx;
   idx += nbb;
-  dfl_grid.map = idx;
+  dfl_grid.dfl_map = idx;
 }
 
 static void set_index(void)
@@ -314,7 +314,7 @@ static void set_ipp(void)
   nb = dfl_grid.nb;
   inn = dfl_grid.inn;
   ipp = dfl_grid.ipp;
-  map = dfl_grid.map;
+  map = dfl_grid.dfl_map;
 
   for (in = 0; in < nb; in++) {
     for (ifc = 0; ifc < 8; ifc++) {

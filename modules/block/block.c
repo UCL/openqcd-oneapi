@@ -36,7 +36,7 @@
  *     b1,b2,..,b8 (counting from the lowest) of the share flag shf. The
  *     relevant bits are:
  *
- *       b2=1: b.ipt,b.iup and b.idn are shared,
+ *       b2=1: b.index_point,b.index_up and b.index_down are shared,
  *       b3=1: b.u, b.bb.u and b.sw are shared,
  *       b4=1: b.ud, b.bb.ud and b.swd are shared,
  *       b5=1: b.s is shared,
@@ -222,8 +222,8 @@ void free_blk(block_t *b)
   (*b).bs = NULL;
 
   if (!(shf & 0x2)) {
-    free((*b).ipt);
-    free((*b).iup);
+    free((*b).index_point);
+    free((*b).index_up);
   }
 
   free((*b).imb);
@@ -232,11 +232,11 @@ void free_blk(block_t *b)
   (*b).vbb = 0;
   (*b).nbp = 0;
   (*b).shf = 0x0;
-  (*b).ipt = NULL;
+  (*b).index_point = NULL;
   (*b).imb = NULL;
   (*b).ibp = NULL;
-  (*b).iup = NULL;
-  (*b).idn = NULL;
+  (*b).index_up = NULL;
+  (*b).index_down = NULL;
 
   if ((!(shf & 0x4)) && ((*b).u != NULL)) {
     afree((*b).u);
@@ -408,15 +408,15 @@ static void new_blk(block_t *b, int const *bo, int const *bs, int iu, int iud,
   (*b).shf = shf;
 
   if (shf & 0x2) {
-    (*b).ipt = NULL;
-    (*b).iup = NULL;
-    (*b).idn = NULL;
+    (*b).index_point = NULL;
+    (*b).index_up = NULL;
+    (*b).index_down = NULL;
   } else {
-    (*b).ipt = malloc(((*b).vol + 1) * sizeof(*(*b).ipt));
-    (*b).iup = malloc(2 * (*b).vol * sizeof(*(*b).iup));
-    error(((*b).ipt == NULL) || ((*b).iup == NULL), 1, "new_blk [block.c]",
+    (*b).index_point = malloc(((*b).vol + 1) * sizeof(*(*b).index_point));
+    (*b).index_up = malloc(2 * (*b).vol * sizeof(*(*b).index_up));
+    error(((*b).index_point == NULL) || ((*b).index_up == NULL), 1, "new_blk [block.c]",
           "Unable to allocate the geometry arrays");
-    (*b).idn = (*b).iup + (*b).vol;
+    (*b).index_down = (*b).index_up + (*b).vol;
   }
 
   (*b).imb = malloc((((*b).vol + 1) + (*b).nbp) * sizeof(*(*b).imb));
@@ -561,7 +561,7 @@ static void new_bnd(block_t *b, int iu, int iud, int nw, int nwd, int shf)
   if (shf & 0x2) {
     for (ifc = 0; ifc < 8; ifc++) {
       bb[ifc].ipp = NULL;
-      bb[ifc].map = NULL;
+      bb[ifc].block_map = NULL;
     }
   } else {
     ipp = malloc(2 * (vol + 8) * sizeof(*ipp));
@@ -572,7 +572,7 @@ static void new_bnd(block_t *b, int iu, int iud, int nw, int nwd, int shf)
     for (ifc = 0; ifc < 8; ifc++) {
       bb[ifc].ipp = ipp;
       ipp += (bb[ifc].vol + 1);
-      bb[ifc].map = map;
+      bb[ifc].block_map = map;
       map += (bb[ifc].vol + 1);
     }
   }
@@ -795,9 +795,9 @@ void clone_blk(block_t const *b, int shf, int const *bo, block_t *c)
   new_blk(c, bo, bs, iu, iud, ns, nsd, shf);
 
   if (shf & 0x2) {
-    (*c).ipt = (*b).ipt;
-    (*c).iup = (*b).iup;
-    (*c).idn = (*b).idn;
+    (*c).index_point = (*b).index_point;
+    (*c).index_up = (*b).index_up;
+    (*c).index_down = (*b).index_down;
   }
 
   if ((shf & 0x4) && (iu != 0)) {
@@ -835,7 +835,7 @@ void clone_blk(block_t const *b, int shf, int const *bo, block_t *c)
     for (ifc = 0; ifc < 8; ifc++) {
       if (shf & 0x2) {
         (*c).bb[ifc].ipp = (*b).bb[ifc].ipp;
-        (*c).bb[ifc].map = (*b).bb[ifc].map;
+        (*c).bb[ifc].block_map = (*b).bb[ifc].block_map;
       }
 
       if ((shf & 0x4) && (iub != 0)) {
@@ -882,7 +882,7 @@ int ipt_blk(block_t const *b, int const *x)
   ix = x[3] + bs[3] * ix;
 
   if (n == 0) {
-    return (*b).ipt[ix];
+    return (*b).index_point[ix];
   } else {
     error_loc(1, 1, "ipt_blk [block.c]", "Point coordinates are out of range");
     return 0;

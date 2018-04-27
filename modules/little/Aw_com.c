@@ -104,7 +104,7 @@ static void set_constants(void)
   inn = grd.inn;
   idx = grd.idx;
   ipp = grd.ipp;
-  mp = grd.map;
+  mp = grd.dfl_map;
 
   np = (cpr[0] + cpr[1] + cpr[2] + cpr[3]) & 0x1;
   nsnd = 0;
@@ -216,7 +216,7 @@ static void alloc_bsd(void)
       (*brd).iud[1] = iud;
 
       for (ix = 0; ix < vol; ix++) {
-        iy = bb[ifc].map[ix + vol];
+        iy = bb[ifc].block_map[ix + vol];
         (*iud) = 8 * (b[m].imb[iy] - VOLUME / 2) + ifc;
         iud += 1;
       }
@@ -225,8 +225,8 @@ static void alloc_bsd(void)
       (*brd).sd[1] = b[m].sd + 1;
       (*brd).ise[0] = bb[ifc].ipp + vol;
       (*brd).iso[0] = bb[ifc].ipp;
-      (*brd).ise[1] = bb[ifc].map;
-      (*brd).iso[1] = bb[ifc].map + vol;
+      (*brd).ise[1] = bb[ifc].block_map;
+      (*brd).iso[1] = bb[ifc].block_map + vol;
 
       (*brd).ud[0] = ud;
       (*brd).ud[1] = ud + vol;

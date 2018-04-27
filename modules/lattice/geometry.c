@@ -32,7 +32,7 @@
  *     geometry (see main/global.h).
  *
  *   void blk_geometry(block_t *b)
- *     Computes the index arrays b.ipt,b.iup and b.idn that describe the
+ *     Computes the index arrays b.index_point,b.index_up and b.index_down that describe the
  *     geometry of the block b.
  *
  *   void blk_imbed(block_t *b)
@@ -40,7 +40,7 @@
  *     embedding of the block b in the full lattice.
  *
  *   void bnd_geometry(block_t *b)
- *     Computes the index arrays bb.ipp and bb.map that describe the
+ *     Computes the index arrays bb.ipp and bb.block_map that describe the
  *     geometry of the exterior boundaries bb of the block b.
  *
  *   void bnd_imbed(block_t *b)
@@ -463,61 +463,61 @@ void blk_geometry(block_t *b)
           ix = index(bo, bs, x0, x1, x2, x3);
           iy =
               x3 + bs[3] * x2 + bs[2] * bs[3] * x1 + bs[1] * bs[2] * bs[3] * x0;
-          (*b).ipt[iy] = ix;
+          (*b).index_point[iy] = ix;
 
           if ((x0 + 1) < bs[0]) {
-            (*b).iup[ix][0] = index(bo, bs, x0 + 1, x1, x2, x3);
+            (*b).index_up[ix][0] = index(bo, bs, x0 + 1, x1, x2, x3);
           } else {
-            (*b).iup[ix][0] = (*b).vol;
+            (*b).index_up[ix][0] = (*b).vol;
           }
 
           if (x0 > 0) {
-            (*b).idn[ix][0] = index(bo, bs, x0 - 1, x1, x2, x3);
+            (*b).index_down[ix][0] = index(bo, bs, x0 - 1, x1, x2, x3);
           } else {
-            (*b).idn[ix][0] = (*b).vol;
+            (*b).index_down[ix][0] = (*b).vol;
           }
 
           if ((x1 + 1) < bs[1]) {
-            (*b).iup[ix][1] = index(bo, bs, x0, x1 + 1, x2, x3);
+            (*b).index_up[ix][1] = index(bo, bs, x0, x1 + 1, x2, x3);
           } else {
-            (*b).iup[ix][1] = (*b).vol;
+            (*b).index_up[ix][1] = (*b).vol;
           }
 
           if (x1 > 0) {
-            (*b).idn[ix][1] = index(bo, bs, x0, x1 - 1, x2, x3);
+            (*b).index_down[ix][1] = index(bo, bs, x0, x1 - 1, x2, x3);
           } else {
-            (*b).idn[ix][1] = (*b).vol;
+            (*b).index_down[ix][1] = (*b).vol;
           }
 
           if ((x2 + 1) < bs[2]) {
-            (*b).iup[ix][2] = index(bo, bs, x0, x1, x2 + 1, x3);
+            (*b).index_up[ix][2] = index(bo, bs, x0, x1, x2 + 1, x3);
           } else {
-            (*b).iup[ix][2] = (*b).vol;
+            (*b).index_up[ix][2] = (*b).vol;
           }
 
           if (x2 > 0) {
-            (*b).idn[ix][2] = index(bo, bs, x0, x1, x2 - 1, x3);
+            (*b).index_down[ix][2] = index(bo, bs, x0, x1, x2 - 1, x3);
           } else {
-            (*b).idn[ix][2] = (*b).vol;
+            (*b).index_down[ix][2] = (*b).vol;
           }
 
           if ((x3 + 1) < bs[3]) {
-            (*b).iup[ix][3] = index(bo, bs, x0, x1, x2, x3 + 1);
+            (*b).index_up[ix][3] = index(bo, bs, x0, x1, x2, x3 + 1);
           } else {
-            (*b).iup[ix][3] = (*b).vol;
+            (*b).index_up[ix][3] = (*b).vol;
           }
 
           if (x3 > 0) {
-            (*b).idn[ix][3] = index(bo, bs, x0, x1, x2, x3 - 1);
+            (*b).index_down[ix][3] = index(bo, bs, x0, x1, x2, x3 - 1);
           } else {
-            (*b).idn[ix][3] = (*b).vol;
+            (*b).index_down[ix][3] = (*b).vol;
           }
         }
       }
     }
   }
 
-  (*b).ipt[(*b).vol] = (*b).ipt[0];
+  (*b).index_point[(*b).vol] = (*b).index_point[0];
 
   free(cbix);
   cbix = NULL;
@@ -538,7 +538,7 @@ void blk_imbed(block_t *b)
         for (x3 = 0; x3 < bs[3]; x3++) {
           iy =
               x3 + bs[3] * x2 + bs[2] * bs[3] * x1 + bs[1] * bs[2] * bs[3] * x0;
-          ix = (*b).ipt[iy];
+          ix = (*b).index_point[iy];
 
           iy = (bo[3] + x3) + L3 * (bo[2] + x2) + L2 * L3 * (bo[1] + x1) +
                L1 * L2 * L3 * (bo[0] + x0);
@@ -556,8 +556,8 @@ void blk_imbed(block_t *b)
   ibp = (*b).ibp;
 
   for (ix = 0; ix < (*b).vol; ix++) {
-    if (((ibd) && ((*b).idn[ix][0] == (*b).vol)) ||
-        ((ibu) && ((*b).iup[ix][0] == (*b).vol))) {
+    if (((ibd) && ((*b).index_down[ix][0] == (*b).vol)) ||
+        ((ibu) && ((*b).index_up[ix][0] == (*b).vol))) {
       (*ibp) = ix;
       ibp += 1;
     }
@@ -576,7 +576,7 @@ void bnd_geometry(block_t *b)
 
   for (ifc = 0; ifc < 8; ifc++) {
     ipp[ifc] = bb[ifc].ipp;
-    map[ifc] = bb[ifc].map;
+    map[ifc] = bb[ifc].block_map;
   }
 
   for (ix = 0; ix < vol; ix++) {
@@ -587,7 +587,7 @@ void bnd_geometry(block_t *b)
     }
 
     for (mu = 0; mu < 4; mu++) {
-      if ((*b).iup[iy][mu] == vol) {
+      if ((*b).index_up[iy][mu] == vol) {
         ifc = 2 * mu + 1;
         ipp[ifc][0] = iy;
         ipp[ifc] += 1;
@@ -597,14 +597,14 @@ void bnd_geometry(block_t *b)
 
         while (iw < vol) {
           iz = iw;
-          iw = (*b).idn[iw][mu];
+          iw = (*b).index_down[iw][mu];
         }
 
         map[ifc][0] = iz;
         map[ifc] += 1;
       }
 
-      if ((*b).idn[iy][mu] == vol) {
+      if ((*b).index_down[iy][mu] == vol) {
         ifc = 2 * mu;
         ipp[ifc][0] = iy;
         ipp[ifc] += 1;
@@ -614,7 +614,7 @@ void bnd_geometry(block_t *b)
 
         while (iw < vol) {
           iz = iw;
-          iw = (*b).iup[iw][mu];
+          iw = (*b).index_up[iw][mu];
         }
 
         map[ifc][0] = iz;
@@ -626,7 +626,7 @@ void bnd_geometry(block_t *b)
   for (ifc = 0; ifc < 8; ifc++) {
     vol = (*bb).vol;
     (*bb).ipp[vol] = (*bb).ipp[0];
-    (*bb).map[vol] = (*bb).map[0];
+    (*bb).block_map[vol] = (*bb).block_map[0];
     bb += 1;
   }
 }

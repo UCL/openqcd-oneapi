@@ -19,7 +19,7 @@
 typedef struct
 {
   int ifc, ibn, vol, nw, nwd;
-  int *ipp, *map, *imb;
+  int *ipp, *block_map, *imb;
   openqcd__su3 *u;
   openqcd__su3_dble *ud;
   openqcd__weyl **w;
@@ -29,8 +29,8 @@ typedef struct
 typedef struct
 {
   int *bo, *bs, vol, vbb, nbp, ns, nsd, shf;
-  int *ipt, *imb, *ibp;
-  int (*iup)[4], (*idn)[4];
+  int *index_point, *imb, *ibp;
+  int (*index_up)[4], (*index_down)[4];
   openqcd__su3 *u;
   openqcd__su3_dble *ud;
   openqcd__pauli *sw;

@@ -296,7 +296,7 @@ static void alloc_imb(void)
         if ((bb[ifc ^ 0x1].ibn) || ((ifc == 1) && (ibd) && (bo[0] == 0)) ||
             ((ifc == 0) && (ibu) && ((bo[0] + bs[0]) == L0))) {
           for (n = 0; n < bb[ifc].vol; n++) {
-            im[n] = (*b).imb[bb[ifc].map[n]];
+            im[n] = (*b).imb[bb[ifc].block_map[n]];
           }
 
           im += bb[ifc].vol;
