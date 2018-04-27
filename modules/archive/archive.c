@@ -84,6 +84,7 @@
  *******************************************************************************/
 
 #define ARCHIVE_C
+#define OPENQCD_INTERNAL
 
 #include "archive.h"
 #include "flags.h"

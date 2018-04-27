@@ -73,6 +73,7 @@
  *******************************************************************************/
 
 #define SALG_DBLE_C
+#define OPENQCD_INTERNAL
 
 #include "global.h"
 #include "linalg.h"

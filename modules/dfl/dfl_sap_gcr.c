@@ -130,6 +130,7 @@
 *******************************************************************************/
 
 #define DFL_SAP_GCR_C
+#define OPENQCD_INTERNAL
 
 #include "block.h"
 #include "dfl.h"

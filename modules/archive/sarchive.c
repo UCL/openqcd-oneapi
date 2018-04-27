@@ -61,6 +61,7 @@
  *******************************************************************************/
 
 #define SARCHIVE_C
+#define OPENQCD_INTERNAL
 
 #include "archive.h"
 #include "global.h"

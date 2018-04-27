@@ -39,6 +39,7 @@
  *******************************************************************************/
 
 #define RANLXS_C
+#define OPENQCD_INTERNAL
 
 #include "random.h"
 

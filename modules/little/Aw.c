@@ -61,6 +61,7 @@
  *******************************************************************************/
 
 #define AW_C
+#define OPENQCD_INTERNAL
 
 #include "dfl.h"
 #include "flags.h"
@@ -149,23 +150,23 @@ void Aw(complex *v, complex *w)
   int(*nn)[8], (*nm)[8];
   complex *rv, *rw, *rs, *rm;
   complex **Aeo, **Aoe;
-  Aw_t Aw;
+  Aw_t Aw_val;
 
   if (Ns == 0) {
     alloc_vs();
   }
 
-  Aw = Awop();
-  apply_Aee(Aw.Aee, v, w);
-  apply_Aoo(Aw.Aoo, v, w);
+  Aw_val = Awop();
+  apply_Aee(Aw_val.Aee, v, w);
+  apply_Aoo(Aw_val.Aoo, v, w);
 
   if (NPROC > 1) {
     set_v2zero(nbbh * Ns, w + nb * Ns);
     cpv_int_bnd(v);
   }
 
-  Aoe = Aw.Aoe;
-  Aeo = Aw.Aeo;
+  Aoe = Aw_val.Aoe;
+  Aeo = Aw_val.Aeo;
   rv = v + nbh * Ns;
   rw = w + nbh * Ns;
 
@@ -202,26 +203,26 @@ void Aw(complex *v, complex *w)
 
 void Aweeinv(complex *v, complex *w)
 {
-  Aw_t Aw;
+  Aw_t Aw_val;
 
   if (Ns == 0) {
     alloc_vs();
   }
 
-  Aw = Awophat();
-  apply_Aee(Aw.Aee, v, w);
+  Aw_val = Awophat();
+  apply_Aee(Aw_val.Aee, v, w);
 }
 
 void Awooinv(complex *v, complex *w)
 {
-  Aw_t Aw;
+  Aw_t Aw_val;
 
   if (Ns == 0) {
     alloc_vs();
   }
 
-  Aw = Awophat();
-  apply_Aoo(Aw.Aoo, v, w);
+  Aw_val = Awophat();
+  apply_Aoo(Aw_val.Aoo, v, w);
 }
 
 void Awoe(complex *v, complex *w)
@@ -229,7 +230,7 @@ void Awoe(complex *v, complex *w)
   int(*nn)[8], (*nm)[8];
   complex *rw, *rs, *rm;
   complex **Aoe;
-  Aw_t Aw;
+  Aw_t Aw_val;
 
   if (Ns == 0) {
     alloc_vs();
@@ -239,8 +240,8 @@ void Awoe(complex *v, complex *w)
     cpv_int_bnd(v);
   }
 
-  Aw = Awop();
-  Aoe = Aw.Aoe;
+  Aw_val = Awop();
+  Aoe = Aw_val.Aoe;
   rw = w + nbh * Ns;
 
   nn = inn + nbh;
@@ -267,7 +268,7 @@ void Aweo(complex *v, complex *w)
   int(*nn)[8], (*nm)[8];
   complex *rv, *rs, *rm;
   complex **Aeo;
-  Aw_t Aw;
+  Aw_t Aw_val;
 
   if (Ns == 0) {
     alloc_vs();
@@ -277,8 +278,8 @@ void Aweo(complex *v, complex *w)
     set_v2zero(nbbh * Ns, w + nb * Ns);
   }
 
-  Aw = Awop();
-  Aeo = Aw.Aeo;
+  Aw_val = Awop();
+  Aeo = Aw_val.Aeo;
   rv = v + nbh * Ns;
 
   nn = inn + nbh;
@@ -309,7 +310,7 @@ void Awhat(complex *v, complex *w)
   int(*nn)[8], (*nm)[8];
   complex *rs, *rm;
   complex **Aeo, **Aoe;
-  Aw_t Aw;
+  Aw_t Aw_val;
 
   if (Ns == 0) {
     alloc_vs();
@@ -322,9 +323,9 @@ void Awhat(complex *v, complex *w)
     cpv_int_bnd(v);
   }
 
-  Aw = Awophat();
-  Aoe = Aw.Aoe;
-  Aeo = Aw.Aeo;
+  Aw_val = Awophat();
+  Aoe = Aw_val.Aoe;
+  Aeo = Aw_val.Aeo;
 
   nn = inn + nbh;
   nm = inn + nb;

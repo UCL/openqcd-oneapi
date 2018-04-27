@@ -54,6 +54,7 @@
  *******************************************************************************/
 
 #define MAP_S2BLK_C
+#define OPENQCD_INTERNAL
 
 #include "block.h"
 #include "global.h"

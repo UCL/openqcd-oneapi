@@ -59,6 +59,7 @@
  *******************************************************************************/
 
 #define FRCFCTS_C
+#define OPENQCD_INTERNAL
 
 #include "flags.h"
 #include "forces.h"

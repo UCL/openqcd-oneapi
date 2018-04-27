@@ -11,6 +11,7 @@
  *******************************************************************************/
 
 #define GLOBAL_C
+#define OPENQCD_INTERNAL
 
 #include "global.h"
 #include "utils.h"
@@ -59,21 +60,21 @@ static void check_lattice_sizes(void)
        ((NPROC1 > 1) && ((NPROC1 % 2) != 0)) ||
        ((NPROC2 > 1) && ((NPROC2 % 2) != 0)) ||
        ((NPROC3 > 1) && ((NPROC3 % 2) != 0))),
-      "check_lattice_sizes [global.c]",
+      1, "check_lattice_sizes [global.c]",
       "The number of processes in each direction must be 1 or a multiple of 2");
 
   error(((L0 < 4) || (L1 < 4) || (L2 < 4) || (L3 < 4) || ((L0 % 2) != 0) ||
          ((L1 % 2) != 0) || ((L2 % 2) != 0) || ((L3 % 2) != 0)),
-        "check_lattice_sizes [global.c]",
+        1, "check_lattice_sizes [global.c]",
         "The local lattice sizes must be even and not smaller than 4");
 
-  error(((NPROC0_BLK < 1) || (NBROC0_BLK > NPROC0) ||
+  error(((NPROC0_BLK < 1) || (NPROC0_BLK > NPROC0) ||
          ((NPROC0 % NPROC0_BLK) != 0) || (NPROC1_BLK < 1) ||
-         (NBROC1_BLK > NPROC1) || ((NPROC1 % NPROC1_BLK) != 0) ||
-         (NPROC2_BLK < 1) || (NBROC2_BLK > NPROC2) ||
+         (NPROC1_BLK > NPROC1) || ((NPROC1 % NPROC1_BLK) != 0) ||
+         (NPROC2_BLK < 1) || (NPROC2_BLK > NPROC2) ||
          ((NPROC2 % NPROC2_BLK) != 0) || (NPROC3_BLK < 1) ||
-         (NBROC3_BLK > NPROC3) || ((NPROC3 % NPROC3_BLK) != 0)),
-        "check_lattice_sizes [global.c]",
+         (NPROC3_BLK > NPROC3) || ((NPROC3 % NPROC3_BLK) != 0)),
+        1, "check_lattice_sizes [global.c]",
         "Improper processor block sizes NPROC0_BLK,..,NPROC3_BLK");
 }
 
@@ -111,16 +112,16 @@ void set_lattice_sizes(int nproc[4], int lat_sizes[4], int block_sizes[4])
   NSPIN = (VOLUME + (BNDRY / 2));
 
   ipt = malloc(VOLUME * sizeof(*ipt));
-  iup = malloc(4 * sizeof(*iup));
-  idn = malloc(4 * sizeof(*idn));
+  iup = malloc(VOLUME * sizeof(*iup));
+  idn = malloc(VOLUME * sizeof(*idn));
   map = malloc((BNDRY + NPROC % 2) * sizeof(*map));
 
   iup[0] = malloc(4 * VOLUME * sizeof(**iup));
   idn[0] = malloc(4 * VOLUME * sizeof(**idn));
 
-  for (i = 1; i < 4; ++i) {
-    iup[i] = iup[i - 1] + VOLUME;
-    idn[i] = idn[i - 1] + VOLUME;
+  for (i = 1; i < VOLUME; ++i) {
+    iup[i] = iup[i - 1] + 4;
+    idn[i] = idn[i - 1] + 4;
   }
 
   already_init = 1;

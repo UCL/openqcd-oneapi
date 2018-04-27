@@ -104,6 +104,7 @@
  *****************************************************************************/
 
 #define DW_C
+#define OPENQCD_INTERNAL
 
 #include "dirac.h"
 #include "global.h"

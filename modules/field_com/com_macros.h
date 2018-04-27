@@ -3,17 +3,17 @@
  * Communication macros shared between the different source files.
  */
 
-/* Function used to copy an su3_dble */
-#define _copy_function_su3_dble(x, y) cm3x3_assign(1, y, x)
+/* Function used to copy an openqcd__su3_dble */
+#define _copy_function_openqcd__su3_dble(x, y) cm3x3_assign(1, y, x)
 
-/* Function used to copy an su3_alg_dble */
-#define _copy_function_su3_alg_dble(x, y) *(x) = *(y)
+/* Function used to copy an openqcd__su3_alg_dble */
+#define _copy_function_openqcd__su3_alg_dble(x, y) *(x) = *(y)
 
-/* Function used to add assign an su3_dble */
-#define _add_function_su3_dble(x, y) cm3x3_add(y, x)
+/* Function used to add assign an openqcd__su3_dble */
+#define _add_function_openqcd__su3_dble(x, y) cm3x3_add(y, x)
 
-/* Function used to add assign an su3_alg_dble */
-#define _add_function_su3_alg_dble(x, y)                                       \
+/* Function used to add assign an openqcd__su3_alg_dble */
+#define _add_function_openqcd__su3_alg_dble(x, y)                                       \
   (x)->c1 += (y)->c1;                                                          \
   (x)->c2 += (y)->c2;                                                          \
   (x)->c3 += (y)->c3;                                                          \

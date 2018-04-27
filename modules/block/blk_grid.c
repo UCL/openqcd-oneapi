@@ -52,6 +52,7 @@
  *******************************************************************************/
 
 #define BLK_GRID_C
+#define OPENQCD_INTERNAL
 
 #include "block.h"
 #include "flags.h"

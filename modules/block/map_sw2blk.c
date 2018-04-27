@@ -47,6 +47,7 @@
  *******************************************************************************/
 
 #define MAP_SW2BLK_C
+#define OPENQCD_INTERNAL
 
 #include "block.h"
 #include "flags.h"

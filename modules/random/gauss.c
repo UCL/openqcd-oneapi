@@ -28,6 +28,7 @@
  *******************************************************************************/
 
 #define GAUSS_C
+#define OPENQCD_INTERNAL
 
 #include "random.h"
 

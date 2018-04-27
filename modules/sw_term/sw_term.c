@@ -55,6 +55,7 @@
  *******************************************************************************/
 
 #define SW_TERM_C
+#define OPENQCD_INTERNAL
 
 #include "sw_term.h"
 #include "flags.h"

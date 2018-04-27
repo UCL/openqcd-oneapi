@@ -109,6 +109,7 @@
  *******************************************************************************/
 
 #define FORCE3_C
+#define OPENQCD_INTERNAL
 
 #include "dfl.h"
 #include "dirac.h"

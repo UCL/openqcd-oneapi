@@ -28,6 +28,7 @@
  *******************************************************************************/
 
 #define PCHI_SQUARE_C
+#define OPENQCD_INTERNAL
 
 #include "extras.h"
 

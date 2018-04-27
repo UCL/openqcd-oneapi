@@ -92,6 +92,7 @@
  *******************************************************************************/
 
 #define XTENSOR_C
+#define OPENQCD_INTERNAL
 
 #include "forces.h"
 #include "global.h"

@@ -66,6 +66,7 @@
  *******************************************************************************/
 
 #define VINIT_C
+#define OPENQCD_INTERNAL
 
 #include "random.h"
 #include "su3.h"

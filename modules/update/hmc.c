@@ -63,6 +63,7 @@
  *******************************************************************************/
 
 #define HMC_C
+#define OPENQCD_INTERNAL
 
 #include "dfl.h"
 #include "forces.h"

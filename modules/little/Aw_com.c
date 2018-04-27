@@ -42,6 +42,7 @@
  *******************************************************************************/
 
 #define AW_COM_C
+#define OPENQCD_INTERNAL
 
 #include "dfl.h"
 #include "global.h"

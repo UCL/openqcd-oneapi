@@ -34,6 +34,7 @@
  *******************************************************************************/
 
 #define STOUT_SMEARING_C
+#define OPENQCD_INTERNAL
 
 #include "stout_smearing.h"
 #include "field_com.h"

@@ -135,6 +135,7 @@
  *******************************************************************************/
 
 #define RW_PARMS_C
+#define OPENQCD_INTERNAL
 
 #include "flags.h"
 #include "global.h"

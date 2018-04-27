@@ -96,6 +96,7 @@
  *******************************************************************************/
 
 #define STAT_C
+#define OPENQCD_INTERNAL
 
 #include "extras.h"
 #include "utils.h"

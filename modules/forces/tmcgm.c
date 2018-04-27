@@ -71,6 +71,7 @@
  *******************************************************************************/
 
 #define TMCGM_C
+#define OPENQCD_INTERNAL
 
 #include "dirac.h"
 #include "forces.h"

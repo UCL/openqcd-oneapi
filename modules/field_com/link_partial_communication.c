@@ -62,6 +62,7 @@
  *******************************************************************************/
 
 #define LINK_PARTIAL_COMMUNICATION_C
+#define OPENQCD_INTERNAL
 
 #include "field_com.h"
 #include "flags.h"
@@ -376,31 +377,31 @@ static int count_dirs(int mu, int const *dirs)
   }
 
 /*Instantiate comm functions for su3_dble */
-communication_routines(su3_dble)
+communication_routines(openqcd__su3_dble)
 
 /*Instantiate comm functions for su3_alg_dble */
-communication_routines(su3_alg_dble)
+communication_routines(openqcd__su3_alg_dble)
 
 void copy_partial_boundary_su3_field(su3_dble *su3_field, int const *dirs)
 {
-  _copy_partial_boundary_link_field_su3_dble(su3_field, dirs);
+  _copy_partial_boundary_link_field_openqcd__su3_dble(su3_field, dirs);
 }
 
 void add_partial_boundary_su3_field(su3_dble *su3_field, int const *dirs)
 {
-  _add_partial_boundary_link_field_su3_dble(su3_field, dirs);
+  _add_partial_boundary_link_field_openqcd__su3_dble(su3_field, dirs);
 }
 
 void copy_partial_boundary_su3_alg_field(su3_alg_dble *su3_alg_field,
                                          int const *dirs)
 {
-  _copy_partial_boundary_link_field_su3_alg_dble(su3_alg_field, dirs);
+  _copy_partial_boundary_link_field_openqcd__su3_alg_dble(su3_alg_field, dirs);
 }
 
 void add_partial_boundary_su3_alg_field(su3_alg_dble *su3_alg_field,
                                         int const *dirs)
 {
-  _add_partial_boundary_link_field_su3_alg_dble(su3_alg_field, dirs);
+  _add_partial_boundary_link_field_openqcd__su3_alg_dble(su3_alg_field, dirs);
 }
 
 void copy_spatial_boundary_su3_field(su3_dble *su3_field)

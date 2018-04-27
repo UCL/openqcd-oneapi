@@ -82,6 +82,7 @@
  *******************************************************************************/
 
 #define UFLDS_C
+#define OPENQCD_INTERNAL
 
 #include "uflds.h"
 #include "field_com.h"

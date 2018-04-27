@@ -33,6 +33,7 @@
  *******************************************************************************/
 
 #define RANDOM_SU3_C
+#define OPENQCD_INTERNAL
 
 #include "random.h"
 #include "su3fcts.h"

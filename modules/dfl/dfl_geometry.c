@@ -75,6 +75,7 @@
  *******************************************************************************/
 
 #define DFL_GEOMETRY_C
+#define OPENQCD_INTERNAL
 
 #include "dfl.h"
 #include "flags.h"

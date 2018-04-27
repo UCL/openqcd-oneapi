@@ -43,6 +43,7 @@
  *******************************************************************************/
 
 #define DW_BND_C
+#define OPENQCD_INTERNAL
 
 #include "dirac.h"
 #include "flags.h"

@@ -40,6 +40,7 @@
 *******************************************************************************/
 
 #define ENDIAN_C
+#define OPENQCD_INTERNAL
 
 #include "utils.h"
 

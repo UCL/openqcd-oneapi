@@ -71,6 +71,7 @@
  *******************************************************************************/
 
 #define COUNTERS_C
+#define OPENQCD_INTERNAL
 
 #include "global.h"
 #include "mpi.h"

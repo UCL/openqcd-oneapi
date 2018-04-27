@@ -48,6 +48,7 @@
  *******************************************************************************/
 
 #define PBND_DBLE_C
+#define OPENQCD_INTERNAL
 
 #include "sflds.h"
 

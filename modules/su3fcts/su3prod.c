@@ -87,6 +87,7 @@
  *******************************************************************************/
 
 #define SU3PROD_C
+#define OPENQCD_INTERNAL
 
 #include "su3fcts.h"
 

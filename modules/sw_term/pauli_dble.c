@@ -65,6 +65,7 @@
  *******************************************************************************/
 
 #define PAULI_DBLE_C
+#define OPENQCD_INTERNAL
 
 #include "linalg.h"
 #include "sw_term.h"

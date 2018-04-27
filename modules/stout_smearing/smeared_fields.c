@@ -39,6 +39,7 @@
  *******************************************************************************/
 
 #define SMEARED_FIELDS_C
+#define OPENQCD_INTERNAL
 
 #include "global.h"
 #include "stout_smearing.h"

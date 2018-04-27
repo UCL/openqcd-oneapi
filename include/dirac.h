@@ -17,34 +17,89 @@
 #include "su3.h"
 
 /* DW_BND_C */
-extern void Dw_bnd(blk_grid_t grid, int n, int k, int l);
+extern void openqcd_dirac__Dw_bnd(openqcd_block__blk_grid_t grid, int n, int k,
+                                  int l);
 
 /* DW_C */
-extern void Dw(float mu, spinor *s, spinor *r);
-extern void Dwee(float mu, spinor *s, spinor *r);
-extern void Dwoo(float mu, spinor *s, spinor *r);
-extern void Dweo(spinor *s, spinor *r);
-extern void Dwoe(spinor *s, spinor *r);
-extern void Dwhat(float mu, spinor *s, spinor *r);
-extern void Dw_blk(blk_grid_t grid, int n, float mu, int k, int l);
-extern void Dwee_blk(blk_grid_t grid, int n, float mu, int k, int l);
-extern void Dwoo_blk(blk_grid_t grid, int n, float mu, int k, int l);
-extern void Dwoe_blk(blk_grid_t grid, int n, int k, int l);
-extern void Dweo_blk(blk_grid_t grid, int n, int k, int l);
-extern void Dwhat_blk(blk_grid_t grid, int n, float mu, int k, int l);
+extern void openqcd_dirac__Dw(float mu, openqcd__spinor *s, openqcd__spinor *r);
+extern void openqcd_dirac__Dwee(float mu, openqcd__spinor *s,
+                                openqcd__spinor *r);
+extern void openqcd_dirac__Dwoo(float mu, openqcd__spinor *s,
+                                openqcd__spinor *r);
+extern void openqcd_dirac__Dweo(openqcd__spinor *s, openqcd__spinor *r);
+extern void openqcd_dirac__Dwoe(openqcd__spinor *s, openqcd__spinor *r);
+extern void openqcd_dirac__Dwhat(float mu, openqcd__spinor *s,
+                                 openqcd__spinor *r);
+extern void openqcd_dirac__Dw_blk(openqcd_block__blk_grid_t grid, int n,
+                                  float mu, int k, int l);
+extern void openqcd_dirac__Dwee_blk(openqcd_block__blk_grid_t grid, int n,
+                                    float mu, int k, int l);
+extern void openqcd_dirac__Dwoo_blk(openqcd_block__blk_grid_t grid, int n,
+                                    float mu, int k, int l);
+extern void openqcd_dirac__Dwoe_blk(openqcd_block__blk_grid_t grid, int n,
+                                    int k, int l);
+extern void openqcd_dirac__Dweo_blk(openqcd_block__blk_grid_t grid, int n,
+                                    int k, int l);
+extern void openqcd_dirac__Dwhat_blk(openqcd_block__blk_grid_t grid, int n,
+                                     float mu, int k, int l);
 
-/* DW_DBLE_C */
-extern void Dw_dble(double mu, spinor_dble *s, spinor_dble *r);
-extern void Dwee_dble(double mu, spinor_dble *s, spinor_dble *r);
-extern void Dwoo_dble(double mu, spinor_dble *s, spinor_dble *r);
-extern void Dweo_dble(spinor_dble *s, spinor_dble *r);
-extern void Dwoe_dble(spinor_dble *s, spinor_dble *r);
-extern void Dwhat_dble(double mu, spinor_dble *s, spinor_dble *r);
-extern void Dw_blk_dble(blk_grid_t grid, int n, double mu, int k, int l);
-extern void Dwee_blk_dble(blk_grid_t grid, int n, double mu, int k, int l);
-extern void Dwoo_blk_dble(blk_grid_t grid, int n, double mu, int k, int l);
-extern void Dwoe_blk_dble(blk_grid_t grid, int n, int k, int l);
-extern void Dweo_blk_dble(blk_grid_t grid, int n, int k, int l);
-extern void Dwhat_blk_dble(blk_grid_t grid, int n, double mu, int k, int l);
+/* DW_DBLE_Copenqcd_dirac__ */
+extern void openqcd_dirac__Dw_dble(double mu, openqcd__spinor_dble *s,
+                                   openqcd__spinor_dble *r);
+extern void openqcd_dirac__Dwee_dble(double mu, openqcd__spinor_dble *s,
+                                     openqcd__spinor_dble *r);
+extern void openqcd_dirac__Dwoo_dble(double mu, openqcd__spinor_dble *s,
+                                     openqcd__spinor_dble *r);
+extern void openqcd_dirac__Dweo_dble(openqcd__spinor_dble *s,
+                                     openqcd__spinor_dble *r);
+extern void openqcd_dirac__Dwoe_dble(openqcd__spinor_dble *s,
+                                     openqcd__spinor_dble *r);
+extern void openqcd_dirac__Dwhat_dble(double mu, openqcd__spinor_dble *s,
+                                      openqcd__spinor_dble *r);
+extern void openqcd_dirac__Dw_blk_dble(openqcd_block__blk_grid_t grid, int n,
+                                       double mu, int k, int l);
+extern void openqcd_dirac__Dwee_blk_dble(openqcd_block__blk_grid_t grid, int n,
+                                         double mu, int k, int l);
+extern void openqcd_dirac__Dwoo_blk_dble(openqcd_block__blk_grid_t grid, int n,
+                                         double mu, int k, int l);
+extern void openqcd_dirac__Dwoe_blk_dble(openqcd_block__blk_grid_t grid, int n,
+                                         int k, int l);
+extern void openqcd_dirac__Dweo_blk_dble(openqcd_block__blk_grid_t grid, int n,
+                                         int k, int l);
+extern void openqcd_dirac__Dwhat_blk_dble(openqcd_block__blk_grid_t grid, int n,
+                                          double mu, int k, int l);
+
+#if defined(OPENQCD_INTERNAL)
+/* DW_BND_C */
+#define Dw_bnd(...) openqcd_dirac__Dw_bnd(__VA_ARGS__)
+
+/* DW_C */
+#define Dw(...) openqcd_dirac__Dw(__VA_ARGS__)
+#define Dwee(...) openqcd_dirac__Dwee(__VA_ARGS__)
+#define Dwoo(...) openqcd_dirac__Dwoo(__VA_ARGS__)
+#define Dweo(...) openqcd_dirac__Dweo(__VA_ARGS__)
+#define Dwoe(...) openqcd_dirac__Dwoe(__VA_ARGS__)
+#define Dwhat(...) openqcd_dirac__Dwhat(__VA_ARGS__)
+#define Dw_blk(...) openqcd_dirac__Dw_blk(__VA_ARGS__)
+#define Dwee_blk(...) openqcd_dirac__Dwee_blk(__VA_ARGS__)
+#define Dwoo_blk(...) openqcd_dirac__Dwoo_blk(__VA_ARGS__)
+#define Dwoe_blk(...) openqcd_dirac__Dwoe_blk(__VA_ARGS__)
+#define Dweo_blk(...) openqcd_dirac__Dweo_blk(__VA_ARGS__)
+#define Dwhat_blk(...) openqcd_dirac__Dwhat_blk(__VA_ARGS__)
+
+/* DW_DBLE_Copenqcd_dirac__ */
+#define Dw_dble(...) openqcd_dirac__Dw_dble(__VA_ARGS__)
+#define Dwee_dble(...) openqcd_dirac__Dwee_dble(__VA_ARGS__)
+#define Dwoo_dble(...) openqcd_dirac__Dwoo_dble(__VA_ARGS__)
+#define Dweo_dble(...) openqcd_dirac__Dweo_dble(__VA_ARGS__)
+#define Dwoe_dble(...) openqcd_dirac__Dwoe_dble(__VA_ARGS__)
+#define Dwhat_dble(...) openqcd_dirac__Dwhat_dble(__VA_ARGS__)
+#define Dw_blk_dble(...) openqcd_dirac__Dw_blk_dble(__VA_ARGS__)
+#define Dwee_blk_dble(...) openqcd_dirac__Dwee_blk_dble(__VA_ARGS__)
+#define Dwoo_blk_dble(...) openqcd_dirac__Dwoo_blk_dble(__VA_ARGS__)
+#define Dwoe_blk_dble(...) openqcd_dirac__Dwoe_blk_dble(__VA_ARGS__)
+#define Dweo_blk_dble(...) openqcd_dirac__Dweo_blk_dble(__VA_ARGS__)
+#define Dwhat_blk_dble(...) openqcd_dirac__Dwhat_blk_dble(__VA_ARGS__)
+#endif /* defined OPENQCD_INTERNAL */
 
 #endif

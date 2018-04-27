@@ -27,6 +27,7 @@
  *******************************************************************************/
 
 #define I0M_C
+#define OPENQCD_INTERNAL
 
 #include "extras.h"
 #include "utils.h"

@@ -65,6 +65,7 @@
  *******************************************************************************/
 
 #define PLAQ_SUM_C
+#define OPENQCD_INTERNAL
 
 #include "global.h"
 #include "lattice.h"
@@ -74,11 +75,32 @@
 
 #define N0 (NPROC0 * L0)
 
-static int isA[2], isE[L0], isB[L0], init = 0;
-static double aslE[N0], aslB[N0];
 static su3_dble *udb;
 static su3_dble wd1 ALIGNED16;
 static su3_dble wd2 ALIGNED16;
+
+#if defined(LIBRARY)
+
+static int isA[2], *isE, *isB, init = 0;
+static double *aslE, *aslB;
+
+static void allocate_buffers(void)
+{
+  isE = malloc(L0 * sizeof(*isE));
+  isB = malloc(L0 * sizeof(*isB));
+
+  aslE = amalloc(N0 * sizeof(*aslE), ALIGN);
+  aslB = amalloc(N0 * sizeof(*aslB), ALIGN);
+}
+
+#else
+
+static int isA[2], isE[L0], isB[L0], init = 0;
+static double aslE[N0], aslB[N0];
+
+static void allocate_buffers(void) {}
+
+#endif
 
 static double real_trace(su3_dble const *u)
 {
@@ -105,6 +127,8 @@ static void local_plaq_sum_dble(int iw)
   double wp, pat, pas;
 
   if (init < 1) {
+    allocate_buffers();
+
     isA[0] = init_hsum(1);
     isA[1] = init_hsum(1);
     init = 1;
@@ -216,6 +240,7 @@ double plaq_action_slices(double *asl)
 
   if (init < 2) {
     if (init < 1) {
+      allocate_buffers();
       isA[0] = init_hsum(1);
     }
 

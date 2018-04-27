@@ -36,6 +36,7 @@
  *******************************************************************************/
 
 #define LINK_COMMUNICATION_C
+#define OPENQCD_INTERNAL
 
 #include "field_com.h"
 #include "flags.h"
@@ -206,27 +207,27 @@ static void init_buffer(void)
   }
 
 /*Instantiate comm functions for su3_dble */
-communication_routines(su3_dble)
+communication_routines(openqcd__su3_dble)
 
 /*Instantiate comm functions for su3_alg_dble */
-communication_routines(su3_alg_dble)
+communication_routines(openqcd__su3_alg_dble)
 
 void copy_boundary_su3_field(su3_dble *su3_field)
 {
-  _copy_boundary_link_field_su3_dble(su3_field);
+  _copy_boundary_link_field_openqcd__su3_dble(su3_field);
 }
 
 void add_boundary_su3_field(su3_dble *su3_field)
 {
-  _add_boundary_link_field_su3_dble(su3_field);
+  _add_boundary_link_field_openqcd__su3_dble(su3_field);
 }
 
 void copy_boundary_su3_alg_field(su3_alg_dble *su3_alg_field)
 {
-  _copy_boundary_link_field_su3_alg_dble(su3_alg_field);
+  _copy_boundary_link_field_openqcd__su3_alg_dble(su3_alg_field);
 }
 
 void add_boundary_su3_alg_field(su3_alg_dble *su3_alg_field)
 {
-  _add_boundary_link_field_su3_alg_dble(su3_alg_field);
+  _add_boundary_link_field_openqcd__su3_alg_dble(su3_alg_field);
 }

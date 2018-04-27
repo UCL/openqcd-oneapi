@@ -17,6 +17,8 @@
  *
  *******************************************************************************/
 
+#define OPENQCD_INTERNAL
+
 #include "archive.h"
 #include "flags.h"
 #include "forces.h"
@@ -1905,8 +1907,31 @@ int main(int argc, char *argv[])
   su3_dble **usv;
   dat_t ndat;
 
+#if defined(LIBRARY)
+  int local_lattice_sizes[4], mpi_layout[4], block_layout[4];
+#endif
+
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+
+#if defined(LIBRARY)
+  mpi_layout[0] = 2;
+  mpi_layout[1] = 2;
+  mpi_layout[2] = 1;
+  mpi_layout[3] = 1;
+
+  local_lattice_sizes[0] = 8;
+  local_lattice_sizes[1] = 8;
+  local_lattice_sizes[2] = 16;
+  local_lattice_sizes[3] = 16;
+
+  block_layout[0] = 1;
+  block_layout[1] = 1;
+  block_layout[2] = 1;
+  block_layout[3] = 1;
+
+  set_lattice_sizes(mpi_layout, local_lattice_sizes, block_layout);
+#endif
 
   read_infile(argc, argv);
   if (noms == 0) {

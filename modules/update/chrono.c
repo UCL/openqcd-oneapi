@@ -69,6 +69,7 @@
  *******************************************************************************/
 
 #define CHRONO_C
+#define OPENQCD_INTERNAL
 
 #include "global.h"
 #include "linalg.h"

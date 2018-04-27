@@ -51,6 +51,7 @@
  *******************************************************************************/
 
 #define TCHARGE_C
+#define OPENQCD_INTERNAL
 
 #include "tcharge.h"
 #include "flags.h"
@@ -60,9 +61,27 @@
 
 #define N0 (NPROC0 * L0)
 
+#if defined(LIBRARY)
+
+static int *isx, init = 0;
+static double *qsl0;
+static u3_alg_dble **ft;
+
+static void allocate_buffers(void)
+{
+  isx = malloc(L0 * sizeof(*isx));
+  qsl0 = malloc(N0 * sizeof(*qsl0));
+}
+
+#else
+
 static int isx[L0], init = 0;
 static double qsl0[N0];
 static u3_alg_dble **ft;
+
+static void allocate_buffers(void) {}
+
+#endif
 
 static double prodXY(u3_alg_dble *X, u3_alg_dble *Y)
 {
@@ -93,6 +112,8 @@ double tcharge(void)
   double pi, Q;
 
   if (init == 0) {
+    allocate_buffers();
+
     for (t = 0; t < L0; t++) {
       isx[t] = init_hsum(1);
     }
@@ -135,6 +156,8 @@ double tcharge_slices(double *qsl)
   double pi, fact, Q;
 
   if (init == 0) {
+    allocate_buffers();
+
     for (t = 0; t < L0; t++) {
       isx[t] = init_hsum(1);
     }

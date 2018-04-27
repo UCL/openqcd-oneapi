@@ -112,6 +112,7 @@
  *******************************************************************************/
 
 #define MUTILS_C
+#define OPENQCD_INTERNAL
 
 #include "utils.h"
 #include <stdarg.h>

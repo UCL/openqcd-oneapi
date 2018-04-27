@@ -71,6 +71,7 @@
  *******************************************************************************/
 
 #define SFLDS_C
+#define OPENQCD_INTERNAL
 
 #include "sflds.h"
 #include "global.h"

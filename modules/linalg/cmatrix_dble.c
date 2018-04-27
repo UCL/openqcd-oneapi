@@ -63,6 +63,7 @@
  *******************************************************************************/
 
 #define CMATRIX_DBLE_C
+#define OPENQCD_INTERNAL
 
 #include "linalg.h"
 

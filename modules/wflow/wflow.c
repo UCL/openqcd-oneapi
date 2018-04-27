@@ -58,6 +58,7 @@
  *******************************************************************************/
 
 #define WFLOW_C
+#define OPENQCD_INTERNAL
 
 #include "wflow.h"
 #include "forces.h"

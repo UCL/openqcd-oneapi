@@ -32,6 +32,7 @@
  *******************************************************************************/
 
 #define KS_TEST_C
+#define OPENQCD_INTERNAL
 
 #include "extras.h"
 

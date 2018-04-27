@@ -60,6 +60,7 @@
  *******************************************************************************/
 
 #define MDFLDS_C
+#define OPENQCD_INTERNAL
 
 #include "mdflds.h"
 #include "field_com.h"

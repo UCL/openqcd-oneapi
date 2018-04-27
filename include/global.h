@@ -15,49 +15,87 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define NAME_SIZE 128
+#define openqcd__NAME_SIZE 128
 
-#if (NAME_SIZE < 128)
+#if (openqcd__NAME_SIZE < 128)
 #error : NAME_SIZE must be greater or equal to 128
 #endif
 
-#define ALIGN 6
+#define openqcd__ALIGN 6
 
 #if defined (LIBRARY)
 
-extern int NPROC0;
-extern int NPROC1;
-extern int NPROC2;
-extern int NPROC3;
+extern int openqcd__NPROC0;
+extern int openqcd__NPROC1;
+extern int openqcd__NPROC2;
+extern int openqcd__NPROC3;
 
-extern int L0;
-extern int L1;
-extern int L2;
-extern int L3;
+extern int openqcd__L0;
+extern int openqcd__L1;
+extern int openqcd__L2;
+extern int openqcd__L3;
 
-extern int NPROC0_BLK;
-extern int NPROC1_BLK;
-extern int NPROC2_BLK;
-extern int NPROC3_BLK;
+extern int openqcd__NPROC0_BLK;
+extern int openqcd__NPROC1_BLK;
+extern int openqcd__NPROC2_BLK;
+extern int openqcd__NPROC3_BLK;
 
-extern int NPROC;
-extern int VOLUME;
-extern int FACE0;
-extern int FACE1;
-extern int FACE2;
-extern int FACE3;
-extern int BNDRY;
-extern int NSPIN;
+extern int openqcd__NPROC;
+extern int openqcd__VOLUME;
+extern int openqcd__FACE0;
+extern int openqcd__FACE1;
+extern int openqcd__FACE2;
+extern int openqcd__FACE3;
+extern int openqcd__BNDRY;
+extern int openqcd__NSPIN;
 
-extern int cpr[4];
-extern int npr[8];
+extern int openqcd__cpr[4];
+extern int openqcd__npr[8];
 
-extern int *ipt;
-extern int **iup;
-extern int **idn;
-extern int *map;
+extern int *openqcd__ipt;
+extern int **openqcd__iup;
+extern int **openqcd__idn;
+extern int *openqcd__map;
 
-extern void set_lattice_sizes(int nproc[4], int lat_sizes[4], int block_sizes[4]);
+extern void openqcd__set_lattice_sizes(int nproc[4], int lat_sizes[4], int block_sizes[4]);
+
+#if defined(OPENQCD_INTERNAL)
+
+#define NPROC0 openqcd__NPROC0
+#define NPROC1 openqcd__NPROC1
+#define NPROC2 openqcd__NPROC2
+#define NPROC3 openqcd__NPROC3
+
+#define L0 openqcd__L0
+#define L1 openqcd__L1
+#define L2 openqcd__L2
+#define L3 openqcd__L3
+
+#define NPROC0_BLK openqcd__NPROC0_BLK
+#define NPROC1_BLK openqcd__NPROC1_BLK
+#define NPROC2_BLK openqcd__NPROC2_BLK
+#define NPROC3_BLK openqcd__NPROC3_BLK
+
+#define NPROC openqcd__NPROC
+#define VOLUME openqcd__VOLUME
+#define FACE0 openqcd__FACE0
+#define FACE1 openqcd__FACE1
+#define FACE2 openqcd__FACE2
+#define FACE3 openqcd__FACE3
+#define BNDRY openqcd__BNDRY
+#define NSPIN openqcd__NSPIN
+
+#define cpr openqcd__cpr
+#define npr openqcd__npr
+
+#define ipt openqcd__ipt
+#define iup openqcd__iup
+#define idn openqcd__idn
+#define map openqcd__map
+
+#define set_lattice_sizes(...) openqcd__set_lattice_sizes(__VA_ARGS__)
+
+#endif /* defined OPENQCD_INTERNAL */
 
 #else /* not defined LIBRARY */
 
@@ -123,34 +161,69 @@ extern int map[BNDRY + NPROC % 2];
 
 #endif /* LIBRARY */
 
+
+#if defined(OPENQCD_INTERNAL)
+#define NAME_SIZE openqcd__NAME_SIZE
+#define ALIGN openqcd__ALIGN
+#endif /* defined OPENQCD_INTERNAL */
+
 #ifdef dirac_counters
 
 /* Counters for call to the Dirac operator  */
-extern int Dw_dble_counter;
-extern int Dwee_dble_counter;
-extern int Dwoo_dble_counter;
-extern int Dwoe_dble_counter;
-extern int Dweo_dble_counter;
-extern int Dwhat_dble_counter;
-extern int Dw_blk_dble_counter;
-extern int Dwee_blk_dble_counter;
-extern int Dwoo_blk_dble_counter;
-extern int Dwoe_blk_dble_counter;
-extern int Dweo_blk_dble_counter;
-extern int Dwhat_blk_dble_counter;
+extern int openqcd__Dw_dble_counter;
+extern int openqcd__Dwee_dble_counter;
+extern int openqcd__Dwoo_dble_counter;
+extern int openqcd__Dwoe_dble_counter;
+extern int openqcd__Dweo_dble_counter;
+extern int openqcd__Dwhat_dble_counter;
+extern int openqcd__Dw_blk_dble_counter;
+extern int openqcd__Dwee_blk_dble_counter;
+extern int openqcd__Dwoo_blk_dble_counter;
+extern int openqcd__Dwoe_blk_dble_counter;
+extern int openqcd__Dweo_blk_dble_counter;
+extern int openqcd__Dwhat_blk_dble_counter;
 
-extern int Dw_counter;
-extern int Dwee_counter;
-extern int Dwoo_counter;
-extern int Dwoe_counter;
-extern int Dweo_counter;
-extern int Dwhat_counter;
-extern int Dw_blk_counter;
-extern int Dwee_blk_counter;
-extern int Dwoo_blk_counter;
-extern int Dwoe_blk_counter;
-extern int Dweo_blk_counter;
-extern int Dwhat_blk_counter;
+extern int openqcd__Dw_counter;
+extern int openqcd__Dwee_counter;
+extern int openqcd__Dwoo_counter;
+extern int openqcd__Dwoe_counter;
+extern int openqcd__Dweo_counter;
+extern int openqcd__Dwhat_counter;
+extern int openqcd__Dw_blk_counter;
+extern int openqcd__Dwee_blk_counter;
+extern int openqcd__Dwoo_blk_counter;
+extern int openqcd__Dwoe_blk_counter;
+extern int openqcd__Dweo_blk_counter;
+extern int openqcd__Dwhat_blk_counter;
+
+
+#if defined(OPENQCD_INTERNAL)
+#define Dw_dble_counter openqcd__Dw_dble_counter
+#define Dwee_dble_counter openqcd__Dwee_dble_counter
+#define Dwoo_dble_counter openqcd__Dwoo_dble_counter
+#define Dwoe_dble_counter openqcd__Dwoe_dble_counter
+#define Dweo_dble_counter openqcd__Dweo_dble_counter
+#define Dwhat_dble_counter openqcd__Dwhat_dble_counter
+#define Dw_blk_dble_counter openqcd__Dw_blk_dble_counter
+#define Dwee_blk_dble_counter openqcd__Dwee_blk_dble_counter
+#define Dwoo_blk_dble_counter openqcd__Dwoo_blk_dble_counter
+#define Dwoe_blk_dble_counter openqcd__Dwoe_blk_dble_counter
+#define Dweo_blk_dble_counter openqcd__Dweo_blk_dble_counter
+#define Dwhat_blk_dble_counter openqcd__Dwhat_blk_dble_counter
+
+#define Dw_counter openqcd__Dw_counter
+#define Dwee_counter openqcd__Dwee_counter
+#define Dwoo_counter openqcd__Dwoo_counter
+#define Dwoe_counter openqcd__Dwoe_counter
+#define Dweo_counter openqcd__Dweo_counter
+#define Dwhat_counter openqcd__Dwhat_counter
+#define Dw_blk_counter openqcd__Dw_blk_counter
+#define Dwee_blk_counter openqcd__Dwee_blk_counter
+#define Dwoo_blk_counter openqcd__Dwoo_blk_counter
+#define Dwoe_blk_counter openqcd__Dwoe_blk_counter
+#define Dweo_blk_counter openqcd__Dweo_blk_counter
+#define Dwhat_blk_counter openqcd__Dwhat_blk_counter
+#endif /* defined OPENQCD_INTERNAL */
 
 #endif /* dirac_counters */
 

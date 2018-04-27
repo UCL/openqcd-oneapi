@@ -42,6 +42,7 @@
  *******************************************************************************/
 
 #define VFLDS_C
+#define OPENQCD_INTERNAL
 
 #include "vflds.h"
 #include "flags.h"

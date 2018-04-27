@@ -94,6 +94,7 @@
  *******************************************************************************/
 
 #define FGCR4VD_C
+#define OPENQCD_INTERNAL
 
 #include "global.h"
 #include "linalg.h"

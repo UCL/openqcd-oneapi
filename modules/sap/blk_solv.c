@@ -39,6 +39,7 @@
  *******************************************************************************/
 
 #define BLK_SOLV_C
+#define OPENQCD_INTERNAL
 
 #include "dirac.h"
 #include "linalg.h"

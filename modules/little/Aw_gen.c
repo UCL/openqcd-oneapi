@@ -52,6 +52,7 @@
  *******************************************************************************/
 
 #define AW_GEN_C
+#define OPENQCD_INTERNAL
 
 #include "flags.h"
 #include "little.h"

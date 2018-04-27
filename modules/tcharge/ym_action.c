@@ -50,6 +50,7 @@
  *******************************************************************************/
 
 #define YM_ACTION_C
+#define OPENQCD_INTERNAL
 
 #include "flags.h"
 #include "global.h"
@@ -59,9 +60,27 @@
 
 #define N0 (NPROC0 * L0)
 
+#if defined(LIBRARY)
+
+static int *isx, init = 0;
+static double *asl0;
+static u3_alg_dble **ft;
+
+static void allocate_buffers(void)
+{
+  isx = malloc(L0 * sizeof(*isx));
+  asl0 = malloc(N0 * sizeof(*asl0));
+}
+
+#else
+
 static int isx[L0], init = 0;
 static double asl0[N0];
 static u3_alg_dble **ft;
+
+static void allocate_buffers(void) {}
+
+#endif
 
 static double prodXX(u3_alg_dble *X)
 {
@@ -92,6 +111,8 @@ double ym_action(void)
   double S;
 
   if (init == 0) {
+    allocate_buffers();
+
     for (t = 0; t < L0; t++) {
       isx[t] = init_hsum(1);
     }
@@ -132,6 +153,8 @@ double ym_action_slices(double *asl)
   double S;
 
   if (init == 0) {
+    allocate_buffers();
+
     for (t = 0; t < L0; t++) {
       isx[t] = init_hsum(1);
     }

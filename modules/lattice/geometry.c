@@ -59,6 +59,7 @@
  *******************************************************************************/
 
 #define GEOMETRY_C
+#define OPENQCD_INTERNAL
 
 #include "flags.h"
 #include "global.h"

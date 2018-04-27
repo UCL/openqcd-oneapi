@@ -103,6 +103,7 @@
  *******************************************************************************/
 
 #define RATFCTS_C
+#define OPENQCD_INTERNAL
 
 #include "ratfcts.h"
 #include "flags.h"

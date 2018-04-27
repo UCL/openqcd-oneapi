@@ -62,6 +62,7 @@
  *******************************************************************************/
 
 #define RANLUX_C
+#define OPENQCD_INTERNAL
 
 #include "global.h"
 #include "lattice.h"

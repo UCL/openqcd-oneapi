@@ -50,6 +50,7 @@
  *******************************************************************************/
 
 #define ZOLOTAREV_C
+#define OPENQCD_INTERNAL
 
 #include "ratfcts.h"
 

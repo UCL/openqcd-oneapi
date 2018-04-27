@@ -71,6 +71,7 @@
  *******************************************************************************/
 
 #define DFL_SUBSPACE_C
+#define OPENQCD_INTERNAL
 
 #include "block.h"
 #include "dfl.h"

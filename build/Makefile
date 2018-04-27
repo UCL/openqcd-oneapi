@@ -57,7 +57,7 @@ SIZE_FLAGS := -DNPROC0=$(NPROC0) -DNPROC1=$(NPROC1)\
               -DNPROC0_BLK=$(NPROC0_BLK) -DNPROC1_BLK=$(NPROC1_BLK)\
               -DNPROC2_BLK=$(NPROC2_BLK) -DNPROC3_BLK=$(NPROC3_BLK)
 
-CORRECTNESS := -pedantic -fstrict-aliasing -Wno-long-long -Wstrict-prototypes
+CORRECTNESS := -fstrict-aliasing -Wno-long-long -Wstrict-prototypes
 
 CFLAGS     += -I$(code_dir)/include -I$(code_dir) -isystem $(MPI_INCLUDE)\
               $(SIZE_FLAGS) $(USR_CFLAGS) $(CORRECTNESS)
@@ -432,7 +432,8 @@ $(target_module_dir)/utils/version.o: $(target_module_dir)/utils/version.c $(set
 
 # Fill the version.c file with current build information
 $(target_module_dir)/utils/version.c: $(settings_file) Makefile
-	@echo "#include \"version.h\"" > $@
+	@echo "#define OPENQCD_INTERNAL" > $@
+	@echo "#include \"version.h\"" >> $@ 
 	$(eval git_version := $(call git-version))
 	@echo "const char * build_git_sha = \"$(git_version)\";" >> $@
 	@current_date_time=$$(date "+%d-%m-%Y %H:%M:%S");\

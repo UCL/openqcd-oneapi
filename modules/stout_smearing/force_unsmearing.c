@@ -37,6 +37,7 @@
  *******************************************************************************/
 
 #define FORCE_UNSMEARING_C
+#define OPENQCD_INTERNAL
 
 #include "field_com.h"
 #include "global.h"

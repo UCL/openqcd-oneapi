@@ -50,6 +50,7 @@
  *******************************************************************************/
 
 #define SAP_C
+#define OPENQCD_INTERNAL
 
 #include "sap.h"
 #include "dirac.h"

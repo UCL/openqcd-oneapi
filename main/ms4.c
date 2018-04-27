@@ -16,6 +16,8 @@
  *
  *******************************************************************************/
 
+#define OPENQCD_INTERNAL
+
 #include "archive.h"
 #include "dfl.h"
 #include "dirac.h"

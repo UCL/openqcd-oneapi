@@ -21,94 +21,94 @@
 #endif
 
 #if (defined x64)
-#define ALIGNED8 __attribute__((aligned(8)))
-#define ALIGNED16 __attribute__((aligned(16)))
-#define ALIGNED32 __attribute__((aligned(32)))
+#define openqcd__ALIGNED8 __attribute__((aligned(8)))
+#define openqcd__ALIGNED16 __attribute__((aligned(16)))
+#define openqcd__ALIGNED32 __attribute__((aligned(32)))
 #else
-#define ALIGNED8
-#define ALIGNED16
-#define ALIGNED32
+#define openqcd__ALIGNED8
+#define openqcd__ALIGNED16
+#define openqcd__ALIGNED32
 #endif
 
 typedef struct
 {
   float re, im;
-} complex;
+} openqcd__complex;
 
 typedef struct
 {
-  complex c1, c2, c3;
-} su3_vector;
+  openqcd__complex c1, c2, c3;
+} openqcd__su3_vector;
 
 typedef struct
 {
-  complex c11, c12, c13, c21, c22, c23, c31, c32, c33;
-} su3;
+  openqcd__complex c11, c12, c13, c21, c22, c23, c31, c32, c33;
+} openqcd__su3;
 
 typedef struct
 {
   float c1, c2, c3, c4, c5, c6, c7, c8;
-} su3_alg;
+} openqcd__su3_alg;
 
 typedef struct
 {
-  su3_vector c1, c2;
-} weyl;
+  openqcd__su3_vector c1, c2;
+} openqcd__weyl;
 
 typedef struct
 {
-  su3_vector c1, c2, c3, c4;
-} spinor;
+  openqcd__su3_vector c1, c2, c3, c4;
+} openqcd__spinor;
 
 typedef struct
 {
   float u[36];
-} pauli;
+} openqcd__pauli;
 
 typedef struct
 {
   float c1, c2, c3, c4, c5, c6, c7, c8, c9;
-} u3_alg;
+} openqcd__u3_alg;
 
 typedef struct
 {
   double re, im;
-} complex_dble;
+} openqcd__complex_dble;
 
 typedef struct
 {
-  complex_dble c1, c2, c3;
-} su3_vector_dble;
+  openqcd__complex_dble c1, c2, c3;
+} openqcd__su3_vector_dble;
 
 typedef struct
 {
-  complex_dble c11, c12, c13, c21, c22, c23, c31, c32, c33;
-} su3_dble;
+  openqcd__complex_dble c11, c12, c13, c21, c22, c23, c31, c32, c33;
+} openqcd__su3_dble;
 
 typedef struct
 {
   double c1, c2, c3, c4, c5, c6, c7, c8;
-} su3_alg_dble;
+} openqcd__su3_alg_dble;
 
 typedef struct
 {
-  su3_vector_dble c1, c2;
-} weyl_dble;
+  openqcd__su3_vector_dble c1, c2;
+} openqcd__weyl_dble;
 
 typedef struct
 {
-  su3_vector_dble c1, c2, c3, c4;
-} spinor_dble;
+  openqcd__su3_vector_dble c1, c2, c3, c4;
+} openqcd__spinor_dble;
 
 typedef struct
 {
   double u[36];
-} pauli_dble;
+} openqcd__pauli_dble;
 
 typedef struct
 {
   double c1, c2, c3, c4, c5, c6, c7, c8, c9;
-} u3_alg_dble;
+} openqcd__u3_alg_dble;
 
 /*******************************************************************************
  *
@@ -653,5 +653,28 @@ typedef struct
   (r).c7 = (c) * ((u).c7 - (v).c7);                                            \
   (r).c8 = (c) * ((u).c8 - (v).c8);                                            \
   (r).c9 = (c) * ((u).c9 - (v).c9)
+
+#if defined(OPENQCD_INTERNAL)
+#define ALIGNED8 openqcd__ALIGNED8
+#define ALIGNED16 openqcd__ALIGNED16
+#define ALIGNED32 openqcd__ALIGNED32
+
+#define complex openqcd__complex
+#define su3_vector openqcd__su3_vector
+#define su3 openqcd__su3
+#define su3_alg openqcd__su3_alg
+#define weyl openqcd__weyl
+#define spinor openqcd__spinor
+#define pauli openqcd__pauli
+#define u3_alg openqcd__u3_alg
+#define complex_dble openqcd__complex_dble
+#define su3_vector_dble openqcd__su3_vector_dble
+#define su3_dble openqcd__su3_dble
+#define su3_alg_dble openqcd__su3_alg_dble
+#define weyl_dble openqcd__weyl_dble
+#define spinor_dble openqcd__spinor_dble
+#define pauli_dble openqcd__pauli_dble
+#define u3_alg_dble openqcd__u3_alg_dble
+#endif /* defined OPENQCD_INTERNAL */
 
 #endif

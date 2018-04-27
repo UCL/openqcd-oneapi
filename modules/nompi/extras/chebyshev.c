@@ -48,6 +48,7 @@
  *******************************************************************************/
 
 #define CHEBYSHEV_C
+#define OPENQCD_INTERNAL
 
 #include "extras.h"
 

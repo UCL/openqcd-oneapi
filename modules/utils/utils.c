@@ -112,6 +112,7 @@
  *******************************************************************************/
 
 #define UTILS_C
+#define OPENQCD_INTERNAL
 
 #include "utils.h"
 #include "global.h"

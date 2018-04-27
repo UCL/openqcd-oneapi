@@ -87,6 +87,7 @@
  *******************************************************************************/
 
 #define SAP_GCR_C
+#define OPENQCD_INTERNAL
 
 #include "dirac.h"
 #include "flags.h"

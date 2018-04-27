@@ -90,6 +90,7 @@
  *******************************************************************************/
 
 #define CHEXP_C
+#define OPENQCD_INTERNAL
 
 #include "su3fcts.h"
 #include "utils.h"

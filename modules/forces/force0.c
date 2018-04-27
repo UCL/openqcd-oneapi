@@ -51,6 +51,7 @@
  *******************************************************************************/
 
 #define FORCE0_C
+#define OPENQCD_INTERNAL
 
 #include "field_com.h"
 #include "forces.h"

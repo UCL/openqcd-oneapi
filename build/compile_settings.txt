@@ -2,7 +2,7 @@ CODELOC ..
 COMPILER /usr/bin/mpicc
 MPI_INCLUDE /usr/include/mpi
 
-CFLAGS -std=c89 -O2 -DAVX -DFMA3 -Werror -Wall
+CFLAGS -std=c99 -O2 -DAVX -DFMA3 -Werror -Wall
 LDFLAGS
 
 NPROC0_TOT   1
