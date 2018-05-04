@@ -18,8 +18,8 @@
 typedef struct
 {
   int npf;
-  su3_alg_dble *mom, *frc;
-  spinor_dble **pf;
+  openqcd__su3_alg_dble *mom, *frc;
+  openqcd__spinor_dble **pf;
 } openqcd_mdflds__mdflds_t;
 
 /* MDFLDS_C */

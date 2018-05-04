@@ -20,7 +20,7 @@
 typedef struct
 {
   openqcd__su3_alg_dble X;
-  ch_drv0_t coeff;
+  openqcd_su3fcts__ch_drv0_t coeff;
 } openqcd_stout_smearing__ch_mat_coeff_pair_t;
 
 /* FORCE_UNSMEARING_C */

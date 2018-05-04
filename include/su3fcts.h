@@ -18,26 +18,26 @@
 typedef struct
 {
   double t, d;
-  openqcd__complex_dble p[3] ALIGNED16;
+  openqcd__complex_dble p[3] openqcd__ALIGNED16;
 } openqcd_su3fcts__ch_drv0_t;
 
 typedef struct
 {
   double t, d;
-  openqcd__complex_dble p[3] ALIGNED16;
-  openqcd__complex_dble pt[3] ALIGNED16;
-  openqcd__complex_dble pd[3] ALIGNED16;
+  openqcd__complex_dble p[3] openqcd__ALIGNED16;
+  openqcd__complex_dble pt[3] openqcd__ALIGNED16;
+  openqcd__complex_dble pd[3] openqcd__ALIGNED16;
 } openqcd_su3fcts__ch_drv1_t;
 
 typedef struct
 {
   double t, d;
-  openqcd__complex_dble p[3] ALIGNED16;
-  openqcd__complex_dble pt[3] ALIGNED16;
-  openqcd__complex_dble pd[3] ALIGNED16;
-  openqcd__complex_dble ptt[3] ALIGNED16;
-  openqcd__complex_dble ptd[3] ALIGNED16;
-  openqcd__complex_dble pdd[3] ALIGNED16;
+  openqcd__complex_dble p[3] openqcd__ALIGNED16;
+  openqcd__complex_dble pt[3] openqcd__ALIGNED16;
+  openqcd__complex_dble pd[3] openqcd__ALIGNED16;
+  openqcd__complex_dble ptt[3] openqcd__ALIGNED16;
+  openqcd__complex_dble ptd[3] openqcd__ALIGNED16;
+  openqcd__complex_dble pdd[3] openqcd__ALIGNED16;
 } openqcd_su3fcts__ch_drv2_t;
 
 /* CHEXP_C */
