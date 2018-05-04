@@ -8,12 +8,14 @@
 # ------------------------------------------------------------------------------
 # {{{
 
-target_module_dir := modules
-target_tests_dir  := tests
-dep_dir           := .deps
+target_module_dir  := modules
+target_tests_dir   := tests
+target_include_dir := include
+dep_dir            := .deps
 source_main_dir    = $(code_dir)/main
 source_module_dir  = $(code_dir)/modules
-source_tests_dir   = $(code_dir)/tests
+source_devel_dir   = $(code_dir)/tests
+source_include_dir = $(code_dir)/include
 
 # }}}
 #
@@ -51,18 +53,22 @@ USR_LDFLAGS := $(shell grep LDFLAGS     $(settings_file)| grep -v '\#' | awk '{f
 # ------------------------------------------------------------------------------
 # {{{
 
-SIZE_FLAGS := -DNPROC0=$(NPROC0) -DNPROC1=$(NPROC1)\
-              -DNPROC2=$(NPROC2) -DNPROC3=$(NPROC3)\
-              -DL0=$(L0) -DL1=$(L1) -DL2=$(L2) -DL3=$(L3)\
-              -DNPROC0_BLK=$(NPROC0_BLK) -DNPROC1_BLK=$(NPROC1_BLK)\
-              -DNPROC2_BLK=$(NPROC2_BLK) -DNPROC3_BLK=$(NPROC3_BLK)
+SIZE_FLAGS  := -DSTATIC_SIZES -DNPROC0=$(NPROC0) -DNPROC1=$(NPROC1)\
+               -DNPROC2=$(NPROC2) -DNPROC3=$(NPROC3)\
+               -DL0=$(L0) -DL1=$(L1) -DL2=$(L2) -DL3=$(L3)\
+               -DNPROC0_BLK=$(NPROC0_BLK) -DNPROC1_BLK=$(NPROC1_BLK)\
+               -DNPROC2_BLK=$(NPROC2_BLK) -DNPROC3_BLK=$(NPROC3_BLK)
 
 CORRECTNESS := -fstrict-aliasing -Wno-long-long -Wstrict-prototypes
 
-CFLAGS     += -I$(code_dir)/include -I$(code_dir) -isystem $(MPI_INCLUDE)\
-              $(SIZE_FLAGS) $(USR_CFLAGS) $(CORRECTNESS)
+CFLAGS      += -I$(code_dir)/include -I$(code_dir) -isystem $(MPI_INCLUDE)\
+               $(SIZE_FLAGS) $(USR_CFLAGS) $(CORRECTNESS)
 
-LDFLAGS    += $(USR_LDFLAGS) -lm
+LDFLAGS     += $(USR_LDFLAGS) -lm
+
+# No size flags if building libraries
+library: CFLAGS := $(filter-out $(SIZE_FLAGS),$(CFLAGS))
+library-cpp: CFLAGS := $(filter-out $(SIZE_FLAGS),$(CFLAGS))
 
 # The nompi targets needs one more include directory
 $(target_tests_dir)/nompi/%: \
@@ -88,6 +94,15 @@ $(dep_dir)/nompi/%: \
 # test_module_names: list of all testing modules in the tests/ folder
 # test_module_dirs: the corresponding target "directories", as all tests are
 #                   executable we set the targets as the folder containing them
+
+# Temporary "thin" static libraries
+tmp_mod_lib       := $(target_module_dir)/module_library.a
+tmp_nompi_mod_lib := $(target_module_dir)/nompi_module_library.a
+
+openqcd_lib       := libopenqcd.a
+
+master_header_C   := $(target_include_dir)/openqcd.h
+
 
 # All the modules in openQCD
 module_names := archive block dfl dirac field_com flags forces lattice linalg\
@@ -158,6 +173,16 @@ tests: print-header $(test_module_dirs) $(test_nompi_module_dirs)
 # The main programs depend on all the modules
 $(main_programs): print-header $(module_libs)
 
+# Build an openqcd library
+.PHONY: library
+library: headers $(openqcd_lib)
+
+.PHONY: library-cpp
+library-cpp: headers-cpp $(openqcd_lib)
+
+.PHONY: headers
+headers: $(target_include_dir)
+
 # Can build the modules independently if you wish
 .PHONY: $(module_names)
 $(module_names): %: $(target_module_dir)/%.a
@@ -214,7 +239,7 @@ print-header:
 
 # Delete make-generated files
 .PHONY: clean
-clean: clean-modules clean-main clean-tests
+clean: clean-modules clean-main clean-includes clean-tests
 	@rm -rf $(dep_dir)
 
 .PHONY: clean-tests
@@ -225,6 +250,7 @@ clean-tests:
 .PHONY: clean-main
 clean-main:
 	@echo "Cleaning executables..."
+	@rm -rf $(openqcd_lib)
 	@rm -rf $(main_programs)
 
 .PHONY: clean-modules
@@ -232,15 +258,16 @@ clean-modules:
 	@echo "Cleaning modules..."
 	@rm -rf $(target_module_dir)
 
+.PHONY: clean-includes
+clean-includes:
+	@echo "Cleaning includes..."
+	@rm -rf $(target_include_dir)
+
 # }}}
 #
 # Dependencies
 # ------------------------------------------------------------------------------
 # {{{
-
-# Temporary "thin" static libraries
-tmp_mod_lib       := $(target_module_dir)/module_library.a
-tmp_nompi_mod_lib := $(target_module_dir)/nompi_module_library.a
 
 # Make it so that a module depends on the .c files in it
 # Also add the .d files to the .SECONDARY so that they aren't cleaned up by make
@@ -348,11 +375,26 @@ $(tmp_nompi_mod_lib): $(nompi_module_libs)
 	@rm -f $@
 	@ar rcsT $@ $^
 
+.DELETE_ON_ERROR: $(openqcd_lib)
+$(openqcd_lib): $(tmp_mod_lib)
+	@rm -f $@
+	@echo "create $@" > libopenqcd.mri
+	@echo "addlib $<" >> libopenqcd.mri
+	@echo "save" >> libopenqcd.mri
+	@echo "end" >> libopenqcd.mri
+	$(call link-and-print,ar -M < libopenqcd.mri,$@)
+	@rm libopenqcd.mri
+
+$(target_include_dir): $(master_header_C) $(source_include_dir)
+	@rm -rf include/openqcd
+	@mkdir -p $(target_include_dir)/openqcd
+	@cp -r $(source_include_dir)/* $(target_include_dir)/openqcd
+
 # Compile a simulation program
-$(main_programs): %: $(source_main_dir)/%.c $(tmp_mod_lib)
+$(main_programs): %: $(source_main_dir)/%.c $(openqcd_lib)
 	$(mkdir-target)
 	$(call link-and-print,\
-		$(CC) $(CFLAGS) $< -o $@ $(tmp_mod_lib) $(LDFLAGS),\
+		$(CC) $(CFLAGS) $< -o $@ $(openqcd_lib) $(LDFLAGS),\
 		$(notdir $<))
 
 # Compile a test
@@ -440,6 +482,13 @@ $(target_module_dir)/utils/version.c: $(settings_file) Makefile
 	echo "const char * build_date = \"$${current_date_time}\";" >> $@
 	$(eval sanitised_cflags := $(call sanitize-string,$(USR_CFLAGS)))
 	@echo "const char * build_user_cflags = \"$(sanitised_cflags)\";" >> $@
+
+$(master_header_C): Makefile
+	$(mkdir-target)
+	@echo '#ifndef OPENQCD_H' > $@
+	@echo '#define OPENQCD_H\n' >> $@
+	@echo '#include "openqcd/openqcd.h"\n' >> $@
+	@echo '#endif' >> $@
 
 ## }}}
 # }}}

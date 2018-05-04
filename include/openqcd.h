@@ -12,8 +12,8 @@
  *
  *******************************************************************************/
 
-#ifndef OPENQCD_H
-#define OPENQCD_H
+#ifndef OPENQCD_COLLECT_H
+#define OPENQCD_COLLECT_H
 
 #include "archive.h"
 #include "block.h"
@@ -45,4 +45,4 @@
 #include "vflds.h"
 #include "wflow.h"
 
-#endif /* OPENQCD_H */
+#endif /* OPENQCD_COLLECT_H */

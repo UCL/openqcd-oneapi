@@ -23,7 +23,7 @@
 
 #define openqcd__ALIGN 6
 
-#if defined (LIBRARY)
+#if !defined (STATIC_SIZES)
 
 extern int openqcd__NPROC0;
 extern int openqcd__NPROC1;
@@ -97,7 +97,7 @@ extern void openqcd__set_lattice_sizes(int nproc[4], int lat_sizes[4], int block
 
 #endif /* defined OPENQCD_INTERNAL */
 
-#else /* not defined LIBRARY */
+#else /* defined STATIC_SIZES */
 
 /*
 THESE QUANTITIES ARE NOW DEFINED IN A TEXT FILE READ BY THE MAKEFILE
@@ -159,7 +159,7 @@ extern int iup[VOLUME][4];
 extern int idn[VOLUME][4];
 extern int map[BNDRY + NPROC % 2];
 
-#endif /* LIBRARY */
+#endif /* STATIC_SIZES */
 
 
 #if defined(OPENQCD_INTERNAL)
