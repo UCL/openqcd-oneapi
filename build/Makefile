@@ -28,36 +28,56 @@ settings_file := compile_settings.txt
 # Function to load a parameter from the settings file
 load-par-from-file = $(shell grep $(1) $(settings_file)| grep -v '\#' | awk '{print$$2;}')
 
-NPROC0      := $(call load-par-from-file, NPROC0_TOT )
-NPROC1      := $(call load-par-from-file, NPROC1_TOT )
-NPROC2      := $(call load-par-from-file, NPROC2_TOT )
-NPROC3      := $(call load-par-from-file, NPROC3_TOT )
-L0          := $(call load-par-from-file, L0 )
-L1          := $(call load-par-from-file, L1 )
-L2          := $(call load-par-from-file, L2 )
-L3          := $(call load-par-from-file, L3 )
-NPROC0_BLK  := $(call load-par-from-file, NPROC0_BLK )
-NPROC1_BLK  := $(call load-par-from-file, NPROC1_BLK )
-NPROC2_BLK  := $(call load-par-from-file, NPROC2_BLK )
-NPROC3_BLK  := $(call load-par-from-file, NPROC3_BLK )
+DYNAMIC_SIZES := $(call load-par-from-file, DYNAMIC_SIZES)
 
-code_dir    := $(shell grep CODELOC     $(settings_file)| grep -v '\#' | awk '{print$$2;}')
-CC          := $(shell grep COMPILER    $(settings_file)| grep -v '\#' | awk '{print$$2;}')
-MPI_INCLUDE := $(shell grep MPI_INCLUDE $(settings_file)| grep -v '\#' | awk '{print$$2;}')
-USR_CFLAGS  := $(shell grep CFLAGS      $(settings_file)| grep -v '\#' | awk '{for (i=2; i<=NF; i++) print FS$$i;}')
-USR_LDFLAGS := $(shell grep LDFLAGS     $(settings_file)| grep -v '\#' | awk '{for (i=2; i<=NF; i++) print FS$$i;}')
+#Default to zero
+ifeq ($(DYNAMIC_SIZES),)
+DYNAMIC_SIZES := 0
+endif
 
-# }}}
-#
-# Compile flags
-# ------------------------------------------------------------------------------
-# {{{
+
+ifeq ($(DYNAMIC_SIZES),1)
+
+else 
+
+ifeq ($(DYNAMIC_SIZES),0)
+
+NPROC0        := $(call load-par-from-file, NPROC0_TOT)
+NPROC1        := $(call load-par-from-file, NPROC1_TOT)
+NPROC2        := $(call load-par-from-file, NPROC2_TOT)
+NPROC3        := $(call load-par-from-file, NPROC3_TOT)
+L0            := $(call load-par-from-file, L0)
+L1            := $(call load-par-from-file, L1)
+L2            := $(call load-par-from-file, L2)
+L3            := $(call load-par-from-file, L3)
+NPROC0_BLK    := $(call load-par-from-file, NPROC0_BLK)
+NPROC1_BLK    := $(call load-par-from-file, NPROC1_BLK)
+NPROC2_BLK    := $(call load-par-from-file, NPROC2_BLK)
+NPROC3_BLK    := $(call load-par-from-file, NPROC3_BLK)
 
 SIZE_FLAGS  := -DSTATIC_SIZES -DNPROC0=$(NPROC0) -DNPROC1=$(NPROC1)\
                -DNPROC2=$(NPROC2) -DNPROC3=$(NPROC3)\
                -DL0=$(L0) -DL1=$(L1) -DL2=$(L2) -DL3=$(L3)\
                -DNPROC0_BLK=$(NPROC0_BLK) -DNPROC1_BLK=$(NPROC1_BLK)\
                -DNPROC2_BLK=$(NPROC2_BLK) -DNPROC3_BLK=$(NPROC3_BLK)
+
+else
+$(error "Unknown setting for 'DYNAMIC_SIZES', '$(DYNAMIC_SIZES)'")
+endif
+
+endif
+
+code_dir      := $(call load-par-from-file, CODELOC)
+CC            := $(call load-par-from-file, COMPILER)
+MPI_INCLUDE   := $(call load-par-from-file, MPI_INCLUDE)
+USR_CFLAGS    := $(shell grep CFLAGS      $(settings_file)| grep -v '\#' | awk '{for (i=2; i<=NF; i++) print FS$$i;}')
+USR_LDFLAGS   := $(shell grep LDFLAGS     $(settings_file)| grep -v '\#' | awk '{for (i=2; i<=NF; i++) print FS$$i;}')
+
+# }}}
+#
+# Compile flags
+# ------------------------------------------------------------------------------
+# {{{
 
 CORRECTNESS := -fstrict-aliasing -Wno-long-long -Wstrict-prototypes
 
@@ -430,6 +450,7 @@ endif
 # Compiling a single source file
 $(target_module_dir)/%.o: $(source_module_dir)/%.c $(settings_file) Makefile
 	$(mkdir-target)
+	@echo $(CFLAGS)
 	$(call compile-and-print,\
 		$(CC) $(CFLAGS) -c $< -o $@,\
 		"modules/$(subst $(source_module_dir)/,,$<)")

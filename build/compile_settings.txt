@@ -5,6 +5,8 @@ MPI_INCLUDE /usr/include/mpi
 CFLAGS -std=c99 -O2 -DAVX -DFMA3 -Werror -Wall
 LDFLAGS
 
+DYNAMIC_SIZES 0
+
 NPROC0_TOT   1
 NPROC1_TOT   1
 NPROC2_TOT   1 
