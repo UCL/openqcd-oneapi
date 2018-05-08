@@ -57,8 +57,6 @@ extern int openqcd_sw_term__apply_swinv_dble(int vol, double mu,
 /* SWFLDS_C */
 extern openqcd__pauli *openqcd_sw_term__swfld(void);
 extern openqcd__pauli_dble *openqcd_sw_term__swdfld(void);
-extern void openqcd_sw_term__free_sw(void);
-extern void openqcd_sw_term__free_swd(void);
 extern void openqcd_sw_term__assign_swd2sw(void);
 
 /* SW_TERM_C */
@@ -82,8 +80,6 @@ extern int openqcd_sw_term__sw_term(openqcd_utils__ptset_t set);
 /* SWFLDS_C */
 #define swfld(...) openqcd_sw_term__swfld(__VA_ARGS__)
 #define swdfld(...) openqcd_sw_term__swdfld(__VA_ARGS__)
-#define free_sw(...) openqcd_sw_term__free_sw(__VA_ARGS__)
-#define free_swd(...) openqcd_sw_term__free_swd(__VA_ARGS__)
 #define assign_swd2sw(...) openqcd_sw_term__assign_swd2sw(__VA_ARGS__)
 
 /* SW_TERM_C */

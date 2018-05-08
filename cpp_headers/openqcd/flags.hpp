@@ -44,7 +44,6 @@ using sap_parms_t = openqcd_flags__sap_parms_t;
 using solver_parms_t = openqcd_flags__solver_parms_t;
 using tm_parms_t = openqcd_flags__tm_parms_t;
 using ani_params_t = openqcd_flags__ani_params_t;
-using wflow_parms_t = openqcd_flags__wflow_parms_t;
 using stout_smearing_params_t = openqcd_flags__stout_smearing_params_t;
 
 // FLAGS_C
@@ -153,10 +152,6 @@ const auto &read_solver_parms = openqcd_flags__read_solver_parms;
 const auto &print_solver_parms = openqcd_flags__print_solver_parms;
 const auto &write_solver_parms = openqcd_flags__write_solver_parms;
 const auto &check_solver_parms = openqcd_flags__check_solver_parms;
-
-// WFLOW_PARMS_C
-const auto &set_wflow_parms = openqcd_flags__set_wflow_parms;
-const auto &wflow_parms = openqcd_flags__wflow_parms;
 
 // ANISOTROPY_PARMS_C
 const auto &set_ani_parms = openqcd_flags__set_ani_parms;

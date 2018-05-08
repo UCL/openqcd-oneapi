@@ -68,7 +68,6 @@ extern void openqcd_sflds__diff_sd2s(int vol, openqcd__spinor_dble const *sd,
 /* SCOM_C */
 extern void openqcd_sflds__cps_int_bnd(int is, openqcd__spinor *s);
 extern void openqcd_sflds__cps_ext_bnd(int is, openqcd__spinor *s);
-extern void openqcd_sflds__free_sbufs(void);
 
 /* SDCOM_C */
 extern void openqcd_sflds__cpsd_int_bnd(int is, openqcd__spinor_dble *sd);
@@ -103,7 +102,6 @@ extern void openqcd_sflds__cpsd_ext_bnd(int is, openqcd__spinor_dble *sd);
 /* SCOM_C */
 #define cps_int_bnd(...) openqcd_sflds__cps_int_bnd(__VA_ARGS__)
 #define cps_ext_bnd(...) openqcd_sflds__cps_ext_bnd(__VA_ARGS__)
-#define free_sbufs(...) openqcd_sflds__free_sbufs(__VA_ARGS__)
 
 /* SDCOM_C */
 #define cpsd_int_bnd(...) openqcd_sflds__cpsd_int_bnd(__VA_ARGS__)

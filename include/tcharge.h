@@ -18,7 +18,6 @@
 /* FTCOM_C */
 extern void openqcd_tcharge__copy_bnd_ft(int n, openqcd__u3_alg_dble *ft);
 extern void openqcd_tcharge__add_bnd_ft(int n, openqcd__u3_alg_dble *ft);
-extern void openqcd_tcharge__free_ftcom_bufs(void);
 
 /* FTENSOR_C */
 extern openqcd__u3_alg_dble **openqcd_tcharge__ftensor(void);
@@ -35,7 +34,6 @@ extern double openqcd_tcharge__ym_action_slices(double *asl);
 /* FTCOM_C */
 #define copy_bnd_ft(...) openqcd_tcharge__copy_bnd_ft(__VA_ARGS__)
 #define add_bnd_ft(...) openqcd_tcharge__add_bnd_ft(__VA_ARGS__)
-#define free_ftcom_bufs(...) openqcd_tcharge__free_ftcom_bufs(__VA_ARGS__)
 
 /* FTENSOR_C */
 #define ftensor(...) openqcd_tcharge__ftensor(__VA_ARGS__)

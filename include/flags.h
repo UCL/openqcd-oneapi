@@ -256,12 +256,6 @@ typedef struct
 
 typedef struct
 {
-  int n;
-  double eps;
-} openqcd_flags__wflow_parms_t;
-
-typedef struct
-{
   int num_smear;
 
   int smear_temporal;
@@ -414,11 +408,6 @@ extern void openqcd_flags__print_solver_parms(int *isap, int *idfl);
 extern void openqcd_flags__write_solver_parms(FILE *fdat);
 extern void openqcd_flags__check_solver_parms(FILE *fdat);
 
-/* WFLOW_PARMS_C */
-extern openqcd_flags__wflow_parms_t openqcd_flags__set_wflow_parms(int n,
-                                                                   double eps);
-extern openqcd_flags__wflow_parms_t openqcd_flags__wflow_parms(void);
-
 /* ANISOTROPY_PARMS_C */
 extern openqcd_flags__ani_params_t
 openqcd_flags__set_ani_parms(int use_tts, double nu, double xi, double cR,
@@ -471,7 +460,6 @@ extern void openqcd_flags__check_stout_smearing_parms(FILE *fdat);
 #define solver_parms_t openqcd_flags__solver_parms_t
 #define tm_parms_t openqcd_flags__tm_parms_t
 #define ani_params_t openqcd_flags__ani_params_t
-#define wflow_parms_t openqcd_flags__wflow_parms_t
 #define stout_smearing_params_t openqcd_flags__stout_smearing_params_t
 
 /* FLAGS_C */
@@ -582,10 +570,6 @@ extern void openqcd_flags__check_stout_smearing_parms(FILE *fdat);
 #define print_solver_parms(...) openqcd_flags__print_solver_parms(__VA_ARGS__)
 #define write_solver_parms(...) openqcd_flags__write_solver_parms(__VA_ARGS__)
 #define check_solver_parms(...) openqcd_flags__check_solver_parms(__VA_ARGS__)
-
-/* WFLOW_PARMS_C */
-#define set_wflow_parms(...) openqcd_flags__set_wflow_parms(__VA_ARGS__)
-#define wflow_parms(...) openqcd_flags__wflow_parms(__VA_ARGS__)
 
 /* ANISOTROPY_PARMS_C */
 #define set_ani_parms(...) openqcd_flags__set_ani_parms(__VA_ARGS__)

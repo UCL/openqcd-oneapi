@@ -42,7 +42,6 @@ const auto &udfld = openqcd_uflds__udfld;
 const auto &apply_ani_ud = openqcd_uflds__apply_ani_ud;
 const auto &remove_ani_ud = openqcd_uflds__remove_ani_ud;
 const auto &random_ud = openqcd_uflds__random_ud;
-const auto &renormalize_u = openqcd_uflds__renormalize_u;
 const auto &set_ud_phase = openqcd_uflds__set_ud_phase;
 const auto &unset_ud_phase = openqcd_uflds__unset_ud_phase;
 const auto &renormalize_ud = openqcd_uflds__renormalize_ud;

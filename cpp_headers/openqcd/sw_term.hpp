@@ -37,8 +37,6 @@ const auto &apply_swinv_dble = openqcd_sw_term__apply_swinv_dble;
 // SWFLDS_C
 const auto &swfld = openqcd_sw_term__swfld;
 const auto &swdfld = openqcd_sw_term__swdfld;
-const auto &free_sw = openqcd_sw_term__free_sw;
-const auto &free_swd = openqcd_sw_term__free_swd;
 const auto &assign_swd2sw = openqcd_sw_term__assign_swd2sw;
 
 // SW_TERM_C

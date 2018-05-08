@@ -38,7 +38,6 @@ extern openqcd__su3_dble *openqcd_uflds__udfld(void);
 extern void openqcd_uflds__apply_ani_ud(void);
 extern void openqcd_uflds__remove_ani_ud(void);
 extern void openqcd_uflds__random_ud(void);
-extern void openqcd_uflds__renormalize_u(void);
 extern void openqcd_uflds__set_ud_phase(void);
 extern void openqcd_uflds__unset_ud_phase(void);
 extern void openqcd_uflds__renormalize_ud(void);
@@ -70,7 +69,6 @@ extern void openqcd_uflds__copy_bnd_ud(void);
 #define apply_ani_ud(...) openqcd_uflds__apply_ani_ud(__VA_ARGS__)
 #define remove_ani_ud(...) openqcd_uflds__remove_ani_ud(__VA_ARGS__)
 #define random_ud(...) openqcd_uflds__random_ud(__VA_ARGS__)
-#define renormalize_u(...) openqcd_uflds__renormalize_u(__VA_ARGS__)
 #define set_ud_phase(...) openqcd_uflds__set_ud_phase(__VA_ARGS__)
 #define unset_ud_phase(...) openqcd_uflds__unset_ud_phase(__VA_ARGS__)
 #define renormalize_ud(...) openqcd_uflds__renormalize_ud(__VA_ARGS__)

@@ -23,7 +23,6 @@ namespace tcharge {
 // FTCOM_C
 const auto &copy_bnd_ft = openqcd_tcharge__copy_bnd_ft;
 const auto &add_bnd_ft = openqcd_tcharge__add_bnd_ft;
-const auto &free_ftcom_bufs = openqcd_tcharge__free_ftcom_bufs;
 
 // FTENSOR_C
 const auto &ftensor = openqcd_tcharge__ftensor;

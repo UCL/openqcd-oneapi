@@ -48,7 +48,6 @@ const auto &diff_sd2s = openqcd_sflds__diff_sd2s;
 // SCOM_C
 const auto &cps_int_bnd = openqcd_sflds__cps_int_bnd;
 const auto &cps_ext_bnd = openqcd_sflds__cps_ext_bnd;
-const auto &free_sbufs = openqcd_sflds__free_sbufs;
 
 // SDCOM_C
 const auto &cpsd_int_bnd = openqcd_sflds__cpsd_int_bnd;
