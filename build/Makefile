@@ -8,14 +8,16 @@
 # ------------------------------------------------------------------------------
 # {{{
 
-target_module_dir  := modules
-target_tests_dir   := tests
-target_include_dir := include
-dep_dir            := .deps
-source_main_dir    = $(code_dir)/main
-source_module_dir  = $(code_dir)/modules
-source_devel_dir   = $(code_dir)/tests
-source_include_dir = $(code_dir)/include
+target_module_dir      := modules
+target_tests_dir       := tests
+target_include_dir     := include
+target_include_cpp_dir := include-cpp
+dep_dir                := .deps
+source_main_dir         = $(code_dir)/main
+source_module_dir       = $(code_dir)/modules
+source_tests_dir        = $(code_dir)/tests
+source_include_dir      = $(code_dir)/include
+source_include_cpp_dir  = $(code_dir)/cpp_headers
 
 # }}}
 #
@@ -184,24 +186,28 @@ test_nompi_module_dirs  := $(patsubst %,$(target_tests_dir)/nompi/%,$(test_nompi
 
 # Compile every main program
 .PHONY: all
-all: print-header $(main_programs)
+all: $(main_programs)
 
 # Compile every test in tests
 .PHONY: tests
-tests: print-header $(test_module_dirs) $(test_nompi_module_dirs)
+tests: $(test_module_dirs) $(test_nompi_module_dirs)
 
 # The main programs depend on all the modules
-$(main_programs): print-header $(module_libs)
+$(main_programs): $(module_libs)
 
 # Build an openqcd library
 .PHONY: library
-library: headers $(openqcd_lib)
+library: $(openqcd_lib) headers
 
+# Build the C++ variant of the openqcd library
 .PHONY: library-cpp
-library-cpp: headers-cpp $(openqcd_lib)
+library-cpp: $(openqcd_lib) headers-cpp
 
 .PHONY: headers
 headers: $(target_include_dir)
+
+.PHONY: headers-cpp
+headers-cpp: $(target_include_cpp_dir)
 
 # Can build the modules independently if you wish
 .PHONY: $(module_names)
@@ -405,10 +411,20 @@ $(openqcd_lib): $(tmp_mod_lib)
 	$(call link-and-print,ar -M < libopenqcd.mri,$@)
 	@rm libopenqcd.mri
 
+# Copy the C headers to include
 $(target_include_dir): $(master_header_C) $(source_include_dir)
+	@echo "$(call header-print,Copying C headers)"
 	@rm -rf include/openqcd
 	@mkdir -p $(target_include_dir)/openqcd
 	@cp -r $(source_include_dir)/* $(target_include_dir)/openqcd
+
+# Copy the C++ headers to include-cpp
+$(target_include_cpp_dir): $(source_include_cpp_dir) $(source_include_dir)
+	@echo "$(call header-print,Copying C++ headers)"
+	@rm -rf $@
+	@cp -r $(source_include_cpp_dir) $(target_include_cpp_dir)
+	@rm -rf $(target_include_cpp_dir)/openqcd/c_headers
+	@cp -r $(source_include_dir) $(target_include_cpp_dir)/openqcd/c_headers
 
 # Compile a simulation program
 $(main_programs): %: $(source_main_dir)/%.c $(openqcd_lib)
