@@ -125,7 +125,7 @@ typedef struct
  * r.c3=c*s.c3
  */
 
-#define _vector_mul(r, c, s)                                                   \
+#define _openqcd__vector_mul(r, c, s)                                          \
   (r).c1.re = (c) * (s).c1.re;                                                 \
   (r).c1.im = (c) * (s).c1.im;                                                 \
   (r).c2.re = (c) * (s).c2.re;                                                 \
@@ -139,7 +139,7 @@ typedef struct
  * r.c3=i*c*s.c3
  */
 
-#define _vector_imul(r, c, s)                                                  \
+#define _openqcd__vector_imul(r, c, s)                                         \
   (r).c1.re = -(c) * (s).c1.im;                                                \
   (r).c1.im = (c) * (s).c1.re;                                                 \
   (r).c2.re = -(c) * (s).c2.im;                                                \
@@ -153,7 +153,7 @@ typedef struct
  * r.c3=c*s.c3
  */
 
-#define _vector_mulc(r, c, s)                                                  \
+#define _openqcd__vector_mulc(r, c, s)                                         \
   (r).c1.re = (c).re * (s).c1.re - (c).im * (s).c1.im;                         \
   (r).c1.im = (c).re * (s).c1.im + (c).im * (s).c1.re;                         \
   (r).c2.re = (c).re * (s).c2.re - (c).im * (s).c2.im;                         \
@@ -167,7 +167,7 @@ typedef struct
  * r.c3=s1.c3+s2.c3
  */
 
-#define _vector_add(r, s1, s2)                                                 \
+#define _openqcd__vector_add(r, s1, s2)                                        \
   (r).c1.re = (s1).c1.re + (s2).c1.re;                                         \
   (r).c1.im = (s1).c1.im + (s2).c1.im;                                         \
   (r).c2.re = (s1).c2.re + (s2).c2.re;                                         \
@@ -181,7 +181,7 @@ typedef struct
  * r.c3=s1.c3-s2.c3
  */
 
-#define _vector_sub(r, s1, s2)                                                 \
+#define _openqcd__vector_sub(r, s1, s2)                                        \
   (r).c1.re = (s1).c1.re - (s2).c1.re;                                         \
   (r).c1.im = (s1).c1.im - (s2).c1.im;                                         \
   (r).c2.re = (s1).c2.re - (s2).c2.re;                                         \
@@ -195,7 +195,7 @@ typedef struct
  * r.c3=s1.c3+i*s2.c3
  */
 
-#define _vector_i_add(r, s1, s2)                                               \
+#define _openqcd__vector_i_add(r, s1, s2)                                      \
   (r).c1.re = (s1).c1.re - (s2).c1.im;                                         \
   (r).c1.im = (s1).c1.im + (s2).c1.re;                                         \
   (r).c2.re = (s1).c2.re - (s2).c2.im;                                         \
@@ -209,7 +209,7 @@ typedef struct
  * r.c3=s1.c3+i*s2.c3
  */
 
-#define _vector_i_sub(r, s1, s2)                                               \
+#define _openqcd__vector_i_sub(r, s1, s2)                                      \
   (r).c1.re = (s1).c1.re + (s2).c1.im;                                         \
   (r).c1.im = (s1).c1.im - (s2).c1.re;                                         \
   (r).c2.re = (s1).c2.re + (s2).c2.im;                                         \
@@ -223,7 +223,7 @@ typedef struct
  * r.c3+=s.c3
  */
 
-#define _vector_add_assign(r, s)                                               \
+#define _openqcd__vector_add_assign(r, s)                                      \
   (r).c1.re += (s).c1.re;                                                      \
   (r).c1.im += (s).c1.im;                                                      \
   (r).c2.re += (s).c2.re;                                                      \
@@ -237,7 +237,7 @@ typedef struct
  * r.c3-=s.c3
  */
 
-#define _vector_sub_assign(r, s)                                               \
+#define _openqcd__vector_sub_assign(r, s)                                      \
   (r).c1.re -= (s).c1.re;                                                      \
   (r).c1.im -= (s).c1.im;                                                      \
   (r).c2.re -= (s).c2.re;                                                      \
@@ -251,7 +251,7 @@ typedef struct
  * r.c3+=i*s.c3
  */
 
-#define _vector_i_add_assign(r, s)                                             \
+#define _openqcd__vector_i_add_assign(r, s)                                    \
   (r).c1.re -= (s).c1.im;                                                      \
   (r).c1.im += (s).c1.re;                                                      \
   (r).c2.re -= (s).c2.im;                                                      \
@@ -265,7 +265,7 @@ typedef struct
  * r.c3-=i*s.c3
  */
 
-#define _vector_i_sub_assign(r, s)                                             \
+#define _openqcd__vector_i_sub_assign(r, s)                                    \
   (r).c1.re += (s).c1.im;                                                      \
   (r).c1.im -= (s).c1.re;                                                      \
   (r).c2.re += (s).c2.im;                                                      \
@@ -277,7 +277,7 @@ typedef struct
  * Real part of the scalar product (r,s)
  */
 
-#define _vector_prod_re(r, s)                                                  \
+#define _openqcd__vector_prod_re(r, s)                                         \
   (r).c1.re *(s).c1.re + (r).c1.im *(s).c1.im + (r).c2.re *(s).c2.re +         \
       (r).c2.im *(s).c2.im + (r).c3.re *(s).c3.re + (r).c3.im *(s).c3.im
 
@@ -285,7 +285,7 @@ typedef struct
  * Imaginary part of the scalar product (r,s)
  */
 
-#define _vector_prod_im(r, s)                                                  \
+#define _openqcd__vector_prod_im(r, s)                                         \
   (r).c1.re *(s).c1.im - (r).c1.im *(s).c1.re + (r).c2.re *(s).c2.im -         \
       (r).c2.im *(s).c2.re + (r).c3.re *(s).c3.im - (r).c3.im *(s).c3.re
 
@@ -295,7 +295,7 @@ typedef struct
  * r.c3+=c*s.c3
  */
 
-#define _vector_mulr_assign(r, c, s)                                           \
+#define _openqcd__vector_mulr_assign(r, c, s)                                  \
   (r).c1.re += (c) * (s).c1.re;                                                \
   (r).c1.im += (c) * (s).c1.im;                                                \
   (r).c2.re += (c) * (s).c2.re;                                                \
@@ -309,7 +309,7 @@ typedef struct
  * r.c3+=i*c*s.c3
  */
 
-#define _vector_mulir_assign(r, c, s)                                          \
+#define _openqcd__vector_mulir_assign(r, c, s)                                 \
   (r).c1.re -= (c) * (s).c1.im;                                                \
   (r).c1.im += (c) * (s).c1.re;                                                \
   (r).c2.re -= (c) * (s).c2.im;                                                \
@@ -323,7 +323,7 @@ typedef struct
  * r.c3+=z*s.c3
  */
 
-#define _vector_mulc_assign(r, z, s)                                           \
+#define _openqcd__vector_mulc_assign(r, z, s)                                  \
   (r).c1.re += ((z).re * (s).c1.re - (z).im * (s).c1.im);                      \
   (r).c1.im += ((z).re * (s).c1.im + (z).im * (s).c1.re);                      \
   (r).c2.re += ((z).re * (s).c2.re - (z).im * (s).c2.im);                      \
@@ -337,7 +337,7 @@ typedef struct
  * r.c3-=z*s.c3
  */
 
-#define _vector_project(r, z, s)                                               \
+#define _openqcd__vector_project(r, z, s)                                      \
   (r).c1.re -= ((z).re * (s).c1.re - (z).im * (s).c1.im);                      \
   (r).c1.im -= ((z).re * (s).c1.im + (z).im * (s).c1.re);                      \
   (r).c2.re -= ((z).re * (s).c2.re - (z).im * (s).c2.im);                      \
@@ -351,7 +351,7 @@ typedef struct
  * r.c3=c*r.c3+s.c3
  */
 
-#define _vector_mulr_add(r, c, s)                                              \
+#define _openqcd__vector_mulr_add(r, c, s)                                     \
   (r).c1.re = (c) * (r).c1.re + (s).c1.re;                                     \
   (r).c1.im = (c) * (r).c1.im + (s).c1.im;                                     \
   (r).c2.re = (c) * (r).c2.re + (s).c2.re;                                     \
@@ -365,7 +365,7 @@ typedef struct
  * r.c3=cr*r.c3+cs*s.c3
  */
 
-#define _vector_combine(r, s, cr, cs)                                          \
+#define _openqcd__vector_combine(r, s, cr, cs)                                 \
   (r).c1.re = (cr) * (r).c1.re + (cs) * (s).c1.re;                             \
   (r).c1.im = (cr) * (r).c1.im + (cs) * (s).c1.im;                             \
   (r).c2.re = (cr) * (r).c2.re + (cs) * (s).c2.re;                             \
@@ -379,7 +379,7 @@ typedef struct
  * v.c3=(w.c1*z.c2-w.c2*z.c1)^*
  */
 
-#define _vector_cross_prod(v, w, z)                                            \
+#define _openqcd__vector_cross_prod(v, w, z)                                   \
   (v).c1.re = (w).c2.re * (z).c3.re - (w).c2.im * (z).c3.im -                  \
               (w).c3.re * (z).c2.re + (w).c3.im * (z).c2.im;                   \
   (v).c1.im = (w).c3.re * (z).c2.im + (w).c3.im * (z).c2.re -                  \
@@ -400,7 +400,7 @@ typedef struct
  * r.c2=(u*s).c2
  * r.c3=(u*s).c3
  */
-#define _su3_multiply(r, u, s)                                                 \
+#define _openqcd__su3_multiply(r, u, s)                                        \
   (r).c1.re = (u).c11.re * (s).c1.re - (u).c11.im * (s).c1.im +                \
               (u).c12.re * (s).c2.re - (u).c12.im * (s).c2.im +                \
               (u).c13.re * (s).c3.re - (u).c13.im * (s).c3.im;                 \
@@ -430,7 +430,7 @@ typedef struct
  * r.c3=(u^dagger*s).c3
  */
 
-#define _su3_inverse_multiply(r, u, s)                                         \
+#define _openqcd__su3_inverse_multiply(r, u, s)                                \
   (r).c1.re = (u).c11.re * (s).c1.re + (u).c11.im * (s).c1.im +                \
               (u).c21.re * (s).c2.re + (u).c21.im * (s).c2.im +                \
               (u).c31.re * (s).c3.re + (u).c31.im * (s).c3.im;                 \
@@ -462,7 +462,7 @@ typedef struct
  * u=v^dagger
  */
 
-#define _su3_dagger(u, v)                                                      \
+#define _openqcd__su3_dagger(u, v)                                             \
   (u).c11.re = (v).c11.re;                                                     \
   (u).c11.im = -(v).c11.im;                                                    \
   (u).c12.re = (v).c21.re;                                                     \
@@ -486,7 +486,7 @@ typedef struct
  * u=v*w
  */
 
-#define _su3_times_su3(u, v, w)                                                \
+#define _openqcd__su3_times_su3(u, v, w)                                       \
   (u).c11.re = (v).c11.re * (w).c11.re - (v).c11.im * (w).c11.im +             \
                (v).c12.re * (w).c21.re - (v).c12.im * (w).c21.im +             \
                (v).c13.re * (w).c31.re - (v).c13.im * (w).c31.im;              \
@@ -552,7 +552,7 @@ typedef struct
  * r+=s
  */
 
-#define _su3_alg_add_assign(r, s)                                              \
+#define _openqcd__su3_alg_add_assign(r, s)                                     \
   (r).c1 += (s).c1;                                                            \
   (r).c2 += (s).c2;                                                            \
   (r).c3 += (s).c3;                                                            \
@@ -566,7 +566,7 @@ typedef struct
  * r-=s
  */
 
-#define _su3_alg_sub_assign(r, s)                                              \
+#define _openqcd__su3_alg_sub_assign(r, s)                                     \
   (r).c1 -= (s).c1;                                                            \
   (r).c2 -= (s).c2;                                                            \
   (r).c3 -= (s).c3;                                                            \
@@ -580,7 +580,7 @@ typedef struct
  * s*=c, c real
  */
 
-#define _su3_alg_mul_assign(s, c)                                              \
+#define _openqcd__su3_alg_mul_assign(s, c)                                     \
   (s).c1 *= (c);                                                               \
   (s).c2 *= (c);                                                               \
   (s).c3 *= (c);                                                               \
@@ -594,7 +594,7 @@ typedef struct
  * r+=c*s, c real
  */
 
-#define _su3_alg_mul_add_assign(r, c, s)                                       \
+#define _openqcd__su3_alg_mul_add_assign(r, c, s)                              \
   (r).c1 += (c) * (s).c1;                                                      \
   (r).c2 += (c) * (s).c2;                                                      \
   (r).c3 += (c) * (s).c3;                                                      \
@@ -608,7 +608,7 @@ typedef struct
  * r-=c*s, c real
  */
 
-#define _su3_alg_mul_sub_assign(r, c, s)                                       \
+#define _openqcd__su3_alg_mul_sub_assign(r, c, s)                              \
   (r).c1 -= (c) * (s).c1;                                                      \
   (r).c2 -= (c) * (s).c2;                                                      \
   (r).c3 -= (c) * (s).c3;                                                      \
@@ -628,7 +628,7 @@ typedef struct
  * r=c*(u+v)
  */
 
-#define _u3_alg_mul_add(r, c, u, v)                                            \
+#define _openqcd__u3_alg_mul_add(r, c, u, v)                                   \
   (r).c1 = (c) * ((u).c1 + (v).c1);                                            \
   (r).c2 = (c) * ((u).c2 + (v).c2);                                            \
   (r).c3 = (c) * ((u).c3 + (v).c3);                                            \
@@ -643,7 +643,7 @@ typedef struct
  * r=c*(u-v)
  */
 
-#define _u3_alg_mul_sub(r, c, u, v)                                            \
+#define _openqcd__u3_alg_mul_sub(r, c, u, v)                                   \
   (r).c1 = (c) * ((u).c1 - (v).c1);                                            \
   (r).c2 = (c) * ((u).c2 - (v).c2);                                            \
   (r).c3 = (c) * ((u).c3 - (v).c3);                                            \
@@ -675,6 +675,39 @@ typedef struct
 #define spinor_dble openqcd__spinor_dble
 #define pauli_dble openqcd__pauli_dble
 #define u3_alg_dble openqcd__u3_alg_dble
+
+#define _vector_mul _openqcd__vector_mul
+#define _vector_imul _openqcd__vector_imul
+#define _vector_mulc _openqcd__vector_mulc
+#define _vector_add _openqcd__vector_add
+#define _vector_sub _openqcd__vector_sub
+#define _vector_i_add _openqcd__vector_i_add
+#define _vector_i_sub _openqcd__vector_i_sub
+#define _vector_add_assign _openqcd__vector_add_assign
+#define _vector_sub_assign _openqcd__vector_sub_assign
+#define _vector_i_add_assign _openqcd__vector_i_add_assign
+#define _vector_i_sub_assign _openqcd__vector_i_sub_assign
+#define _vector_prod_re _openqcd__vector_prod_re
+#define _vector_prod_im _openqcd__vector_prod_im
+#define _vector_mulr_assign _openqcd__vector_mulr_assign
+#define _vector_mulir_assign _openqcd__vector_mulir_assign
+#define _vector_mulc_assign _openqcd__vector_mulc_assign
+#define _vector_project _openqcd__vector_project
+#define _vector_mulr_add _openqcd__vector_mulr_add
+#define _vector_combine _openqcd__vector_combine
+#define _vector_cross_prod _openqcd__vector_cross_prod
+#define _su3_multiply _openqcd__su3_multiply
+#define _su3_inverse_multiply _openqcd__su3_inverse_multiply
+#define _su3_dagger _openqcd__su3_dagger
+#define _su3_times_su3 _openqcd__su3_times_su3
+#define _su3_alg_add_assign _openqcd__su3_alg_add_assign
+#define _su3_alg_sub_assign _openqcd__su3_alg_sub_assign
+#define _su3_alg_mul_assign _openqcd__su3_alg_mul_assign
+#define _su3_alg_mul_add_assign _openqcd__su3_alg_mul_add_assign
+#define _su3_alg_mul_sub_assign _openqcd__su3_alg_mul_sub_assign
+#define _u3_alg_mul_add _openqcd__u3_alg_mul_add
+#define _u3_alg_mul_sub _openqcd__u3_alg_mul_sub
+
 #endif /* defined OPENQCD_INTERNAL */
 
 #endif

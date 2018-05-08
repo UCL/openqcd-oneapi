@@ -97,7 +97,7 @@ extern void openqcd__set_lattice_sizes(int nproc[4], int lat_sizes[4], int block
 
 #endif /* defined OPENQCD_INTERNAL */
 
-#else /* defined STATIC_SIZES */
+#else /* if defined(STATIC_SIZES) */
 
 /*
 THESE QUANTITIES ARE NOW DEFINED IN A TEXT FILE READ BY THE MAKEFILE

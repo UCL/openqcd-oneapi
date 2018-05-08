@@ -24,14 +24,14 @@
 #endif
 
 #if (SHRT_MAX == 0x7fffffff)
-typedef short int stdint_t;
-typedef unsigned short int stduint_t;
+typedef short int openqcd_utils__stdint_t;
+typedef unsigned short int openqcd_utils__stduint_t;
 #elif (INT_MAX == 0x7fffffff)
-typedef int stdint_t;
-typedef unsigned int stduint_t;
+typedef int openqcd_utils__stdint_t;
+typedef unsigned int openqcd_utils__stduint_t;
 #elif (LONG_MAX == 0x7fffffff)
-typedef long int stdint_t;
-typedef unsigned long int stduint_t;
+typedef long int openqcd_utils__stdint_t;
+typedef unsigned long int openqcd_utils__stduint_t;
 #else
 #error : There is no four-byte integer type on this machine
 #endif
@@ -152,6 +152,10 @@ extern int openqcd_utils__release_wvd(void);
 extern int openqcd_utils__wvd_size(void);
 
 #if defined(OPENQCD_INTERNAL)
+
+#define stdint_t openqcd_utils__stdint_t
+#define stduint_t openqcd_utils__stduint_t
+
 #define UNKNOWN_ENDIAN openqcd_utils__UNKNOWN_ENDIAN
 #define LITTLE_ENDIAN openqcd_utils__LITTLE_ENDIAN
 #define BIG_ENDIAN openqcd_utils__BIG_ENDIAN

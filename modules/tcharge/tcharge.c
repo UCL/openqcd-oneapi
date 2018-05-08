@@ -61,7 +61,7 @@
 
 #define N0 (NPROC0 * L0)
 
-#if defined(LIBRARY)
+#if !defined (STATIC_SIZES)
 
 static int *isx, init = 0;
 static double *qsl0;
@@ -73,7 +73,7 @@ static void allocate_buffers(void)
   qsl0 = malloc(N0 * sizeof(*qsl0));
 }
 
-#else
+#else /* if defined(STATIC_SIZES) */
 
 static int isx[L0], init = 0;
 static double qsl0[N0];
@@ -81,7 +81,7 @@ static u3_alg_dble **ft;
 
 static void allocate_buffers(void) {}
 
-#endif
+#endif /* defined STATIC_SIZES */
 
 static double prodXY(u3_alg_dble *X, u3_alg_dble *Y)
 {

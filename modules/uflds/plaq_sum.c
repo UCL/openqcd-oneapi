@@ -79,7 +79,7 @@ static su3_dble *udb;
 static su3_dble wd1 ALIGNED16;
 static su3_dble wd2 ALIGNED16;
 
-#if defined(LIBRARY)
+#if !defined (STATIC_SIZES)
 
 static int isA[2], *isE, *isB, init = 0;
 static double *aslE, *aslB;
@@ -93,14 +93,14 @@ static void allocate_buffers(void)
   aslB = amalloc(N0 * sizeof(*aslB), ALIGN);
 }
 
-#else
+#else /* if defined(STATIC_SIZES) */
 
 static int isA[2], isE[L0], isB[L0], init = 0;
 static double aslE[N0], aslB[N0];
 
 static void allocate_buffers(void) {}
 
-#endif
+#endif /* defined STATIC_SIZES */
 
 static double real_trace(su3_dble const *u)
 {

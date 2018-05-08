@@ -16,7 +16,7 @@
 #include "global.h"
 #include "utils.h"
 
-#if defined(LIBRARY)
+#if !defined (STATIC_SIZES)
 
 int NPROC0 = 0;
 int NPROC1 = 0;
@@ -127,7 +127,7 @@ void set_lattice_sizes(int nproc[4], int lat_sizes[4], int block_sizes[4])
   already_init = 1;
 }
 
-#else
+#else /* if defined(STATIC_SIZES) */
 
 int cpr[4];
 int npr[8];
@@ -137,7 +137,7 @@ int iup[VOLUME][4];
 int idn[VOLUME][4];
 int map[BNDRY + NPROC % 2];
 
-#endif /* defined LIBRARY */
+#endif /* defined STATIC_SIZES */
 
 #ifdef dirac_counters
 
