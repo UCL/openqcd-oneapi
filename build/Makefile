@@ -450,7 +450,6 @@ endif
 # Compiling a single source file
 $(target_module_dir)/%.o: $(source_module_dir)/%.c $(settings_file) Makefile
 	$(mkdir-target)
-	@echo $(CFLAGS)
 	$(call compile-and-print,\
 		$(CC) $(CFLAGS) -c $< -o $@,\
 		"modules/$(subst $(source_module_dir)/,,$<)")

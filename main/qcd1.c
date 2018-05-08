@@ -410,6 +410,26 @@ static void setup_files(void)
   sprintf(rng_save, "%s~", rng_file);
 }
 
+#if !defined(STATIC_SIZES)
+static void read_lattize_sizes(void)
+{
+  int local_lattice_sizes[4], mpi_layout[4], block_layout[4];
+
+  if (my_rank == 0) {
+    find_section("Lattice sizes");
+    read_iprms("number_of_processes", 4, mpi_layout);
+    read_iprms("local_lattice_sizes", 4, local_lattice_sizes);
+    read_iprms("number_of_blocks", 4, block_layout);
+  }
+
+  mpc_bcast_i(mpi_layout, 4);
+  mpc_bcast_i(local_lattice_sizes, 4);
+  mpc_bcast_i(block_layout, 4);
+
+  set_lattice_sizes(mpi_layout, local_lattice_sizes, block_layout);
+}
+#endif
+
 static void read_lat_parms(void)
 {
   int nk;
@@ -1185,6 +1205,10 @@ static void read_infile(int argc, char *argv[])
                "Unable to open parameter file");
   }
 
+#if !defined(STATIC_SIZES)
+  read_lattize_sizes();
+#endif
+
   read_ani_parms();
   read_smearing();
   read_lat_parms();
@@ -1907,31 +1931,8 @@ int main(int argc, char *argv[])
   su3_dble **usv;
   dat_t ndat;
 
-#if defined(LIBRARY)
-  int local_lattice_sizes[4], mpi_layout[4], block_layout[4];
-#endif
-
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
-#if defined(LIBRARY)
-  mpi_layout[0] = 2;
-  mpi_layout[1] = 2;
-  mpi_layout[2] = 1;
-  mpi_layout[3] = 1;
-
-  local_lattice_sizes[0] = 8;
-  local_lattice_sizes[1] = 8;
-  local_lattice_sizes[2] = 16;
-  local_lattice_sizes[3] = 16;
-
-  block_layout[0] = 1;
-  block_layout[1] = 1;
-  block_layout[2] = 1;
-  block_layout[3] = 1;
-
-  set_lattice_sizes(mpi_layout, local_lattice_sizes, block_layout);
-#endif
 
   read_infile(argc, argv);
   if (noms == 0) {

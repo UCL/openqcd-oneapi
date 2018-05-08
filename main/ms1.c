@@ -389,6 +389,26 @@ static void setup_files(void)
   sprintf(rng_save, "%s~", rng_file);
 }
 
+#if !defined(STATIC_SIZES)
+static void read_lattize_sizes(void)
+{
+  int local_lattice_sizes[4], mpi_layout[4], block_layout[4];
+
+  if (my_rank == 0) {
+    find_section("Lattice sizes");
+    read_iprms("number_of_processes", 4, mpi_layout);
+    read_iprms("local_lattice_sizes", 4, local_lattice_sizes);
+    read_iprms("number_of_blocks", 4, block_layout);
+  }
+
+  mpc_bcast_i(mpi_layout, 4);
+  mpc_bcast_i(local_lattice_sizes, 4);
+  mpc_bcast_i(block_layout, 4);
+
+  set_lattice_sizes(mpi_layout, local_lattice_sizes, block_layout);
+}
+#endif
+
 static void read_lat_parms(void)
 {
   int nk;
@@ -733,6 +753,10 @@ static void read_infile(int argc, char *argv[])
 
   MPI_Bcast(&level, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&seed, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+#if !defined(STATIC_SIZES)
+  read_lattize_sizes();
+#endif
 
   read_ani_parms();
   read_lat_parms();
