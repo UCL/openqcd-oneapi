@@ -99,25 +99,6 @@ extern void openqcd__set_lattice_sizes(int nproc[4], int lat_sizes[4], int block
 
 #else /* if defined(STATIC_SIZES) */
 
-/*
-THESE QUANTITIES ARE NOW DEFINED IN A TEXT FILE READ BY THE MAKEFILE
-
-#define NPROC0 4
-#define NPROC1 8
-#define NPROC2 8
-#define NPROC3 8
-
-#define L0 8
-#define L1 4
-#define L2 4
-#define L3 4
-
-#define NPROC0_BLK 2
-#define NPROC1_BLK 2
-#define NPROC2_BLK 2
-#define NPROC3_BLK 2
-*/
-
 /* Global geometry checks */
 
 #if ((NPROC0 < 1) || (NPROC1 < 1) || (NPROC2 < 1) || (NPROC3 < 1) ||           \

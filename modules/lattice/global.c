@@ -80,7 +80,7 @@ static void check_lattice_sizes(void)
 
 void set_lattice_sizes(int nproc[4], int lat_sizes[4], int block_sizes[4])
 {
-  int i;
+  int i, j;
 
   error(already_init != 0, 1, "set_lattice_sizes [global.c]",
         "The lattice size has already been initialised");
@@ -119,9 +119,19 @@ void set_lattice_sizes(int nproc[4], int lat_sizes[4], int block_sizes[4])
   iup[0] = malloc(4 * VOLUME * sizeof(**iup));
   idn[0] = malloc(4 * VOLUME * sizeof(**idn));
 
+  for (j = 0; j < 4; ++j) {
+    iup[0][j] = 0;
+    idn[0][j] = 0;
+  }
+
   for (i = 1; i < VOLUME; ++i) {
     iup[i] = iup[i - 1] + 4;
     idn[i] = idn[i - 1] + 4;
+
+    for (j = 0; j < 4; ++j) {
+      iup[i][j] = 0;
+      idn[i][j] = 0;
+    }
   }
 
   already_init = 1;
