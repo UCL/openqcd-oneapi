@@ -331,7 +331,7 @@ void write_lat_parms(FILE *fdat)
     dstd[2] = lat.c1;
     dstd[3] = lat.csw;
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(5, istd);
       bswap_double(4, dstd);
     }
@@ -343,7 +343,7 @@ void write_lat_parms(FILE *fdat)
       dstd[0] = lat.kappa[ik];
       dstd[1] = lat.m0[ik];
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_double(2, dstd);
       }
 
@@ -369,7 +369,7 @@ void check_lat_parms(FILE *fdat)
     ir = fread(istd, sizeof(stdint_t), 5, fdat);
     ir += fread(dstd, sizeof(double), 4, fdat);
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(5, istd);
       bswap_double(4, dstd);
     }
@@ -389,7 +389,7 @@ void check_lat_parms(FILE *fdat)
     for (ik = 0; ik < lat.nk; ik++) {
       ir += fread(dstd, sizeof(double), 2, fdat);
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_double(2, dstd);
       }
 
@@ -634,7 +634,7 @@ void write_bc_parms(FILE *fdat)
     dstd[11] = bc.theta[1];
     dstd[12] = bc.theta[2];
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(1, istd);
       bswap_double(13, dstd);
     }
@@ -660,7 +660,7 @@ void check_bc_parms(FILE *fdat)
     ir = fread(istd, sizeof(stdint_t), 1, fdat);
     ir += fread(dstd, sizeof(double), 13, fdat);
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(1, istd);
       bswap_double(13, dstd);
     }

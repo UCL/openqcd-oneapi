@@ -373,7 +373,7 @@ void write_dfl_parms(FILE *fdat)
     dstd[2] = dfl_gen.mu;
     dstd[3] = dfl_upd.dtau;
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(11, istd);
       bswap_double(4, dstd);
     }
@@ -401,7 +401,7 @@ void check_dfl_parms(FILE *fdat)
     error_root(ir != 15, 1, "check_dfl_parms [dfl_parms.c]",
                "Incorrect read count");
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(11, istd);
       bswap_double(4, dstd);
     }

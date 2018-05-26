@@ -506,7 +506,7 @@ void write_rw_parms(FILE *fdat)
         istd[4] = (stdint_t)(rw[irw].irp);
         istd[5] = (stdint_t)(rw[irw].nfct);
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_int(6, istd);
         }
 
@@ -517,7 +517,7 @@ void write_rw_parms(FILE *fdat)
           for (i = 0; i < nfct; i++) {
             istd[0] = (stdint_t)(rw[irw].np[i]);
 
-            if (endian == BIG_ENDIAN) {
+            if (endian == openqcd_utils__BIG_ENDIAN) {
               bswap_int(1, istd);
             }
 
@@ -527,7 +527,7 @@ void write_rw_parms(FILE *fdat)
           for (i = 0; i < nfct; i++) {
             dstd[0] = rw[irw].mu[i];
 
-            if (endian == BIG_ENDIAN) {
+            if (endian == openqcd_utils__BIG_ENDIAN) {
               bswap_double(1, dstd);
             }
 
@@ -538,7 +538,7 @@ void write_rw_parms(FILE *fdat)
         for (i = 0; i < nfct; i++) {
           istd[0] = (stdint_t)(rw[irw].isp[i]);
 
-          if (endian == BIG_ENDIAN) {
+          if (endian == openqcd_utils__BIG_ENDIAN) {
             bswap_int(1, istd);
           }
 
@@ -572,7 +572,7 @@ void check_rw_parms(FILE *fdat)
         error_root(ir != 6, 1, "check_rw_parms [rw_parms.c]",
                    "Incorrect read count");
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_int(6, istd);
         }
 
@@ -592,7 +592,7 @@ void check_rw_parms(FILE *fdat)
           for (i = 0; i < nfct; i++) {
             ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-            if (endian == BIG_ENDIAN) {
+            if (endian == openqcd_utils__BIG_ENDIAN) {
               bswap_int(1, istd);
             }
 
@@ -602,7 +602,7 @@ void check_rw_parms(FILE *fdat)
           for (i = 0; i < nfct; i++) {
             ir += fread(dstd, sizeof(double), 1, fdat);
 
-            if (endian == BIG_ENDIAN) {
+            if (endian == openqcd_utils__BIG_ENDIAN) {
               bswap_double(1, dstd);
             }
 
@@ -613,7 +613,7 @@ void check_rw_parms(FILE *fdat)
         for (i = 0; i < nfct; i++) {
           ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-          if (endian == BIG_ENDIAN) {
+          if (endian == openqcd_utils__BIG_ENDIAN) {
             bswap_int(1, istd);
           }
 

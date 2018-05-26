@@ -461,7 +461,7 @@ void write_action_parms(FILE *fdat)
 
         istd[15] = (stdint_t)(ap[i].smear);
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_int(16, istd);
         }
 
@@ -491,7 +491,7 @@ void check_action_parms(FILE *fdat)
         error_root(ir != 16, 1, "check_action_parms [action_parms.c]",
                    "Incorrect read count");
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_int(16, istd);
         }
 

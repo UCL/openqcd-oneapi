@@ -175,7 +175,7 @@ void write_stout_smearing_parms(FILE *fdat)
     dstd[0] = ssp.rho_temporal;
     dstd[1] = ssp.rho_spatial;
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(NUM_INT_PARMS, istd);
       bswap_double(NUM_DOUBLE_PARMS, dstd);
     }
@@ -202,7 +202,7 @@ void check_stout_smearing_parms(FILE *fdat)
     ir = fread(istd, sizeof(stdint_t), NUM_INT_PARMS, fdat);
     ir += fread(dstd, sizeof(double), NUM_DOUBLE_PARMS, fdat);
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(NUM_INT_PARMS, istd);
       bswap_double(NUM_DOUBLE_PARMS, dstd);
     }

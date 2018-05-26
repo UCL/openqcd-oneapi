@@ -224,7 +224,7 @@ void write_hmc_parms(FILE *fdat)
       dstd[1 + i] = hmc.mu[i];
     }
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(nact + 4, istd);
       bswap_double(nmu + 1, dstd);
     }
@@ -264,7 +264,7 @@ void check_hmc_parms(FILE *fdat)
     error_root(ir != (nact + nmu + 5), 1, "check_hmc_parms [hmc_parms.c]",
                "Incorrect read count");
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(nact + 4, istd);
       bswap_double(nmu + 1, dstd);
     }

@@ -180,7 +180,7 @@ void write_sap_parms(FILE *fdat)
     istd[5] = (stdint_t)(sap.nmr);
     istd[6] = (stdint_t)(sap.ncy);
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(7, istd);
     }
 
@@ -204,7 +204,7 @@ void check_sap_parms(FILE *fdat)
     error_root(ir != 7, 1, "check_sap_parms [sap_parms.c]",
                "Incorrect read count");
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(7, istd);
     }
 

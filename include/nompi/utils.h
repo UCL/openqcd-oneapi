@@ -95,9 +95,6 @@ extern int openqcd_utils__not_equal_d(double, double);
 
 #if defined(OPENQCD_INTERNAL)
 #define NAME_SIZE openqcd_utils__NAME_SIZE
-#define UNKNOWN_ENDIAN openqcd_utils__UNKNOWN_ENDIAN
-#define LITTLE_ENDIAN openqcd_utils__LITTLE_ENDIAN
-#define BIG_ENDIAN openqcd_utils__BIG_ENDIAN
 #define IMAX openqcd_utils__IMAX
 #define ptset_t openqcd_utils__ptset_t
 

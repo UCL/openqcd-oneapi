@@ -380,7 +380,7 @@ void write_mdint_parms(FILE *fdat)
         dstd[0] = mdp[i].lambda;
         n = 4 + nfr;
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_int(n, istd);
           bswap_double(1, dstd);
         }
@@ -431,7 +431,7 @@ void check_mdint_parms(FILE *fdat)
         error_root(ir != (n + 1), 1, "check_mdint_parms [mdint_parms.c]",
                    "Incorrect read count");
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_int(n, istd);
           bswap_double(1, dstd);
         }

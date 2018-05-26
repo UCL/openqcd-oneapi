@@ -663,7 +663,7 @@ void write_force_parms(FILE *fdat)
           istd[19 + j] = (stdint_t)(fp[i].icr[j]);
         }
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_int(23, istd);
         }
 
@@ -693,7 +693,7 @@ void check_force_parms(FILE *fdat)
         error_root(ir != 23, 1, "check_force_parms [force_parms.c]",
                    "Incorrect read count");
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_int(23, istd);
         }
 

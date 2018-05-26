@@ -181,7 +181,7 @@ void write_ani_parms(FILE *fdat)
     dstd[6] = ani.us_fermion;
     dstd[7] = ani.ut_fermion;
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(2, istd);
       bswap_double(8, dstd);
     }
@@ -207,7 +207,7 @@ void check_ani_parms(FILE *fdat)
     ir = fread(istd, sizeof(stdint_t), 2, fdat);
     ir += fread(dstd, sizeof(double), 8, fdat);
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(2, istd);
       bswap_double(8, dstd);
     }

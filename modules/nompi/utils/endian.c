@@ -13,7 +13,7 @@
 * The externally accessible functions are
 *
 *   int endianness(void)
-*     Returns LITTLE_ENDIAN if the machine is little endian and BIG_ENDIAN
+*     Returns openqcd_utils__LITTLE_ENDIAN if the machine is little endian and BIG_ENDIAN
 *     if it is big endian. Otherwise the return value is UNKNOWN_ENDIAN
 *
 *   void bswap_int(int n,void *a)
@@ -53,11 +53,11 @@ int endianness(void)
   b = (unsigned char *)(&i);
 
   if ((b[0] == 1u) && (b[1] == 2u) && (b[2] == 3u) && (b[3] == 4u)) {
-    return LITTLE_ENDIAN;
+    return openqcd_utils__LITTLE_ENDIAN;
   } else if ((b[0] == 4u) && (b[1] == 3u) && (b[2] == 2u) && (b[3] == 1u)) {
-    return BIG_ENDIAN;
+    return openqcd_utils__BIG_ENDIAN;
   } else {
-    return UNKNOWN_ENDIAN;
+    return openqcd_utils__UNKNOWN_ENDIAN;
   }
 }
 

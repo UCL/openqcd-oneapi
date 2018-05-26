@@ -85,7 +85,7 @@ static int check_machine(void)
              "Size of a stdint_t integer is not 4");
 
   ie = endianness();
-  error_root(ie == UNKNOWN_ENDIAN, 1, "check_machine [ranlux.c]",
+  error_root(ie == openqcd_utils__UNKNOWN_ENDIAN, 1, "check_machine [ranlux.c]",
              "Unkown endianness");
 
   return ie;
@@ -204,7 +204,7 @@ void export_ranlux(int tag, char *out)
     lsize[7] = (stdint_t)(L2);
     lsize[8] = (stdint_t)(L3);
 
-    if (ie == BIG_ENDIAN) {
+    if (ie == openqcd_utils__BIG_ENDIAN) {
       bswap_int(9, lsize);
     }
 
@@ -232,7 +232,7 @@ void export_ranlux(int tag, char *out)
         state[k] = (stdint_t)(rlxs_state[k]);
       }
 
-      if (ie == BIG_ENDIAN) {
+      if (ie == openqcd_utils__BIG_ENDIAN) {
         bswap_int(ns, state);
       }
 
@@ -272,7 +272,7 @@ int import_ranlux(char const *in)
 
     ir += fread(lsize, sizeof(stdint_t), 9, fin);
 
-    if (ie == BIG_ENDIAN) {
+    if (ie == openqcd_utils__BIG_ENDIAN) {
       bswap_int(9, lsize);
     }
 
@@ -297,7 +297,7 @@ int import_ranlux(char const *in)
     if (my_rank == 0) {
       ir += fread(state, sizeof(stdint_t), ns, fin);
 
-      if (ie == BIG_ENDIAN) {
+      if (ie == openqcd_utils__BIG_ENDIAN) {
         bswap_int(ns, state);
       }
 

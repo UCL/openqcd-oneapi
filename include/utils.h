@@ -156,9 +156,6 @@ extern int openqcd_utils__wvd_size(void);
 #define stdint_t openqcd_utils__stdint_t
 #define stduint_t openqcd_utils__stduint_t
 
-#define UNKNOWN_ENDIAN openqcd_utils__UNKNOWN_ENDIAN
-#define LITTLE_ENDIAN openqcd_utils__LITTLE_ENDIAN
-#define BIG_ENDIAN openqcd_utils__BIG_ENDIAN
 #define IMAX openqcd_utils__IMAX
 #define ptset_t openqcd_utils__ptset_t
 #define No_Section_Found openqcd_utils__No_Section_Found

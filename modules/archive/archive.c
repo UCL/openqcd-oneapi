@@ -239,7 +239,7 @@ static void check_machine(void)
              "Size of a double is not 8");
 
   endian = endianness();
-  error_root(endian == UNKNOWN_ENDIAN, 1, "check_machine [archive.c]",
+  error_root(endian == openqcd_utils__UNKNOWN_ENDIAN, 1, "check_machine [archive.c]",
              "Unkown endianness");
 }
 
@@ -339,7 +339,7 @@ void export_cnfg(char const *out)
     lsize[2] = (stdint_t)(N2);
     lsize[3] = (stdint_t)(N3);
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(4, lsize);
       bswap_double(1, &plaq);
     }
@@ -386,7 +386,7 @@ void export_cnfg(char const *out)
       }
 
       if (my_rank == 0) {
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_double(4 * L3 * 18, ubuf);
         }
         iw = fwrite(ubuf, sizeof(su3_dble), 4 * L3, fout);
@@ -435,7 +435,7 @@ void import_cnfg(char const *in)
     ir += fread(&plaq0, sizeof(double), 1, fin);
     error_root(ir != 5, 1, "import_cnfg [archive.c]", "Incorrect read count");
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(4, lsize);
       bswap_double(1, &plaq0);
     }
@@ -486,7 +486,7 @@ void import_cnfg(char const *in)
       ir = fread(vbuf, sizeof(su3_dble), n, fin);
       ira |= (ir != n);
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_double(n * 18, vbuf);
       }
 

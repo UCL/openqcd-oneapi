@@ -214,7 +214,7 @@ void write_rat_parms(FILE *fdat)
         dstd[0] = rp[irp].range[0];
         dstd[1] = rp[irp].range[1];
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_int(2, istd);
           bswap_double(2, dstd);
         }
@@ -250,7 +250,7 @@ void check_rat_parms(FILE *fdat)
         error_root(ir != 4, 1, "check_rat_parms [rat_parms.c]",
                    "Incorrect read count");
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_int(2, istd);
           bswap_double(2, dstd);
         }

@@ -173,7 +173,7 @@ static void check_machine(void)
              "The spinor_dble structures are not properly packed");
 
   endian = endianness();
-  error_root(endian == UNKNOWN_ENDIAN, 1, "check_machine [sarchive.c]",
+  error_root(endian == openqcd_utils__UNKNOWN_ENDIAN, 1, "check_machine [sarchive.c]",
              "Unkown endianness");
 }
 
@@ -251,7 +251,7 @@ void export_sfld(char const *out, spinor_dble const *sd)
     lsize[2] = N2;
     lsize[3] = N3;
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(4, lsize);
       bswap_double(1, &norm);
     }
@@ -295,7 +295,7 @@ void export_sfld(char const *out, spinor_dble const *sd)
       }
 
       if (my_rank == 0) {
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_double(L3 * 24, (double *)(sbuf));
         }
         iw = fwrite(sbuf, sizeof(spinor_dble), L3, fout);
@@ -344,7 +344,7 @@ void import_sfld(char const *in, spinor_dble *sd)
     ir += fread(&norm0, sizeof(double), 1, fin);
     error_root(ir != 5, 1, "import_sfld [sarchive.c]", "Incorrect read count");
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(4, lsize);
       bswap_double(1, &norm0);
     }
@@ -380,7 +380,7 @@ void import_sfld(char const *in, spinor_dble *sd)
         ir = fread(sbuf, sizeof(spinor_dble), L3, fin);
         ira |= (ir != L3);
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_double(L3 * 24, (double *)(sbuf));
         }
       }
