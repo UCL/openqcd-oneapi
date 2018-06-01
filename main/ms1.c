@@ -125,7 +125,7 @@ static void write_file_head(void)
 
   istd[0] = (stdint_t)(nrw);
 
-  if (endian == BIG_ENDIAN) {
+  if (endian == openqcd_utils__BIG_ENDIAN) {
     bswap_int(1, istd);
   }
 
@@ -134,7 +134,7 @@ static void write_file_head(void)
   for (irw = 0; irw < nrw; irw++) {
     istd[0] = (stdint_t)(nfct[irw]);
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(1, istd);
     }
 
@@ -144,7 +144,7 @@ static void write_file_head(void)
   for (irw = 0; irw < nrw; irw++) {
     istd[0] = (stdint_t)(nsrc[irw]);
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(1, istd);
     }
 
@@ -167,7 +167,7 @@ static void check_file_head(void)
 
   ir = fread(istd, sizeof(stdint_t), 1, fdat);
 
-  if (endian == BIG_ENDIAN) {
+  if (endian == openqcd_utils__BIG_ENDIAN) {
     bswap_int(1, istd);
   }
 
@@ -179,7 +179,7 @@ static void check_file_head(void)
   for (irw = 0; irw < nrw; irw++) {
     ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(1, istd);
     }
 
@@ -189,7 +189,7 @@ static void check_file_head(void)
   for (irw = 0; irw < nrw; irw++) {
     ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(1, istd);
     }
 
@@ -212,7 +212,7 @@ static void write_data(void)
 
   istd[0] = (stdint_t)(data.nc);
 
-  if (endian == BIG_ENDIAN) {
+  if (endian == openqcd_utils__BIG_ENDIAN) {
     bswap_int(1, istd);
   }
 
@@ -228,7 +228,7 @@ static void write_data(void)
       for (isrc = 0; isrc < nsrc[irw]; isrc++) {
         dstd[0] = data.sqn[irw][ifct][isrc];
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_double(1, dstd);
         }
 
@@ -238,7 +238,7 @@ static void write_data(void)
       for (isrc = 0; isrc < nsrc[irw]; isrc++) {
         dstd[0] = data.lnr[irw][ifct][isrc];
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_double(1, dstd);
         }
 
@@ -266,7 +266,7 @@ static int read_data(void)
     return 0;
   }
 
-  if (endian == BIG_ENDIAN) {
+  if (endian == openqcd_utils__BIG_ENDIAN) {
     bswap_int(1, istd);
   }
 
@@ -282,7 +282,7 @@ static int read_data(void)
       for (isrc = 0; isrc < nsrc[irw]; isrc++) {
         ir += fread(dstd, sizeof(double), 1, fdat);
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_double(1, dstd);
         }
 
@@ -292,7 +292,7 @@ static int read_data(void)
       for (isrc = 0; isrc < nsrc[irw]; isrc++) {
         ir += fread(dstd, sizeof(double), 1, fdat);
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_double(1, dstd);
         }
 
@@ -714,7 +714,7 @@ static void read_infile(int argc, char *argv[])
     error_root((ifile == 0) || (ifile == (argc - 1)), 1, "read_infile [ms1.c]",
                "Syntax: ms1 -i <input file> [-noexp] [-a [-norng]]");
 
-    error_root(endian == UNKNOWN_ENDIAN, 1, "read_infile [ms1.c]",
+    error_root(endian == openqcd_utils__UNKNOWN_ENDIAN, 1, "read_infile [ms1.c]",
                "Machine has unknown endianness");
 
     noexp = find_opt(argc, argv, "-noexp");
@@ -952,7 +952,7 @@ static void print_info(void)
     printf("Program git SHA: %s\n", build_git_sha);
     printf("Program user CFLAGS: %s\n", build_user_cflags);
 
-    if (endian == LITTLE_ENDIAN) {
+    if (endian == openqcd_utils__LITTLE_ENDIAN) {
       printf("The machine is little endian\n");
     } else {
       printf("The machine is big endian\n");

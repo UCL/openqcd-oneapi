@@ -334,7 +334,7 @@ static void read_infile(int argc, char *argv[])
     error_root((ifile == 0) || (ifile == (argc - 1)), 1, "read_infile [ms2.c]",
                "Syntax: ms2 -i <input file> [-noexp]");
 
-    error_root(endian == UNKNOWN_ENDIAN, 1, "read_infile [ms2.c]",
+    error_root(endian == openqcd_utils__UNKNOWN_ENDIAN, 1, "read_infile [ms2.c]",
                "Machine has unknown endianness");
 
     noexp = find_opt(argc, argv, "-noexp");
@@ -410,7 +410,7 @@ static void print_info(void)
     printf("Program git SHA: %s\n", build_git_sha);
     printf("Program user CFLAGS: %s\n", build_user_cflags);
 
-    if (endian == LITTLE_ENDIAN) {
+    if (endian == openqcd_utils__LITTLE_ENDIAN) {
       printf("The machine is little endian\n");
     } else {
       printf("The machine is big endian\n");

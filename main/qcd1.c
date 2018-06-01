@@ -101,7 +101,7 @@ static int write_dat(int n, dat_t *ndat)
     dstd[0] = (*ndat).dH;
     dstd[1] = (*ndat).avpl;
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(2, istd);
       bswap_double(2, dstd);
     }
@@ -136,7 +136,7 @@ static int read_dat(int n, dat_t *ndat)
       return ic;
     }
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(2, istd);
       bswap_double(2, dstd);
     }
@@ -197,7 +197,7 @@ static void write_file_head(void)
   istd[2] = (stdint_t)(file_head.tmax);
   dstd[0] = file_head.eps;
 
-  if (endian == BIG_ENDIAN) {
+  if (endian == openqcd_utils__BIG_ENDIAN) {
     bswap_int(3, istd);
     bswap_double(1, dstd);
   }
@@ -219,7 +219,7 @@ static void check_file_head(void)
 
   error_root(ir != 4, 1, "check_file_head [qcd1.c]", "Incorrect read count");
 
-  if (endian == BIG_ENDIAN) {
+  if (endian == openqcd_utils__BIG_ENDIAN) {
     bswap_int(3, istd);
     bswap_double(1, dstd);
   }
@@ -239,7 +239,7 @@ static void write_data(void)
 
   istd[0] = (stdint_t)(data.nt);
 
-  if (endian == BIG_ENDIAN) {
+  if (endian == openqcd_utils__BIG_ENDIAN) {
     bswap_int(1, istd);
   }
 
@@ -252,7 +252,7 @@ static void write_data(void)
     for (t = 0; t < tmax; t++) {
       dstd[0] = data.Wsl[in][t];
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_double(1, dstd);
       }
 
@@ -264,7 +264,7 @@ static void write_data(void)
     for (t = 0; t < tmax; t++) {
       dstd[0] = data.Ysl[in][t];
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_double(1, dstd);
       }
 
@@ -276,7 +276,7 @@ static void write_data(void)
     for (t = 0; t < tmax; t++) {
       dstd[0] = data.Qsl[in][t];
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_double(1, dstd);
       }
 
@@ -301,7 +301,7 @@ static int read_data(void)
     return 0;
   }
 
-  if (endian == BIG_ENDIAN) {
+  if (endian == openqcd_utils__BIG_ENDIAN) {
     bswap_int(1, istd);
   }
 
@@ -314,7 +314,7 @@ static int read_data(void)
     for (t = 0; t < tmax; t++) {
       ir += fread(dstd, sizeof(double), 1, fdat);
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_double(1, dstd);
       }
 
@@ -326,7 +326,7 @@ static int read_data(void)
     for (t = 0; t < tmax; t++) {
       ir += fread(dstd, sizeof(double), 1, fdat);
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_double(1, dstd);
       }
 
@@ -338,7 +338,7 @@ static int read_data(void)
     for (t = 0; t < tmax; t++) {
       ir += fread(dstd, sizeof(double), 1, fdat);
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_double(1, dstd);
       }
 
@@ -586,7 +586,7 @@ static void read_schedule(void)
       ir = fread(istd, sizeof(stdint_t), 3, fdat);
       error_root(ir != 3, 1, "read_schedule [qcd1.c]", "Incorrect read count");
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_int(3, istd);
       }
 
@@ -602,7 +602,7 @@ static void read_schedule(void)
       istd[1] = (stdint_t)(dtr_ms);
       istd[2] = (stdint_t)(dtr_cnfg);
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_int(3, istd);
       }
 
@@ -984,7 +984,7 @@ static void read_wflow_parms(void)
       error_root(ir != 1, 1, "read_wflow_parms [qcd1.c]",
                  "Incorrect read count");
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_int(1, istd);
       }
 
@@ -994,7 +994,7 @@ static void read_wflow_parms(void)
     } else {
       istd[0] = (stdint_t)(noms == 0);
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_int(1, istd);
       }
 
@@ -1048,7 +1048,7 @@ static void read_wflow_parms(void)
       error_root(ir != 4, 1, "read_wflow_parms [qcd1.c]",
                  "Incorrect read count");
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_int(3, istd);
         bswap_double(1, dstd);
       }
@@ -1067,7 +1067,7 @@ static void read_wflow_parms(void)
       istd[2] = (stdint_t)(dnms);
       dstd[0] = eps;
 
-      if (endian == BIG_ENDIAN) {
+      if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_int(3, istd);
         bswap_double(1, dstd);
       }
@@ -1154,7 +1154,7 @@ static void read_infile(int argc, char *argv[])
                "Syntax: qcd1 -i <filename> [-noloc] [-noexp] "
                "[-rmold] [-noms] [-c <filename> [-a [-norng]]]");
 
-    error_root(endian == UNKNOWN_ENDIAN, 1, "read_infile [qcd1.c]",
+    error_root(endian == openqcd_utils__UNKNOWN_ENDIAN, 1, "read_infile [qcd1.c]",
                "Machine has unknown endianness");
 
     error_root((noexp) && (noloc), 1, "read_infile [qcd1.c]",
@@ -1587,7 +1587,7 @@ static void print_info(int icnfg)
       printf("Program user CFLAGS: %s\n", build_user_cflags);
     }
 
-    if (endian == LITTLE_ENDIAN) {
+    if (endian == openqcd_utils__LITTLE_ENDIAN) {
       printf("The machine is little endian\n");
     } else {
       printf("The machine is big endian\n");
