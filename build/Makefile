@@ -288,6 +288,7 @@ clean-modules:
 clean-includes:
 	@echo "Cleaning includes..."
 	@rm -rf $(target_include_dir)
+	@rm -rd $(target_include_cpp_dir)
 
 # }}}
 #
