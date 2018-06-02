@@ -22,8 +22,8 @@
 #include "su3fcts.h"
 #include "uflds.h"
 
-#include <devel/testing_utilities/data_type_diffs.c>
-#include <devel/testing_utilities/test_counter.c>
+#include <tests/testing_utilities/data_type_diffs.c>
+#include <tests/testing_utilities/test_counter.c>
 
 static size_t one_offsets[4];
 static size_t two_offsets[4];

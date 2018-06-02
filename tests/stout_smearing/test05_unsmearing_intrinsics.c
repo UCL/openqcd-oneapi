@@ -19,9 +19,9 @@
 #include "mpi.h"
 #include "stout_smearing.h"
 
-#include <devel/testing_utilities/data_type_diffs.c>
-#include <devel/testing_utilities/diff_printing.c>
-#include <devel/testing_utilities/test_counter.c>
+#include <tests/testing_utilities/data_type_diffs.c>
+#include <tests/testing_utilities/diff_printing.c>
+#include <tests/testing_utilities/test_counter.c>
 #include <modules/stout_smearing/force_unsmearing.c>
 
 void get_inputs(su3_dble *exp_mat, su3_dble *link, su3_alg_dble *force)

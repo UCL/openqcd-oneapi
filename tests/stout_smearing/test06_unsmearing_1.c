@@ -21,8 +21,8 @@
 #include "stout_smearing.h"
 #include "uflds.h"
 
-#include <devel/testing_utilities/data_type_diffs.c>
-#include <devel/testing_utilities/test_counter.c>
+#include <tests/testing_utilities/data_type_diffs.c>
+#include <tests/testing_utilities/test_counter.c>
 #include <modules/stout_smearing/force_unsmearing.c>
 
 int main(int argc, char *argv[])

@@ -1,26 +1,27 @@
 
 /*******************************************************************************
  *
- * File test02_mdsteps_smearing.c
+ * File test01_mdsteps_no_smearing.c
  *
  * Author (2017, 2018): Jonas Rylund Glesaaen
  *
  * This software is distributed under the terms of the GNU General Public
  * License (GPL)
  *
- * Test on the mdsteps integrator generation with two smeared actions
+ * Test on the mdsteps integrator generation
  *
  *******************************************************************************/
 
 #define MAIN_PROGRAM
 
+#include "flags.h"
 #include "global.h"
 #include "mpi.h"
 #include "update.h"
 
-#include <devel/testing_utilities/data_type_diffs.c>
-#include <devel/testing_utilities/diff_printing.c>
-#include <devel/testing_utilities/test_counter.c>
+#include <tests/testing_utilities/data_type_diffs.c>
+#include <tests/testing_utilities/diff_printing.c>
+#include <tests/testing_utilities/test_counter.c>
 
 void get_steplist(mdstep_t const *begin, mdstep_t const *end, int *out)
 {
@@ -33,7 +34,7 @@ void get_steplist(mdstep_t const *begin, mdstep_t const *end, int *out)
 int main(int argc, char *argv[])
 {
   size_t nop;
-  int my_rank, i, j, k, n;
+  int my_rank, i, j, n;
   int iact[32], irat[3], imu[4], isp[4];
   int ifr[32], ncr[4];
   int itu, ismear, iunsmear, step_diff;
@@ -50,20 +51,13 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf(
-        "Test on the mdsteps integrator generation with two smeared actions\n");
+    printf("Test on the mdsteps integrator generation\n");
     printf("-------------------------------------------\n\n");
 
     printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,
            NPROC3 * L3);
     printf("%dx%dx%dx%d process grid, ", NPROC0, NPROC1, NPROC2, NPROC3);
     printf("%dx%dx%dx%d local lattice\n\n", L0, L1, L2, L3);
-
-    printf("Using a 3 level integrator:\n");
-    printf("Level 0: LPRF, forces = {0, smeared(1)}\n");
-    printf("Level 1: LPRF, forces = {2, 3}\n");
-    printf("Level 2: LPRF, forces = {smeared(4)}\n\n");
-
     printf("-------------------------------------------\n\n");
   }
 
@@ -83,10 +77,7 @@ int main(int argc, char *argv[])
 
   iact[0] = 0;
   iact[1] = 1;
-  iact[2] = 2;
-  iact[3] = 3;
-  iact[4] = 4;
-  set_hmc_parms(5, iact, 0, 0, NULL, 3, tau);
+  set_hmc_parms(2, iact, 0, 0, NULL, 2, tau);
 
   /* Register action 0 */
 
@@ -96,48 +87,23 @@ int main(int argc, char *argv[])
   force_type = FRG;
   set_force_parms(0, force_type, 0, 0, irat, imu, isp, ncr);
 
-  /* Register action 1-4 */
+  /* Register action 1 */
 
   action_type = ACF_TM1;
-  set_action_parms(1, action_type, 0, 0, irat, imu, isp, 1);
+  set_action_parms(1, action_type, 0, 0, irat, imu, isp, 0);
 
   force_type = FRF_TM1;
   set_force_parms(1, force_type, 0, 0, irat, imu, isp, ncr);
 
-  action_type = ACF_TM1;
-  set_action_parms(2, action_type, 0, 0, irat, imu, isp, 0);
-
-  force_type = FRF_TM1;
-  set_force_parms(2, force_type, 0, 0, irat, imu, isp, ncr);
-
-  action_type = ACF_TM1;
-  set_action_parms(3, action_type, 0, 0, irat, imu, isp, 0);
-
-  force_type = FRF_TM1;
-  set_force_parms(3, force_type, 0, 0, irat, imu, isp, ncr);
-
-  action_type = ACF_TM1;
-  set_action_parms(4, action_type, 0, 0, irat, imu, isp, 1);
-
-  force_type = FRF_TM1;
-  set_force_parms(4, force_type, 0, 0, irat, imu, isp, ncr);
-
   /* Register integrator 0 */
 
   ifr[0] = 0;
-  ifr[1] = 1;
-  set_mdint_parms(0, LPFR, 0.0, 4, 2, ifr);
+  set_mdint_parms(0, LPFR, 0.0, 4, 1, ifr);
 
   /* Register integrator 1 */
 
-  ifr[0] = 2;
-  ifr[1] = 3;
-  set_mdint_parms(1, LPFR, 0.0, 4, 2, ifr);
-
-  /* Register integrator 2 */
-
-  ifr[0] = 4;
-  set_mdint_parms(2, LPFR, 0.0, 10, 1, ifr);
+  ifr[0] = 1;
+  set_mdint_parms(1, LPFR, 0.0, 10, 1, ifr);
 
   /* Get mdsteps */
 
@@ -150,49 +116,23 @@ int main(int argc, char *argv[])
 
   /* Construct expected steporder */
 
-  expected_steplist = malloc(1000 * sizeof *expected_steplist);
+  expected_steplist = malloc(100 * sizeof *expected_steplist);
 
   n = 0;
-  expected_steplist[n++] = ismear;
-  expected_steplist[n++] = 1;
-  expected_steplist[n++] = 4;
-  expected_steplist[n++] = iunsmear;
-  expected_steplist[n++] = 0;
-  expected_steplist[n++] = 2;
-  expected_steplist[n++] = 3;
-  expected_steplist[n++] = itu;
-
   for (i = 0; i < 10; ++i) {
-    for (j = 0; j < 4; ++j) {
-      for (k = 0; k < (4 - 1); ++k) {
-        expected_steplist[n++] = ismear;
-        expected_steplist[n++] = 1;
-        expected_steplist[n++] = iunsmear;
-        expected_steplist[n++] = 0;
-        expected_steplist[n++] = itu;
-      }
-
-      if (j < 3) {
-        expected_steplist[n++] = ismear;
-        expected_steplist[n++] = 1;
-        expected_steplist[n++] = iunsmear;
-        expected_steplist[n++] = 0;
-        expected_steplist[n++] = 2;
-        expected_steplist[n++] = 3;
-        expected_steplist[n++] = itu;
-      }
-    }
-    expected_steplist[n++] = ismear;
-    expected_steplist[n++] = 1;
-    expected_steplist[n++] = 4;
-    expected_steplist[n++] = iunsmear;
     expected_steplist[n++] = 0;
-    expected_steplist[n++] = 2;
-    expected_steplist[n++] = 3;
+    expected_steplist[n++] = 1;
     expected_steplist[n++] = itu;
+
+    for (j = 0; j < (4 - 1); ++j) {
+      expected_steplist[n++] = 0;
+      expected_steplist[n++] = itu;
+    }
   }
 
-  expected_steplist[n - 1] = itu + 1;
+  expected_steplist[n++] = 0;
+  expected_steplist[n++] = 1;
+  expected_steplist[n++] = itu + 1;
 
   /* Begin tests */
 
@@ -206,20 +146,6 @@ int main(int argc, char *argv[])
       print_int_array_comparison_tail(computed_steplist, expected_steplist, nop,
                                       n, 3);
       fail_test(1);
-
-      printf("First diff:\n");
-      if (n < nop) {
-        step_diff =
-            index_diff_array_int(computed_steplist, expected_steplist, n);
-        print_int_array_comparison_mid(computed_steplist, expected_steplist, n,
-                                       step_diff, 3);
-      } else {
-        step_diff =
-            index_diff_array_int(computed_steplist, expected_steplist, nop);
-        print_int_array_comparison_mid(computed_steplist, expected_steplist,
-                                       nop, step_diff, 3);
-      }
-
     } else {
       step_diff = index_diff_array_int(computed_steplist, expected_steplist, n);
       printf("Checking for discrepancy between computed and expected operation "

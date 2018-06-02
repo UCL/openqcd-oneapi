@@ -1,7 +1,7 @@
 
 At the top level, the openQCD package is structured as follows: 
 
-devel            Directories used for developing and testing the various 
+tests            Directories used for developing and testing the various 
                  modules
 
 doc              Documentation files

@@ -13,7 +13,7 @@ test01_chs_bcnd_boundaries   Test of whether copy_bnd_ud() is correctly
                              applied to the boundary
 
 Checks on the block geometry programs are included in the directory
-devel/block.
+tests/block.
 
 The programs check2 and check3 accept the option -bc <type> that allows the
 type of boundary condition to be chosen at runtime. When the option is not

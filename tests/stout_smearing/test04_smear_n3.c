@@ -1,29 +1,28 @@
 
 /*******************************************************************************
  *
- * File test02_smear_n1.c
+ * File test04_smear_n3.c
  *
  * Author (2017, 2018): Jonas Rylund Glesaaen
  *
  * This software is distributed under the terms of the GNU General Public
  * License (GPL)
  *
- * Check of n=1 smearing agains a reference configuration
+ * Check of n=3 smearing agains a reference configuration
  *
  *******************************************************************************/
 
 #define MAIN_PROGRAM
 
 #include "archive.h"
-#include "flags.h"
 #include "global.h"
 #include "lattice.h"
 #include "mpi.h"
 #include "stout_smearing.h"
 #include "uflds.h"
 
-#include <devel/testing_utilities/data_type_diffs.c>
-#include <devel/testing_utilities/test_counter.c>
+#include <tests/testing_utilities/data_type_diffs.c>
+#include <tests/testing_utilities/test_counter.c>
 
 #define N0 (NPROC0 * L0)
 #define N1 (NPROC1 * L1)
@@ -55,10 +54,8 @@ int main(int argc, char *argv[])
     printf("---------------------------------------------\n\n");
   }
 
-  new_test_module();
-
   set_bc_parms(3, 0., 0., 0., 0., NULL, NULL, theta);
-  set_stout_smearing_parms(1, 0., 0.25, 1, 1);
+  set_stout_smearing_parms(3, 0., 0.25, 1, 1);
   stout_params = stout_smearing_parms();
 
   geometry();
@@ -74,7 +71,7 @@ int main(int argc, char *argv[])
 
   unsmear_fields();
 
-  import_cnfg("configurations/smeared_conf_n1.conf");
+  import_cnfg("configurations/smeared_conf_n3.conf");
   plaq_temp_r = plaq_wsum_dble(0) / (3. * npl);
   MPI_Reduce(&plaq_temp_r, &plaq_total_r, 1, MPI_DOUBLE, MPI_SUM, 0,
              MPI_COMM_WORLD);
@@ -90,7 +87,6 @@ int main(int argc, char *argv[])
                       smeared_fields()[stout_params.num_smear - 1] + ix) /
         nlinks;
   }
-
   MPI_Reduce(&config_temp_diff, &config_total_diff, 1, MPI_DOUBLE, MPI_SUM, 0,
              MPI_COMM_WORLD);
 

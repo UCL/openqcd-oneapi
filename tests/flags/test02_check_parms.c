@@ -18,7 +18,7 @@
 #include "global.h"
 #include "mpi.h"
 
-#include <devel/testing_utilities/test_counter.c>
+#include <tests/testing_utilities/test_counter.c>
 
 const char file_name[] = "test02_output.dat";
 

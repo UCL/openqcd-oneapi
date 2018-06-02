@@ -20,9 +20,9 @@
 #include "stout_smearing.h"
 #include <time.h>
 
-#include <devel/testing_utilities/data_type_diffs.c>
-#include <devel/testing_utilities/diff_printing.c>
-#include <devel/testing_utilities/test_counter.c>
+#include <tests/testing_utilities/data_type_diffs.c>
+#include <tests/testing_utilities/diff_printing.c>
+#include <tests/testing_utilities/test_counter.c>
 #include <modules/stout_smearing/force_unsmearing.c>
 
 #include "inputs/test08_inputs.c"

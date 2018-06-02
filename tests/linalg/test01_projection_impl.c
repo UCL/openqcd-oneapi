@@ -18,9 +18,9 @@
 #include "mpi.h"
 #include "su3fcts.h"
 
-#include <devel/testing_utilities/data_type_diffs.c>
-#include <devel/testing_utilities/diff_printing.c>
-#include <devel/testing_utilities/test_counter.c>
+#include <tests/testing_utilities/data_type_diffs.c>
+#include <tests/testing_utilities/diff_printing.c>
+#include <tests/testing_utilities/test_counter.c>
 
 void get_input_test1to3(su3_dble *u)
 {

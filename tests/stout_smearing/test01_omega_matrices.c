@@ -19,8 +19,8 @@
 #include "mpi.h"
 #include "stout_smearing.h"
 
-#include <devel/testing_utilities/data_type_diffs.c>
-#include <devel/testing_utilities/test_counter.c>
+#include <tests/testing_utilities/data_type_diffs.c>
+#include <tests/testing_utilities/test_counter.c>
 #include <modules/stout_smearing/stout_smearing.c>
 
 double diff_identity(su3_dble const *X, double val)

@@ -18,9 +18,9 @@
 #include "global.h"
 #include "mpi.h"
 
-#include <devel/testing_utilities/data_type_diffs.c>
-#include <devel/testing_utilities/test_counter.c>
-#include <devel/testing_utilities/verbose_queries.c>
+#include <tests/testing_utilities/data_type_diffs.c>
+#include <tests/testing_utilities/test_counter.c>
+#include <tests/testing_utilities/verbose_queries.c>
 
 int main(int argc, char *argv[])
 {
