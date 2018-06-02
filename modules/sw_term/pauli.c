@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  *
  * File pauli.c
@@ -554,149 +553,13 @@ void mul_pauli(float mu, pauli const *m, weyl const *s, weyl *r)
 
 #ifdef AVX512
 
-#include "avx512.h"
-#include "sse.h"
-
-void mul_pauli2(float mu, pauli const *m, spinor const *source, spinor *res)
+void mul_pauli2_avx512(float mu, pauli const *m, spinor const *source, spinor *res );
+void mul_pauli2(float mu, pauli const *m, spinor const *source, spinor *res )
 {
-  spin_t const *ps;
-  spin_t *pr;
-
-  ps = (spin_t const *)(source);
-  pr = (spin_t *)(res);
-
-  float const *u, *u2;
-  u = (*m).u;
-  u2 = (m + 1)->u;
-
-  weyl const *s = (*ps).w;
-  weyl *r = (*pr).w;
-  weyl const *s2 = (*ps).w + 1;
-  weyl *r2 = (*pr).w + 1;
-
-  register __m512 r512_1, r512_2, r512_3;
-  register __m512 s512, u512;
-
-  _avx512_load_4_2_f(s512, &(*s).c1.c1.re, &(*s).c2.c1.re, &(*s2).c1.c1.re,
-                     &(*s2).c2.c1.re);
-  _avx512_load_8_2(u512, u, u + 10, u + 10, u + 3, u2, u2 + 10, u2 + 10,
-                   u2 + 3);
-  r512_1 = _mm512_mul_ps(s512, u512);
-  _avx512_load_8_2(u512, u + 6, u + 12, u + 18, u + 30, u2 + 6, u2 + 12,
-                   u2 + 18, u2 + 30);
-  r512_2 = _mm512_mul_ps(s512, u512);
-  _avx512_load_8_2(u512, u + 8, u + 14, u + 24, u + 32, u2 + 8, u2 + 14,
-                   u2 + 24, u2 + 32);
-  r512_3 = _mm512_mul_ps(s512, u512);
-
-  s512 = _mm512_permute_ps(s512, 0b10110001);
-  _avx512_load_8_2(u512, &mu, u + 11, u + 11, &mu, &mu, u2 + 11, u2 + 11, &mu);
-  u512 = _mm512_mul_ps(u512, s512);
-  r512_1 = _mm512_mask_add_ps(r512_1, 0b0110010110100110, r512_1, u512);
-  r512_1 = _mm512_mask_sub_ps(r512_1, 0b1001101001011001, r512_1, u512);
-  _avx512_load_8_2(u512, u + 7, u + 13, u + 19, u + 31, u2 + 7, u2 + 13,
-                   u2 + 19, u2 + 31);
-  u512 = _mm512_mul_ps(u512, s512);
-  r512_2 = _mm512_mask_add_ps(r512_2, 0b0110010101100101, r512_2, u512);
-  r512_2 = _mm512_mask_sub_ps(r512_2, 0b1001101010011010, r512_2, u512);
-  _avx512_load_8_2(u512, u + 9, u + 15, u + 25, u + 33, u2 + 9, u2 + 15,
-                   u2 + 25, u2 + 33);
-  u512 = _mm512_mul_ps(u512, s512);
-  r512_3 = _mm512_mask_add_ps(r512_3, 0b0110010101100101, r512_3, u512);
-  r512_3 = _mm512_mask_sub_ps(r512_3, 0b1001101010011010, r512_3, u512);
-
-  _avx512_load_4_2_f(s512, &(*s).c1.c2.re, &(*s).c2.c2.re, &(*s2).c1.c2.re,
-                     &(*s2).c2.c2.re);
-  _avx512_load_8_2(u512, u + 6, u + 18, u + 12, u + 30, u2 + 6, u2 + 18,
-                   u2 + 12, u2 + 30);
-  r512_1 = _mm512_fmadd_ps(s512, u512, r512_1);
-  _avx512_load_8_2(u512, u + 1, u + 20, u + 20, u + 4, u2 + 1, u2 + 20, u2 + 20,
-                   u2 + 4);
-  r512_2 = _mm512_fmadd_ps(s512, u512, r512_2);
-  _avx512_load_8_2(u512, u + 16, u + 22, u + 26, u + 34, u2 + 16, u2 + 22,
-                   u2 + 26, u2 + 34);
-  r512_3 = _mm512_fmadd_ps(s512, u512, r512_3);
-
-  s512 = _mm512_permute_ps(s512, 0b10110001);
-  _avx512_load_8_2(u512, u + 7, u + 19, u + 13, u + 31, u2 + 7, u2 + 19,
-                   u2 + 13, u2 + 31);
-  u512 = _mm512_mul_ps(u512, s512);
-  r512_1 = _mm512_mask_add_ps(r512_1, 0b1010011010100110, r512_1, u512);
-  r512_1 = _mm512_mask_sub_ps(r512_1, 0b0101100101011001, r512_1, u512);
-  _avx512_load_8_2(u512, &mu, u + 21, u + 21, &mu, &mu, u2 + 21, u2 + 21, &mu);
-  u512 = _mm512_mul_ps(u512, s512);
-  r512_2 = _mm512_mask_add_ps(r512_2, 0b0110010110100110, r512_2, u512);
-  r512_2 = _mm512_mask_sub_ps(r512_2, 0b1001101001011001, r512_2, u512);
-  _avx512_load_8_2(u512, u + 17, u + 23, u + 27, u + 35, u2 + 17, u2 + 23,
-                   u2 + 27, u2 + 35);
-  u512 = _mm512_mul_ps(u512, s512);
-  r512_3 = _mm512_mask_add_ps(r512_3, 0b0110010101100101, r512_3, u512);
-  r512_3 = _mm512_mask_sub_ps(r512_3, 0b1001101010011010, r512_3, u512);
-
-  _avx512_load_4_2_f(s512, &(*s).c1.c3.re, &(*s).c2.c3.re, &(*s2).c1.c3.re,
-                     &(*s2).c2.c3.re);
-  _avx512_load_8_2(u512, u + 8, u + 24, u + 14, u + 32, u2 + 8, u2 + 24,
-                   u2 + 14, u2 + 32);
-  r512_1 = _mm512_fmadd_ps(s512, u512, r512_1);
-  _avx512_load_8_2(u512, u + 16, u + 26, u + 22, u + 34, u2 + 16, u2 + 26,
-                   u2 + 22, u2 + 34);
-  r512_2 = _mm512_fmadd_ps(s512, u512, r512_2);
-  _avx512_load_8_2(u512, u + 2, u + 28, u + 28, u + 5, u2 + 2, u2 + 28, u2 + 28,
-                   u2 + 5);
-  r512_3 = _mm512_fmadd_ps(s512, u512, r512_3);
-
-  s512 = _mm512_permute_ps(s512, 0b10110001);
-  _avx512_load_8_2(u512, u + 9, u + 25, u + 15, u + 33, u2 + 9, u2 + 25,
-                   u2 + 15, u2 + 33);
-  u512 = _mm512_mul_ps(u512, s512);
-  r512_1 = _mm512_mask_add_ps(r512_1, 0b1010011010100110, r512_1, u512);
-  r512_1 = _mm512_mask_sub_ps(r512_1, 0b0101100101011001, r512_1, u512);
-  _avx512_load_8_2(u512, u + 17, u + 27, u + 23, u + 35, u2 + 17, u2 + 27,
-                   u2 + 23, u2 + 35);
-  u512 = _mm512_mul_ps(u512, s512);
-  r512_2 = _mm512_mask_add_ps(r512_2, 0b1010011010100110, r512_2, u512);
-  r512_2 = _mm512_mask_sub_ps(r512_2, 0b0101100101011001, r512_2, u512);
-  _avx512_load_8_2(u512, &mu, u + 29, u + 29, &mu, &mu, u2 + 29, u2 + 29, &mu);
-  u512 = _mm512_mul_ps(u512, s512);
-  r512_3 = _mm512_mask_add_ps(r512_3, 0b0110010110100110, r512_3, u512);
-  r512_3 = _mm512_mask_sub_ps(r512_3, 0b1001101001011001, r512_3, u512);
-
-  register __m128 t1 = _mm512_castps512_ps128(r512_1);
-  register __m128 t2 = _mm512_extractf32x4_ps(r512_1, 1);
-  t1 = _mm_add_ps(t1, t2);
-  _avx512_store_64_dn(t1, &(*r).c1.c1.re);
-  _avx512_store_64_up(t1, &(*r).c2.c1.re);
-
-  t1 = _mm512_extractf32x4_ps(r512_1, 2);
-  t2 = _mm512_extractf32x4_ps(r512_1, 3);
-  t1 = _mm_add_ps(t1, t2);
-  _avx512_store_64_dn(t1, &(*r2).c1.c1.re);
-  _avx512_store_64_up(t1, &(*r2).c2.c1.re);
-
-  t1 = _mm512_castps512_ps128(r512_2);
-  t2 = _mm512_extractf32x4_ps(r512_2, 1);
-  t1 = _mm_add_ps(t1, t2);
-  _avx512_store_64_dn(t1, &(*r).c1.c2.re);
-  _avx512_store_64_up(t1, &(*r).c2.c2.re);
-
-  t1 = _mm512_extractf32x4_ps(r512_2, 2);
-  t2 = _mm512_extractf32x4_ps(r512_2, 3);
-  t1 = _mm_add_ps(t1, t2);
-  _avx512_store_64_dn(t1, &(*r2).c1.c2.re);
-  _avx512_store_64_up(t1, &(*r2).c2.c2.re);
-
-  t1 = _mm512_castps512_ps128(r512_3);
-  t2 = _mm512_extractf32x4_ps(r512_3, 1);
-  t1 = _mm_add_ps(t1, t2);
-  _avx512_store_64_dn(t1, &(*r).c1.c3.re);
-  _avx512_store_64_up(t1, &(*r).c2.c3.re);
-
-  t1 = _mm512_extractf32x4_ps(r512_3, 2);
-  t2 = _mm512_extractf32x4_ps(r512_3, 3);
-  t1 = _mm_add_ps(t1, t2);
-  _avx512_store_64_dn(t1, &(*r2).c1.c3.re);
-  _avx512_store_64_up(t1, &(*r2).c2.c3.re);
+  mul_pauli2_avx512( mu, m, source, res );
 }
+
+
 
 #elif (defined AVX)
 #include "avx.h"

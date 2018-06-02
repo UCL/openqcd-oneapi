@@ -26,18 +26,18 @@ settings_file := compile_settings.txt
 # Function to load a parameter from the settings file
 load-par-from-file = $(shell grep $(1) $(settings_file)| grep -v '\#' | awk '{print$$2;}')
 
-NPROC0      := $(call load-par-from-file, NPROC0_TOT ) 
-NPROC1      := $(call load-par-from-file, NPROC1_TOT ) 
-NPROC2      := $(call load-par-from-file, NPROC2_TOT ) 
-NPROC3      := $(call load-par-from-file, NPROC3_TOT ) 
-L0          := $(call load-par-from-file, L0 ) 
-L1          := $(call load-par-from-file, L1 ) 
-L2          := $(call load-par-from-file, L2 ) 
-L3          := $(call load-par-from-file, L3 ) 
-NPROC0_BLK  := $(call load-par-from-file, NPROC0_BLK ) 
-NPROC1_BLK  := $(call load-par-from-file, NPROC1_BLK ) 
-NPROC2_BLK  := $(call load-par-from-file, NPROC2_BLK ) 
-NPROC3_BLK  := $(call load-par-from-file, NPROC3_BLK ) 
+NPROC0      := $(call load-par-from-file, NPROC0_TOT )
+NPROC1      := $(call load-par-from-file, NPROC1_TOT )
+NPROC2      := $(call load-par-from-file, NPROC2_TOT )
+NPROC3      := $(call load-par-from-file, NPROC3_TOT )
+L0          := $(call load-par-from-file, L0 )
+L1          := $(call load-par-from-file, L1 )
+L2          := $(call load-par-from-file, L2 )
+L3          := $(call load-par-from-file, L3 )
+NPROC0_BLK  := $(call load-par-from-file, NPROC0_BLK )
+NPROC1_BLK  := $(call load-par-from-file, NPROC1_BLK )
+NPROC2_BLK  := $(call load-par-from-file, NPROC2_BLK )
+NPROC3_BLK  := $(call load-par-from-file, NPROC3_BLK )
 
 code_dir    := $(shell grep CODELOC     $(settings_file)| grep -v '\#' | awk '{print$$2;}')
 CC          := $(shell grep COMPILER    $(settings_file)| grep -v '\#' | awk '{print$$2;}')
@@ -246,7 +246,7 @@ tmp_nompi_mod_lib := $(target_module_dir)/nompi_module_library.a
 # Also add the .d files to the .SECONDARY so that they aren't cleaned up by make
 define expand-module-deps
 .SECONDARY: \
-	$(patsubst $(source_module_dir)/%.c,$(dep_dir)/%.d,$(wildcard $(source_module_dir)/$1/*.c)) 
+	$(patsubst $(source_module_dir)/%.c,$(dep_dir)/%.d,$(wildcard $(source_module_dir)/$1/*.c))
 
 $(target_module_dir)/$1.a: \
 	$(patsubst $(source_module_dir)/%.c,$(target_module_dir)/%.o,$(wildcard $(source_module_dir)/$1/*.c))
@@ -283,6 +283,39 @@ endif
 -include $(patsubst %,$(dep_dir)/%.d,$(compiled_mains))
 $(foreach mod,$(compiled_modules),$(eval $(call include-module-deps,$(mod))))
 
+## Optimisation dependencies
+## -----------------------------------------------------------------------------
+## {{{
+
+# The AVX512 instructions are stored in subfolders of their respective modules,
+# these needs to be added if avx512 is used
+ifneq (,$(findstring AVX512,$(CFLAGS)))
+
+define expand-avx512-module-deps
+.SECONDARY: \
+	$(patsubst $(source_module_dir)/%.c,$(dep_dir)/%.d,$(wildcard $(source_module_dir)/$1/avx512/*.c))
+
+$(target_module_dir)/$1.a: \
+	$(patsubst $(source_module_dir)/%.c,$(target_module_dir)/%.o,$(wildcard $(source_module_dir)/$1/avx512/*.c))
+endef
+
+$(foreach mod,$(module_names),$(eval $(call expand-avx512-module-deps,$(mod))))
+endif
+
+# The AVX512_ASM instructions are stored as .s files, and they do not
+# necessariy have the same name as their .c counterparts
+ifneq (,$(findstring AVX512_ASM,$(CFLAGS)))
+
+define expand-avx512-asm-module-deps
+$(target_module_dir)/$1.a: \
+	$(patsubst $(source_module_dir)/%.s,$(target_module_dir)/%.o,$(wildcard $(source_module_dir)/$1/avx512/*.c))
+endef
+
+$(foreach mod,$(module_names),$(eval $(call expand-avx512-asm-module-deps,$(mod))))
+endif
+
+## }}}
+##
 ## Extra dependencies
 ## -----------------------------------------------------------------------------
 ## {{{
@@ -341,12 +374,24 @@ $(target_module_dir)/%.a:
 	$(mkdir-target)
 	$(call link-and-print,ar rcs $@ $^,$(notdir $@))
 
+# This rule has to come before the %.c -> %.o one so that it takes presedence
+# in the case that we enable the ASM
+ifneq (,$(findstring AVX512_ASM,$(CFLAGS)))
+# Compiling an assembly file
+$(target_module_dir)/%.o: $(source_module_dir)/%.s $(settings_file) Makefile
+	$(mkdir-target)
+	$(call compile-and-print,\
+		$(CC) $(CFLAGS) -c $< -o $@,\
+		"modules/$(subst $(source_module_dir)/,,$<)")
+endif
+
 # Compiling a single source file
 $(target_module_dir)/%.o: $(source_module_dir)/%.c $(settings_file) Makefile
 	$(mkdir-target)
 	$(call compile-and-print,\
 		$(CC) $(CFLAGS) -c $< -o $@,\
 		"modules/$(subst $(source_module_dir)/,,$<)")
+
 
 # Creating a dependency file from a source file
 $(dep_dir)/%.d: $(source_module_dir)/%.c
@@ -387,7 +432,7 @@ $(target_module_dir)/utils/version.o: $(target_module_dir)/utils/version.c $(set
 
 # Fill the version.c file with current build information
 $(target_module_dir)/utils/version.c: $(settings_file) Makefile
-	@echo "#include \"version.h\"" > $@ 
+	@echo "#include \"version.h\"" > $@
 	$(eval git_version := $(call git-version))
 	@echo "const char * build_git_sha = \"$(git_version)\";" >> $@
 	@current_date_time=$$(date "+%d-%m-%Y %H:%M:%S");\
