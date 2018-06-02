@@ -12,6 +12,12 @@
  *
  *******************************************************************************/
 
+#define OPENQCD_INTERNAL
+
+#if !defined (STATIC_SIZES)
+#error : This test cannot be compiled with dynamic lattice sizes
+#endif
+
 #include "linalg.h"
 #include "random.h"
 #include "sw_term.h"

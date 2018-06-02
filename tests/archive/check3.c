@@ -12,6 +12,12 @@
  *
  *******************************************************************************/
 
+#define OPENQCD_INTERNAL
+
+#if !defined (STATIC_SIZES)
+#error : This test cannot be compiled with dynamic lattice sizes
+#endif
+
 #include "archive.h"
 #include "global.h"
 #include "lattice.h"
@@ -97,7 +103,7 @@ int main(int argc, char *argv[])
     error_root(ir != 5, 1, "main [check3.c]", "Incorrect read count");
     fclose(fin);
 
-    if (endianness() == BIG_ENDIAN) {
+    if (endianness() == openqcd_utils__BIG_ENDIAN) {
       bswap_int(4, l);
       bswap_double(1, &plaq1);
     }

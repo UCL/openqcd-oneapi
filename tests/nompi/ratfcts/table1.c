@@ -13,6 +13,12 @@
  *
  *******************************************************************************/
 
+#define OPENQCD_INTERNAL
+
+#if !defined (STATIC_SIZES)
+#error : This test cannot be compiled with dynamic lattice sizes
+#endif
+
 #include "ratfcts.h"
 #include "utils.h"
 #include <stdio.h>

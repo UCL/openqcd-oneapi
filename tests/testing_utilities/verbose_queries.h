@@ -1,6 +1,10 @@
 #ifndef VERBOSE_QUERIES_H
 #define VERBOSE_QUERIES_H
 
+#ifndef OPENQCD_INTERNAL
+#define OPENQCD_INTERNAL
+#endif
+
 #include "flags.h"
 
 char const *query_t_to_char(query_t qflag);

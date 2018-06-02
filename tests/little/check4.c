@@ -12,6 +12,12 @@
  *
  *******************************************************************************/
 
+#define OPENQCD_INTERNAL
+
+#if !defined(STATIC_SIZES)
+#error : This test cannot be compiled with dynamic lattice sizes
+#endif
+
 #include "dfl.h"
 #include "dirac.h"
 #include "global.h"
@@ -207,34 +213,34 @@ int main(int argc, char *argv[])
 
   for (iop = 0; iop < 6; iop++) {
     if (iop == 0) {
-      op = Awhat;
+      op = openqcd_little__Awhat;
       pr = "Awhat()  ";
-      op_dble = Awhat_dble;
+      op_dble = openqcd_little__Awhat_dble;
       prd = "Awhat_dble()  ";
     } else if (iop == 1) {
-      op = Aweeinv;
+      op = openqcd_little__Aweeinv;
       pr = "Aweeinv()";
-      op_dble = Aweeinv_dble;
+      op_dble = openqcd_little__Aweeinv_dble;
       prd = "Aweeinv_dble()";
     } else if (iop == 2) {
-      op = Awooinv;
+      op = openqcd_little__Awooinv;
       pr = "Awooinv()";
-      op_dble = Awooinv_dble;
+      op_dble = openqcd_little__Awooinv_dble;
       prd = "Awooinv_dble()";
     } else if (iop == 3) {
-      op = Awoe;
+      op = openqcd_little__Awoe;
       pr = "Awoe()   ";
-      op_dble = Awoe_dble;
+      op_dble = openqcd_little__Awoe_dble;
       prd = "Awoe_dble()   ";
     } else if (iop == 4) {
-      op = Aweo;
+      op = openqcd_little__Aweo;
       pr = "Aweo()   ";
-      op_dble = Aweo_dble;
+      op_dble = openqcd_little__Aweo_dble;
       prd = "Aweo_dble()   ";
     } else {
-      op = Aw;
+      op = openqcd_little__Aw;
       pr = "Aw()     ";
-      op_dble = Aw_dble;
+      op_dble = openqcd_little__Aw_dble;
       prd = "Aw_dble()     ";
     }
 

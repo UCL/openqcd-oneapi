@@ -1,6 +1,10 @@
 #ifndef DATA_TYPE_DIFFS_H
 #define DATA_TYPE_DIFFS_H
 
+#ifndef OPENQCD_INTERNAL
+#define OPENQCD_INTERNAL
+#endif
+
 #include "su3.h"
 #include <stdlib.h>
 

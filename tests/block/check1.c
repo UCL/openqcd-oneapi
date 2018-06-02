@@ -12,6 +12,12 @@
  *
  *******************************************************************************/
 
+#define OPENQCD_INTERNAL
+
+#if !defined(STATIC_SIZES)
+#error : This test cannot be compiled with dynamic lattice sizes
+#endif
+
 #include "block.h"
 #include "flags.h"
 #include "global.h"
@@ -128,21 +134,21 @@ static void test2(blk_grid_t grid)
 
               for (mu = 0; mu < 4; mu++) {
                 if ((x[mu] + 1) < bs[mu]) {
-                  if (imb[(*b).iup[ix][mu]] != iup[iy][mu]) {
+                  if (imb[(*b).index_up[ix][mu]] != iup[iy][mu]) {
                     itest = 4;
                   }
                 } else {
-                  if ((*b).iup[ix][mu] != vol) {
+                  if ((*b).index_up[ix][mu] != vol) {
                     itest = 5;
                   }
                 }
 
                 if (x[mu] > 0) {
-                  if (imb[(*b).idn[ix][mu]] != idn[iy][mu]) {
+                  if (imb[(*b).index_down[ix][mu]] != idn[iy][mu]) {
                     itest = 6;
                   }
                 } else {
-                  if ((*b).idn[ix][mu] != vol) {
+                  if ((*b).index_down[ix][mu] != vol) {
                     itest = 7;
                   }
                 }
@@ -159,12 +165,12 @@ static void test2(blk_grid_t grid)
         "The blocks are not properly embedded");
   error(itest == 3, 1, "test2 [check1.c]",
         "b.ipt does not respect the even-odd ordering");
-  error(itest == 4, 1, "test2 [check1.c]", "b.iup is incorrect");
+  error(itest == 4, 1, "test2 [check1.c]", "b.index_up is incorrect");
   error(itest == 5, 1, "test2 [check1.c]",
-        "b.iup is incorrect at the block boundary");
-  error(itest == 6, 1, "test2 [check1.c]", "b.idn is incorrect");
+        "b.index_up is incorrect at the block boundary");
+  error(itest == 6, 1, "test2 [check1.c]", "b.index_down is incorrect");
   error(itest == 7, 1, "test2 [check1.c]",
-        "b.idn is incorrect at the block boundary");
+        "b.index_down is incorrect at the block boundary");
 }
 
 static void test3(blk_grid_t grid)
@@ -308,10 +314,10 @@ static void test4(blk_grid_t grid)
       ib = 0;
 
       for (mu = 0; mu < 4; mu++) {
-        if (((*b).iup[ix][mu] == vol) && (iup[iy][mu] < VOLUME)) {
+        if (((*b).index_up[ix][mu] == vol) && (iup[iy][mu] < VOLUME)) {
           ib += 1;
         }
-        if (((*b).idn[ix][mu] == vol) && (idn[iy][mu] < VOLUME)) {
+        if (((*b).index_down[ix][mu] == vol) && (idn[iy][mu] < VOLUME)) {
           ib += 1;
         }
       }
@@ -383,20 +389,20 @@ static void test5(blk_grid_t grid)
       for (ix = 0; ix < (*bb).vol; ix++) {
         iy = (*bb).ipp[ix];
 
-        if ((((ifc % 2) == 0) && ((*b).idn[iy][mu] != vol)) ||
-            (((ifc % 2) == 1) && ((*b).iup[iy][mu] != vol))) {
+        if ((((ifc % 2) == 0) && ((*b).index_down[iy][mu] != vol)) ||
+            (((ifc % 2) == 1) && ((*b).index_up[iy][mu] != vol))) {
           itest = 3;
         }
 
-        iz = (*bb).map[ix];
+        iz = (*bb).block_map[ix];
 
         if ((ifc % 2) == 0) {
           for (is = 1; is < bs[mu]; is++) {
-            iz = (*b).idn[iz][mu];
+            iz = (*b).index_down[iz][mu];
           }
         } else {
           for (is = 1; is < bs[mu]; is++) {
-            iz = (*b).iup[iz][mu];
+            iz = (*b).index_up[iz][mu];
           }
         }
 

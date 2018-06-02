@@ -288,7 +288,7 @@ clean-modules:
 clean-includes:
 	@echo "Cleaning includes..."
 	@rm -rf $(target_include_dir)
-	@rm -rd $(target_include_cpp_dir)
+	@rm -rf $(target_include_cpp_dir)
 
 # }}}
 #
@@ -326,7 +326,7 @@ $(foreach dev,$(test_module_names),$(eval $(call expand-tests-deps,$(dev))))
 $(foreach dev,$(patsubst %,nompi/%,$(test_nompi_module_names)),$(eval $(call expand-tests-deps,$(dev))))
 
 # No need to fetch the dependencies if we are building a PHONY target
-nop_targets := clean clean-tests clean-main clean-modules help list-targets list-all-targets nop
+nop_targets := clean clean-tests clean-main clean-modules clean-includes help list-targets list-all-targets nop
 ifeq ("$(findstring $(MAKECMDGOALS),"$(nop_targets)")","")
 compiled_modules := $(module_names) $(patsubst %,nompi/%,$(nompi_module_names))
 compiled_mains   := $(main_programs)

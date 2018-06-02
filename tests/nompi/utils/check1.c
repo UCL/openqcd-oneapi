@@ -12,6 +12,12 @@
  *
  *******************************************************************************/
 
+#define OPENQCD_INTERNAL
+
+#if !defined (STATIC_SIZES)
+#error : This test cannot be compiled with dynamic lattice sizes
+#endif
+
 #include "random.h"
 
 #define N 18000
@@ -83,9 +89,9 @@ int main(void)
   printf("sizeof(double) = %d\n", (int)(sizeof(double)));
 
   ie = endianness();
-  if (ie == LITTLE_ENDIAN) {
+  if (ie == openqcd_utils__LITTLE_ENDIAN) {
     printf("The machine is little endian\n\n");
-  } else if (ie == BIG_ENDIAN) {
+  } else if (ie == openqcd_utils__BIG_ENDIAN) {
     printf("The machine is big endian\n\n");
   } else {
     printf("The machine has unknown endianness\n\n");

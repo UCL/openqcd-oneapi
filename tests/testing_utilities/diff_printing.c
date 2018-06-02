@@ -1,5 +1,9 @@
 #define DIFF_PRINTING_C
 
+#ifndef OPENQCD_INTERNAL
+#define OPENQCD_INTERNAL
+#endif
+
 #include "diff_printing.h"
 #include <math.h>
 #include <stdio.h>

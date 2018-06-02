@@ -13,6 +13,12 @@
  *
  *******************************************************************************/
 
+#define OPENQCD_INTERNAL
+
+#if !defined(STATIC_SIZES)
+#error : This test cannot be compiled with dynamic lattice sizes
+#endif
+
 #include "block.h"
 #include "flags.h"
 #include "global.h"
@@ -229,8 +235,9 @@ static int check_blk(block_t *b0, block_t *b, int iu, int iud, int ns, int nsd,
   }
 
   if (shf & 0x2) {
-    if (((*b0).ipt != (*b).ipt) || ((*b0).iup != (*b).iup) ||
-        ((*b0).idn != (*b).idn)) {
+    if (((*b0).index_point != (*b).index_point) ||
+        ((*b0).index_up != (*b).index_up) ||
+        ((*b0).index_down != (*b).index_down)) {
       return 2;
     }
   }

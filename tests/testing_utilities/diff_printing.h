@@ -1,6 +1,10 @@
 #ifndef DIFF_PRINTING_H
 #define DIFF_PRINTING_H
 
+#ifndef OPENQCD_INTERNAL
+#define OPENQCD_INTERNAL
+#endif
+
 #include "data_type_diffs.h"
 
 extern void print_complex_diff(complex_dble l, complex_dble r);

@@ -1,5 +1,9 @@
 #define TEST_COUNTER_C
 
+#ifndef OPENQCD_INTERNAL
+#define OPENQCD_INTERNAL
+#endif
+
 #include "test_counter.h"
 #include "printing_macros.h"
 #include <stdio.h>

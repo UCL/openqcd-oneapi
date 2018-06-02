@@ -12,6 +12,12 @@
  *
  *******************************************************************************/
 
+#define OPENQCD_INTERNAL
+
+#if !defined (STATIC_SIZES)
+#error : This test cannot be compiled with dynamic lattice sizes
+#endif
+
 #include "dfl.h"
 #include "flags.h"
 #include "global.h"
@@ -117,7 +123,7 @@ int main(int argc, char *argv[])
   inn = dfl_grid.inn;
   idx = dfl_grid.idx;
   ipp = dfl_grid.ipp;
-  map = dfl_grid.map;
+  map = dfl_grid.dfl_map;
   iz = 0;
 
   for (ifc = 0; ifc < 8; ifc++) {

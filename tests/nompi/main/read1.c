@@ -19,6 +19,12 @@
  *
  *******************************************************************************/
 
+#define OPENQCD_INTERNAL
+
+#if !defined (STATIC_SIZES)
+#error : This test cannot be compiled with dynamic lattice sizes
+#endif
+
 #include "extras.h"
 #include "utils.h"
 #include <string.h>
@@ -49,7 +55,7 @@ static int read_dat(int n, dat_t *ndat, FILE *fin)
       return ic;
     }
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(2, istd);
       bswap_double(2, dstd);
     }

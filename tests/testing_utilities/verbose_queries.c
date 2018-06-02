@@ -5,6 +5,10 @@
  * Author: Jonas R. Glesaaen (jonas@glesaaen.com)
  */
 
+#ifndef OPENQCD_INTERNAL
+#define OPENQCD_INTERNAL
+#endif
+
 #include "verbose_queries.h"
 #include "printing_macros.h"
 #include "test_counter.h"

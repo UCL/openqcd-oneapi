@@ -12,6 +12,12 @@
  *
  *******************************************************************************/
 
+#define OPENQCD_INTERNAL
+
+#if !defined (STATIC_SIZES)
+#error : This test cannot be compiled with dynamic lattice sizes
+#endif
+
 #include "block.h"
 #include "global.h"
 #include "lattice.h"
@@ -110,7 +116,7 @@ static int check_ublk(block_t *b)
             y2 = cpr[2] * L2 + bo[2] + x2;
             y3 = cpr[3] * L3 + bo[3] + x3;
 
-            ix = (*b).ipt[x3 + bs[3] * x2 + bs[2] * bs[3] * x1 +
+            ix = (*b).index_point[x3 + bs[3] * x2 + bs[2] * bs[3] * x1 +
                           bs[1] * bs[2] * bs[3] * x0];
             u = ub + 8 * (ix - ((*b).vol / 2));
 
@@ -163,7 +169,7 @@ static int check_udblk(block_t *b)
             y2 = cpr[2] * L2 + bo[2] + x2;
             y3 = cpr[3] * L3 + bo[3] + x3;
 
-            ix = (*b).ipt[x3 + bs[3] * x2 + bs[2] * bs[3] * x1 +
+            ix = (*b).index_point[x3 + bs[3] * x2 + bs[2] * bs[3] * x1 +
                           bs[1] * bs[2] * bs[3] * x0];
             ud = udb + 8 * (ix - ((*b).vol / 2));
 
@@ -185,35 +191,35 @@ static void fnd_coord(block_t *b, int ix, int *x0, int *x1, int *x2, int *x3)
   int iz;
 
   (*x0) = 0;
-  iz = (*b).idn[ix][0];
+  iz = (*b).index_down[ix][0];
 
   while (iz < (*b).vol) {
     (*x0) += 1;
-    iz = (*b).idn[iz][0];
+    iz = (*b).index_down[iz][0];
   }
 
   (*x1) = 0;
-  iz = (*b).idn[ix][1];
+  iz = (*b).index_down[ix][1];
 
   while (iz < (*b).vol) {
     (*x1) += 1;
-    iz = (*b).idn[iz][1];
+    iz = (*b).index_down[iz][1];
   }
 
   (*x2) = 0;
-  iz = (*b).idn[ix][2];
+  iz = (*b).index_down[ix][2];
 
   while (iz < (*b).vol) {
     (*x2) += 1;
-    iz = (*b).idn[iz][2];
+    iz = (*b).index_down[iz][2];
   }
 
   (*x3) = 0;
-  iz = (*b).idn[ix][3];
+  iz = (*b).index_down[ix][3];
 
   while (iz < (*b).vol) {
     (*x3) += 1;
-    iz = (*b).idn[iz][3];
+    iz = (*b).index_down[iz][3];
   }
 }
 

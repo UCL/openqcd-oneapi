@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  *
  * File read2.c
@@ -16,6 +17,12 @@
  * to stdout.
  *
  *******************************************************************************/
+
+#define OPENQCD_INTERNAL
+
+#if !defined (STATIC_SIZES)
+#error : This test cannot be compiled with dynamic lattice sizes
+#endif
 
 #include "extras.h"
 #include "utils.h"
@@ -46,7 +53,7 @@ static void read_file_head(FILE *fdat)
   ir = fread(istd, sizeof(stdint_t), 1, fdat);
   error(ir != 1, 1, "read_file_head [read2.c]", "Incorrect read count");
 
-  if (endian == BIG_ENDIAN) {
+  if (endian == openqcd_utils__BIG_ENDIAN) {
     bswap_int(1, istd);
   }
 
@@ -62,7 +69,7 @@ static void read_file_head(FILE *fdat)
   for (irw = 0; irw < nrw; irw++) {
     ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(1, istd);
     }
 
@@ -73,7 +80,7 @@ static void read_file_head(FILE *fdat)
   for (irw = 0; irw < nrw; irw++) {
     ir += fread(istd, sizeof(stdint_t), 1, fdat);
 
-    if (endian == BIG_ENDIAN) {
+    if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(1, istd);
     }
 
@@ -145,7 +152,7 @@ static int read_data(FILE *fdat)
     return 0;
   }
 
-  if (endian == BIG_ENDIAN) {
+  if (endian == openqcd_utils__BIG_ENDIAN) {
     bswap_int(1, istd);
   }
 
@@ -161,7 +168,7 @@ static int read_data(FILE *fdat)
       for (isrc = 0; isrc < nsrc[irw]; isrc++) {
         ir += fread(dstd, sizeof(double), 1, fdat);
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_double(1, dstd);
         }
 
@@ -171,7 +178,7 @@ static int read_data(FILE *fdat)
       for (isrc = 0; isrc < nsrc[irw]; isrc++) {
         ir += fread(dstd, sizeof(double), 1, fdat);
 
-        if (endian == BIG_ENDIAN) {
+        if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_double(1, dstd);
         }
 

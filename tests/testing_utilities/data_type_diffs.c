@@ -1,5 +1,9 @@
 #define DATA_TYPE_DIFFS_C
 
+#ifndef OPENQCD_INTERNAL
+#define OPENQCD_INTERNAL
+#endif
+
 #include "data_type_diffs.h"
 #include <math.h>
 #include <utils.h>
