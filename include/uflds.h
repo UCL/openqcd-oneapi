@@ -29,6 +29,9 @@ extern double openqcd_uflds__plaq_action_slices(double *asl);
 extern double openqcd_uflds__spatial_link_sum(int icom);
 extern double openqcd_uflds__temporal_link_sum(int icom);
 
+/* POLYAKOV_LOOP_C */
+extern double openqcd_uflds__polyakov_loop(void);
+
 /* SHIFT_C */
 extern int openqcd_uflds__shift_ud(int *s);
 
@@ -59,6 +62,9 @@ extern void openqcd_uflds__copy_bnd_ud(void);
 #define plaq_action_slices(...) openqcd_uflds__plaq_action_slices(__VA_ARGS__)
 #define spatial_link_sum(...) openqcd_uflds__spatial_link_sum(__VA_ARGS__)
 #define temporal_link_sum(...) openqcd_uflds__temporal_link_sum(__VA_ARGS__)
+
+/* POLYAKOV_LOOP_C */
+#define polyakov_loop(...) openqcd_uflds__polyakov_loop(__VA_ARGS__)
 
 /* SHIFT_C */
 #define shift_ud(...) openqcd_uflds__shift_ud(__VA_ARGS__)

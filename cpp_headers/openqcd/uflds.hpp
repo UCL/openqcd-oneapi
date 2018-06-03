@@ -33,6 +33,9 @@ const auto &plaq_action_slices = openqcd_uflds__plaq_action_slices;
 const auto &spatial_link_sum = openqcd_uflds__spatial_link_sum;
 const auto &temporal_link_sum = openqcd_uflds__temporal_link_sum;
 
+// POLYAKOV_LOOP_C
+const auto &polyakov_loop = openqcd_uflds__polyakov_loop;
+
 // SHIFT_C
 const auto &shift_ud = openqcd_uflds__shift_ud;
 
