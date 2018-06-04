@@ -68,6 +68,7 @@ const auto &spinor_prod_dble = openqcd_linalg__spinor_prod_dble;
 const auto &spinor_prod_re_dble = openqcd_linalg__spinor_prod_re_dble;
 const auto &spinor_prod5_dble = openqcd_linalg__spinor_prod5_dble;
 const auto &norm_square_dble = openqcd_linalg__norm_square_dble;
+const auto& mulr_spinor_assign_dble = openqcd_linalg__mulr_spinor_assign_dble;
 const auto &mulc_spinor_add_dble = openqcd_linalg__mulc_spinor_add_dble;
 const auto &mulr_spinor_add_dble = openqcd_linalg__mulr_spinor_add_dble;
 const auto &combine_spinor_dble = openqcd_linalg__combine_spinor_dble;

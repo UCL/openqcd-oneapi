@@ -3070,6 +3070,21 @@ void mulmg5_dble(int vol, spinor_dble *s)
 
 #endif
 
+/* TODO Vector instructions */
+void mulr_spinor_assign_dble(int vol, spinor_dble *s, spinor_dble const *r,
+                             double c)
+{
+  spinor_dble *sm;
+  sm = s + vol;
+
+  for (; s < sm; s++, r++) {
+    _vector_mul((*s).c1, c, (*r).c1);
+    _vector_mul((*s).c2, c, (*r).c2);
+    _vector_mul((*s).c3, c, (*r).c3);
+    _vector_mul((*s).c4, c, (*r).c4);
+  }
+}
+
 void project_dble(int vol, int icom, spinor_dble *s, spinor_dble const *r)
 {
   complex_dble z;

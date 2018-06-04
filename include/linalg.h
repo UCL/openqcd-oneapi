@@ -119,6 +119,8 @@ openqcd_linalg__spinor_prod5_dble(int vol, int icom,
                                   openqcd__spinor_dble const *r);
 extern double openqcd_linalg__norm_square_dble(int vol, int icom,
                                                openqcd__spinor_dble const *s);
+extern void openqcd_linalg__mulr_spinor_assign_dble(
+    int vol, openqcd__spinor_dble *s, openqcd__spinor_dble const *r, double c);
 extern void openqcd_linalg__mulc_spinor_add_dble(int vol,
                                                  openqcd__spinor_dble *s,
                                                  openqcd__spinor_dble const *r,
@@ -231,6 +233,8 @@ extern void openqcd_linalg__vrotate_dble(int n, int nv,
   openqcd_linalg__spinor_prod_re_dble(__VA_ARGS__)
 #define spinor_prod5_dble(...) openqcd_linalg__spinor_prod5_dble(__VA_ARGS__)
 #define norm_square_dble(...) openqcd_linalg__norm_square_dble(__VA_ARGS__)
+#define mulr_spinor_assign_dble(...)                                           \
+  openqcd_linalg__mulr_spinor_assign_dble(__VA_ARGS__)
 #define mulc_spinor_add_dble(...)                                              \
   openqcd_linalg__mulc_spinor_add_dble(__VA_ARGS__)
 #define mulr_spinor_add_dble(...)                                              \
