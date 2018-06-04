@@ -30,7 +30,7 @@ extern double openqcd_uflds__spatial_link_sum(int icom);
 extern double openqcd_uflds__temporal_link_sum(int icom);
 
 /* POLYAKOV_LOOP_C */
-extern double openqcd_uflds__polyakov_loop(void);
+extern openqcd__complex openqcd_uflds__polyakov_loop(void);
 
 /* SHIFT_C */
 extern int openqcd_uflds__shift_ud(int *s);

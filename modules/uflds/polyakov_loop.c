@@ -26,12 +26,15 @@
 #include "uflds.h"
 
 #define LSPATIAL (L1 * L2 * L3)
+#define NSPATIAL (NPROC1 * NPROC2 * NPROC3)
 
-double polyakov_loop(void)
+complex polyakov_loop(void)
 {
   su3_dble *pol_loops, *pol_buffers = NULL, *u, tmp_link;
   int it, full_idx, spat_idx, tag, phase_set_q;
-  double inv_lspat, local_trace, global_trace;
+  double inv_lspat;
+  double local_trace[2] = {0.0, 0.0}, global_trace[2] = {0.0, 0.0};
+  complex result;
   MPI_Status stat;
 
   error(iup[0][0] == 0, 1, "polyakov_loop [polyakov_loop.c]",
@@ -71,8 +74,8 @@ double polyakov_loop(void)
     }
   }
 
-  /* Loop and extend their lengths */
-  /* This is done in reverse because of how the su3xsu3 function works, the
+  /* Loop and extend their lengths.
+   * This is done in reverse because of how the su3xsu3 function works, the
    * first and the last argument can not point to the same matrix, which is what
    * the formula would be if we were to multiply "forwards" */
   for (it = L0 - 4; it >= 0; it -= 2) {
@@ -126,21 +129,23 @@ double polyakov_loop(void)
     }
   }
 
-  local_trace = 0.0;
-  global_trace = 0.0;
-
   /* Trace the completed polyakov loops */
   if (cpr[0] == 0) {
-    inv_lspat = 1.0 / (3. * LSPATIAL);
+    inv_lspat = 1.0 / (LSPATIAL * NSPATIAL);
 
     for (spat_idx = 0; spat_idx < LSPATIAL; ++spat_idx) {
-      local_trace += (pol_loops[spat_idx].c11.re + pol_loops[spat_idx].c22.re +
-                      pol_loops[spat_idx].c33.re) *
-                     inv_lspat;
+      local_trace[0] +=
+          (pol_loops[spat_idx].c11.re + pol_loops[spat_idx].c22.re +
+           pol_loops[spat_idx].c33.re) *
+          inv_lspat;
+      local_trace[1] +=
+          (pol_loops[spat_idx].c11.im + pol_loops[spat_idx].c22.im +
+           pol_loops[spat_idx].c33.im) *
+          inv_lspat;
     }
   }
 
-  MPI_Allreduce(&local_trace, &global_trace, 1, MPI_DOUBLE, MPI_SUM,
+  MPI_Allreduce(local_trace, global_trace, 2, MPI_DOUBLE, MPI_SUM,
                 MPI_COMM_WORLD);
 
   afree(pol_loops);
@@ -149,5 +154,8 @@ double polyakov_loop(void)
     afree(pol_buffers);
   }
 
-  return global_trace / (NPROC1 * NPROC2 * NPROC3);
+  result.re = global_trace[0];
+  result.im = global_trace[1];
+
+  return result;
 }
