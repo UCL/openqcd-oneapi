@@ -10,7 +10,7 @@
 
 target_module_dir      := modules
 target_tests_dir       := tests
-target_include_dir     := include
+target_include_dir     := include-c
 target_include_cpp_dir := include-cpp
 dep_dir                := .deps
 source_main_dir         = $(code_dir)/main
@@ -18,6 +18,10 @@ source_module_dir       = $(code_dir)/modules
 source_tests_dir        = $(code_dir)/tests
 source_include_dir      = $(code_dir)/include
 source_include_cpp_dir  = $(code_dir)/cpp_headers
+
+ifeq ($(PREFIX),)
+PREFIX := .
+endif
 
 # }}}
 #
@@ -184,6 +188,10 @@ test_nompi_module_dirs  := $(patsubst %,$(target_tests_dir)/nompi/%,$(test_nompi
 # ------------------------------------------------------------------------------
 # {{{
 
+.PHONY: echo
+echo:
+	@echo "$(PREFIX)"
+
 # Compile every main program
 .PHONY: all
 all: $(main_programs)
@@ -208,6 +216,29 @@ headers: $(target_include_dir)
 
 .PHONY: headers-cpp
 headers-cpp: $(target_include_cpp_dir)
+
+.PHONY: base-install
+base-install: $(main_programs) $(openqcd_lib)
+	@echo "$(call header-print,Moving binaries to $(PREFIX)/bin)"
+	@mkdir -p $(PREFIX)/bin
+	@mv $(main_programs) $(PREFIX)/bin
+	@echo "$(call header-print,Moving libraries to $(PREFIX)/lib)"
+	@mkdir -p $(PREFIX)/lib
+	@mv $(openqcd_lib) $(PREFIX)/lib
+
+.PHONY: install
+install: base-install headers
+	@echo "$(call header-print,Moving headers to $(PREFIX)/include)"
+	@mkdir -p $(PREFIX)/include
+	@cp -r $(target_include_dir)/* $(PREFIX)/include
+	@rm -rf $(target_include_dir)
+
+.PHONY: install-cpp
+install-cpp: base-install headers-cpp
+	@echo "$(call header-print,Moving headers to $(PREFIX)/include)"
+	@mkdir -p $(PREFIX)/include
+	@cp -r $(target_include_cpp_dir)/* $(PREFIX)/include
+	@rm -rf $(target_include_cpp_dir)
 
 # Can build the modules independently if you wish
 .PHONY: $(module_names)
@@ -278,6 +309,7 @@ clean-main:
 	@echo "Cleaning executables..."
 	@rm -rf $(openqcd_lib)
 	@rm -rf $(main_programs)
+	@rm -rf bin lib
 
 .PHONY: clean-modules
 clean-modules:
@@ -289,6 +321,7 @@ clean-includes:
 	@echo "Cleaning includes..."
 	@rm -rf $(target_include_dir)
 	@rm -rf $(target_include_cpp_dir)
+	@rm -rf include
 
 # }}}
 #
