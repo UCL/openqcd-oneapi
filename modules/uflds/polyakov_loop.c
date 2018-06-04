@@ -29,7 +29,7 @@
 
 double polyakov_loop(void)
 {
-  su3_dble *pol_loops, *pol_buffers = NULL, *u;
+  su3_dble *pol_loops, *pol_buffers = NULL, *u, tmp_link;
   int it, full_idx, spat_idx, tag, phase_set_q;
   double inv_lspat, local_trace, global_trace;
   MPI_Status stat;
@@ -59,32 +59,34 @@ double polyakov_loop(void)
 
   /* Initialise the Polyakov loops */
   for (spat_idx = 0; spat_idx < LSPATIAL; ++spat_idx) {
-    full_idx = ipt[spat_idx];
+    full_idx = ipt[spat_idx + (L0 - 2) * LSPATIAL];
     if (full_idx < VOLUME / 2) {
-      pol_loops[spat_idx] = u[8 * (iup[full_idx][0] - VOLUME / 2) + 1];
-      su3xsu3(u + 8 * (iup[full_idx][0] - VOLUME / 2), pol_loops + spat_idx,
+      pol_loops[spat_idx] = u[8 * (iup[full_idx][0] - VOLUME / 2)];
+      su3xsu3(u + 8 * (iup[full_idx][0] - VOLUME / 2) + 1, pol_loops + spat_idx,
               pol_loops + spat_idx);
     } else {
-      pol_loops[spat_idx] = u[8 * (full_idx - VOLUME / 2) + 1];
-      su3xsu3(u + 8 * (full_idx - VOLUME / 2), pol_loops + spat_idx,
+      pol_loops[spat_idx] = u[8 * (full_idx - VOLUME / 2)];
+      su3xsu3(u + 8 * (full_idx - VOLUME / 2) + 1, pol_loops + spat_idx,
               pol_loops + spat_idx);
     }
   }
 
-
   /* Loop and extend their lengths */
-  for (it = 2; it < L0; it += 2) {
+  /* This is done in reverse because of how the su3xsu3 function works, the
+   * first and the last argument can not point to the same matrix, which is what
+   * the formula would be if we were to multiply "forwards" */
+  for (it = L0 - 4; it >= 0; it -= 2) {
     for (spat_idx = 0; spat_idx < LSPATIAL; ++spat_idx) {
       full_idx = ipt[spat_idx + it * LSPATIAL];
       if (full_idx < VOLUME / 2) {
+        su3xsu3(u + 8 * (iup[full_idx][0] - VOLUME / 2), pol_loops + spat_idx,
+                pol_loops + spat_idx);
         su3xsu3(u + 8 * (iup[full_idx][0] - VOLUME / 2) + 1,
                 pol_loops + spat_idx, pol_loops + spat_idx);
-        su3xsu3(u + 8 * (iup[full_idx][0] - VOLUME / 2),
-                pol_loops + spat_idx, pol_loops + spat_idx);
       } else {
-        su3xsu3(u + 8 * (full_idx - VOLUME / 2) + 1, pol_loops + spat_idx,
-                pol_loops + spat_idx);
         su3xsu3(u + 8 * (full_idx - VOLUME / 2), pol_loops + spat_idx,
+                pol_loops + spat_idx);
+        su3xsu3(u + 8 * (full_idx - VOLUME / 2) + 1, pol_loops + spat_idx,
                 pol_loops + spat_idx);
       }
     }
@@ -95,6 +97,7 @@ double polyakov_loop(void)
   }
 
   /* Order communication in the temporal direction */
+  /* Information flow "downwards" towards smaller t */
   if (NPROC0 > 1) {
     tag = mpi_tag();
 
@@ -106,16 +109,16 @@ double polyakov_loop(void)
                MPI_COMM_WORLD, &stat);
 
       for (spat_idx = 0; spat_idx < LSPATIAL; ++spat_idx) {
-        su3xsu3(pol_buffers + spat_idx, pol_loops + spat_idx,
-                pol_loops + spat_idx);
+        su3xsu3(pol_loops + spat_idx, pol_buffers + spat_idx, &tmp_link);
+        cm3x3_assign(1, &tmp_link, pol_loops + spat_idx);
       }
     } else {
       MPI_Recv(pol_buffers, 18 * LSPATIAL, MPI_DOUBLE, npr[1], tag,
                MPI_COMM_WORLD, &stat);
 
       for (spat_idx = 0; spat_idx < LSPATIAL; ++spat_idx) {
-        su3xsu3(pol_buffers + spat_idx, pol_loops + spat_idx,
-                pol_loops + spat_idx);
+        su3xsu3(pol_loops + spat_idx, pol_buffers + spat_idx, &tmp_link);
+        cm3x3_assign(1, &tmp_link, pol_loops + spat_idx);
       }
 
       MPI_Send(pol_loops, 18 * LSPATIAL, MPI_DOUBLE, npr[0], tag,
@@ -145,7 +148,6 @@ double polyakov_loop(void)
   if ((NPROC0 > 0) && (cpr[0] != (NPROC0 - 1))) {
     afree(pol_buffers);
   }
-
 
   return global_trace / (NPROC1 * NPROC2 * NPROC3);
 }

@@ -190,10 +190,6 @@ test_nompi_module_dirs  := $(patsubst %,$(target_tests_dir)/nompi/%,$(test_nompi
 # ------------------------------------------------------------------------------
 # {{{
 
-.PHONY: echo
-echo:
-	@echo "$(PREFIX)"
-
 # Compile every main program
 .PHONY: all
 all: $(main_programs)
