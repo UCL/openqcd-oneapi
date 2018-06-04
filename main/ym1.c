@@ -50,6 +50,7 @@ typedef struct
   double dH, avpl, avpl_smeared;
   double average_t_link, average_s_link;
   double average_stout_t_link, average_stout_s_link;
+  complex ploop, smeared_ploop;
 } dat_t;
 
 static struct
@@ -887,8 +888,8 @@ static void read_infile(int argc, char *argv[])
                "Syntax: ym1 -i <filename> [-noloc] [-noexp] "
                "[-rmold] [-noms] [-c <filename> [-a [-norng]]]");
 
-    error_root(endian == openqcd_utils__UNKNOWN_ENDIAN, 1, "read_infile [ym1.c]",
-               "Machine has unknown endianness");
+    error_root(endian == openqcd_utils__UNKNOWN_ENDIAN, 1,
+               "read_infile [ym1.c]", "Machine has unknown endianness");
 
     error_root((noexp) && (noloc), 1, "read_infile [ym1.c]",
                "The concurrent use of -noloc and -noexp is not permitted");
@@ -1452,6 +1453,14 @@ static void print_log(dat_t *ndat)
         printf("Average spatial link = %.15f\n", (*ndat).average_s_link);
         printf("Average link = %.15f\n", average_link);
       }
+
+      printf("Polyakov loop = %.15f %.15f\n", (*ndat).ploop.re,
+             (*ndat).ploop.im);
+
+      if (stout_smearing_parms().num_smear > 0) {
+        printf("Polyakov loop (stout) = %.15f %.15f\n",
+               (*ndat).smeared_ploop.re, (*ndat).smeared_ploop.im);
+      }
     }
 
     print_all_avgstat();
@@ -1625,6 +1634,16 @@ static dat_t compute_log_values(double const *act0, double const *act1,
   ndat.avpl_smeared = w1[4];
   ndat.average_stout_t_link = w1[5];
   ndat.average_stout_s_link = w1[6];
+
+  if (bc_type() == 3) {
+    ndat.ploop = polyakov_loop();
+
+    if (stout_smearing_parms().num_smear > 0) {
+      smear_fields();
+      ndat.smeared_ploop = polyakov_loop();
+      unsmear_fields();
+    }
+  }
 
   return ndat;
 }
