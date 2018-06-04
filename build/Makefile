@@ -95,6 +95,8 @@ LDFLAGS     += $(USR_LDFLAGS) -lm
 # No size flags if building libraries
 library: CFLAGS := $(filter-out $(SIZE_FLAGS),$(CFLAGS))
 library-cpp: CFLAGS := $(filter-out $(SIZE_FLAGS),$(CFLAGS))
+install: CFLAGS := $(filter-out $(SIZE_FLAGS),$(CFLAGS))
+install-cpp: CFLAGS := $(filter-out $(SIZE_FLAGS),$(CFLAGS))
 
 # The nompi targets needs one more include directory
 $(target_tests_dir)/nompi/%: \
