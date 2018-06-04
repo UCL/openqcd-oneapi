@@ -23,8 +23,8 @@
 #endif
 
 #include "global.h"
-#include "mpi.h"
 #include "lattice.h"
+#include "mpi.h"
 #include "su3fcts.h"
 #include "uflds.h"
 
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 {
   int my_rank;
   double theta[3] = {0.24, -1.1, 0.97};
-  double ploop;
+  complex ploop;
 
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
   geometry();
   new_test_module();
 
-  cm3x3_unity(4*VOLUME, udfld());
+  cm3x3_unity(4 * VOLUME, udfld());
 
   { /* Test 1 */
 
@@ -74,8 +74,9 @@ int main(int argc, char *argv[])
     ploop = polyakov_loop();
 
     if (my_rank == 0) {
-      printf("Polyakov loop = %lf (should be 1.0)\n", ploop);
-      fail_test_if(1, fabs(ploop - 1.0) > 1e-12);
+      printf("Polyakov loop = (%.2lf, %.2lf) (should be 3.0)\n", ploop.re,
+             ploop.im);
+      fail_test_if(1, (fabs(ploop.re - 3.0) + fabs(ploop.im)) > 1e-12);
       printf("\n-------------------------------------------\n\n");
     }
   }
@@ -91,8 +92,9 @@ int main(int argc, char *argv[])
     ploop = polyakov_loop();
 
     if (my_rank == 0) {
-      printf("Polyakov loop = %lf (should be 1.0)\n", ploop);
-      fail_test_if(2, fabs(ploop - 1.0) > 1e-12);
+      printf("Polyakov loop = (%.2lf, %.2lf) (should be 3.0)\n", ploop.re,
+             ploop.im);
+      fail_test_if(1, (fabs(ploop.re - 3.0) + fabs(ploop.im)) > 1e-12);
       printf("\n-------------------------------------------\n\n");
     }
   }
