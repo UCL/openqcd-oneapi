@@ -9,13 +9,15 @@
 Files
 -----
 
-bstap.c        Allocation and computation of the boundary staple field.
+bstap.c          Allocation and computation of the boundary staple field.
 
-plaq_sum.c     Calculation of plaquette sums.
+plaq_sum.c       Calculation of plaquette sums.
 
-shift.c        Translation of the global double-precision gauge field.
+polyakov_loop.c  Calculation of the Polyakov loop.
 
-uflds.c        Allocation and initialization of the global gauge fields.
+shift.c          Translation of the global double-precision gauge field.
+
+uflds.c          Allocation and initialization of the global gauge fields.
 
 
 Include file
@@ -70,6 +72,12 @@ double spatial_link_sum(int icom)
 double temporal_link_sum(int icom)
   Returns the sum of the real trace of all gauge links pointing in a temporal
   direction.
+
+complex polyakov_loop(void)
+  Computes the spatially averaged temporal Polyakov loop for the current gauge
+  configuration using periodic boundary conditions. Similar to the plaquette,
+  this number is not divided by the number of colours and will therefore be 3.0
+  for a unit gauge.
 
 int shift_ud(int *s)
   Replaces the double-precision gauge field U(x,mu) by U(x-s,mu), where s[4] is

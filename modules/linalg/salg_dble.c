@@ -27,6 +27,10 @@
  *   double norm_square_dble(int vol, int icom, spinor_dble const *s)
  *     Computes the square of the norm of the field s.
  *
+ *   void mulr_spinor_assign_dble(int vol, spinor_dble *s, spinor_dble const *r,
+ *                                double c)
+ *     Replaces the field s by c*r.
+ *
  *   void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
  *                             complex_dble z)
  *     Replaces the field s by s+z*r.

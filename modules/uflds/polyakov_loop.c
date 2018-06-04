@@ -10,9 +10,16 @@
  *
  * The externally accessible functions are
  *
+ *   complex polyakov_loop(void)
+ *     Computes the spatially averaged temporal Polyakov loop for the current
+ *     gauge configuration using periodic boundary conditions. Similar to the
+ *     plaquette, this number is not divided by the number of colours and will
+ *     therefore be 3.0 for a unit gauge.
  *
  * Notes:
  *
+ * All programs in this module perform global communications and must be called
+ * simultaneously on all MPI processes.
  *
  *******************************************************************************/
 
