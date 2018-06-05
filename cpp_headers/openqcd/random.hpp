@@ -13,6 +13,8 @@
 #ifndef CPP_RANDOM_HPP
 #define CPP_RANDOM_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/random.h"
 }
@@ -21,32 +23,32 @@ namespace openqcd {
 namespace random {
 
 // GAUSS_C
-const auto &gauss = openqcd_random__gauss;
-const auto &gauss_dble = openqcd_random__gauss_dble;
+OPENQCD_MODULE_FUNCTION_ALIAS(gauss, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(gauss_dble, random)
 
 // RANLUX_C
-const auto &start_ranlux = openqcd_random__start_ranlux;
-const auto &export_ranlux = openqcd_random__export_ranlux;
-const auto &import_ranlux = openqcd_random__import_ranlux;
+OPENQCD_MODULE_FUNCTION_ALIAS(start_ranlux, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(export_ranlux, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(import_ranlux, random)
 
 // RANLXS_C
-const auto &ranlxs = openqcd_random__ranlxs;
-const auto &rlxs_init = openqcd_random__rlxs_init;
-const auto &rlxs_size = openqcd_random__rlxs_size;
-const auto &rlxs_get = openqcd_random__rlxs_get;
-const auto &rlxs_reset = openqcd_random__rlxs_reset;
+OPENQCD_MODULE_FUNCTION_ALIAS(ranlxs, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(rlxs_init, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(rlxs_size, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(rlxs_get, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(rlxs_reset, random)
 
 // RANLXD_C
-const auto &ranlxd = openqcd_random__ranlxd;
-const auto &rlxd_init = openqcd_random__rlxd_init;
-const auto &rlxd_size = openqcd_random__rlxd_size;
-const auto &rlxd_get = openqcd_random__rlxd_get;
-const auto &rlxd_reset = openqcd_random__rlxd_reset;
+OPENQCD_MODULE_FUNCTION_ALIAS(ranlxd, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(rlxd_init, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(rlxd_size, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(rlxd_get, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(rlxd_reset, random)
 
 // RANLUX_SITE_C
-const auto &ranlxs_site = openqcd_random__ranlxs_site;
-const auto &ranlxd_site = openqcd_random__ranlxd_site;
-const auto &start_ranlux_site = openqcd_random__start_ranlux_site;
+OPENQCD_MODULE_FUNCTION_ALIAS(ranlxs_site, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(ranlxd_site, random)
+OPENQCD_MODULE_FUNCTION_ALIAS(start_ranlux_site, random)
 
 } // namespace random
 } // namespace openqcd

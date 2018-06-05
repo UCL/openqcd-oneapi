@@ -13,6 +13,8 @@
 #ifndef CPP_MDFLDS_HPP
 #define CPP_MDFLDS_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/mdflds.h"
 }
@@ -23,13 +25,13 @@ namespace mdflds {
 using mdflds_t = openqcd_mdflds__mdflds_t;
 
 // MDFLDS_C
-const auto &mdflds = openqcd_mdflds__mdflds;
-const auto &set_frc2zero = openqcd_mdflds__set_frc2zero;
-const auto &bnd_mom2zero = openqcd_mdflds__bnd_mom2zero;
-const auto &random_mom = openqcd_mdflds__random_mom;
-const auto &momentum_action = openqcd_mdflds__momentum_action;
-const auto &copy_bnd_frc = openqcd_mdflds__copy_bnd_frc;
-const auto &add_bnd_frc = openqcd_mdflds__add_bnd_frc;
+OPENQCD_MODULE_FUNCTION_ALIAS(mdflds, mdflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(set_frc2zero, mdflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(bnd_mom2zero, mdflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(random_mom, mdflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(momentum_action, mdflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(copy_bnd_frc, mdflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(add_bnd_frc, mdflds)
 
 } // namespace mdflds
 } // namespace openqcd

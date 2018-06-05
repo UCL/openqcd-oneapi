@@ -13,6 +13,8 @@
 #ifndef CPP_LITTLE_HPP
 #define CPP_LITTLE_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/little.h"
 }
@@ -25,44 +27,44 @@ using Aw_dble_t = openqcd_little__Aw_dble_t;
 using b2b_flds_t = openqcd_little__b2b_flds_t;
 
 // AW_COM_C
-const auto &b2b_flds = openqcd_little__b2b_flds;
-const auto &cpAoe_ext_bnd = openqcd_little__cpAoe_ext_bnd;
-const auto &cpAee_int_bnd = openqcd_little__cpAee_int_bnd;
+OPENQCD_MODULE_FUNCTION_ALIAS(b2b_flds, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(cpAoe_ext_bnd, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(cpAee_int_bnd, little)
 
 // AW_C
-const auto &Aw = openqcd_little__Aw;
-const auto &Aweeinv = openqcd_little__Aweeinv;
-const auto &Awooinv = openqcd_little__Awooinv;
-const auto &Awoe = openqcd_little__Awoe;
-const auto &Aweo = openqcd_little__Aweo;
-const auto &Awhat = openqcd_little__Awhat;
+OPENQCD_MODULE_FUNCTION_ALIAS(Aw, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Aweeinv, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Awooinv, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Awoe, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Aweo, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Awhat, little)
 
 // AW_DBLE_C
-const auto &Aw_dble = openqcd_little__Aw_dble;
-const auto &Aweeinv_dble = openqcd_little__Aweeinv_dble;
-const auto &Awooinv_dble = openqcd_little__Awooinv_dble;
-const auto &Awoe_dble = openqcd_little__Awoe_dble;
-const auto &Aweo_dble = openqcd_little__Aweo_dble;
-const auto &Awhat_dble = openqcd_little__Awhat_dble;
+OPENQCD_MODULE_FUNCTION_ALIAS(Aw_dble, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Aweeinv_dble, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Awooinv_dble, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Awoe_dble, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Aweo_dble, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Awhat_dble, little)
 
 // AW_GEN_C
-const auto &gather_ud = openqcd_little__gather_ud;
-const auto &gather_sd = openqcd_little__gather_sd;
-const auto &apply_u2sd = openqcd_little__apply_u2sd;
-const auto &apply_udag2sd = openqcd_little__apply_udag2sd;
-const auto &spinor_prod_gamma = openqcd_little__spinor_prod_gamma;
+OPENQCD_MODULE_FUNCTION_ALIAS(gather_ud, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(gather_sd, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(apply_u2sd, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(apply_udag2sd, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(spinor_prod_gamma, little)
 
 // AW_OPS_C
-const auto &Awop = openqcd_little__Awop;
-const auto &Awophat = openqcd_little__Awophat;
-const auto &Awop_dble = openqcd_little__Awop_dble;
-const auto &Awophat_dble = openqcd_little__Awophat_dble;
-const auto &set_Aw = openqcd_little__set_Aw;
-const auto &set_Awhat = openqcd_little__set_Awhat;
+OPENQCD_MODULE_FUNCTION_ALIAS(Awop, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Awophat, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Awop_dble, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(Awophat_dble, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(set_Aw, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(set_Awhat, little)
 
 // LTL_MODES_C
-const auto &set_ltl_modes = openqcd_little__set_ltl_modes;
-const auto &ltl_matrix = openqcd_little__ltl_matrix;
+OPENQCD_MODULE_FUNCTION_ALIAS(set_ltl_modes, little)
+OPENQCD_MODULE_FUNCTION_ALIAS(ltl_matrix, little)
 
 } // namespace little
 } // namespace openqcd

@@ -13,6 +13,8 @@
 #ifndef CPP_RATFCTS_HPP
 #define CPP_RATFCTS_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/ratfcts.h"
 }
@@ -23,14 +25,14 @@ namespace ratfct {
 using ratfct_t = openqcd_ratfcts__ratfct_t;
 
 // ELLIPTIC_C
-const auto &ellipticK = openqcd_ratfcts__ellipticK;
-const auto &sncndn = openqcd_ratfcts__sncndn;
+OPENQCD_MODULE_FUNCTION_ALIAS(ellipticK, ratfcts)
+OPENQCD_MODULE_FUNCTION_ALIAS(sncndn, ratfcts)
 
 // RATFCTS_C
-const auto &ratfct = openqcd_ratfcts__ratfct;
+OPENQCD_MODULE_FUNCTION_ALIAS(ratfct, ratfcts)
 
 // ZOLOTAREV_C
-const auto &zolotarev = openqcd_ratfcts__zolotarev;
+OPENQCD_MODULE_FUNCTION_ALIAS(zolotarev, ratfcts)
 
 } // namespace ratfct
 } // namespace openqcd

@@ -13,6 +13,8 @@
 #ifndef CPP_VFLDS_HPP
 #define CPP_VFLDS_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/vflds.h"
 }
@@ -21,28 +23,28 @@ namespace openqcd {
 namespace vflds {
 
 // VCOM_C
-const auto &cpv_int_bnd = openqcd_vflds__cpv_int_bnd;
-const auto &cpv_ext_bnd = openqcd_vflds__cpv_ext_bnd;
+OPENQCD_MODULE_FUNCTION_ALIAS(cpv_int_bnd, vflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(cpv_ext_bnd, vflds)
 
 // VDCOM_C
-const auto &cpvd_int_bnd = openqcd_vflds__cpvd_int_bnd;
-const auto &cpvd_ext_bnd = openqcd_vflds__cpvd_ext_bnd;
+OPENQCD_MODULE_FUNCTION_ALIAS(cpvd_int_bnd, vflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(cpvd_ext_bnd, vflds)
 
 // VFLDS_C
-const auto &vflds = openqcd_vflds__vflds;
-const auto &vdflds = openqcd_vflds__vdflds;
+OPENQCD_MODULE_FUNCTION_ALIAS(vflds, vflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(vdflds, vflds)
 
 // VINIT_C
-const auto &set_v2zero = openqcd_vflds__set_v2zero;
-const auto &set_vd2zero = openqcd_vflds__set_vd2zero;
-const auto &random_v = openqcd_vflds__random_v;
-const auto &random_vd = openqcd_vflds__random_vd;
-const auto &assign_v2v = openqcd_vflds__assign_v2v;
-const auto &assign_v2vd = openqcd_vflds__assign_v2vd;
-const auto &assign_vd2v = openqcd_vflds__assign_vd2v;
-const auto &assign_vd2vd = openqcd_vflds__assign_vd2vd;
-const auto &add_v2vd = openqcd_vflds__add_v2vd;
-const auto &diff_vd2v = openqcd_vflds__diff_vd2v;
+OPENQCD_MODULE_FUNCTION_ALIAS(set_v2zero, vflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(set_vd2zero, vflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(random_v, vflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(random_vd, vflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(assign_v2v, vflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(assign_v2vd, vflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(assign_vd2v, vflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(assign_vd2vd, vflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(add_v2vd, vflds)
+OPENQCD_MODULE_FUNCTION_ALIAS(diff_vd2v, vflds)
 
 } // namespace vflds
 } // namespace openqcd

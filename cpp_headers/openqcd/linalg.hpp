@@ -21,81 +21,81 @@ namespace openqcd {
 namespace linalg {
 
 // CMATRIX_C
-const auto &cmat_vec = openqcd_linalg__cmat_vec;
-const auto &cmat_vec_assign = openqcd_linalg__cmat_vec_assign;
-const auto &cmat_add = openqcd_linalg__cmat_add;
-const auto &cmat_sub = openqcd_linalg__cmat_sub;
-const auto &cmat_mul = openqcd_linalg__cmat_mul;
-const auto &cmat_dag = openqcd_linalg__cmat_dag;
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_vec, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_vec_assign, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_add, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_sub, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_mul, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_dag, linalg)
 
 // CMATRIX_DBLE_C
-const auto &cmat_vec_dble = openqcd_linalg__cmat_vec_dble;
-const auto &cmat_vec_assign_dble = openqcd_linalg__cmat_vec_assign_dble;
-const auto &cmat_add_dble = openqcd_linalg__cmat_add_dble;
-const auto &cmat_sub_dble = openqcd_linalg__cmat_sub_dble;
-const auto &cmat_mul_dble = openqcd_linalg__cmat_mul_dble;
-const auto &cmat_dag_dble = openqcd_linalg__cmat_dag_dble;
-const auto &cmat_inv_dble = openqcd_linalg__cmat_inv_dble;
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_vec_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_vec_assign_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_add_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_sub_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_mul_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_dag_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(cmat_inv_dble, linalg)
 
 // LIEALG_C
-const auto &random_alg = openqcd_linalg__random_alg;
-const auto &norm_square_alg = openqcd_linalg__norm_square_alg;
-const auto &scalar_prod_alg = openqcd_linalg__scalar_prod_alg;
-const auto &set_alg2zero = openqcd_linalg__set_alg2zero;
-const auto &set_ualg2zero = openqcd_linalg__set_ualg2zero;
-const auto &assign_alg2alg = openqcd_linalg__assign_alg2alg;
-const auto &swap_alg = openqcd_linalg__swap_alg;
-const auto &add_alg = openqcd_linalg__add_alg;
-const auto &muladd_assign_alg = openqcd_linalg__muladd_assign_alg;
-const auto &project_to_su3alg = openqcd_linalg__project_to_su3alg;
-const auto &su3alg_to_cm3x3 = openqcd_linalg__su3alg_to_cm3x3;
+OPENQCD_MODULE_FUNCTION_ALIAS(random_alg, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(norm_square_alg, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(scalar_prod_alg, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(set_alg2zero, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(set_ualg2zero, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(assign_alg2alg, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(swap_alg, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(add_alg, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(muladd_assign_alg, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(project_to_su3alg, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(su3alg_to_cm3x3, linalg)
 
 // SALG_C
-const auto &spinor_prod = openqcd_linalg__spinor_prod;
-const auto &spinor_prod_re = openqcd_linalg__spinor_prod_re;
-const auto &norm_square = openqcd_linalg__norm_square;
-const auto &mulc_spinor_add = openqcd_linalg__mulc_spinor_add;
-const auto &mulr_spinor_add = openqcd_linalg__mulr_spinor_add;
-const auto &project = openqcd_linalg__project;
-const auto &scale = openqcd_linalg__scale;
-const auto &normalize = openqcd_linalg__normalize;
-const auto &rotate = openqcd_linalg__rotate;
-const auto &mulg5 = openqcd_linalg__mulg5;
-const auto &mulmg5 = openqcd_linalg__mulmg5;
+OPENQCD_MODULE_FUNCTION_ALIAS(spinor_prod, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(spinor_prod_re, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(norm_square, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(mulc_spinor_add, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(mulr_spinor_add, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(project, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(scale, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(normalize, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(rotate, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(mulg5, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(mulmg5, linalg)
 
 // SALG_DBLE_C
-const auto &spinor_prod_dble = openqcd_linalg__spinor_prod_dble;
-const auto &spinor_prod_re_dble = openqcd_linalg__spinor_prod_re_dble;
-const auto &spinor_prod5_dble = openqcd_linalg__spinor_prod5_dble;
-const auto &norm_square_dble = openqcd_linalg__norm_square_dble;
-const auto &mulr_spinor_assign_dble = openqcd_linalg__mulr_spinor_assign_dble;
-const auto &mulc_spinor_add_dble = openqcd_linalg__mulc_spinor_add_dble;
-const auto &mulr_spinor_add_dble = openqcd_linalg__mulr_spinor_add_dble;
-const auto &combine_spinor_dble = openqcd_linalg__combine_spinor_dble;
-const auto &project_dble = openqcd_linalg__project_dble;
-const auto &scale_dble = openqcd_linalg__scale_dble;
-const auto &normalize_dble = openqcd_linalg__normalize_dble;
-const auto &rotate_dble = openqcd_linalg__rotate_dble;
-const auto &mulg5_dble = openqcd_linalg__mulg5_dble;
-const auto &mulmg5_dble = openqcd_linalg__mulmg5_dble;
+OPENQCD_MODULE_FUNCTION_ALIAS(spinor_prod_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(spinor_prod_re_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(spinor_prod5_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(norm_square_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(mulr_spinor_assign_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(mulc_spinor_add_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(mulr_spinor_add_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(combine_spinor_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(project_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(scale_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(normalize_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(rotate_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(mulg5_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(mulmg5_dble, linalg)
 
 // VALG_C
-const auto &vprod = openqcd_linalg__vprod;
-const auto &vnorm_square = openqcd_linalg__vnorm_square;
-const auto &mulc_vadd = openqcd_linalg__mulc_vadd;
-const auto &vproject = openqcd_linalg__vproject;
-const auto &vscale = openqcd_linalg__vscale;
-const auto &vnormalize = openqcd_linalg__vnormalize;
-const auto &vrotate = openqcd_linalg__vrotate;
+OPENQCD_MODULE_FUNCTION_ALIAS(vprod, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(vnorm_square, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(mulc_vadd, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(vproject, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(vscale, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(vnormalize, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(vrotate, linalg)
 
 // VALG_DBLE_C
-const auto &vprod_dble = openqcd_linalg__vprod_dble;
-const auto &vnorm_square_dble = openqcd_linalg__vnorm_square_dble;
-const auto &mulc_vadd_dble = openqcd_linalg__mulc_vadd_dble;
-const auto &vproject_dble = openqcd_linalg__vproject_dble;
-const auto &vscale_dble = openqcd_linalg__vscale_dble;
-const auto &vnormalize_dble = openqcd_linalg__vnormalize_dble;
-const auto &vrotate_dble = openqcd_linalg__vrotate_dble;
+OPENQCD_MODULE_FUNCTION_ALIAS(vprod_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(vnorm_square_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(mulc_vadd_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(vproject_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(vscale_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(vnormalize_dble, linalg)
+OPENQCD_MODULE_FUNCTION_ALIAS(vrotate_dble, linalg)
 
 } // namespace linalg
 } // namespace openqcd

@@ -13,6 +13,8 @@
 #ifndef CPP_WFLOW_HPP
 #define CPP_WFLOW_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/wflow.h"
 }
@@ -21,9 +23,9 @@ namespace openqcd {
 namespace wflow {
 
 // WFLOW_C
-const auto &fwd_euler = openqcd_wflow__fwd_euler;
-const auto &fwd_rk2 = openqcd_wflow__fwd_rk2;
-const auto &fwd_rk3 = openqcd_wflow__fwd_rk3;
+OPENQCD_MODULE_FUNCTION_ALIAS(fwd_euler, wflow)
+OPENQCD_MODULE_FUNCTION_ALIAS(fwd_rk2, wflow)
+OPENQCD_MODULE_FUNCTION_ALIAS(fwd_rk3, wflow)
 
 } // namespace wflow
 } // namespace openqcd

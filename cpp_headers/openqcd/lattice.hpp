@@ -13,6 +13,8 @@
 #ifndef CPP_LATTICE_HPP
 #define CPP_LATTICE_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/lattice.h"
 }
@@ -24,28 +26,28 @@ using uidx_t = openqcd_lattice__uidx_t;
 using ftidx_t = openqcd_lattice__ftidx_t;
 
 // BCNDS_C
-const auto &bnd_lks = openqcd_lattice__bnd_lks;
-const auto &bnd_bnd_lks = openqcd_lattice__bnd_bnd_lks;
-const auto &bnd_pts = openqcd_lattice__bnd_pts;
-const auto &set_bc = openqcd_lattice__set_bc;
-const auto &check_bc = openqcd_lattice__check_bc;
-const auto &bnd_s2zero = openqcd_lattice__bnd_s2zero;
-const auto &bnd_sd2zero = openqcd_lattice__bnd_sd2zero;
+OPENQCD_MODULE_FUNCTION_ALIAS(bnd_lks, lattice)
+OPENQCD_MODULE_FUNCTION_ALIAS(bnd_bnd_lks, lattice)
+OPENQCD_MODULE_FUNCTION_ALIAS(bnd_pts, lattice)
+OPENQCD_MODULE_FUNCTION_ALIAS(set_bc, lattice)
+OPENQCD_MODULE_FUNCTION_ALIAS(check_bc, lattice)
+OPENQCD_MODULE_FUNCTION_ALIAS(bnd_s2zero, lattice)
+OPENQCD_MODULE_FUNCTION_ALIAS(bnd_sd2zero, lattice)
 
 // FTIDX_C
-const auto &ftidx = openqcd_lattice__ftidx;
-const auto &plaq_ftidx = openqcd_lattice__plaq_ftidx;
+OPENQCD_MODULE_FUNCTION_ALIAS(ftidx, lattice)
+OPENQCD_MODULE_FUNCTION_ALIAS(plaq_ftidx, lattice)
 
 // GEOMETRY_C
-const auto &ipr_global = openqcd_lattice__ipr_global;
-const auto &ipt_global = openqcd_lattice__ipt_global;
-const auto &global_time = openqcd_lattice__global_time;
-const auto &geometry = openqcd_lattice__geometry;
+OPENQCD_MODULE_FUNCTION_ALIAS(ipr_global, lattice)
+OPENQCD_MODULE_FUNCTION_ALIAS(ipt_global, lattice)
+OPENQCD_MODULE_FUNCTION_ALIAS(global_time, lattice)
+OPENQCD_MODULE_FUNCTION_ALIAS(geometry, lattice)
 
 // UIDX_C
-const auto &uidx = openqcd_lattice__uidx;
-const auto &alloc_uidx = openqcd_lattice__alloc_uidx;
-const auto &plaq_uidx = openqcd_lattice__plaq_uidx;
+OPENQCD_MODULE_FUNCTION_ALIAS(uidx, lattice)
+OPENQCD_MODULE_FUNCTION_ALIAS(alloc_uidx, lattice)
+OPENQCD_MODULE_FUNCTION_ALIAS(plaq_uidx, lattice)
 
 } // namespace lattice
 } // namespace openqcd

@@ -13,6 +13,8 @@
 #ifndef CPP_DFL_HPP
 #define CPP_DFL_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/dfl.h"
 }
@@ -23,31 +25,31 @@ namespace dfl {
 using dfl_grid_t = openqcd_dfl__dfl_grid_t;
 
 // DFL_GEOMETRY_C
-const auto& dfl_geometry = openqcd_dfl__dfl_geometry;
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_geometry, dfl)
 
 // DFL_MODES_C
-const auto& dfl_modes = openqcd_dfl__dfl_modes;
-const auto& dfl_update = openqcd_dfl__dfl_update;
-const auto& dfl_modes2 = openqcd_dfl__dfl_modes2;
-const auto& dfl_update2 = openqcd_dfl__dfl_update2;
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_modes, dfl)
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_update, dfl)
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_modes2, dfl)
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_update2, dfl)
 
 // DFL_SAP_GCR_C
-const auto& dfl_sap_gcr = openqcd_dfl__dfl_sap_gcr;
-const auto& dfl_sap_gcr2 = openqcd_dfl__dfl_sap_gcr2;
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_sap_gcr, dfl)
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_sap_gcr2, dfl)
 
 // DFL_SUBSPACE_C
-const auto& dfl_sd2vd = openqcd_dfl__dfl_sd2vd;
-const auto& dfl_vd2sd = openqcd_dfl__dfl_vd2sd;
-const auto& dfl_sub_vd2sd = openqcd_dfl__dfl_sub_vd2sd;
-const auto& dfl_s2v = openqcd_dfl__dfl_s2v;
-const auto& dfl_v2s = openqcd_dfl__dfl_v2s;
-const auto& dfl_sub_v2s = openqcd_dfl__dfl_sub_v2s;
-const auto& dfl_subspace = openqcd_dfl__dfl_subspace;
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_sd2vd, dfl)
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_vd2sd, dfl)
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_sub_vd2sd, dfl)
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_s2v, dfl)
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_v2s, dfl)
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_sub_v2s, dfl)
+OPENQCD_MODULE_FUNCTION_ALIAS(dfl_subspace, dfl)
 
 /* LTL_GCR */
-const auto& ltl_gcr = openqcd_dfl__ltl_gcr;
+OPENQCD_MODULE_FUNCTION_ALIAS(ltl_gcr, dfl)
 
-} // namespace dfl 
-} // namespace openqcd 
+} // namespace dfl
+} // namespace openqcd
 
 #endif // ifndef CPP_DFL_HPP

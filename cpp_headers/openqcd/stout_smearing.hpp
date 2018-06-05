@@ -13,6 +13,8 @@
 #ifndef CPP_STOUT_SMEARING_HPP
 #define CPP_STOUT_SMEARING_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/stout_smearing.h"
 }
@@ -23,19 +25,17 @@ namespace stout_smearing {
 using ch_mat_coeff_pair_t = openqcd_stout_smearing__ch_mat_coeff_pair_t;
 
 // FORCE_UNSMEARING_C
-const auto &unsmear_force = openqcd_stout_smearing__unsmear_force;
-const auto &unsmear_mdforce = openqcd_stout_smearing__unsmear_mdforce;
+OPENQCD_MODULE_FUNCTION_ALIAS(unsmear_force, stout_smearing)
+OPENQCD_MODULE_FUNCTION_ALIAS(unsmear_mdforce, stout_smearing)
 
 // SMEARED_FIELDS_C
-const auto &smeared_fields = openqcd_stout_smearing__smeared_fields;
-const auto &free_smearing_ch_coeff_fields =
-    openqcd_stout_smearing__free_smearing_ch_coeff_fields;
-const auto &smearing_ch_coeff_fields =
-    openqcd_stout_smearing__smearing_ch_coeff_fields;
+OPENQCD_MODULE_FUNCTION_ALIAS(smeared_fields, stout_smearing)
+OPENQCD_MODULE_FUNCTION_ALIAS(free_smearing_ch_coeff_fields, stout_smearing)
+OPENQCD_MODULE_FUNCTION_ALIAS(smearing_ch_coeff_fields, stout_smearing)
 
 // STOUT_SMEARING_C
-const auto &smear_fields = openqcd_stout_smearing__smear_fields;
-const auto &unsmear_fields = openqcd_stout_smearing__unsmear_fields;
+OPENQCD_MODULE_FUNCTION_ALIAS(smear_fields, stout_smearing)
+OPENQCD_MODULE_FUNCTION_ALIAS(unsmear_fields, stout_smearing)
 
 } // namespace stout_smearing
 } // namespace openqcd

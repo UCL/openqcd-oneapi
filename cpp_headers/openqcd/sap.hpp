@@ -13,6 +13,8 @@
 #ifndef CPP_SAP_HPP
 #define CPP_SAP_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/sap.h"
 }
@@ -21,17 +23,17 @@ namespace openqcd {
 namespace sap {
 
 // BLK_SOLV_C
-const auto &blk_mres = openqcd_sap__blk_mres;
-const auto &blk_eo_mres = openqcd_sap__blk_eo_mres;
+OPENQCD_MODULE_FUNCTION_ALIAS(blk_mres, sap)
+OPENQCD_MODULE_FUNCTION_ALIAS(blk_eo_mres, sap)
 
 // SAP_COM_C
-const auto &sap_com = openqcd_sap__sap_com;
+OPENQCD_MODULE_FUNCTION_ALIAS(sap_com, sap)
 
 /* SAP */
-const auto &sap = openqcd_sap__sap;
+OPENQCD_MODULE_FUNCTION_ALIAS(sap, sap)
 
 /* SAP_GCR */
-const auto &sap_gcr = openqcd_sap__sap_gcr;
+OPENQCD_MODULE_FUNCTION_ALIAS(sap_gcr, sap)
 
 } // namespace sap
 } // namespace openqcd

@@ -13,6 +13,8 @@
 #ifndef CPP_LINSOLV_HPP
 #define CPP_LINSOLV_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/linsolv.h"
 }
@@ -21,16 +23,16 @@ namespace openqcd {
 namespace linsolv {
 
 /* CGNE_C */
-const auto &cgne = openqcd_linsolv__cgne;
+OPENQCD_MODULE_FUNCTION_ALIAS(cgne, linsolv)
 
 /* FGCR4VD_C */
-const auto &fgcr4vd = openqcd_linsolv__fgcr4vd;
+OPENQCD_MODULE_FUNCTION_ALIAS(fgcr4vd, linsolv)
 
 /* FGCR_C */
-const auto &fgcr = openqcd_linsolv__fgcr;
+OPENQCD_MODULE_FUNCTION_ALIAS(fgcr, linsolv)
 
 /* MSCG_C */
-const auto &mscg = openqcd_linsolv__mscg;
+OPENQCD_MODULE_FUNCTION_ALIAS(mscg, linsolv)
 
 } // namespace linsolv
 } // namespace openqcd

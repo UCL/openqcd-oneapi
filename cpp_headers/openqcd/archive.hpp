@@ -13,6 +13,8 @@
 #ifndef CPP_ARCHIVE_HPP
 #define CPP_ARCHIVE_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/archive.h"
 }
@@ -21,18 +23,18 @@ namespace openqcd {
 namespace archive {
 
 // ARCHIVE_H
-const auto& write_cnfg = openqcd_archive__write_cnfg;
-const auto& read_cnfg = openqcd_archive__read_cnfg;
-const auto& export_cnfg = openqcd_archive__export_cnfg;
-const auto& import_cnfg = openqcd_archive__import_cnfg;
+OPENQCD_MODULE_FUNCTION_ALIAS(write_cnfg, archive)
+OPENQCD_MODULE_FUNCTION_ALIAS(read_cnfg, archive)
+OPENQCD_MODULE_FUNCTION_ALIAS(export_cnfg, archive)
+OPENQCD_MODULE_FUNCTION_ALIAS(import_cnfg, archive)
 
 // SARCHIVE_H
-const auto& write_sfld = openqcd_archive__write_sfld;
-const auto& read_sfld = openqcd_archive__read_sfld;
-const auto& export_sfld = openqcd_archive__export_sfld;
-const auto& import_sfld = openqcd_archive__import_sfld;
+OPENQCD_MODULE_FUNCTION_ALIAS(write_sfld, archive)
+OPENQCD_MODULE_FUNCTION_ALIAS(read_sfld, archive)
+OPENQCD_MODULE_FUNCTION_ALIAS(export_sfld, archive)
+OPENQCD_MODULE_FUNCTION_ALIAS(import_sfld, archive)
 
-} // namespace archive 
-} // namespace openqcd 
+} // namespace archive
+} // namespace openqcd
 
 #endif // define CPP_ARCHIVE_HPP

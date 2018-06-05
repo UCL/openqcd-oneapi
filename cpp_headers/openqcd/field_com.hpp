@@ -13,6 +13,8 @@
 #ifndef CPP_FIELD_COM_HPP
 #define CPP_FIELD_COM_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/field_com.h"
 }
@@ -21,35 +23,24 @@ namespace openqcd {
 namespace fieldcom {
 
 // LINK_COMMUNICATION_C
-const auto &copy_boundary_su3_field =
-    openqcd_field_com__copy_boundary_su3_field;
-const auto &add_boundary_su3_field = openqcd_field_com__add_boundary_su3_field;
-const auto &copy_boundary_su3_alg_field =
-    openqcd_field_com__copy_boundary_su3_alg_field;
-const auto &add_boundary_su3_alg_field =
-    openqcd_field_com__add_boundary_su3_alg_field;
+OPENQCD_MODULE_FUNCTION_ALIAS(copy_boundary_su3_field, field_com)
+OPENQCD_MODULE_FUNCTION_ALIAS(add_boundary_su3_field, field_com)
+OPENQCD_MODULE_FUNCTION_ALIAS(copy_boundary_su3_alg_field, field_com)
+OPENQCD_MODULE_FUNCTION_ALIAS(add_boundary_su3_alg_field, field_com)
 
 // LINK_PARTIAL_COMMUNICATION_C
-const auto &copy_partial_boundary_su3_field =
-    openqcd_field_com__copy_partial_boundary_su3_field;
-const auto &add_partial_boundary_su3_field =
-    openqcd_field_com__add_partial_boundary_su3_field;
-const auto &copy_partial_boundary_su3_alg_field =
-    openqcd_field_com__copy_partial_boundary_su3_alg_field;
-const auto &add_partial_boundary_su3_alg_field =
-    openqcd_field_com__add_partial_boundary_su3_alg_field;
+OPENQCD_MODULE_FUNCTION_ALIAS(copy_partial_boundary_su3_field, field_com)
+OPENQCD_MODULE_FUNCTION_ALIAS(add_partial_boundary_su3_field, field_com)
+OPENQCD_MODULE_FUNCTION_ALIAS(copy_partial_boundary_su3_alg_field, field_com)
+OPENQCD_MODULE_FUNCTION_ALIAS(add_partial_boundary_su3_alg_field, field_com)
 
-const auto &copy_spatial_boundary_su3_field =
-    openqcd_field_com__copy_spatial_boundary_su3_field;
-const auto &add_spatial_boundary_su3_field =
-    openqcd_field_com__add_spatial_boundary_su3_field;
-const auto &copy_spatial_boundary_su3_alg_field =
-    openqcd_field_com__copy_spatial_boundary_su3_alg_field;
-const auto &add_spatial_boundary_su3_alg_field =
-    openqcd_field_com__add_spatial_boundary_su3_alg_field;
+OPENQCD_MODULE_FUNCTION_ALIAS(copy_spatial_boundary_su3_field, field_com)
+OPENQCD_MODULE_FUNCTION_ALIAS(add_spatial_boundary_su3_field, field_com)
+OPENQCD_MODULE_FUNCTION_ALIAS(copy_spatial_boundary_su3_alg_field, field_com)
+OPENQCD_MODULE_FUNCTION_ALIAS(add_spatial_boundary_su3_alg_field, field_com)
 
 // COMMUNICATION_BUFFER_C
-const auto &communication_buffer = openqcd_field_com__communication_buffer;
+OPENQCD_MODULE_FUNCTION_ALIAS(communication_buffer, field_com)
 
 } // namespace fieldcom
 } // namespace openqcd

@@ -13,6 +13,8 @@
 #ifndef CPP_SW_TERM_HPP
 #define CPP_SW_TERM_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/sw_term.h"
 }
@@ -21,26 +23,26 @@ namespace openqcd {
 namespace sw_term {
 
 // PAULI_C
-const auto &mul_pauli = openqcd_sw_term__mul_pauli;
-const auto &mul_pauli2 = openqcd_sw_term__mul_pauli2;
-const auto &assign_pauli = openqcd_sw_term__assign_pauli;
-const auto &apply_sw = openqcd_sw_term__apply_sw;
+OPENQCD_MODULE_FUNCTION_ALIAS(mul_pauli, sw_term)
+OPENQCD_MODULE_FUNCTION_ALIAS(mul_pauli2, sw_term)
+OPENQCD_MODULE_FUNCTION_ALIAS(assign_pauli, sw_term)
+OPENQCD_MODULE_FUNCTION_ALIAS(apply_sw, sw_term)
 
 // PAULI_DBLE_C
-const auto &mul_pauli_dble = openqcd_sw_term__mul_pauli_dble;
-const auto &mul_pauli2_dble = openqcd_sw_term__mul_pauli2_dble;
-const auto &inv_pauli_dble = openqcd_sw_term__inv_pauli_dble;
-const auto &det_pauli_dble = openqcd_sw_term__det_pauli_dble;
-const auto &apply_sw_dble = openqcd_sw_term__apply_sw_dble;
-const auto &apply_swinv_dble = openqcd_sw_term__apply_swinv_dble;
+OPENQCD_MODULE_FUNCTION_ALIAS(mul_pauli_dble, sw_term)
+OPENQCD_MODULE_FUNCTION_ALIAS(mul_pauli2_dble, sw_term)
+OPENQCD_MODULE_FUNCTION_ALIAS(inv_pauli_dble, sw_term)
+OPENQCD_MODULE_FUNCTION_ALIAS(det_pauli_dble, sw_term)
+OPENQCD_MODULE_FUNCTION_ALIAS(apply_sw_dble, sw_term)
+OPENQCD_MODULE_FUNCTION_ALIAS(apply_swinv_dble, sw_term)
 
 // SWFLDS_C
-const auto &swfld = openqcd_sw_term__swfld;
-const auto &swdfld = openqcd_sw_term__swdfld;
-const auto &assign_swd2sw = openqcd_sw_term__assign_swd2sw;
+OPENQCD_MODULE_FUNCTION_ALIAS(swfld, sw_term)
+OPENQCD_MODULE_FUNCTION_ALIAS(swdfld, sw_term)
+OPENQCD_MODULE_FUNCTION_ALIAS(assign_swd2sw, sw_term)
 
 // SW_TERM_C
-const auto &sw_term = openqcd_sw_term__sw_term;
+OPENQCD_MODULE_FUNCTION_ALIAS(sw_term, sw_term)
 
 } // namespace sw_term
 } // namespace openqcd

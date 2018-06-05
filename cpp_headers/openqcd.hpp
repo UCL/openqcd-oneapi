@@ -20,7 +20,7 @@
 #include "openqcd/field_com.hpp"
 #include "openqcd/flags.hpp"
 #include "openqcd/forces.hpp"
-#include "openqcd/global.h"
+#include "openqcd/global.hpp"
 #include "openqcd/lattice.hpp"
 #include "openqcd/linalg.hpp"
 #include "openqcd/linsolv.hpp"

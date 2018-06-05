@@ -13,6 +13,8 @@
 #ifndef CPP_TCHARGE_HPP
 #define CPP_TCHARGE_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/tcharge.h"
 }
@@ -21,19 +23,19 @@ namespace openqcd {
 namespace tcharge {
 
 // FTCOM_C
-const auto &copy_bnd_ft = openqcd_tcharge__copy_bnd_ft;
-const auto &add_bnd_ft = openqcd_tcharge__add_bnd_ft;
+OPENQCD_MODULE_FUNCTION_ALIAS(copy_bnd_ft, tcharge)
+OPENQCD_MODULE_FUNCTION_ALIAS(add_bnd_ft, tcharge)
 
 // FTENSOR_C
-const auto &ftensor = openqcd_tcharge__ftensor;
+OPENQCD_MODULE_FUNCTION_ALIAS(ftensor, tcharge)
 
 // TCHARGE_C
-const auto &tcharge = openqcd_tcharge__tcharge;
-const auto &tcharge_slices = openqcd_tcharge__tcharge_slices;
+OPENQCD_MODULE_FUNCTION_ALIAS(tcharge, tcharge)
+OPENQCD_MODULE_FUNCTION_ALIAS(tcharge_slices, tcharge)
 
 // YM_ACTION_C
-const auto &ym_action = openqcd_tcharge__ym_action;
-const auto &ym_action_slices = openqcd_tcharge__ym_action_slices;
+OPENQCD_MODULE_FUNCTION_ALIAS(ym_action, tcharge)
+OPENQCD_MODULE_FUNCTION_ALIAS(ym_action_slices, tcharge)
 
 } // namespace tcharge
 } // namespace openqcd

@@ -13,6 +13,8 @@
 #ifndef CPP_UTILS_HPP
 #define CPP_UTILS_HPP
 
+#include "internal/function_alias.hpp"
+
 extern "C" {
 #include "c_headers/utils.h"
 }
@@ -25,93 +27,90 @@ using stduint_t = openqcd_utils__stduint_t;
 using ptset_t = openqcd_utils__ptset_t;
 
 // ENDIAN_C
-const auto &endianness = openqcd_utils__endianness;
-const auto &bswap_int = openqcd_utils__bswap_int;
-const auto &bswap_double = openqcd_utils__bswap_double;
+OPENQCD_MODULE_FUNCTION_ALIAS(endianness, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(bswap_int, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(bswap_double, utils)
 
 // ERROR_C
-const auto &set_error_file = openqcd_utils__set_error_file;
-const auto &error = openqcd_utils__error;
-const auto &error_root = openqcd_utils__error_root;
-const auto &error_loc = openqcd_utils__error_loc;
+OPENQCD_MODULE_FUNCTION_ALIAS(set_error_file, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(error, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(error_root, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(error_loc, utils)
 
 // HSUM_C
-const auto &init_hsum = openqcd_utils__init_hsum;
-const auto &reset_hsum = openqcd_utils__reset_hsum;
-const auto &add_to_hsum = openqcd_utils__add_to_hsum;
-const auto &local_hsum = openqcd_utils__local_hsum;
-const auto &global_hsum = openqcd_utils__global_hsum;
+OPENQCD_MODULE_FUNCTION_ALIAS(init_hsum, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(reset_hsum, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(add_to_hsum, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(local_hsum, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(global_hsum, utils)
 
 // MUTILS_C
-const auto &find_opt = openqcd_utils__find_opt;
-const auto &fdigits = openqcd_utils__fdigits;
-const auto &check_dir = openqcd_utils__check_dir;
-const auto &check_dir_root = openqcd_utils__check_dir_root;
-const auto &name_size = openqcd_utils__name_size;
-const auto &find_section = openqcd_utils__find_section;
-const auto &find_optional_section = openqcd_utils__find_optional_section;
-const auto &read_line = openqcd_utils__read_line;
-const auto &read_optional_line = openqcd_utils__read_optional_line;
-const auto &count_tokens = openqcd_utils__count_tokens;
-const auto &read_iprms = openqcd_utils__read_iprms;
-const auto &read_optional_iprms = openqcd_utils__read_optional_iprms;
-const auto &read_dprms = openqcd_utils__read_dprms;
-const auto &read_optional_dprms = openqcd_utils__read_optional_dprms;
-const auto &copy_file = openqcd_utils__copy_file;
-
-const auto &No_Section_Found = openqcd_utils__No_Section_Found;
+OPENQCD_MODULE_FUNCTION_ALIAS(find_opt, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(fdigits, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(check_dir, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(check_dir_root, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(name_size, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(find_section, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(find_optional_section, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(read_line, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(read_optional_line, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(count_tokens, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(read_iprms, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(read_optional_iprms, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(read_dprms, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(read_optional_dprms, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(copy_file, utils)
 
 // UTILS_C
-const auto &safe_mod = openqcd_utils__safe_mod;
-const auto &amalloc = openqcd_utils__amalloc;
-const auto &afree = openqcd_utils__afree;
-const auto &amem_use_mb = openqcd_utils__amem_use_mb;
-const auto &amem_max_mb = openqcd_utils__amem_max_mb;
-const auto &mpi_permanent_tag = openqcd_utils__mpi_permanent_tag;
-const auto &mpi_tag = openqcd_utils__mpi_tag;
-const auto &message = openqcd_utils__message;
-const auto &mpc_bcast_c = openqcd_utils__mpc_bcast_c;
-const auto &mpc_bcast_d = openqcd_utils__mpc_bcast_d;
-const auto &mpc_bcast_i = openqcd_utils__mpc_bcast_i;
-const auto &mpc_gsum_d = openqcd_utils__mpc_gsum_d;
-const auto &mpc_print_info = openqcd_utils__mpc_print_info;
-const auto &square_dble = openqcd_utils__square_dble;
-const auto &sinc_dble = openqcd_utils__sinc_dble;
-const auto &smear_xi0_dble = openqcd_utils__smear_xi0_dble;
-const auto &smear_xi1_dble = openqcd_utils__smear_xi1_dble;
-const auto &mul_icomplex = openqcd_utils__mul_icomplex;
-const auto &mul_assign_scalar_complex =
-    openqcd_utils__mul_assign_scalar_complex;
-const auto &is_equal_f = openqcd_utils__is_equal_f;
-const auto &not_equal_f = openqcd_utils__not_equal_f;
-const auto &is_equal_d = openqcd_utils__is_equal_d;
-const auto &not_equal_d = openqcd_utils__not_equal_d;
+OPENQCD_MODULE_FUNCTION_ALIAS(safe_mod, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(amalloc, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(afree, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(amem_use_mb, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(amem_max_mb, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(mpi_permanent_tag, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(mpi_tag, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(message, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(mpc_bcast_c, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(mpc_bcast_d, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(mpc_bcast_i, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(mpc_gsum_d, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(mpc_print_info, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(square_dble, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(sinc_dble, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(smear_xi0_dble, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(smear_xi1_dble, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(mul_icomplex, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(mul_assign_scalar_complex, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(is_equal_f, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(not_equal_f, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(is_equal_d, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(not_equal_d, utils)
 
 // WSPACE_C
-const auto &alloc_wud = openqcd_utils__alloc_wud;
-const auto &reserve_wud = openqcd_utils__reserve_wud;
-const auto &release_wud = openqcd_utils__release_wud;
-const auto &wud_size = openqcd_utils__wud_size;
-const auto &alloc_wfd = openqcd_utils__alloc_wfd;
-const auto &reserve_wfd = openqcd_utils__reserve_wfd;
-const auto &release_wfd = openqcd_utils__release_wfd;
-const auto &wfd_size = openqcd_utils__wfd_size;
-const auto &alloc_ws = openqcd_utils__alloc_ws;
-const auto &reserve_ws = openqcd_utils__reserve_ws;
-const auto &release_ws = openqcd_utils__release_ws;
-const auto &ws_size = openqcd_utils__ws_size;
-const auto &alloc_wsd = openqcd_utils__alloc_wsd;
-const auto &reserve_wsd = openqcd_utils__reserve_wsd;
-const auto &release_wsd = openqcd_utils__release_wsd;
-const auto &wsd_size = openqcd_utils__wsd_size;
-const auto &alloc_wv = openqcd_utils__alloc_wv;
-const auto &reserve_wv = openqcd_utils__reserve_wv;
-const auto &release_wv = openqcd_utils__release_wv;
-const auto &wv_size = openqcd_utils__wv_size;
-const auto &alloc_wvd = openqcd_utils__alloc_wvd;
-const auto &reserve_wvd = openqcd_utils__reserve_wvd;
-const auto &release_wvd = openqcd_utils__release_wvd;
-const auto &wvd_size = openqcd_utils__wvd_size;
+OPENQCD_MODULE_FUNCTION_ALIAS(alloc_wud, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(reserve_wud, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(release_wud, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(wud_size, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(alloc_wfd, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(reserve_wfd, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(release_wfd, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(wfd_size, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(alloc_ws, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(reserve_ws, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(release_ws, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(ws_size, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(alloc_wsd, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(reserve_wsd, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(release_wsd, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(wsd_size, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(alloc_wv, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(reserve_wv, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(release_wv, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(wv_size, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(alloc_wvd, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(reserve_wvd, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(release_wvd, utils)
+OPENQCD_MODULE_FUNCTION_ALIAS(wvd_size, utils)
 
 } // namespace utils
 } // namespace openqcd
