@@ -357,7 +357,7 @@ void write_solver_parms(FILE *fdat)
   }
 }
 
-void check_solver_parms(FILE *fdat)
+void check_solver_parms(FILE *fdat, int read_only)
 {
   int my_rank, endian;
   int ir, ie, i;
@@ -376,6 +376,10 @@ void check_solver_parms(FILE *fdat)
         ir += fread(dstd, sizeof(double), 1, fdat);
         error_root(ir != 8, 1, "check_solver_parms [solver_parms.c]",
                    "Incorrect read count");
+
+        if (read_only) {
+          continue;
+        }
 
         if (endian == openqcd_utils__BIG_ENDIAN) {
           bswap_int(7, istd);

@@ -473,7 +473,7 @@ void write_action_parms(FILE *fdat)
   }
 }
 
-void check_action_parms(FILE *fdat)
+void check_action_parms(FILE *fdat, int read_only)
 {
   int my_rank, endian;
   int ir, ie, i, j;
@@ -506,7 +506,11 @@ void check_action_parms(FILE *fdat)
 
         for (j = 0; j < 4; j++) {
           ie |= (istd[7 + j] != (stdint_t)(ap[i].imu[j]));
-          ie |= (istd[11 + j] != (stdint_t)(ap[i].isp[j]));
+
+          /* Do not check action on read_only */
+          if (read_only == 0) {
+            ie |= (istd[11 + j] != (stdint_t)(ap[i].isp[j]));
+          }
         }
 
         ie |= (istd[15] != (stdint_t)(ap[i].smear));

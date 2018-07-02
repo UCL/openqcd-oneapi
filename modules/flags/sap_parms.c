@@ -190,7 +190,7 @@ void write_sap_parms(FILE *fdat)
   }
 }
 
-void check_sap_parms(FILE *fdat)
+void check_sap_parms(FILE *fdat, int read_only)
 {
   int my_rank, endian;
   int i, ir, ie;
@@ -203,6 +203,11 @@ void check_sap_parms(FILE *fdat)
     ir = fread(istd, sizeof(stdint_t), 7, fdat);
     error_root(ir != 7, 1, "check_sap_parms [sap_parms.c]",
                "Incorrect read count");
+
+    /* Exit if we do not need to actually check for correctness */
+    if (read_only) {
+      return;
+    }
 
     if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(7, istd);

@@ -385,7 +385,7 @@ void write_dfl_parms(FILE *fdat)
   }
 }
 
-void check_dfl_parms(FILE *fdat)
+void check_dfl_parms(FILE *fdat, int read_only)
 {
   int my_rank, endian;
   int i, ir, ie;
@@ -400,6 +400,11 @@ void check_dfl_parms(FILE *fdat)
     ir += fread(dstd, sizeof(double), 4, fdat);
     error_root(ir != 15, 1, "check_dfl_parms [dfl_parms.c]",
                "Incorrect read count");
+
+    /* Exit if we do not need to actually check for correctness */
+    if (read_only) {
+      return;
+    }
 
     if (endian == openqcd_utils__BIG_ENDIAN) {
       bswap_int(11, istd);

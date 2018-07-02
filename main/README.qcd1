@@ -49,17 +49,28 @@ through an input file. The options are
                  plaquette.
 
 -c <filename>    This option instructs the program to read the initial
-                 gauge-field configuration from the specified file. The
-                 file must be in one of the configuration directories
-                 listed in the input file and its name must be of the form
-                 described below. The run starts from a random gauge-field
-                 configuration if this option is omitted.
+                 gauge-field configuration from the specified file. The file
+                 must be in one of the configuration directories listed in the
+                 input file and its name must be of the form described below. if
+                 the filename is omitted and -a is supplied it will start from
+                 the last exported configuration. The run starts from a random
+                 gauge-field configuration if this option is omitted.
 
 -a               This option specifies that the run is a continuation of a
                  previous run. The -c <filename> option is required in this
-                 case and must point to the last configuration saved by
-                 the previous run. All output data are appended to the
-                 previous output files.
+                 case. If -c points to a different gauge configuration than the
+                 last configuration saved by the previous run the run has to
+                 start from a "new-rng" state. Basically any option that resets
+                 the RNG to a seed rather than restoring the RNG state (-norng
+                 and -seed). All output data are appended to the previous output
+                 files regardless of whether -c points to the last saved gauge
+                 config or not.
+
+-A               A more lenient version of -a that doesn't check for non-result
+                 related consistencies. What this means is that you can specify
+                 different solver parameters to that of the original run,
+                 including deflation and SAP parameters. This option can only be
+                 specified if we are in a "new-rng" state as explained above.
 
 -norng           Continuation runs normally start from the saved state
                  of the random number generators. This option specifies
@@ -67,6 +78,10 @@ through an input file. The options are
                  to be used (see section RANDOM NUMBER GENERATOR below).
                  NOTE: starting from the saved state is not possible if
                  the process grid sizes NPROC0,..,NPROC3 are changed.
+
+-seed <seed>     Override the RNG seed with a new value, for continuation runs
+                 this will also use this value as a seed rather than continue
+                 the RNG state from the previous run.
 
 The concurrent use of the options -noloc and -noexp (in which case the
 generated configurations would not be saved anywhere) is considered to be an

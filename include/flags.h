@@ -288,7 +288,7 @@ extern openqcd_flags__action_parms_t openqcd_flags__action_parms(int iact);
 extern void openqcd_flags__read_action_parms(int iact);
 extern void openqcd_flags__print_action_parms(void);
 extern void openqcd_flags__write_action_parms(FILE *fdat);
-extern void openqcd_flags__check_action_parms(FILE *fdat);
+extern void openqcd_flags__check_action_parms(FILE *fdat, int read_only);
 
 /* DFL_PARMS_C */
 extern openqcd_flags__dfl_parms_t openqcd_flags__set_dfl_parms(int const *bs,
@@ -306,7 +306,7 @@ openqcd_flags__set_dfl_upd_parms(double dtau, int nsm);
 extern openqcd_flags__dfl_upd_parms_t openqcd_flags__dfl_upd_parms(void);
 extern void openqcd_flags__print_dfl_parms(int ipr);
 extern void openqcd_flags__write_dfl_parms(FILE *fdat);
-extern void openqcd_flags__check_dfl_parms(FILE *fdat);
+extern void openqcd_flags__check_dfl_parms(FILE *fdat, int read_only);
 
 /* FORCE_PARMS_C */
 extern openqcd_flags__force_parms_t
@@ -320,7 +320,7 @@ extern void openqcd_flags__read_force_parms2(int ifr);
 extern void openqcd_flags__print_force_parms(void);
 extern void openqcd_flags__print_force_parms2(void);
 extern void openqcd_flags__write_force_parms(FILE *fdat);
-extern void openqcd_flags__check_force_parms(FILE *fdat);
+extern void openqcd_flags__check_force_parms(FILE *fdat, int read_only);
 
 /* HMC_PARMS_C */
 extern openqcd_flags__hmc_parms_t
@@ -395,7 +395,7 @@ openqcd_flags__set_sap_parms(int const *bs, int isolv, int nmr, int ncy);
 extern openqcd_flags__sap_parms_t openqcd_flags__sap_parms(void);
 extern void openqcd_flags__print_sap_parms(int ipr);
 extern void openqcd_flags__write_sap_parms(FILE *fdat);
-extern void openqcd_flags__check_sap_parms(FILE *fdat);
+extern void openqcd_flags__check_sap_parms(FILE *fdat, int read_only);
 
 /* SOLVER_PARMS_C */
 extern openqcd_flags__solver_parms_t
@@ -406,7 +406,7 @@ extern openqcd_flags__solver_parms_t openqcd_flags__solver_parms(int isp);
 extern void openqcd_flags__read_solver_parms(int isp);
 extern void openqcd_flags__print_solver_parms(int *isap, int *idfl);
 extern void openqcd_flags__write_solver_parms(FILE *fdat);
-extern void openqcd_flags__check_solver_parms(FILE *fdat);
+extern void openqcd_flags__check_solver_parms(FILE *fdat, int read_only);
 
 /* ANISOTROPY_PARMS_C */
 extern openqcd_flags__ani_params_t

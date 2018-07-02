@@ -675,7 +675,7 @@ void write_force_parms(FILE *fdat)
   }
 }
 
-void check_force_parms(FILE *fdat)
+void check_force_parms(FILE *fdat, int read_only)
 {
   int my_rank, endian;
   int ir, ie, i, j;
@@ -708,7 +708,12 @@ void check_force_parms(FILE *fdat)
 
         for (j = 0; j < 4; j++) {
           ie |= (istd[7 + j] != (stdint_t)(fp[i].imu[j]));
-          ie |= (istd[11 + j] != (stdint_t)(fp[i].isp[j]));
+
+          /* Skip checking solver id if read_only is set */
+          if (read_only == 0) {
+            ie |= (istd[11 + j] != (stdint_t)(fp[i].isp[j]));
+          }
+
           ie |= (istd[15 + j] != (stdint_t)(fp[i].ncr[j]));
           ie |= (istd[19 + j] != (stdint_t)(fp[i].icr[j]));
         }

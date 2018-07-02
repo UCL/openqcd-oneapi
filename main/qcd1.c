@@ -66,7 +66,7 @@ static struct
 } data;
 
 static int my_rank, noloc, noexp, rmold, noms, norng;
-static int scnfg, append, endian;
+static int scnfg, append, endian, loose_append;
 static int level, seed;
 static int cmd_seed = -1;
 static int nth, ntr, dtr_log, dtr_ms, dtr_cnfg;
@@ -588,6 +588,11 @@ static void read_schedule(void)
       ir = fread(istd, sizeof(stdint_t), 3, fdat);
       error_root(ir != 3, 1, "read_schedule [qcd1.c]", "Incorrect read count");
 
+      /* Skip compatability check on a loose append */
+      if (loose_append) {
+        return;
+      }
+
       if (endian == openqcd_utils__BIG_ENDIAN) {
         bswap_int(3, istd);
       }
@@ -705,7 +710,7 @@ static void read_actions(void)
 
   if (append) {
     check_hmc_parms(fdat);
-    check_action_parms(fdat);
+    check_action_parms(fdat, loose_append);
   } else {
     write_hmc_parms(fdat);
     write_action_parms(fdat);
@@ -792,7 +797,7 @@ static void read_integrator(void)
   if (append) {
     check_rat_parms(fdat);
     check_mdint_parms(fdat);
-    check_force_parms(fdat);
+    check_force_parms(fdat, loose_append);
   } else {
     write_rat_parms(fdat);
     write_mdint_parms(fdat);
@@ -813,7 +818,7 @@ static void read_sap_parms(void)
   set_sap_parms(bs, 1, 4, 5);
 
   if (append) {
-    check_sap_parms(fdat);
+    check_sap_parms(fdat, loose_append);
   } else {
     write_sap_parms(fdat);
   }
@@ -874,7 +879,7 @@ static void read_dfl_parms(void)
   set_dfl_upd_parms(dtau, nsm);
 
   if (append) {
-    check_dfl_parms(fdat);
+    check_dfl_parms(fdat, loose_append);
   } else {
     write_dfl_parms(fdat);
   }
@@ -960,7 +965,7 @@ static void read_solvers(void)
   }
 
   if (append) {
-    check_solver_parms(fdat);
+    check_solver_parms(fdat, loose_append);
   } else {
     write_solver_parms(fdat);
   }
@@ -1135,8 +1140,7 @@ static void read_ani_parms(void)
 
 static void read_infile(int argc, char *argv[])
 {
-  int ifile;
-  int iseed;
+  int ifile, iseed, new_rng;
 
   if (my_rank == 0) {
     flog = freopen("STARTUP_ERROR", "w", stdout);
@@ -1148,15 +1152,21 @@ static void read_infile(int argc, char *argv[])
     noms = find_opt(argc, argv, "-noms");
     scnfg = find_opt(argc, argv, "-c");
     append = find_opt(argc, argv, "-a");
+    loose_append = find_opt(argc, argv, "-A");
     norng = find_opt(argc, argv, "-norng");
     iseed = find_opt(argc, argv, "-seed");
     endian = endianness();
 
-    error_root((ifile == 0) || (ifile == (argc - 1)) || (scnfg == (argc - 1)) ||
-                   ((append != 0) && (scnfg == 0)) || (iseed == (argc - 1)),
-               1, "read_infile [qcd1.c]",
-               "Syntax: qcd1 -i <filename> [-noloc] [-noexp] "
-               "[-rmold] [-noms] [-c <filename> [-a [-norng]]] [-seed <seed>]");
+    append = (append != 0) || (loose_append != 0);
+    new_rng = (iseed != 0) || (norng != 0);
+
+    error_root(
+        (ifile == 0) || (ifile == (argc - 1)) ||
+            ((append != 0) && (scnfg == 0)) || (iseed == (argc - 1)) ||
+            ((loose_append != 0) && (new_rng == 0)),
+        1, "read_infile [qcd1.c]",
+        "Syntax: qcd1 -i <filename> [-noloc] [-noexp] "
+        "[-rmold] [-noms] [-c [<filename>] [-norng] [-(a/A)]] [-seed <seed>]");
 
     error_root(endian == openqcd_utils__UNKNOWN_ENDIAN, 1,
                "read_infile [qcd1.c]", "Machine has unknown endianness");
@@ -1164,9 +1174,13 @@ static void read_infile(int argc, char *argv[])
     error_root((noexp) && (noloc), 1, "read_infile [qcd1.c]",
                "The concurrent use of -noloc and -noexp is not permitted");
 
-    if (scnfg) {
+    if ((scnfg != 0) && (scnfg < (argc - 1))) {
       strncpy(cnfg, argv[scnfg + 1], NAME_SIZE - 1);
       cnfg[NAME_SIZE - 1] = '\0';
+
+      if (cnfg[0] == '-') {
+        cnfg[0] = '\0';
+      }
     } else {
       cnfg[0] = '\0';
     }
@@ -1186,6 +1200,7 @@ static void read_infile(int argc, char *argv[])
   mpc_bcast_i(&noms, 1);
   mpc_bcast_i(&scnfg, 1);
   mpc_bcast_i(&append, 1);
+  mpc_bcast_i(&loose_append, 1);
   mpc_bcast_i(&norng, 1);
   mpc_bcast_i(&endian, 1);
   mpc_bcast_i(&cmd_seed, 1);
@@ -1242,7 +1257,7 @@ static void read_infile(int argc, char *argv[])
   }
 }
 
-static void check_old_log(int ic, int *nl, int *icnfg)
+static void check_old_log(int ic, int *nl, int *icnfg, int new_rng)
 {
   int ir, isv;
   int np[4], bp[4];
@@ -1277,13 +1292,18 @@ static void check_old_log(int ic, int *nl, int *icnfg)
 
   error_root(ir != 1, 1, "check_old_log [qcd1.c]", "Incorrect read count");
 
-  error_root(ic != (*icnfg), 1, "check_old_log [qcd1.c]",
-             "Continuation run:\n"
-             "Initial configuration is not the last one of the previous run");
+  if (new_rng == 0) {
+    error_root((ic >= 0) && (ic != (*icnfg)), 1, "check_old_log [qcd1.c]",
+               "Continuation run:\n"
+               "Initial configuration is not the last one of the previous run");
 
-  error_root(isv == 0, 1, "check_old_log [qcd1.c]",
-             "Continuation run:\n"
-             "The log file extends beyond the last configuration save");
+    error_root(isv == 0, 1, "check_old_log [qcd1.c]",
+               "Continuation run:\n"
+               "The log file extends beyond the last configuration save");
+  } else if (ic >= 0) {
+    error_root(ic > (*icnfg), 1, "check_old_log [qcd1.c]",
+               "Continuing from a config later than the last one computed");
+  }
 }
 
 static void check_old_dat(int nl)
@@ -1366,21 +1386,39 @@ static void check_files(int *nl, int *icnfg)
     }
 
     if (append) {
-      error_root(strstr(cnfg, nbase) != cnfg, 1, "check_files [qcd1.c]",
-                 "Continuation run:\n"
-                 "Run name does not match the previous one");
-      error_root(sscanf(cnfg + strlen(nbase), "n%d", &ic) != 1, 1,
-                 "check_files [qcd1.c]",
-                 "Continuation run:\n"
-                 "Unable to read configuration number from file name");
 
-      check_old_log(ic, nl, icnfg);
-      check_old_dat(*nl);
-      if (noms == 0) {
+      ic = -1;
+      if (cnfg[0] != '\0') {
+        error_root(strstr(cnfg, nbase) != cnfg, 1, "check_files [qcd1.c]",
+                   "Continuation run:\n"
+                   "Run name does not match the previous one");
+        error_root(sscanf(cnfg + strlen(nbase), "n%d", &ic) != 1, 1,
+                   "check_files [qcd1.c]",
+                   "Continuation run:\n"
+                   "Unable to read configuration number from file name");
+      }
+
+      check_old_log(ic, nl, icnfg, (norng != 0) || (cmd_seed >= 0));
+
+      if (ic == -1) {
+        ic = *icnfg;
+        sprintf(cnfg, "%sn%d", nbase, ic);
+      }
+
+      /* Change the trajectory number to be inline with the start cfg */
+      if (ic != *icnfg) {
+        *nl = ic * dtr_cnfg;
+      }
+
+      if ((loose_append == 0) && (ic == *icnfg)) {
+        check_old_dat(*nl);
+      }
+
+      if ((noms == 0) && (loose_append == 0) && (ic == *icnfg)) {
         check_old_msdat(*nl);
       }
 
-      (*icnfg) += 1;
+      (*icnfg) = ic + 1;
     } else {
       fin = fopen(log_file, "r");
       fdat = fopen(dat_file, "rb");
@@ -1581,7 +1619,8 @@ static void print_info(int icnfg)
                "Unable to open log file");
 
     if (append) {
-      printf("Continuation run, start from configuration %s\n\n", cnfg);
+      printf("Continuation run (%s), start from configuration %s\n\n",
+             loose_append ? "-A" : "-a", cnfg);
     } else {
       printf("\n");
       printf("Simulation of QCD with Wilson quarks\n");
@@ -1678,11 +1717,19 @@ static void print_info(int icnfg)
                dtr_cnfg);
         printf("Online measurement of Wilson flow observables\n\n");
       }
+    }
 
+    if (append == 0 || loose_append) {
       print_action_parms();
+    }
+
+    if (append == 0) {
       print_rat_parms();
       print_mdint_parms();
       print_force_parms2();
+    }
+
+    if (append == 0 || loose_append) {
       print_solver_parms(&isap, &idfl);
 
       if (isap) {
@@ -1692,21 +1739,21 @@ static void print_info(int icnfg)
       if (idfl) {
         print_dfl_parms(1);
       }
+    }
 
-      if (noms == 0) {
-        printf("Wilson flow:\n");
-        if (flint == 0) {
-          printf("Euler integrator\n");
-        } else if (flint == 1) {
-          printf("2nd order RK integrator\n");
-        } else {
-          printf("3rd order RK integrator\n");
-        }
-        n = fdigits(file_head.eps);
-        printf("eps = %.*f\n", IMAX(n, 1), file_head.eps);
-        printf("nstep = %d\n", file_head.dn * file_head.nn);
-        printf("dnms = %d\n\n", file_head.dn);
+    if ((append == 0) && (noms == 0)) {
+      printf("Wilson flow:\n");
+      if (flint == 0) {
+        printf("Euler integrator\n");
+      } else if (flint == 1) {
+        printf("2nd order RK integrator\n");
+      } else {
+        printf("3rd order RK integrator\n");
       }
+      n = fdigits(file_head.eps);
+      printf("eps = %.*f\n", IMAX(n, 1), file_head.eps);
+      printf("nstep = %d\n", file_head.dn * file_head.nn);
+      printf("dnms = %d\n\n", file_head.dn);
     }
 
     fflush(flog);
@@ -1969,18 +2016,22 @@ int main(int argc, char *argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
   read_infile(argc, argv);
+
   if (noms == 0) {
     alloc_data();
   }
+
   check_files(&nl, &icnfg);
   geometry();
 
   hmc_wsize(&nwud, &nws, &nwsd, &nwv, &nwvd);
+
   alloc_wud(nwud);
   alloc_ws(nws);
   alloc_wsd(nwsd);
   alloc_wv(nwv);
   alloc_wvd(nwvd);
+
   if ((noms == 0) && (flint)) {
     alloc_wfd(1);
   }
