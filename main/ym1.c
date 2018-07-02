@@ -68,6 +68,7 @@ static struct
 static int my_rank, noloc, noexp, rmold, noms, norng;
 static int scnfg, append, endian;
 static int level, seed;
+static int cmd_seed = -1;
 static int nth, ntr, dtr_log, dtr_ms, dtr_cnfg;
 static int ipgrd[2], flint;
 static double *Wact, *Yact, *Qtop;
@@ -868,6 +869,7 @@ static void read_wflow_parms(void)
 static void read_infile(int argc, char *argv[])
 {
   int ifile;
+  int iseed;
 
   if (my_rank == 0) {
     flog = freopen("STARTUP_ERROR", "w", stdout);
@@ -880,13 +882,14 @@ static void read_infile(int argc, char *argv[])
     scnfg = find_opt(argc, argv, "-c");
     append = find_opt(argc, argv, "-a");
     norng = find_opt(argc, argv, "-norng");
+    iseed = find_opt(argc, argv, "-seed");
     endian = endianness();
 
     error_root((ifile == 0) || (ifile == (argc - 1)) || (scnfg == (argc - 1)) ||
-                   ((append != 0) && (scnfg == 0)),
+                   ((append != 0) && (scnfg == 0)) || (iseed == (argc - 1)),
                1, "read_infile [ym1.c]",
                "Syntax: ym1 -i <filename> [-noloc] [-noexp] "
-               "[-rmold] [-noms] [-c <filename> [-a [-norng]]]");
+               "[-rmold] [-noms] [-c <filename> [-a [-norng]]] [-seed <seed>");
 
     error_root(endian == openqcd_utils__UNKNOWN_ENDIAN, 1,
                "read_infile [ym1.c]", "Machine has unknown endianness");
@@ -899,6 +902,10 @@ static void read_infile(int argc, char *argv[])
       cnfg[NAME_SIZE - 1] = '\0';
     } else {
       cnfg[0] = '\0';
+    }
+
+    if (iseed) {
+      cmd_seed = (int)strtol(argv[iseed + 1], NULL, 10);
     }
 
     fin = freopen(argv[ifile + 1], "r", stdin);
@@ -914,6 +921,7 @@ static void read_infile(int argc, char *argv[])
   mpc_bcast_i(&append, 1);
   mpc_bcast_i(&norng, 1);
   mpc_bcast_i(&endian, 1);
+  mpc_bcast_i(&cmd_seed, 1);
   mpc_bcast_c(cnfg, NAME_SIZE);
 
   if (my_rank == 0) {
@@ -924,6 +932,10 @@ static void read_infile(int argc, char *argv[])
 
   mpc_bcast_i(&level, 1);
   mpc_bcast_i(&seed, 1);
+
+  if (cmd_seed >= 0) {
+    seed = cmd_seed;
+  }
 
   read_dirs();
   setup_files();
@@ -1158,7 +1170,9 @@ static void init_rng(int icnfg)
 {
   int ic;
 
-  if (append) {
+  if ((cmd_seed >= 0) || (append == 0)) {
+    start_ranlux(level, seed);
+  } else {
     if (cnfg[strlen(cnfg) - 1] != '*') {
       if (norng) {
         start_ranlux(level, seed ^ (icnfg - 1));
@@ -1168,8 +1182,6 @@ static void init_rng(int icnfg)
                    "Configuration number mismatch (*.rng file)");
       }
     }
-  } else {
-    start_ranlux(level, seed);
   }
 }
 
@@ -1341,7 +1353,10 @@ static void print_info(int icnfg)
 
     printf("Random number generator:\n");
 
-    if (append) {
+    if (cmd_seed >= 0) {
+      printf("Using seed from command line\n");
+      printf("level = %d, seed = %d\n\n", level, seed);
+    } else if (append) {
       if (cnfg[strlen(cnfg) - 1] != '*') {
         if (norng) {
           printf("level = %d, seed = %d, effective seed = %d\n\n", level, seed,
