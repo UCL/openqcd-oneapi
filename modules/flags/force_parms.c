@@ -165,6 +165,56 @@ static void init_fp(void)
   init = 1;
 }
 
+static void check_force_parms_implementation(FILE *fdat, int read_only)
+{
+  int my_rank, endian;
+  int ir, ie, i, j;
+  stdint_t istd[23];
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+  endian = endianness();
+
+  if ((my_rank == 0) && (init == 1)) {
+    ie = 0;
+
+    for (i = 0; i < IFRMAX; i++) {
+      if (fp[i].force != FORCES) {
+        ir = fread(istd, sizeof(stdint_t), 23, fdat);
+        error_root(ir != 23, 1, "check_force_parms [force_parms.c]",
+                   "Incorrect read count");
+
+        if (endian == openqcd_utils__BIG_ENDIAN) {
+          bswap_int(23, istd);
+        }
+
+        ie |= (istd[0] != (stdint_t)(i));
+        ie |= (istd[1] != (stdint_t)(fp[i].force));
+        ie |= (istd[2] != (stdint_t)(fp[i].ipf));
+        ie |= (istd[3] != (stdint_t)(fp[i].im0));
+
+        for (j = 0; j < 3; j++) {
+          ie |= (istd[4 + j] != (stdint_t)(fp[i].irat[j]));
+        }
+
+        for (j = 0; j < 4; j++) {
+          ie |= (istd[7 + j] != (stdint_t)(fp[i].imu[j]));
+
+          /* Skip checking solver id if read_only is set */
+          if (read_only == 0) {
+            ie |= (istd[11 + j] != (stdint_t)(fp[i].isp[j]));
+          }
+
+          ie |= (istd[15 + j] != (stdint_t)(fp[i].ncr[j]));
+          ie |= (istd[19 + j] != (stdint_t)(fp[i].icr[j]));
+        }
+      }
+    }
+
+    error_root(ie != 0, 1, "check_force_parms [force_parms.c]",
+               "Parameters do not match");
+  }
+}
+
 force_parms_t set_force_parms(int ifr, force_t force, int ipf, int im0,
                               int const *irat, int const *imu, int const *isp,
                               int const *ncr)
@@ -675,52 +725,12 @@ void write_force_parms(FILE *fdat)
   }
 }
 
-void check_force_parms(FILE *fdat, int read_only)
+void check_force_parms(FILE *fdat)
 {
-  int my_rank, endian;
-  int ir, ie, i, j;
-  stdint_t istd[23];
+  check_force_parms_implementation(fdat, 0);
+}
 
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-  endian = endianness();
-
-  if ((my_rank == 0) && (init == 1)) {
-    ie = 0;
-
-    for (i = 0; i < IFRMAX; i++) {
-      if (fp[i].force != FORCES) {
-        ir = fread(istd, sizeof(stdint_t), 23, fdat);
-        error_root(ir != 23, 1, "check_force_parms [force_parms.c]",
-                   "Incorrect read count");
-
-        if (endian == openqcd_utils__BIG_ENDIAN) {
-          bswap_int(23, istd);
-        }
-
-        ie |= (istd[0] != (stdint_t)(i));
-        ie |= (istd[1] != (stdint_t)(fp[i].force));
-        ie |= (istd[2] != (stdint_t)(fp[i].ipf));
-        ie |= (istd[3] != (stdint_t)(fp[i].im0));
-
-        for (j = 0; j < 3; j++) {
-          ie |= (istd[4 + j] != (stdint_t)(fp[i].irat[j]));
-        }
-
-        for (j = 0; j < 4; j++) {
-          ie |= (istd[7 + j] != (stdint_t)(fp[i].imu[j]));
-
-          /* Skip checking solver id if read_only is set */
-          if (read_only == 0) {
-            ie |= (istd[11 + j] != (stdint_t)(fp[i].isp[j]));
-          }
-
-          ie |= (istd[15 + j] != (stdint_t)(fp[i].ncr[j]));
-          ie |= (istd[19 + j] != (stdint_t)(fp[i].icr[j]));
-        }
-      }
-    }
-
-    error_root(ie != 0, 1, "check_force_parms [force_parms.c]",
-               "Parameters do not match");
-  }
+void leniently_check_force_parms(FILE *fdat)
+{
+  check_force_parms_implementation(fdat, 1);
 }

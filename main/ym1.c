@@ -672,8 +672,8 @@ static void read_integrator(void)
 
   if (append) {
     check_mdint_parms(fdat);
-    check_action_parms(fdat, 0);
-    check_force_parms(fdat, 0);
+    check_action_parms(fdat);
+    check_force_parms(fdat);
   } else {
     write_mdint_parms(fdat);
     write_action_parms(fdat);

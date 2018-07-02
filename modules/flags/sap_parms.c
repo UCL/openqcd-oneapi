@@ -92,6 +92,44 @@ static void check_block_size(int const *bs)
              "The number of blocks in the local lattice must be even");
 }
 
+static void check_sap_parms_implementation(FILE *fdat, int read_only)
+{
+  int my_rank, endian;
+  int i, ir, ie;
+  stdint_t istd[7];
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+  endian = endianness();
+
+  if (my_rank == 0) {
+    ir = fread(istd, sizeof(stdint_t), 7, fdat);
+    error_root(ir != 7, 1, "check_sap_parms [sap_parms.c]",
+               "Incorrect read count");
+
+    /* Exit if we do not need to actually check for correctness */
+    if (read_only) {
+      return;
+    }
+
+    if (endian == openqcd_utils__BIG_ENDIAN) {
+      bswap_int(7, istd);
+    }
+
+    ie = 0;
+
+    for (i = 0; i < 4; i++) {
+      ie |= (istd[i] != (stdint_t)(sap.bs[i]));
+    }
+
+    ie |= (istd[4] != (stdint_t)(sap.isolv));
+    ie |= (istd[5] != (stdint_t)(sap.nmr));
+    ie |= (istd[6] != (stdint_t)(sap.ncy));
+
+    error_root(ie != 0, 1, "check_sap_parms [sap_parms.c]",
+               "Parameters do not match");
+  }
+}
+
 sap_parms_t set_sap_parms(int const *bs, int isolv, int nmr, int ncy)
 {
   int iprms[7];
@@ -190,40 +228,13 @@ void write_sap_parms(FILE *fdat)
   }
 }
 
-void check_sap_parms(FILE *fdat, int read_only)
+
+void check_sap_parms(FILE *fdat)
 {
-  int my_rank, endian;
-  int i, ir, ie;
-  stdint_t istd[7];
+  check_sap_parms_implementation(fdat, 0);
+} 
 
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-  endian = endianness();
-
-  if (my_rank == 0) {
-    ir = fread(istd, sizeof(stdint_t), 7, fdat);
-    error_root(ir != 7, 1, "check_sap_parms [sap_parms.c]",
-               "Incorrect read count");
-
-    /* Exit if we do not need to actually check for correctness */
-    if (read_only) {
-      return;
-    }
-
-    if (endian == openqcd_utils__BIG_ENDIAN) {
-      bswap_int(7, istd);
-    }
-
-    ie = 0;
-
-    for (i = 0; i < 4; i++) {
-      ie |= (istd[i] != (stdint_t)(sap.bs[i]));
-    }
-
-    ie |= (istd[4] != (stdint_t)(sap.isolv));
-    ie |= (istd[5] != (stdint_t)(sap.nmr));
-    ie |= (istd[6] != (stdint_t)(sap.ncy));
-
-    error_root(ie != 0, 1, "check_sap_parms [sap_parms.c]",
-               "Parameters do not match");
-  }
-}
+void leniently_check_sap_parms(FILE *fdat)
+{
+  check_sap_parms_implementation(fdat, 1);
+} 

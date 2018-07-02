@@ -154,6 +154,55 @@ static void check_block_size(int const *bs)
              "The number of blocks in the local lattice must be even");
 }
 
+static void check_dfl_parms_implementation(FILE *fdat, int read_only)
+{
+  int my_rank, endian;
+  int i, ir, ie;
+  stdint_t istd[11];
+  double dstd[4];
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+  endian = endianness();
+
+  if (my_rank == 0) {
+    ir = fread(istd, sizeof(stdint_t), 11, fdat);
+    ir += fread(dstd, sizeof(double), 4, fdat);
+    error_root(ir != 15, 1, "check_dfl_parms [dfl_parms.c]",
+               "Incorrect read count");
+
+    /* Exit if we do not need to actually check for correctness */
+    if (read_only) {
+      return;
+    }
+
+    if (endian == openqcd_utils__BIG_ENDIAN) {
+      bswap_int(11, istd);
+      bswap_double(4, dstd);
+    }
+
+    ie = 0;
+
+    for (i = 0; i < 4; i++) {
+      ie |= (istd[i] != (stdint_t)(dfl.bs[i]));
+    }
+
+    ie |= (istd[4] != (stdint_t)(dfl.Ns));
+    ie |= (istd[5] != (stdint_t)(dfl_pro.nkv));
+    ie |= (istd[7] != (stdint_t)(dfl_gen.ninv));
+    ie |= (istd[8] != (stdint_t)(dfl_gen.nmr));
+    ie |= (istd[9] != (stdint_t)(dfl_gen.ncy));
+    ie |= (istd[10] != (stdint_t)(dfl_upd.nsm));
+
+    ie |= (dstd[0] != dfl_pro.res);
+    ie |= (dstd[1] != dfl_gen.kappa);
+    ie |= (dstd[2] != dfl_gen.mu);
+    ie |= (dstd[3] != dfl_upd.dtau);
+
+    error_root(ie != 0, 1, "check_dfl_parms [dfl_parms.c]",
+               "Parameters do not match");
+  }
+}
+
 dfl_parms_t set_dfl_parms(int const *bs, int Ns)
 {
   int iprms[5];
@@ -385,51 +434,13 @@ void write_dfl_parms(FILE *fdat)
   }
 }
 
-void check_dfl_parms(FILE *fdat, int read_only)
+
+void check_dfl_parms(FILE *fdat)
 {
-  int my_rank, endian;
-  int i, ir, ie;
-  stdint_t istd[11];
-  double dstd[4];
+  check_dfl_parms_implementation(fdat, 0);
+}
 
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-  endian = endianness();
-
-  if (my_rank == 0) {
-    ir = fread(istd, sizeof(stdint_t), 11, fdat);
-    ir += fread(dstd, sizeof(double), 4, fdat);
-    error_root(ir != 15, 1, "check_dfl_parms [dfl_parms.c]",
-               "Incorrect read count");
-
-    /* Exit if we do not need to actually check for correctness */
-    if (read_only) {
-      return;
-    }
-
-    if (endian == openqcd_utils__BIG_ENDIAN) {
-      bswap_int(11, istd);
-      bswap_double(4, dstd);
-    }
-
-    ie = 0;
-
-    for (i = 0; i < 4; i++) {
-      ie |= (istd[i] != (stdint_t)(dfl.bs[i]));
-    }
-
-    ie |= (istd[4] != (stdint_t)(dfl.Ns));
-    ie |= (istd[5] != (stdint_t)(dfl_pro.nkv));
-    ie |= (istd[7] != (stdint_t)(dfl_gen.ninv));
-    ie |= (istd[8] != (stdint_t)(dfl_gen.nmr));
-    ie |= (istd[9] != (stdint_t)(dfl_gen.ncy));
-    ie |= (istd[10] != (stdint_t)(dfl_upd.nsm));
-
-    ie |= (dstd[0] != dfl_pro.res);
-    ie |= (dstd[1] != dfl_gen.kappa);
-    ie |= (dstd[2] != dfl_gen.mu);
-    ie |= (dstd[3] != dfl_upd.dtau);
-
-    error_root(ie != 0, 1, "check_dfl_parms [dfl_parms.c]",
-               "Parameters do not match");
-  }
+void leniently_check_dfl_parms(FILE *fdat)
+{
+  check_dfl_parms_implementation(fdat, 1);
 }

@@ -710,7 +710,13 @@ static void read_actions(void)
 
   if (append) {
     check_hmc_parms(fdat);
-    check_action_parms(fdat, loose_append);
+
+    if (loose_append) {
+      leniently_check_action_parms(fdat);
+    } else {
+      check_action_parms(fdat);
+    }
+
   } else {
     write_hmc_parms(fdat);
     write_action_parms(fdat);
@@ -797,7 +803,12 @@ static void read_integrator(void)
   if (append) {
     check_rat_parms(fdat);
     check_mdint_parms(fdat);
-    check_force_parms(fdat, loose_append);
+
+    if (loose_append) {
+      leniently_check_force_parms(fdat);
+    } else {
+      check_force_parms(fdat);
+    }
   } else {
     write_rat_parms(fdat);
     write_mdint_parms(fdat);
@@ -817,8 +828,10 @@ static void read_sap_parms(void)
   mpc_bcast_i(bs, 4);
   set_sap_parms(bs, 1, 4, 5);
 
-  if (append) {
-    check_sap_parms(fdat, loose_append);
+  if (loose_append) {
+    leniently_check_sap_parms(fdat);
+  } else if (append) {
+    check_sap_parms(fdat);
   } else {
     write_sap_parms(fdat);
   }
@@ -878,8 +891,10 @@ static void read_dfl_parms(void)
   mpc_bcast_i(&nsm, 1);
   set_dfl_upd_parms(dtau, nsm);
 
-  if (append) {
-    check_dfl_parms(fdat, loose_append);
+  if (loose_append) {
+    leniently_check_dfl_parms(fdat);
+  } else if (append) {
+    check_dfl_parms(fdat);
   } else {
     write_dfl_parms(fdat);
   }
@@ -964,8 +979,10 @@ static void read_solvers(void)
     }
   }
 
-  if (append) {
-    check_solver_parms(fdat, loose_append);
+  if (loose_append) {
+    leniently_check_solver_parms(fdat);
+  } else if (append) {
+    check_solver_parms(fdat);
   } else {
     write_solver_parms(fdat);
   }

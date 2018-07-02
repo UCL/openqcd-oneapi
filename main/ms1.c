@@ -545,7 +545,7 @@ static void read_sap_parms(void)
   set_sap_parms(bs, 1, 4, 5);
 
   if (append) {
-    check_sap_parms(fdat, 0);
+    check_sap_parms(fdat);
   } else {
     write_sap_parms(fdat);
   }
@@ -596,7 +596,7 @@ static void read_dfl_parms(void)
   set_dfl_pro_parms(nkv, nmx, res);
 
   if (append) {
-    check_dfl_parms(fdat, 0);
+    check_dfl_parms(fdat);
   } else {
     write_dfl_parms(fdat);
   }
@@ -636,7 +636,7 @@ static void read_solvers(void)
   }
 
   if (append) {
-    check_solver_parms(fdat, 0);
+    check_solver_parms(fdat);
   } else {
     write_solver_parms(fdat);
   }

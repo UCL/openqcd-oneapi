@@ -12,8 +12,8 @@
  *
  * The externally accessible functions are
  *
- *   solver_parms_t set_solver_parms(int isp, solver_t solver, 
- *                                   int nkv, int isolv, int nmr, int ncy, 
+ *   solver_parms_t set_solver_parms(int isp, solver_t solver,
+ *                                   int nkv, int isolv, int nmr, int ncy,
  *                                   int nmx, double res)
  *     Sets the parameters in the solver parameter set number isp and returns
  *     a structure containing them (see the notes).
@@ -126,6 +126,50 @@ static void init_sp(void)
   }
 
   init = 1;
+}
+
+static void check_solver_parms_implementation(FILE *fdat, int read_only)
+{
+  int my_rank, endian;
+  int ir, ie, i;
+  stdint_t istd[7];
+  double dstd[1];
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+  endian = endianness();
+
+  if ((my_rank == 0) && (init == 1)) {
+    ie = 0;
+
+    for (i = 0; i < ISPMAX; i++) {
+      if (sp[i].solver != SOLVERS) {
+        ir = fread(istd, sizeof(stdint_t), 7, fdat);
+        ir += fread(dstd, sizeof(double), 1, fdat);
+        error_root(ir != 8, 1, "check_solver_parms [solver_parms.c]",
+                   "Incorrect read count");
+
+        if (read_only) {
+          continue;
+        }
+
+        if (endian == openqcd_utils__BIG_ENDIAN) {
+          bswap_int(7, istd);
+          bswap_double(1, dstd);
+        }
+
+        ie |= (istd[0] != (stdint_t)(i));
+        ie |= (istd[1] != (stdint_t)(sp[i].solver));
+        ie |= (istd[3] != (stdint_t)(sp[i].nkv));
+        ie |= (istd[4] != (stdint_t)(sp[i].isolv));
+        ie |= (istd[5] != (stdint_t)(sp[i].nmr));
+        ie |= (istd[6] != (stdint_t)(sp[i].ncy));
+        ie |= (dstd[0] != sp[i].res);
+      }
+    }
+
+    error_root(ie != 0, 1, "check_solver_parms [solver_parms.c]",
+               "Parameters do not match");
+  }
 }
 
 solver_parms_t set_solver_parms(int isp, solver_t solver, int nkv, int isolv,
@@ -357,46 +401,12 @@ void write_solver_parms(FILE *fdat)
   }
 }
 
-void check_solver_parms(FILE *fdat, int read_only)
+void check_solver_parms(FILE *fdat)
 {
-  int my_rank, endian;
-  int ir, ie, i;
-  stdint_t istd[7];
-  double dstd[1];
+  check_solver_parms_implementation(fdat, 0);
+}
 
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-  endian = endianness();
-
-  if ((my_rank == 0) && (init == 1)) {
-    ie = 0;
-
-    for (i = 0; i < ISPMAX; i++) {
-      if (sp[i].solver != SOLVERS) {
-        ir = fread(istd, sizeof(stdint_t), 7, fdat);
-        ir += fread(dstd, sizeof(double), 1, fdat);
-        error_root(ir != 8, 1, "check_solver_parms [solver_parms.c]",
-                   "Incorrect read count");
-
-        if (read_only) {
-          continue;
-        }
-
-        if (endian == openqcd_utils__BIG_ENDIAN) {
-          bswap_int(7, istd);
-          bswap_double(1, dstd);
-        }
-
-        ie |= (istd[0] != (stdint_t)(i));
-        ie |= (istd[1] != (stdint_t)(sp[i].solver));
-        ie |= (istd[3] != (stdint_t)(sp[i].nkv));
-        ie |= (istd[4] != (stdint_t)(sp[i].isolv));
-        ie |= (istd[5] != (stdint_t)(sp[i].nmr));
-        ie |= (istd[6] != (stdint_t)(sp[i].ncy));
-        ie |= (dstd[0] != sp[i].res);
-      }
-    }
-
-    error_root(ie != 0, 1, "check_solver_parms [solver_parms.c]",
-               "Parameters do not match");
-  }
+void leniently_check_solver_parms(FILE *fdat)
+{
+  check_solver_parms_implementation(fdat, 1);
 }

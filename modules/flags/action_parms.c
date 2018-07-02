@@ -137,6 +137,55 @@ static void init_ap(void)
   init = 1;
 }
 
+static void check_action_parms_implementation(FILE *fdat, int read_only)
+{
+  int my_rank, endian;
+  int ir, ie, i, j;
+  stdint_t istd[16];
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+  endian = endianness();
+
+  if ((my_rank == 0) && (init == 1)) {
+    ie = 0;
+
+    for (i = 0; i < IACMAX; i++) {
+      if (ap[i].action != ACTIONS) {
+        ir = fread(istd, sizeof(stdint_t), 16, fdat);
+        error_root(ir != 16, 1, "check_action_parms [action_parms.c]",
+                   "Incorrect read count");
+
+        if (endian == openqcd_utils__BIG_ENDIAN) {
+          bswap_int(16, istd);
+        }
+
+        ie |= (istd[0] != (stdint_t)(i));
+        ie |= (istd[1] != (stdint_t)(ap[i].action));
+        ie |= (istd[2] != (stdint_t)(ap[i].ipf));
+        ie |= (istd[3] != (stdint_t)(ap[i].im0));
+
+        for (j = 0; j < 3; j++) {
+          ie |= (istd[4 + j] != (stdint_t)(ap[i].irat[j]));
+        }
+
+        for (j = 0; j < 4; j++) {
+          ie |= (istd[7 + j] != (stdint_t)(ap[i].imu[j]));
+
+          /* Do not check action on read_only */
+          if (read_only == 0) {
+            ie |= (istd[11 + j] != (stdint_t)(ap[i].isp[j]));
+          }
+        }
+
+        ie |= (istd[15] != (stdint_t)(ap[i].smear));
+      }
+    }
+
+    error_root(ie != 0, 1, "check_action_parms [action_parms.c]",
+               "Parameters do not match");
+  }
+}
+
 action_parms_t set_action_parms(int iact, action_t action, int ipf, int im0,
                                 int const *irat, int const *imu, int const *isp,
                                 int smear)
@@ -473,51 +522,12 @@ void write_action_parms(FILE *fdat)
   }
 }
 
-void check_action_parms(FILE *fdat, int read_only)
+void check_action_parms(FILE *fdat)
 {
-  int my_rank, endian;
-  int ir, ie, i, j;
-  stdint_t istd[16];
+  check_action_parms_implementation(fdat, 0);
+}
 
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-  endian = endianness();
-
-  if ((my_rank == 0) && (init == 1)) {
-    ie = 0;
-
-    for (i = 0; i < IACMAX; i++) {
-      if (ap[i].action != ACTIONS) {
-        ir = fread(istd, sizeof(stdint_t), 16, fdat);
-        error_root(ir != 16, 1, "check_action_parms [action_parms.c]",
-                   "Incorrect read count");
-
-        if (endian == openqcd_utils__BIG_ENDIAN) {
-          bswap_int(16, istd);
-        }
-
-        ie |= (istd[0] != (stdint_t)(i));
-        ie |= (istd[1] != (stdint_t)(ap[i].action));
-        ie |= (istd[2] != (stdint_t)(ap[i].ipf));
-        ie |= (istd[3] != (stdint_t)(ap[i].im0));
-
-        for (j = 0; j < 3; j++) {
-          ie |= (istd[4 + j] != (stdint_t)(ap[i].irat[j]));
-        }
-
-        for (j = 0; j < 4; j++) {
-          ie |= (istd[7 + j] != (stdint_t)(ap[i].imu[j]));
-
-          /* Do not check action on read_only */
-          if (read_only == 0) {
-            ie |= (istd[11 + j] != (stdint_t)(ap[i].isp[j]));
-          }
-        }
-
-        ie |= (istd[15] != (stdint_t)(ap[i].smear));
-      }
-    }
-
-    error_root(ie != 0, 1, "check_action_parms [action_parms.c]",
-               "Parameters do not match");
-  }
+void leniently_check_action_parms(FILE *fdat)
+{
+  check_action_parms_implementation(fdat, 1);
 }
