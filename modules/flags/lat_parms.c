@@ -699,6 +699,27 @@ double sea_quark_mass(int im0)
   }
 }
 
+void recompute_sea_quark_masses(void)
+{
+  int ik;
+  ani_params_t ani;
+  ani = ani_parms();
+
+  for (ik = 0; ik < lat.nk; ik++) {
+    if (not_equal_d(lat.kappa[ik], 0.0)) {
+      lat.m0[ik] = 1.0 / (2.0 * lat.kappa[ik]) - 1.0 - 3.0 * ani.nu / ani.xi;
+    } else {
+      lat.m0[ik] = DBL_MAX;
+    }
+  }
+
+  /* Reset SW terms for safety */
+  set_flags(ERASED_SW);
+  set_flags(ERASED_SWD);
+  set_grid_flags(SAP_BLOCKS, ERASED_SW);
+  set_flags(ERASED_AWHAT);
+}
+
 int bc_type(void)
 {
   return bc.type;

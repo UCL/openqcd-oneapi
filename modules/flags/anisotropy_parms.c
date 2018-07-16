@@ -23,7 +23,7 @@
  *
  *   ani_params_t ani_parms(void)
  *     Return a structure that contains the current anisotropy parameters.
- *     
+ *
  *   void print_ani_parms(void)
  *     Prints the anisotropy parameters to stdout on MPI process 0.
  *
@@ -236,4 +236,15 @@ void check_ani_parms(FILE *fdat)
 int ani_params_initialised(void)
 {
   return (flg_ani == 1);
+}
+
+ani_params_t reset_ani_parms(int use_tts, double nu, double xi, double cR,
+                             double cT, double us_gauge, double ut_gauge,
+                             double us_fermion, double ut_fermion)
+{
+  flg_ani = 0;
+  set_ani_parms(use_tts, nu, xi, cR, cT, us_gauge, ut_gauge, us_fermion,
+                ut_fermion);
+  recompute_sea_quark_masses();
+  return ani;
 }

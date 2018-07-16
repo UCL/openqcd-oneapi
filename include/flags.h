@@ -354,6 +354,7 @@ extern void openqcd_flags__print_bc_parms(int ipr);
 extern void openqcd_flags__write_bc_parms(FILE *fdat);
 extern void openqcd_flags__check_bc_parms(FILE *fdat);
 extern double openqcd_flags__sea_quark_mass(int im0);
+extern void openqcd_flags__recompute_sea_quark_masses(void);
 extern int openqcd_flags__bc_type(void);
 extern openqcd_flags__sw_parms_t openqcd_flags__set_sw_parms(double m0);
 extern openqcd_flags__sw_parms_t openqcd_flags__sw_parms(void);
@@ -425,6 +426,10 @@ extern void openqcd_flags__print_ani_parms(void);
 extern int openqcd_flags__ani_params_initialised(void);
 extern void openqcd_flags__write_ani_parms(FILE *fdat);
 extern void openqcd_flags__check_ani_parms(FILE *fdat);
+extern openqcd_flags__ani_params_t
+openqcd_flags__reset_ani_parms(int use_tts, double nu, double xi, double cR,
+                               double cT, double us_gauge, double ut_gauge,
+                               double us_fermion, double ut_fermion);
 
 /* SMEARING_PARMS_C */
 extern openqcd_flags__stout_smearing_params_t
@@ -536,6 +541,8 @@ extern void openqcd_flags__check_stout_smearing_parms(FILE *fdat);
 #define write_bc_parms(...) openqcd_flags__write_bc_parms(__VA_ARGS__)
 #define check_bc_parms(...) openqcd_flags__check_bc_parms(__VA_ARGS__)
 #define sea_quark_mass(...) openqcd_flags__sea_quark_mass(__VA_ARGS__)
+#define recompute_sea_quark_masses(...)                                        \
+  openqcd_flags__recompute_sea_quark_masses(__VA_ARGS__)
 #define bc_type(...) openqcd_flags__bc_type(__VA_ARGS__)
 #define set_sw_parms(...) openqcd_flags__set_sw_parms(__VA_ARGS__)
 #define sw_parms(...) openqcd_flags__sw_parms(__VA_ARGS__)
@@ -596,6 +603,7 @@ extern void openqcd_flags__check_stout_smearing_parms(FILE *fdat);
   openqcd_flags__ani_params_initialised(__VA_ARGS__)
 #define write_ani_parms(...) openqcd_flags__write_ani_parms(__VA_ARGS__)
 #define check_ani_parms(...) openqcd_flags__check_ani_parms(__VA_ARGS__)
+#define reset_ani_parms(...) openqcd_flags__reset_ani_parms(__VA_ARGS__)
 
 /* SMEARING_PARMS_C */
 #define set_stout_smearing_parms(...)                                          \
