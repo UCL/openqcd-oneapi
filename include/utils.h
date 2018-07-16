@@ -95,6 +95,8 @@ extern long openqcd_utils__read_optional_iprms(char const *tag, int n,
 extern long openqcd_utils__read_dprms(char const *tag, int n, double *dprms);
 extern long openqcd_utils__read_optional_dprms(char const *tag, int n,
                                                double *dprms);
+extern long openqcd_utils__read_cprms(char const *tag, int n, char *cprms);
+extern long openqcd_utils__read_optional_cprms(char const *tag, int n, char *cprms);
 extern void openqcd_utils__copy_file(char const *in, char const *out);
 
 extern long const openqcd_utils__No_Section_Found;
@@ -194,6 +196,8 @@ extern int openqcd_utils__wvd_size(void);
 #define read_optional_iprms(...) openqcd_utils__read_optional_iprms(__VA_ARGS__)
 #define read_dprms(...) openqcd_utils__read_dprms(__VA_ARGS__)
 #define read_optional_dprms(...) openqcd_utils__read_optional_dprms(__VA_ARGS__)
+#define read_cprms(...) openqcd_utils__read_cprms(__VA_ARGS__)
+#define read_optional_cprms(...) openqcd_utils__read_optional_cprms(__VA_ARGS__)
 #define copy_file(...) openqcd_utils__copy_file(__VA_ARGS__)
 
 /* UTILS_C */

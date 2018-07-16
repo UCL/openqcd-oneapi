@@ -167,6 +167,62 @@ static char text[512];
 static char line[NAME_SIZE + 1];
 static char inum[3 * sizeof(int) + 4];
 
+#define scan_int_str "%d"
+#define scan_double_str "%lf"
+#define scan_char_str "%c"
+
+#define _read_prms_impl(type, name, name_str)                                  \
+  static long read_##name##_impl(char const *tag, int n, type *iprms,          \
+                                 int optional)                                 \
+  {                                                                            \
+    int my_rank, nc, ic;                                                       \
+    type buffer;                                                               \
+    long loc;                                                                  \
+    char *s;                                                                   \
+                                                                               \
+    loc = No_Section_Found;                                                    \
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);                                   \
+                                                                               \
+    if (my_rank == 0) {                                                        \
+      check_tag(tag);                                                          \
+                                                                               \
+      if (tag[0] != '\0') {                                                    \
+        loc = find_tag_impl(tag, optional);                                    \
+                                                                               \
+        if (loc == No_Section_Found) {                                         \
+          return loc;                                                          \
+        }                                                                      \
+                                                                               \
+        s = get_line();                                                        \
+        s += strspn(s, " \t");                                                 \
+        s += strcspn(s, " \t\n");                                              \
+      } else {                                                                 \
+        s = get_line();                                                        \
+      }                                                                        \
+                                                                               \
+      s += strspn(s, " \t\n");                                                 \
+      nc = 0;                                                                  \
+                                                                               \
+      while ((s[0] != '\0') && (nc < n)) {                                     \
+        ic = sscanf(s, scan_##type##_str, &buffer);                            \
+                                                                               \
+        if (ic == 1) {                                                         \
+          iprms[nc] = buffer;                                                  \
+          nc += 1;                                                             \
+          s += strcspn(s, " \t\n");                                            \
+          s += strspn(s, " \t\n");                                             \
+        } else {                                                               \
+          break;                                                               \
+        }                                                                      \
+      }                                                                        \
+                                                                               \
+      error_root(nc != n, 1, "read_" name_str "_impl [mutils.c]",              \
+                 "Incorrect read count");                                      \
+    }                                                                          \
+                                                                               \
+    return loc;                                                                \
+  }
+
 int find_opt(int argc, char *argv[], char const *opt)
 {
   int my_rank, k;
@@ -686,53 +742,7 @@ int count_tokens(char const *tag)
   }
 }
 
-static long read_iprms_impl(char const *tag, int n, int *iprms, int optional)
-{
-  int my_rank, nc, ic, i;
-  long loc;
-  char *s;
-
-  loc = No_Section_Found;
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
-  if (my_rank == 0) {
-    check_tag(tag);
-
-    if (tag[0] != '\0') {
-      loc = find_tag_impl(tag, optional);
-
-      if (loc == No_Section_Found) {
-        return loc;
-      }
-
-      s = get_line();
-      s += strspn(s, " \t");
-      s += strcspn(s, " \t\n");
-    } else {
-      s = get_line();
-    }
-
-    s += strspn(s, " \t\n");
-    nc = 0;
-
-    while ((s[0] != '\0') && (nc < n)) {
-      ic = sscanf(s, "%d", &i);
-
-      if (ic == 1) {
-        iprms[nc] = i;
-        nc += 1;
-        s += strcspn(s, " \t\n");
-        s += strspn(s, " \t\n");
-      } else {
-        break;
-      }
-    }
-
-    error_root(nc != n, 1, "read_iprms [mutils.c]", "Incorrect read count");
-  }
-
-  return loc;
-}
+_read_prms_impl(int, iprms, "iprms")
 
 long read_iprms(char const *tag, int n, int *iprms)
 {
@@ -744,63 +754,28 @@ long read_optional_iprms(char const *tag, int n, int *iprms)
   return read_iprms_impl(tag, n, iprms, 1);
 }
 
-static long read_dprms_impl(char const *tag, int n, double *dprms, int optional)
-{
-  int my_rank, nc, ic;
-  long loc;
-  double d;
-  char *s;
-
-  loc = No_Section_Found;
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
-  if (my_rank == 0) {
-    check_tag(tag);
-
-    if (tag[0] != '\0') {
-      loc = find_tag_impl(tag, optional);
-
-      if (loc == No_Section_Found) {
-        return loc;
-      }
-
-      s = get_line();
-      s += strspn(s, " \t");
-      s += strcspn(s, " \t\n");
-    } else {
-      s = get_line();
-    }
-
-    s += strspn(s, " \t\n");
-    nc = 0;
-
-    while ((s[0] != '\0') && (nc < n)) {
-      ic = sscanf(s, "%lf", &d);
-
-      if (ic == 1) {
-        dprms[nc] = d;
-        nc += 1;
-        s += strcspn(s, " \t\n");
-        s += strspn(s, " \t\n");
-      } else {
-        break;
-      }
-    }
-
-    error_root(nc != n, 1, "read_dprms [mutils.c]", "Incorrect read count");
-  }
-
-  return loc;
-}
+_read_prms_impl(double, dprms, "dprms")
 
 long read_dprms(char const *tag, int n, double *dprms)
 {
-  return read_dprms_impl(tag, n, dprms, 0);
+return read_dprms_impl(tag, n, dprms, 0);
 }
 
 long read_optional_dprms(char const *tag, int n, double *dprms)
 {
   return read_dprms_impl(tag, n, dprms, 1);
+}
+
+_read_prms_impl(char, cprms, "cprms")
+
+long read_cprms(char const *tag, int n, char *cprms)
+{
+  return read_cprms_impl(tag, n, cprms, 0);
+}
+
+long read_optional_cprms(char const *tag, int n, char *cprms)
+{
+  return read_cprms_impl(tag, n, cprms, 1);
 }
 
 void copy_file(char const *in, char const *out)
