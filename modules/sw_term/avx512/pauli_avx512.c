@@ -1,3 +1,5 @@
+#define OPENQCD_INTERNAL
+
 #include "sw_term.h"
 
 typedef union

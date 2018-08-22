@@ -1,3 +1,5 @@
+#define OPENQCD_INTERNAL
+
 #include "dirac.h"
 #include "global.h"
 #include "lattice.h"

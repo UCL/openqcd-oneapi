@@ -1,3 +1,5 @@
+#define OPENQCD_INTERNAL
+
 #include "linalg.h"
 #include "sw_term.h"
 #define DELTA 1.0e-04

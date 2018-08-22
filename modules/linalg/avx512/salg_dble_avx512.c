@@ -1,3 +1,5 @@
+#define OPENQCD_INTERNAL
+
 #include "global.h"
 #include "linalg.h"
 #include "mpi.h"
