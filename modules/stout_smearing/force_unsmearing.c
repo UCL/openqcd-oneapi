@@ -239,7 +239,8 @@ static void construct_b_arrays(ch_drv0_t const *coeff, complex_dble *b1_array,
 static void construct_b_matrices(ch_mat_coeff_pair_t const *X_pair,
                                  su3_dble *b1, su3_dble *b2)
 {
-  complex_dble b1_array[3], b2_array[3];
+  complex_dble b1_array[3] ALIGNED16;
+  complex_dble b2_array[3] ALIGNED16;
 
   construct_b_arrays(&(*X_pair).coeff, b1_array, b2_array);
 
