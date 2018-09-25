@@ -8,7 +8,7 @@ typedef union
 
 #include "avx512.h"
 
-void mul_pauli2_avx512(float mu, pauli const *m, spinor const *source, spinor *res )
+void mul_pauli2(float mu, pauli const *m, spinor const *source, spinor *res )
 {
   spin_t *ps, *pr;
   float const *u, *u2;

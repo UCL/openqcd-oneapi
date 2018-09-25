@@ -86,13 +86,6 @@ static void alloc_wrotate(int n)
 
 
 #if (defined AVX512 )
-
-void mulc_spinor_add_avx512(int vol, spinor *s, spinor const *r, complex z);
-void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
-{
-  mulc_spinor_add_avx512( vol, s, r, z);
-}
-
 complex_dble spinor_prod_avx512(int vol, spinor const *s, spinor const *r );
 complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r )
 {

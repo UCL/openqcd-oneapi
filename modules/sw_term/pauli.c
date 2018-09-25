@@ -551,17 +551,8 @@ void mul_pauli(float mu, pauli const *m, weyl const *s, weyl *r)
 
 #endif
 
-#ifdef AVX512
-
-void mul_pauli2_avx512(float mu, pauli const *m, spinor const *source, spinor *res );
-void mul_pauli2(float mu, pauli const *m, spinor const *source, spinor *res )
-{
-  mul_pauli2_avx512( mu, m, source, res );
-}
-
-
-
-#elif (defined AVX)
+#ifndef AVX512
+#ifdef AVX
 #include "avx.h"
 
 void mul_pauli2(float mu, pauli const *m, spinor const *s, spinor *r)
@@ -940,6 +931,7 @@ void mul_pauli2(float mu, pauli const *m, spinor const *s, spinor *r)
   mul_pauli(-mu, m + 1, (*ps).w + 1, (*pr).w + 1);
 }
 
+#endif
 #endif
 
 void assign_pauli(int vol, pauli_dble const *md, pauli *m)

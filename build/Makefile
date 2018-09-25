@@ -302,18 +302,6 @@ endef
 $(foreach mod,$(module_names),$(eval $(call expand-avx512-module-deps,$(mod))))
 endif
 
-# The AVX512_ASM instructions are stored as .s files, and they do not
-# necessariy have the same name as their .c counterparts
-ifneq (,$(findstring AVX512_ASM,$(CFLAGS)))
-
-define expand-avx512-asm-module-deps
-$(target_module_dir)/$1.a: \
-	$(patsubst $(source_module_dir)/%.s,$(target_module_dir)/%.o,$(wildcard $(source_module_dir)/$1/avx512/*.c))
-endef
-
-$(foreach mod,$(module_names),$(eval $(call expand-avx512-asm-module-deps,$(mod))))
-endif
-
 ## }}}
 ##
 ## Extra dependencies
@@ -373,17 +361,6 @@ $(target_tests_dir)/nompi/%: $(source_tests_dir)/nompi/%.c $(tmp_nompi_mod_lib)
 $(target_module_dir)/%.a:
 	$(mkdir-target)
 	$(call link-and-print,ar rcs $@ $^,$(notdir $@))
-
-# This rule has to come before the %.c -> %.o one so that it takes presedence
-# in the case that we enable the ASM
-ifneq (,$(findstring AVX512_ASM,$(CFLAGS)))
-# Compiling an assembly file
-$(target_module_dir)/%.o: $(source_module_dir)/%.s $(settings_file) Makefile
-	$(mkdir-target)
-	$(call compile-and-print,\
-		$(CC) $(CFLAGS) -c $< -o $@,\
-		"modules/$(subst $(source_module_dir)/,,$<)")
-endif
 
 # Compiling a single source file
 $(target_module_dir)/%.o: $(source_module_dir)/%.c $(settings_file) Makefile

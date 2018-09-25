@@ -5,7 +5,7 @@
 
 #include "avx512.h"
 
-void mulc_spinor_add_avx512(int vol, spinor *s, spinor const *r, complex z)
+void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
 {
   spinor *sm;
   __m128 tr, ti;
