@@ -84,52 +84,36 @@ static void alloc_wrotate(int n)
   nrot = n;
 }
 
-#ifdef AVX512
-#include "avx512.h"
+
+#if (defined AVX512 )
+
+void mulc_spinor_add_avx512(int vol, spinor *s, spinor const *r, complex z);
 void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
 {
-  spinor *sm;
+  mulc_spinor_add_avx512( vol, s, r, z);
+}
 
-  sm = s + vol;
+complex_dble spinor_prod_avx512(int vol, spinor const *s, spinor const *r );
+complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r )
+{
+  complex z;
+  complex_dble v, w, x;
 
-  __m128 tr, ti;
-  __m512 zr, zi, t1, t2;
-  tr = _mm_load_ps1(&z.re);
-  ti = _mm_load_ps1(&z.im);
-  zr = _mm512_broadcast_f32x4(tr);
-  zi = _mm512_broadcast_f32x4(ti);
+  x = spinor_prod_avx512(vol, s, r);
 
-  __m512 sign =
-      _mm512_set_ps(-1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1);
-  zi = _mm512_mul_ps(zi, sign);
+  if ((icom != 1) || (NPROC == 1)) {
+    z.re = (float)(x.re);
+    z.im = (float)(x.im);
+  } else {
+    v.re = x.re;
+    v.im = x.im;
 
-  for (; s < sm; s += 2) {
-    t1 = _mm512_loadu_ps(&(*r).c1.c1.re);
-    t2 = _mm512_mul_ps(zi, t1);
-    t2 = _mm512_permute_ps(t2, 0b10110001);
-    t2 = _mm512_fmadd_ps(zr, t1, t2);
-    t1 = _mm512_loadu_ps(&(*s).c1.c1.re);
-    t1 = _mm512_add_ps(t1, t2);
-    _mm512_storeu_ps(&(*s).c1.c1.re, t1);
+    mpc_gsum_d(&v.re, &w.re, 2);
 
-    t1 = _mm512_loadu_ps(&(*r).c1.c1.re + 16);
-    t2 = _mm512_mul_ps(zi, t1);
-    t2 = _mm512_permute_ps(t2, 0b10110001);
-    t2 = _mm512_fmadd_ps(zr, t1, t2);
-    t1 = _mm512_loadu_ps(&(*s).c1.c1.re + 16);
-    t1 = _mm512_add_ps(t1, t2);
-    _mm512_storeu_ps(&(*s).c1.c1.re + 16, t1);
-
-    t1 = _mm512_loadu_ps(&(*r).c1.c1.re + 32);
-    t2 = _mm512_mul_ps(zi, t1);
-    t2 = _mm512_permute_ps(t2, 0b10110001);
-    t2 = _mm512_fmadd_ps(zr, t1, t2);
-    t1 = _mm512_loadu_ps(&(*s).c1.c1.re + 32);
-    t1 = _mm512_add_ps(t1, t2);
-    _mm512_storeu_ps(&(*s).c1.c1.re + 32, t1);
-
-    r += 2;
+    z.re = (float)(w.re);
+    z.im = (float)(w.im);
   }
+  return z;
 }
 
 #endif
@@ -137,8 +121,8 @@ void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
 #if (defined AVX)
 #include "avx.h"
 
+#ifndef AVX512
 #if (defined FMA3)
-
 complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r)
 {
   complex z;
@@ -323,6 +307,25 @@ complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r)
 
   return z;
 }
+#endif
+
+void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
+{
+  spinor *sm;
+
+  _avx_load_cmplx_up(z);
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    _avx_spinor_load(*s);
+    _avx_mulc_spinor_add(*r);
+    _avx_spinor_store(*s);
+
+    r += 1;
+  }
+
+  _avx_zeroupper();
+}
 
 #endif
 
@@ -453,26 +456,6 @@ float norm_square(int vol, int icom, spinor const *s)
   }
 }
 
-#ifndef AVX512
-void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
-{
-  spinor *sm;
-
-  _avx_load_cmplx_up(z);
-  sm = s + vol;
-
-  for (; s < sm; s++) {
-    _avx_spinor_load(*s);
-    _avx_mulc_spinor_add(*r);
-    _avx_spinor_store(*s);
-
-    r += 1;
-  }
-
-  _avx_zeroupper();
-}
-
-#endif
 
 void mulr_spinor_add(int vol, spinor *s, spinor const *r, float c)
 {
@@ -614,6 +597,7 @@ void mulmg5(int vol, spinor *s)
 #elif (defined x64)
 #include "sse2.h"
 
+#ifndef AVX512
 complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r)
 {
   double x, y;
@@ -756,6 +740,7 @@ complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r)
 
   return z;
 }
+#endif
 
 float spinor_prod_re(int vol, int icom, spinor const *s, spinor const *r)
 {
@@ -1357,6 +1342,7 @@ void mulmg5(int vol, spinor *s)
 
 #else
 
+#ifndef AVX512
 complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r)
 {
   double x, y;
@@ -1397,6 +1383,23 @@ complex spinor_prod(int vol, int icom, spinor const *s, spinor const *r)
 
   return z;
 }
+
+void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
+{
+  spinor *sm;
+
+  sm = s + vol;
+
+  for (; s < sm; s++) {
+    _vector_mulc_assign((*s).c1, z, (*r).c1);
+    _vector_mulc_assign((*s).c2, z, (*r).c2);
+    _vector_mulc_assign((*s).c3, z, (*r).c3);
+    _vector_mulc_assign((*s).c4, z, (*r).c4);
+
+    r += 1;
+  }
+}
+#endif
 
 float spinor_prod_re(int vol, int icom, spinor const *s, spinor const *r)
 {
@@ -1445,24 +1448,6 @@ float norm_square(int vol, int icom, spinor const *s)
     return (float)(y);
   }
 }
-
-#ifndef AVX512
-void mulc_spinor_add(int vol, spinor *s, spinor const *r, complex z)
-{
-  spinor *sm;
-
-  sm = s + vol;
-
-  for (; s < sm; s++) {
-    _vector_mulc_assign((*s).c1, z, (*r).c1);
-    _vector_mulc_assign((*s).c2, z, (*r).c2);
-    _vector_mulc_assign((*s).c3, z, (*r).c3);
-    _vector_mulc_assign((*s).c4, z, (*r).c4);
-
-    r += 1;
-  }
-}
-#endif
 
 void mulr_spinor_add(int vol, spinor *s, spinor const *r, float c)
 {

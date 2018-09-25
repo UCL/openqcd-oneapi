@@ -9,11 +9,11 @@
 # {{{
 
 target_module_dir := modules
-target_devel_dir  := devel
+target_tests_dir  := tests
 dep_dir           := .deps
 source_main_dir    = $(code_dir)/main
 source_module_dir  = $(code_dir)/modules
-source_devel_dir   = $(code_dir)/devel
+source_tests_dir   = $(code_dir)/tests
 
 # }}}
 #
@@ -26,18 +26,18 @@ settings_file := compile_settings.txt
 # Function to load a parameter from the settings file
 load-par-from-file = $(shell grep $(1) $(settings_file)| grep -v '\#' | awk '{print$$2;}')
 
-NPROC0      := $(call load-par-from-file, NPROC0_TOT ) 
-NPROC1      := $(call load-par-from-file, NPROC1_TOT ) 
-NPROC2      := $(call load-par-from-file, NPROC2_TOT ) 
-NPROC3      := $(call load-par-from-file, NPROC3_TOT ) 
-L0          := $(call load-par-from-file, L0 ) 
-L1          := $(call load-par-from-file, L1 ) 
-L2          := $(call load-par-from-file, L2 ) 
-L3          := $(call load-par-from-file, L3 ) 
-NPROC0_BLK  := $(call load-par-from-file, NPROC0_BLK ) 
-NPROC1_BLK  := $(call load-par-from-file, NPROC1_BLK ) 
-NPROC2_BLK  := $(call load-par-from-file, NPROC2_BLK ) 
-NPROC3_BLK  := $(call load-par-from-file, NPROC3_BLK ) 
+NPROC0      := $(call load-par-from-file, NPROC0_TOT )
+NPROC1      := $(call load-par-from-file, NPROC1_TOT )
+NPROC2      := $(call load-par-from-file, NPROC2_TOT )
+NPROC3      := $(call load-par-from-file, NPROC3_TOT )
+L0          := $(call load-par-from-file, L0 )
+L1          := $(call load-par-from-file, L1 )
+L2          := $(call load-par-from-file, L2 )
+L3          := $(call load-par-from-file, L3 )
+NPROC0_BLK  := $(call load-par-from-file, NPROC0_BLK )
+NPROC1_BLK  := $(call load-par-from-file, NPROC1_BLK )
+NPROC2_BLK  := $(call load-par-from-file, NPROC2_BLK )
+NPROC3_BLK  := $(call load-par-from-file, NPROC3_BLK )
 
 code_dir    := $(shell grep CODELOC     $(settings_file)| grep -v '\#' | awk '{print$$2;}')
 CC          := $(shell grep COMPILER    $(settings_file)| grep -v '\#' | awk '{print$$2;}')
@@ -65,7 +65,7 @@ CFLAGS     += -I$(code_dir)/include -I$(code_dir) -isystem $(MPI_INCLUDE)\
 LDFLAGS    += $(USR_LDFLAGS) -lm
 
 # The nompi targets needs one more include directory
-$(target_devel_dir)/nompi/%: \
+$(target_tests_dir)/nompi/%: \
 	CFLAGS := -I$(code_dir)/include/nompi $(CFLAGS)
 
 $(target_module_dir)/nompi/%: \
@@ -85,7 +85,7 @@ $(dep_dir)/nompi/%: \
 # module_libs: the target static library names
 # main_sources: all main executable source files
 # main_programs: the corresponding target executables
-# test_module_names: list of all testing modules in the devel/ folder
+# test_module_names: list of all testing modules in the tests/ folder
 # test_module_dirs: the corresponding target "directories", as all tests are
 #                   executable we set the targets as the folder containing them
 
@@ -105,7 +105,7 @@ test_module_names := archive block dfl dirac field_com flags forces lattice lina
                      random ratfcts sap sflds stout_smearing su3fcts sw_term\
                      tcharge uflds update utils vflds wflow
 
-test_module_dirs  := $(patsubst %,$(target_devel_dir)/%,$(test_module_names))
+test_module_dirs  := $(patsubst %,$(target_tests_dir)/%,$(test_module_names))
 
 ## nompi tests and modules
 ## -----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ test_module_dirs  := $(patsubst %,$(target_devel_dir)/%,$(test_module_names))
 ## nompi_module_names: list of all the moduels in the nompi folder
 ## nompi_module_libs: list of all target static libraries necessary to build a
 ##                    nompi test
-## test_nompi_module_names: list of test modules in devel/nompi
+## test_nompi_module_names: list of test modules in tests/nompi
 ## test_nompi_module_dirs: the corresponding target test folders
 
 # And the nompi modules and tests
@@ -138,7 +138,7 @@ nompi_module_libs  := \
 test_nompi_module_names := extras forces linalg main random ratfcts su3fcts\
                            sw_term utils
 
-test_nompi_module_dirs  := $(patsubst %,$(target_devel_dir)/nompi/%,$(test_nompi_module_names))
+test_nompi_module_dirs  := $(patsubst %,$(target_tests_dir)/nompi/%,$(test_nompi_module_names))
 
 ## }}}
 # }}}
@@ -151,7 +151,7 @@ test_nompi_module_dirs  := $(patsubst %,$(target_devel_dir)/nompi/%,$(test_nompi
 .PHONY: all
 all: print-header $(main_programs)
 
-# Compile every test in devel
+# Compile every test in tests
 .PHONY: tests
 tests: print-header $(test_module_dirs) $(test_nompi_module_dirs)
 
@@ -163,8 +163,8 @@ $(main_programs): print-header $(module_libs)
 $(module_names): %: $(target_module_dir)/%.a
 
 # The nompi tests can also be built by itself
-.PHONY: $(target_devel_dir)/nompi
-$(target_devel_dir)/nompi: $(test_nompi_module_dirs)
+.PHONY: $(target_tests_dir)/nompi
+$(target_tests_dir)/nompi: $(test_nompi_module_dirs)
 
 # Targets for the individual test modules
 .PHONY: print-header $(test_module_dirs)
@@ -180,8 +180,8 @@ help:
 	@echo "  $(call header-print,all): build all openQCD executables"
 	@echo "  $(call header-print,qcd1),$(call header-print,...): build any individual openQCD executable"
 	@echo "  $(call header-print,[module]): make a static library of any individual module"
-	@echo "  $(call header-print,tests): build all tests in the devel directory"
-	@echo "  $(call header-print,devel/...): build a subset of tests"
+	@echo "  $(call header-print,tests): build all tests in the tests directory"
+	@echo "  $(call header-print,tests/...): build a subset of tests"
 	@echo "  $(call header-print,clean): delete all files generated by make"
 	@echo "  $(call header-print,list-targets): list of all (main) targets"
 	@echo "  $(call header-print,list-all-targets): list of all possible targets"
@@ -220,7 +220,7 @@ clean: clean-modules clean-main clean-tests
 .PHONY: clean-tests
 clean-tests:
 	@echo "Cleaning tests..."
-	@rm -rf $(target_devel_dir)
+	@rm -rf $(target_tests_dir)
 
 .PHONY: clean-main
 clean-main:
@@ -246,7 +246,7 @@ tmp_nompi_mod_lib := $(target_module_dir)/nompi_module_library.a
 # Also add the .d files to the .SECONDARY so that they aren't cleaned up by make
 define expand-module-deps
 .SECONDARY: \
-	$(patsubst $(source_module_dir)/%.c,$(dep_dir)/%.d,$(wildcard $(source_module_dir)/$1/*.c)) 
+	$(patsubst $(source_module_dir)/%.c,$(dep_dir)/%.d,$(wildcard $(source_module_dir)/$1/*.c))
 
 $(target_module_dir)/$1.a: \
 	$(patsubst $(source_module_dir)/%.c,$(target_module_dir)/%.o,$(wildcard $(source_module_dir)/$1/*.c))
@@ -254,10 +254,10 @@ endef
 
 # Define dependencies for the test folders
 # These also depend on any available .in file which will be copied over
-define expand-devel-deps
-$(target_devel_dir)/$1: \
-	$(patsubst $(source_devel_dir)/%.c,$(target_devel_dir)/%,$(wildcard $(source_devel_dir)/$1/*.c)) \
-	$(patsubst $(source_devel_dir)/%.in,$(target_devel_dir)/%.in,$(wildcard $(source_devel_dir)/$1/*.in))
+define expand-tests-deps
+$(target_tests_dir)/$1: \
+	$(patsubst $(source_tests_dir)/%.c,$(target_tests_dir)/%,$(wildcard $(source_tests_dir)/$1/*.c)) \
+	$(patsubst $(source_tests_dir)/%.in,$(target_tests_dir)/%.in,$(wildcard $(source_tests_dir)/$1/*.in))
 endef
 
 # Include all .d files for each of the .c files in a single module
@@ -268,8 +268,8 @@ endef
 # Add the appropriate dependencies
 $(foreach mod,$(module_names),$(eval $(call expand-module-deps,$(mod))))
 $(foreach mod,$(patsubst %,nompi/%,$(nompi_module_names)),$(eval $(call expand-module-deps,$(mod))))
-$(foreach dev,$(test_module_names),$(eval $(call expand-devel-deps,$(dev))))
-$(foreach dev,$(patsubst %,nompi/%,$(test_nompi_module_names)),$(eval $(call expand-devel-deps,$(dev))))
+$(foreach dev,$(test_module_names),$(eval $(call expand-tests-deps,$(dev))))
+$(foreach dev,$(patsubst %,nompi/%,$(test_nompi_module_names)),$(eval $(call expand-tests-deps,$(dev))))
 
 # No need to fetch the dependencies if we are building a PHONY target
 nop_targets := clean clean-tests clean-main clean-modules help list-targets list-all-targets nop
@@ -283,11 +283,44 @@ endif
 -include $(patsubst %,$(dep_dir)/%.d,$(compiled_mains))
 $(foreach mod,$(compiled_modules),$(eval $(call include-module-deps,$(mod))))
 
+## Optimisation dependencies
+## -----------------------------------------------------------------------------
+## {{{
+
+# The AVX512 instructions are stored in subfolders of their respective modules,
+# these needs to be added if avx512 is used
+ifneq (,$(findstring AVX512,$(CFLAGS)))
+
+define expand-avx512-module-deps
+.SECONDARY: \
+	$(patsubst $(source_module_dir)/%.c,$(dep_dir)/%.d,$(wildcard $(source_module_dir)/$1/avx512/*.c))
+
+$(target_module_dir)/$1.a: \
+	$(patsubst $(source_module_dir)/%.c,$(target_module_dir)/%.o,$(wildcard $(source_module_dir)/$1/avx512/*.c))
+endef
+
+$(foreach mod,$(module_names),$(eval $(call expand-avx512-module-deps,$(mod))))
+endif
+
+# The AVX512_ASM instructions are stored as .s files, and they do not
+# necessariy have the same name as their .c counterparts
+ifneq (,$(findstring AVX512_ASM,$(CFLAGS)))
+
+define expand-avx512-asm-module-deps
+$(target_module_dir)/$1.a: \
+	$(patsubst $(source_module_dir)/%.s,$(target_module_dir)/%.o,$(wildcard $(source_module_dir)/$1/avx512/*.c))
+endef
+
+$(foreach mod,$(module_names),$(eval $(call expand-avx512-asm-module-deps,$(mod))))
+endif
+
+## }}}
+##
 ## Extra dependencies
 ## -----------------------------------------------------------------------------
 ## {{{
 
-$(target_devel_dir)/stout_smearing: | $(target_devel_dir)/stout_smearing/configurations
+$(target_tests_dir)/stout_smearing: | $(target_tests_dir)/stout_smearing/configurations
 
 $(target_module_dir)/utils.a: $(target_module_dir)/utils/version.o
 
@@ -323,14 +356,14 @@ $(main_programs): %: $(source_main_dir)/%.c $(tmp_mod_lib)
 		$(notdir $<))
 
 # Compile a test
-$(target_devel_dir)/%: $(source_devel_dir)/%.c $(tmp_mod_lib)
+$(target_tests_dir)/%: $(source_tests_dir)/%.c $(tmp_mod_lib)
 	$(mkdir-target)
 	$(call link-and-print,\
 		$(CC) $(CFLAGS) $< -o $@ $(tmp_mod_lib) $(LDFLAGS),\
 		$@.c)
 
 # Compile a nompi test
-$(target_devel_dir)/nompi/%: $(source_devel_dir)/nompi/%.c $(tmp_nompi_mod_lib)
+$(target_tests_dir)/nompi/%: $(source_tests_dir)/nompi/%.c $(tmp_nompi_mod_lib)
 	$(mkdir-target)
 	$(call link-and-print,\
 		$(CC) $(CFLAGS) $< -o $@ $(tmp_nompi_mod_lib) $(LDFLAGS),\
@@ -341,12 +374,24 @@ $(target_module_dir)/%.a:
 	$(mkdir-target)
 	$(call link-and-print,ar rcs $@ $^,$(notdir $@))
 
+# This rule has to come before the %.c -> %.o one so that it takes presedence
+# in the case that we enable the ASM
+ifneq (,$(findstring AVX512_ASM,$(CFLAGS)))
+# Compiling an assembly file
+$(target_module_dir)/%.o: $(source_module_dir)/%.s $(settings_file) Makefile
+	$(mkdir-target)
+	$(call compile-and-print,\
+		$(CC) $(CFLAGS) -c $< -o $@,\
+		"modules/$(subst $(source_module_dir)/,,$<)")
+endif
+
 # Compiling a single source file
 $(target_module_dir)/%.o: $(source_module_dir)/%.c $(settings_file) Makefile
 	$(mkdir-target)
 	$(call compile-and-print,\
 		$(CC) $(CFLAGS) -c $< -o $@,\
 		"modules/$(subst $(source_module_dir)/,,$<)")
+
 
 # Creating a dependency file from a source file
 $(dep_dir)/%.d: $(source_module_dir)/%.c
@@ -365,7 +410,7 @@ $(dep_dir)/%.d: $(source_main_dir)/%.c
 		$@ $<
 
 # Copy the test infiles
-$(target_devel_dir)/%.in: $(source_devel_dir)/%.in
+$(target_tests_dir)/%.in: $(source_tests_dir)/%.in
 	$(mkdir-target)
 	@cp -f $< $@
 
@@ -374,8 +419,8 @@ $(target_devel_dir)/%.in: $(source_devel_dir)/%.in
 ## {{{
 
 # Link the configs for the stout_smearing tests
-$(target_devel_dir)/stout_smearing/configurations: \
-		$(source_devel_dir)/stout_smearing/configurations
+$(target_tests_dir)/stout_smearing/configurations: \
+		$(source_tests_dir)/stout_smearing/configurations
 	${mkdir-target}
 	@rm -f $@
 	@ln -s $$(readlink -e $<) $@
@@ -387,7 +432,7 @@ $(target_module_dir)/utils/version.o: $(target_module_dir)/utils/version.c $(set
 
 # Fill the version.c file with current build information
 $(target_module_dir)/utils/version.c: $(settings_file) Makefile
-	@echo "#include \"version.h\"" > $@ 
+	@echo "#include \"version.h\"" > $@
 	$(eval git_version := $(call git-version))
 	@echo "const char * build_git_sha = \"$(git_version)\";" >> $@
 	@current_date_time=$$(date "+%d-%m-%Y %H:%M:%S");\

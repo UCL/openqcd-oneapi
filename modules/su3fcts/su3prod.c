@@ -1415,6 +1415,7 @@ void rotate_su3alg(su3_dble const *u, su3_alg_dble *X)
 static su3_vector_dble psi, chi;
 static su3_dble uX;
 
+
 static void su3xsu3vec(su3_dble const *u)
 {
   _su3_multiply(chi, *u, psi);

@@ -420,6 +420,8 @@ typedef struct
               (u).c32.re * (s).c2.im + (u).c32.im * (s).c2.re +                \
               (u).c33.re * (s).c3.im + (u).c33.im * (s).c3.re
 
+
+
 /*
  * SU(3) matrix u^dagger times SU(3) vector s
  *
