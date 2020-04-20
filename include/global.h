@@ -34,7 +34,7 @@ THESE QUANTITIES ARE NOW DEFINED IN A TEXT FILE READ BY THE MAKEFILE
 #define NPROC3_BLK 2
 */
 
-#define NAME_SIZE 128
+#define NAME_SIZE 512
 
 /****************************** do not change *********************************/
 
