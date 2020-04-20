@@ -12,7 +12,7 @@
  *
  * The externally accessible functions are
  *
- *   mdint_parms_t set_mdint_parms(int ilv, integrator_t integrator, 
+ *   mdint_parms_t set_mdint_parms(int ilv, integrator_t integrator,
  *                                 double lambda, int nstep, int nfr,
  *                                 int const *ifr)
  *     Sets the parameters of the molecular-dynamics integrator at level ilv and

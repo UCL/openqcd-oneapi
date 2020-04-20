@@ -18,7 +18,7 @@
  *                                                    int smear_fermion)
  *     Sets the stout smearing parameters and returns a structure containing
  *     them. See the documentation with respect to their meanings.
- *   
+ *
  *   stout_smearing_params_t set_no_stout_smearing_parms(void)
  *     Sets the parameters so that we do not use stout smearing.
  *

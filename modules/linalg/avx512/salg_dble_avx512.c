@@ -125,7 +125,7 @@ double norm_square_dble_avx512(spinor_dble const *s, spinor_dble const *smb)
   return _mm512_reduce_add_pd( tmp );
 }
 
-void mulc_spinor_add_dble_avx512(int vol, spinor_dble *s, spinor_dble const *r,
+void mulc_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
                           complex_dble z)
 {
   spinor_dble *sm;
@@ -168,7 +168,7 @@ void mulc_spinor_add_dble_avx512(int vol, spinor_dble *s, spinor_dble const *r,
   }
 }
 
-void mulr_spinor_add_dble_avx512(int vol, spinor_dble *s, spinor_dble const *r,
+void mulr_spinor_add_dble(int vol, spinor_dble *s, spinor_dble const *r,
                           double c)
 {
   spinor_dble *sm;
@@ -203,7 +203,7 @@ void mulr_spinor_add_dble_avx512(int vol, spinor_dble *s, spinor_dble const *r,
   }
 }
 
-void combine_spinor_dble_avx512(int vol, spinor_dble *s, spinor_dble const *r,
+void combine_spinor_dble(int vol, spinor_dble *s, spinor_dble const *r,
                          double cs, double cr)
 {
   spinor_dble *sm;
@@ -240,7 +240,7 @@ void combine_spinor_dble_avx512(int vol, spinor_dble *s, spinor_dble const *r,
   }
 }
 
-void scale_dble_avx512(int vol, double c, spinor_dble *s)
+void scale_dble(int vol, double c, spinor_dble *s)
 {
   spinor_dble *sm;
   __m128d t128;
@@ -338,7 +338,7 @@ void rotate_dble_avx512(int n, int ix, spinor_dble **ppk, spinor_dble *psi, comp
   }
 }
 
-void mulg5_dble_avx512(int vol, spinor_dble *s)
+void mulg5_dble(int vol, spinor_dble *s)
 {
   spinor_dble *sm;
 
@@ -358,7 +358,7 @@ void mulg5_dble_avx512(int vol, spinor_dble *s)
   }
 }
 
-void mulmg5_dble_avx512(int vol, spinor_dble *s)
+void mulmg5_dble(int vol, spinor_dble *s)
 {
   spinor_dble *sm;
 

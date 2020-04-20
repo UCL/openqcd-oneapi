@@ -29,21 +29,21 @@
   __m256 t256; __m128 t128;                              \
   t256 = _mm256_shuffle_ps( c1, c2, 0b01000100 );        \
   t128 = _mm256_castps256_ps128( t256 );                 \
-  _mm_storeu_ps( a, t128 );                               \
+  _mm_storeu_ps( a, t128 );                              \
   t128 = _mm256_extractf128_ps( t256, 1 );               \
-  _mm_storeu_ps( a+12, t128 );                            \
+  _mm_storeu_ps( a+12, t128 );                           \
                                                          \
   t256 = _mm256_shuffle_ps( c3, c1, 0b11100100 );        \
   t128 = _mm256_castps256_ps128( t256 );                 \
-  _mm_storeu_ps( a+4, t128 );                             \
+  _mm_storeu_ps( a+4, t128 );                            \
   t128 = _mm256_extractf128_ps( t256, 1 );               \
-  _mm_storeu_ps( a+16, t128 );                            \
+  _mm_storeu_ps( a+16, t128 );                           \
                                                          \
   t256 = _mm256_shuffle_ps( c2, c3, 0b11101110 );        \
   t128 = _mm256_castps256_ps128( t256 );                 \
-  _mm_storeu_ps( a+8, t128 );                             \
+  _mm_storeu_ps( a+8, t128 );                            \
   t128 = _mm256_extractf128_ps( t256, 1 );               \
-  _mm_storeu_ps( a+20, t128 );                            \
+  _mm_storeu_ps( a+20, t128 );                           \
 }
 
 
@@ -408,10 +408,10 @@
 
 /* Accumulate elements of Dirac vectors into a Weyl vector in deo and doe */
 #define _avx512_to_weyl_f_12( c, b, gamma_f ){                         \
-  __m256 w, sign, t5,t6;                                               \
+  __m256 w, sign, t5,t6, gm;                                           \
   __m256i idx;                                                         \
   t5 = _mm512_castps512_ps256( b );                                    \
-  __m256 gm = _mm256_broadcast_ss( &gamma_f );                         \
+  gm = _mm256_broadcast_ss( &gamma_f );                                \
                                                                        \
   idx = _mm256_setr_epi32( 4, 5, 6, 7, 0, 1, 2, 3 );                   \
   t6 = _mm256_permutevar8x32_ps( t5, idx );                            \
@@ -596,7 +596,7 @@
 #define avx512_su3_mul_quad_dble( u, um, b1, b2, b3, c1, c2, c3   )     \
 {                                                                       \
   __m512d tu1, tu2, tu3, tum1, tum2, tum3;                              \
-  __m512d u1;                              \
+  __m512d u1;                                                           \
   __m512d t1, t2, t3, sign;                                             \
   __m512i indexes;                                                      \
   tu1 = _mm512_loadu_pd( &(u).c11.re );                                 \

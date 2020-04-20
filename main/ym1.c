@@ -74,15 +74,15 @@ static int ipgrd[2], flint;
 static double *Wact, *Yact, *Qtop;
 static double npl, volume;
 
-static char line[NAME_SIZE];
+static char line[2 * NAME_SIZE + 2];
 static char log_dir[NAME_SIZE], dat_dir[NAME_SIZE];
 static char loc_dir[NAME_SIZE], cnfg_dir[NAME_SIZE];
-static char log_file[NAME_SIZE], log_save[NAME_SIZE];
-static char par_file[NAME_SIZE], par_save[NAME_SIZE];
-static char dat_file[NAME_SIZE], dat_save[NAME_SIZE];
-static char msdat_file[NAME_SIZE], msdat_save[NAME_SIZE];
-static char rng_file[NAME_SIZE], rng_save[NAME_SIZE];
-static char cnfg_file[NAME_SIZE], end_file[NAME_SIZE];
+static char log_file[2 * NAME_SIZE + 16], log_save[2 * NAME_SIZE + 32];
+static char par_file[2 * NAME_SIZE + 16], par_save[2 * NAME_SIZE + 32];
+static char dat_file[2 * NAME_SIZE + 16], dat_save[2 * NAME_SIZE + 32];
+static char msdat_file[2 * NAME_SIZE + 16], msdat_save[2 * NAME_SIZE + 32];
+static char rng_file[2 * NAME_SIZE + 16], rng_save[2 * NAME_SIZE + 32];
+static char cnfg_file[2 * NAME_SIZE + 16], end_file[2 * NAME_SIZE + 16];
 static char nbase[NAME_SIZE], cnfg[NAME_SIZE];
 static FILE *fin = NULL, *flog = NULL, *fdat = NULL, *fend = NULL;
 

@@ -45,8 +45,8 @@
  *     Returns the parameters currently set for the deflation projectors in
  *     the deflated solver program dfl_sap_gcr().
  *
- *   dfl_gen_parms_t set_dfl_gen_parms(double kappa, double mu, 
- *                                     int ninv, int nmr, int ncy, 
+ *   dfl_gen_parms_t set_dfl_gen_parms(double kappa, double mu,
+ *                                     int ninv, int nmr, int ncy,
  *                                     int nkv, int nmx, double res)
  *     Sets the parameters of the inverse iteration procedure that generates
  *     the deflation subspace. The parameters are

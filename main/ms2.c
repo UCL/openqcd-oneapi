@@ -56,8 +56,9 @@ static int *rlxs_state = NULL, *rlxd_state = NULL;
 static double ar[256];
 
 static char log_dir[NAME_SIZE], loc_dir[NAME_SIZE], cnfg_dir[NAME_SIZE];
-static char log_file[NAME_SIZE], log_save[NAME_SIZE], end_file[NAME_SIZE];
-static char cnfg_file[NAME_SIZE], nbase[NAME_SIZE];
+static char log_file[2 * NAME_SIZE + 16], log_save[2 * NAME_SIZE + 32],
+    end_file[2 * NAME_SIZE + 16];
+static char cnfg_file[2 * NAME_SIZE + 16], nbase[NAME_SIZE];
 static FILE *fin = NULL, *flog = NULL, *fend = NULL;
 
 static lat_parms_t lat;

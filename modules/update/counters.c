@@ -46,7 +46,7 @@
  * In most cases, the computation of the fermion actions and forces requires
  * the Dirac equation to be solved a number of times. Depending on the solver
  * used, the number of status values returned by the solver program may vary.
- 
+
  * The counters administered by this module are set up for all fermion actions
  * and forces that take part in the HMC algorithm according to the parameter
  * data base. In addition, the iteration numbers required for the solution of

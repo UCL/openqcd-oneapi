@@ -23,7 +23,7 @@ extern spin_t rs ALIGNED32;
 
 
 #include "avx512.h"
-void doe_avx512(int *piup, int *pidn, su3 *u, spinor *pk)
+void doe_avx512(int *piup, int *pidn, su3 *u, spinor *pk, float coe, float gamma_f, float one_over_gammaf, spin_t *rs)
 {
   spinor *sp, *sm, *sp2, *sm2;
   su3 *up, *up1, *u1, *up2, *u2;
@@ -104,10 +104,10 @@ void doe_avx512(int *piup, int *pidn, su3 *u, spinor *pk)
   c2 = _mm256_mul_ps( c2, gamma2);
   c3 = _mm256_mul_ps( c3, gamma2);
 
-  _avx512_write_6_hwv_f( c1, c2, c3,  &rs.s.c1.c1.re);
+  _avx512_write_6_hwv_f( c1, c2, c3,  &(*rs).s.c1.c1.re);
 }
 
-void deo_avx512(int *piup, int *pidn, su3 *u, spinor *pl)
+void deo_avx512(int *piup, int *pidn, su3 *u, spinor *pl, float ceo, float gamma_f, float one_over_gammaf, spin_t *rs)
 {
   spinor *sp, *sm, *sp2, *sm2;
   su3 *up, *up1, *u1, *up2, *u2;
@@ -131,7 +131,7 @@ void deo_avx512(int *piup, int *pidn, su3 *u, spinor *pl)
   sm2 = pl + (*(pidn++));
   _mm_prefetch( (char *) sm2, _MM_HINT_T0 );
 
-  _avx512_load_6_hwv_f( c1,c2,c3, &rs.s.c1.c1.re );
+  _avx512_load_6_hwv_f( c1,c2,c3, &(*rs).s.c1.c1.re );
 
   c256 = _mm256_broadcast_ss( &ceo );
   c1 = _mm256_mul_ps( c1, c256 );

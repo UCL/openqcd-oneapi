@@ -12,7 +12,7 @@
  *
  * The externally accessible function is
  *
- *   double sap_gcr(int nkv, int nmx, double res, double mu, 
+ *   double sap_gcr(int nkv, int nmx, double res, double mu,
  *                  spinor_dble *eta, spinor_dble *psi, int *status)
  *     Obtains an approximate solution psi of the Wilson-Dirac equation for
  *     given source eta using the SAP-preconditioned GCR algorithm. See the

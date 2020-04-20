@@ -12,14 +12,14 @@
  *
  * The externally accessible function is
  *
- *   double cgne(int vol, int icom, void (*Dop)(spinor *s, spinor *r), 
- *               void (*Dop_dble)(spinor_dble *s, spinor_dble *r), 
- *               spinor **ws, spinor_dble **wsd, int nmx, double res, 
+ *   double cgne(int vol, int icom, void (*Dop)(spinor *s, spinor *r),
+ *               void (*Dop_dble)(spinor_dble *s, spinor_dble *r),
+ *               spinor **ws, spinor_dble **wsd, int nmx, double res,
  *               spinor_dble *eta, spinor_dble *psi, int *status)
  *     Solution of the (normal) Dirac equation D^dag*D*psi=eta for given
  *     source eta, using the CG algorithm. See the notes for the explanation
  *     of the parameters of the program.
- 
+
  * Notes:
  *
  * This program uses single-precision arithmetic to reduce the execution

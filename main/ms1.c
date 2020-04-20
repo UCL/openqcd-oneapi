@@ -62,11 +62,12 @@ static int ipgrd[2], **rwstat = NULL, *rlxs_state = NULL, *rlxd_state = NULL;
 static char line[NAME_SIZE];
 static char log_dir[NAME_SIZE], dat_dir[NAME_SIZE];
 static char loc_dir[NAME_SIZE], cnfg_dir[NAME_SIZE];
-static char log_file[NAME_SIZE], log_save[NAME_SIZE], end_file[NAME_SIZE];
-static char par_file[NAME_SIZE], par_save[NAME_SIZE];
-static char dat_file[NAME_SIZE], dat_save[NAME_SIZE];
-static char rng_file[NAME_SIZE], rng_save[NAME_SIZE];
-static char cnfg_file[NAME_SIZE], nbase[NAME_SIZE];
+static char log_file[2 * NAME_SIZE + 16], log_save[2 * NAME_SIZE + 32],
+    end_file[2 * NAME_SIZE + 16];
+static char par_file[2 * NAME_SIZE + 16], par_save[2 * NAME_SIZE + 32];
+static char dat_file[2 * NAME_SIZE + 16], dat_save[2 * NAME_SIZE + 32];
+static char rng_file[2 * NAME_SIZE + 16], rng_save[2 * NAME_SIZE + 32];
+static char cnfg_file[2 * NAME_SIZE + 16], nbase[NAME_SIZE];
 static FILE *fin = NULL, *flog = NULL, *fdat = NULL, *fend = NULL;
 
 static lat_parms_t lat;

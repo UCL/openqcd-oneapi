@@ -42,7 +42,8 @@ int main(int argc, char *argv[])
   new_test_module();
 
   if (my_rank == 0) {
-    printf("Test of whether copy_bnd_ud() is correctly applied to the boundary\n");
+    printf(
+        "Test of whether copy_bnd_ud() is correctly applied to the boundary\n");
     printf("-------------------------------------------\n\n");
 
     printf("%dx%dx%dx%d lattice, ", NPROC0 * L0, NPROC1 * L1, NPROC2 * L2,

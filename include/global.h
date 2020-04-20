@@ -15,7 +15,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define openqcd__NAME_SIZE 128
+#define openqcd__NAME_SIZE 512
 
 #if (openqcd__NAME_SIZE < 128)
 #error : NAME_SIZE must be greater or equal to 128

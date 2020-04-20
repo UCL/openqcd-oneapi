@@ -146,14 +146,14 @@ static void set_aniso_hopping_coeffs(void)
 #if ( defined AVX512 )
 
 #include "avx512.h"
-void doe_avx512(int *piup, int *pidn, su3 *u, spinor *pk);
+void doe_avx512(int *piup, int *pidn, su3 *u, spinor *pk, float coe, float gamma_f, float one_over_gammaf, spin_t *rs);
 static void doe(int *piup, int *pidn, su3 *u, spinor *pk){
-  doe_avx512(piup, pidn, u, pk);
+  doe_avx512(piup, pidn, u, pk, coe, gamma_f, one_over_gammaf, &rs );
 }
 
-void deo_avx512(int *piup, int *pidn, su3 *u, spinor *pl);
+void deo_avx512(int *piup, int *pidn, su3 *u, spinor *pl, float ceo, float gamma_f, float one_over_gammaf, spin_t *rs);
 static void deo(int *piup, int *pidn, su3 *u, spinor *pl){
-  deo_avx512(piup, pidn, u, pl);
+  deo_avx512(piup, pidn, u, pl, ceo, gamma_f, one_over_gammaf, &rs );
 }
 
 

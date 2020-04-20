@@ -13,7 +13,7 @@
  *
  * The externally accessible function is
  *
- *   void tmcgm(int nmx, double *res, int nmu, double *mu, 
+ *   void tmcgm(int nmx, double *res, int nmu, double *mu,
  *              spinor_dble *eta, spinor_dble **psi, int *status)
  *     Obtains approximate solutions psi[0],..,psi[nmu-1] of the normal
  *     even-odd preconditioned Wilson-Dirac equation for given source eta

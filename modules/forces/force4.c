@@ -17,13 +17,13 @@
  *     to exp(-Spf) and returns the action Spf+Sdet if isw=1 or Spf if
  *     isw!=1 (see the notes).
  *
- *   void force4(double mu, int ipf, int isw, int isp, int icr, double c, 
+ *   void force4(double mu, int ipf, int isw, int isp, int icr, double c,
  *               int *status)
  *     Computes the force deriving from the action Spf+Sdet if isw=1 or
  *     Spf if isw!=1 (see the notes). The calculated force is multiplied
  *     by c and added to the molecular-dynamics force field.
  *
- *   double action4(double mu, int ipf, int isw, int isp, int icom, 
+ *   double action4(double mu, int ipf, int isw, int isp, int icom,
  *                  int *status)
  *     Returns the action Spf+Sdet if isw=1 or Spf if isw!=1 (see the
  *     notes).

@@ -1,8 +1,15 @@
+# Compile flags
 *.d
 *.o
 *.log
 data/*
 
+# Build files
 build/*
 !build/Makefile
 !build/compile_settings.txt
+
+# Language servers
+.ccls-cache/*
+.clangd/*
+compile_commands.json

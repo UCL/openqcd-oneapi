@@ -87,12 +87,6 @@ static complex_dble dd[6] ALIGNED16;
 
 #if (defined AVX512)
 
-void mul_pauli2_dble_avx512(double mu, pauli_dble const *m, weyl_dble const *s, weyl_dble *r);
-void mul_pauli2_dble(double mu, pauli_dble const *m, weyl_dble const *s, weyl_dble *r)
-{
-  mul_pauli2_dble_avx512( mu, m, s, r );
-}
-
 int fwd_house_avx512(double eps, complex_dble *aa, complex_dble *dd, double * rr );
 static int fwd_house(double eps ){
   return fwd_house_avx512( eps, aa, dd, rr );
@@ -769,7 +763,6 @@ void mul_pauli_dble(double mu, pauli_dble const *m, weyl_dble const *s,
 }
 
 #endif
-
 
 #ifndef AVX512
 static int fwd_house(double eps)
