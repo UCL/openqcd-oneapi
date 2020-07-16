@@ -1,0 +1,14 @@
+break Dw.c:1406
+break Dw.c:1480
+
+dump binary value VOLUME.bin openqcd__VOLUME
+dump binary value mu.bin mu
+
+dump binary memory piup.bin piup piup+openqcd__VOLUME*2
+dump binary memory pidn.bin pidn pidn+openqcd__VOLUME*2
+dump binary memory s.bin s s+openqcd__VOLUME
+dump binary memory r.bin r r+openqcd__VOLUME
+dump binary memory u.bin u u+openqcd__VOLUME*4
+dump binary memory m.bin m m+openqcd__VOLUME
+
+// Before for loop dump all of them and after the for loop dump only r.
