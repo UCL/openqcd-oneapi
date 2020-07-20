@@ -311,6 +311,213 @@ static void deo_cuda(int *piup, int *pidn, su3 *u, spinor *pl,
 }
 
 __device__
+void vector_add_assign(su3_vector *r, su3_vector s)
+{
+    atomicAdd(&((*r).c1.re),  s.c1.re);
+    atomicAdd(&((*r).c1.im),  s.c1.im);
+    atomicAdd(&((*r).c2.re),  s.c2.re);
+    atomicAdd(&((*r).c2.im),  s.c2.im);
+    atomicAdd(&((*r).c3.re),  s.c3.re);
+    atomicAdd(&((*r).c3.im),  s.c3.im);
+    // (r).c1.re += (s).c1.re;
+    // (r).c1.im += (s).c1.im;
+    // (r).c2.re += (s).c2.re;
+    // (r).c2.im += (s).c2.im;
+    // (r).c3.re += (s).c3.re;
+    // (r).c3.im += (s).c3.im
+}
+
+__device__
+void vector_sub_assign(su3_vector *r, su3_vector s)
+{
+    atomicAdd(&((*r).c1.re), -s.c1.re);
+    atomicAdd(&((*r).c1.im), -s.c1.im);
+    atomicAdd(&((*r).c2.re), -s.c2.re);
+    atomicAdd(&((*r).c2.im), -s.c2.im);
+    atomicAdd(&((*r).c3.re), -s.c3.re);
+    atomicAdd(&((*r).c3.im), -s.c3.im);
+    // (r).c1.re -= (s).c1.re;
+    // (r).c1.im -= (s).c1.im;
+    // (r).c2.re -= (s).c2.re;
+    // (r).c2.im -= (s).c2.im;
+    // (r).c3.re -= (s).c3.re;
+    // (r).c3.im -= (s).c3.im
+}
+
+__device__
+void vector_i_add_assign(su3_vector *r, su3_vector s)
+{
+    atomicAdd(&((*r).c1.re), -s.c1.im);
+    atomicAdd(&((*r).c1.im),  s.c1.re);
+    atomicAdd(&((*r).c2.re), -s.c2.im);
+    atomicAdd(&((*r).c2.im),  s.c2.re);
+    atomicAdd(&((*r).c3.re), -s.c3.im);
+    atomicAdd(&((*r).c3.im),  s.c3.re);
+    // (r).c1.re -= (s).c1.im;
+    // (r).c1.im += (s).c1.re;
+    // (r).c2.re -= (s).c2.im;
+    // (r).c2.im += (s).c2.re;
+    // (r).c3.re -= (s).c3.im;
+    // (r).c3.im += (s).c3.re
+}
+
+__device__
+void vector_i_sub_assign(su3_vector *r, su3_vector s)
+{
+    atomicAdd(&((*r).c1.re),  s.c1.im);
+    atomicAdd(&((*r).c1.im), -s.c1.re);
+    atomicAdd(&((*r).c2.re),  s.c2.im);
+    atomicAdd(&((*r).c2.im), -s.c2.re);
+    atomicAdd(&((*r).c3.re),  s.c3.im);
+    atomicAdd(&((*r).c3.im), -s.c3.re);
+    // (r).c1.re += (s).c1.im;
+    // (r).c1.im -= (s).c1.re;
+    // (r).c2.re += (s).c2.im;
+    // (r).c2.im -= (s).c2.re;
+    // (r).c3.re += (s).c3.im;
+    // (r).c3.im -= (s).c3.re
+}
+
+
+__device__
+static void deo_cuda_atomics(int *piup, int *pidn, su3 *u, spinor *pl,
+                             float ceo, float one_over_gammaf, spin_t rs)
+{
+    spinor *sp, *sm;
+    su3_vector psi, chi;
+
+    _vector_mul_assign(rs.s.c1, ceo);
+    _vector_mul_assign(rs.s.c2, ceo);
+    _vector_mul_assign(rs.s.c3, ceo);
+    _vector_mul_assign(rs.s.c4, ceo);
+
+    /***************************** direction +0 *******************************/
+
+    sp = pl + (*(piup++));
+
+    _vector_sub(psi, rs.s.c1, rs.s.c3);
+    _su3_inverse_multiply(chi, *u, psi);
+    vector_add_assign(&((*sp).c1), chi);
+    vector_sub_assign(&((*sp).c3), chi);
+
+    _vector_sub(psi, rs.s.c2, rs.s.c4);
+    _su3_inverse_multiply(chi, *u, psi);
+    vector_add_assign(&((*sp).c2), chi);
+    vector_sub_assign(&((*sp).c4), chi);
+
+    /***************************** direction -0 *******************************/
+
+    sm = pl + (*(pidn++));
+    u += 1;
+
+    _vector_add(psi, rs.s.c1, rs.s.c3);
+    _su3_multiply(chi, *u, psi);
+    vector_add_assign(&((*sm).c1), chi);
+    vector_add_assign(&((*sm).c3), chi);
+
+    _vector_add(psi, rs.s.c2, rs.s.c4);
+    _su3_multiply(chi, *u, psi);
+    vector_add_assign(&((*sm).c2), chi);
+    vector_add_assign(&((*sm).c4), chi);
+
+    /***************************** direction +1 *******************************/
+
+    _vector_mul_assign(rs.s.c1, one_over_gammaf);
+    _vector_mul_assign(rs.s.c2, one_over_gammaf);
+    _vector_mul_assign(rs.s.c3, one_over_gammaf);
+    _vector_mul_assign(rs.s.c4, one_over_gammaf);
+
+    sp = pl + (*(piup++));
+    u += 1;
+
+    _vector_i_sub(psi, rs.s.c1, rs.s.c4);
+    _su3_inverse_multiply(chi, *u, psi);
+    vector_add_assign(&((*sp).c1), chi);
+    vector_i_add_assign(&((*sp).c4), chi);
+
+    _vector_i_sub(psi, rs.s.c2, rs.s.c3);
+    _su3_inverse_multiply(chi, *u, psi);
+    vector_add_assign(&((*sp).c2), chi);
+    vector_i_add_assign(&((*sp).c3), chi);
+
+    /***************************** direction -1 *******************************/
+
+    sm = pl + (*(pidn++));
+    u += 1;
+
+    _vector_i_add(psi, rs.s.c1, rs.s.c4);
+    _su3_multiply(chi, *u, psi);
+    vector_add_assign(&((*sm).c1), chi);
+    vector_i_sub_assign(&((*sm).c4), chi);
+
+    _vector_i_add(psi, rs.s.c2, rs.s.c3);
+    _su3_multiply(chi, *u, psi);
+    vector_add_assign(&((*sm).c2), chi);
+    vector_i_sub_assign(&((*sm).c3), chi);
+
+    /***************************** direction +2 *******************************/
+
+    sp = pl + (*(piup++));
+    u += 1;
+
+    _vector_sub(psi, rs.s.c1, rs.s.c4);
+    _su3_inverse_multiply(chi, *u, psi);
+    vector_add_assign(&((*sp).c1), chi);
+    vector_sub_assign(&((*sp).c4), chi);
+
+    _vector_add(psi, rs.s.c2, rs.s.c3);
+    _su3_inverse_multiply(chi, *u, psi);
+    vector_add_assign(&((*sp).c2), chi);
+    vector_add_assign(&((*sp).c3), chi);
+
+    /***************************** direction -2 *******************************/
+
+    sm = pl + (*(pidn++));
+    u += 1;
+
+    _vector_add(psi, rs.s.c1, rs.s.c4);
+    _su3_multiply(chi, *u, psi);
+    vector_add_assign(&((*sm).c1), chi);
+    vector_add_assign(&((*sm).c4), chi);
+
+    _vector_sub(psi, rs.s.c2, rs.s.c3);
+    _su3_multiply(chi, *u, psi);
+    vector_add_assign(&((*sm).c2), chi);
+    vector_sub_assign(&((*sm).c3), chi);
+
+    /***************************** direction +3 *******************************/
+
+    sp = pl + (*(piup));
+    u += 1;
+
+    _vector_i_sub(psi, rs.s.c1, rs.s.c3);
+    _su3_inverse_multiply(chi, *u, psi);
+    vector_add_assign(&((*sp).c1), chi);
+    vector_i_add_assign(&((*sp).c3), chi);
+
+    _vector_i_add(psi, rs.s.c2, rs.s.c4);
+    _su3_inverse_multiply(chi, *u, psi);
+    vector_add_assign(&((*sp).c2), chi);
+    vector_i_sub_assign(&((*sp).c4), chi);
+
+    /***************************** direction -3 *******************************/
+
+    sm = pl + (*(pidn));
+    u += 1;
+
+    _vector_i_add(psi, rs.s.c1, rs.s.c3);
+    _su3_multiply(chi, *u, psi);
+    vector_add_assign(&((*sm).c1), chi);
+    vector_i_sub_assign(&((*sm).c3), chi);
+
+    _vector_i_sub(psi, rs.s.c2, rs.s.c4);
+    _su3_multiply(chi, *u, psi);
+    vector_add_assign(&((*sm).c2), chi);
+    vector_i_add_assign(&((*sm).c4), chi);
+}
+
+
+__device__
 void mul_pauli_cuda(float mu, pauli const *m, weyl const *s, weyl *r, weyl rt)
 {
     float const *u;
@@ -442,35 +649,58 @@ void Dw_cuda_kernel(int VOLUME, float mu, spinor *s, spinor *r,
     // deo_cuda(piup, pidn, u, r, ceo, one_over_gammaf, rs); // This needs rework (Cannot be parallelized this way)
 }
 
-// This kernel runs in 1 thread in the gpu, with a for loop to simulate
-// the original code and produce the correct results.
-// Of course it is garbage in terms of performance.
+// // This kernel runs in 1 thread in the gpu, with a for loop to simulate
+// // the original code and produce the correct results.
+// // Of course it is garbage in terms of performance.
+// extern "C" __global__
+// void Dw_cuda_kernel2(int VOLUME, float mu, spinor *s, spinor *r,
+//                      int *piup, int *pidn, su3 *u, pauli *m,
+//                      float coe, float ceo, float gamma_f, float one_over_gammaf)
+// {
+//     int idx = blockIdx.x*blockDim.x + threadIdx.x;
+//     if (idx >= 1) return;  // Only for tests and to produce the correct results
+//
+//     su3 *um;
+//     um = u + 4 * VOLUME;
+//
+//     spin_t rs;
+//
+//     spin_t *so, *ro;
+//     so = (spin_t *)(s + (VOLUME / 2));
+//
+//     for (; u < um; u += 8) {
+//         rs = (*so);
+//         deo_cuda(piup, pidn, u, r, ceo, one_over_gammaf, rs);
+//
+//         piup += 4;
+//         pidn += 4;
+//         so += 1;
+//     }
+// }
+
+
 extern "C" __global__
-void Dw_cuda_kernel2(int VOLUME, float mu, spinor *s, spinor *r,
-                     int *piup, int *pidn, su3 *u, pauli *m,
-                     float coe, float ceo, float gamma_f, float one_over_gammaf)
+void Dw_cuda_kernel_deo(int VOLUME, float mu, spinor *s, spinor *r,
+                        int *piup, int *pidn, su3 *u, pauli *m,
+                        float coe, float ceo, float gamma_f, float one_over_gammaf)
 {
     int idx = blockIdx.x*blockDim.x + threadIdx.x;
-    if (idx >= 1) return;  // Only for tests and to produce the correct results
-
-    su3 *um;
-    um = u + 4 * VOLUME;
+    if (idx >= VOLUME/2) return;
 
     spin_t rs;
 
-    spin_t *so, *ro;
+    spin_t *so;
     so = (spin_t *)(s + (VOLUME / 2));
 
-    for (; u < um; u += 8) {
-        rs = (*so);
-        deo_cuda(piup, pidn, u, r, ceo, one_over_gammaf, rs);
+    u    += idx*8;
+    piup += idx*4;
+    pidn += idx*4;
+    so   += idx*1;
 
-        piup += 4;
-        pidn += 4;
-        so += 1;
-    }
+    rs = (*so);
+
+    deo_cuda_atomics(piup, pidn, u, r, ceo, one_over_gammaf, rs);
 }
-
 
 extern "C"
 void Dw_cuda(spinor *r_cpu, char *SIZE)
@@ -598,9 +828,12 @@ void Dw_cuda(spinor *r_cpu, char *SIZE)
                                               d_piup, d_pidn, d_u, d_m,
                                               coe, ceo, gamma_f, one_over_gammaf);
 
-    Dw_cuda_kernel2<<<grid_size, block_size>>>(VOLUME, mu, d_s, d_r,
-                                               d_piup, d_pidn, d_u, d_m,
-                                               coe, ceo, gamma_f, one_over_gammaf);
+    // Dw_cuda_kernel2<<<grid_size, block_size>>>(VOLUME, mu, d_s, d_r,
+    //                                            d_piup, d_pidn, d_u, d_m,
+    //                                            coe, ceo, gamma_f, one_over_gammaf);
+    Dw_cuda_kernel_deo<<<grid_size, block_size>>>(VOLUME, mu, d_s, d_r,
+                                                  d_piup, d_pidn, d_u, d_m,
+                                                  coe, ceo, gamma_f, one_over_gammaf);
 
     // Copy result back to the host
     cudaMemcpy(r, d_r, VOLUME * sizeof(spinor), cudaMemcpyDeviceToHost);
