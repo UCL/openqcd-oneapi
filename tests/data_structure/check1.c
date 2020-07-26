@@ -22,6 +22,7 @@
 #include "uflds.h"
 #include "sflds.h"
 #include "dirac.h"
+#include "sw_term.h"
 
 static double kappa[1] = {0.1};
 
@@ -52,6 +53,8 @@ int main(int argc, char *argv[])
   spinor_dble ** psd;
   spinor_dble * d_sp_aux;
 
+  pauli_dble * md;
+
   /* single precision pointers */
 
   su3 * u;
@@ -59,7 +62,8 @@ int main(int argc, char *argv[])
   spinor ** ps;
   spinor * s_sp_aux;
 
-
+  pauli * m;
+  
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
@@ -249,6 +253,35 @@ int main(int argc, char *argv[])
 
    release_ws();
    release_wsd();
+
+
+   /* Exporting the Pauli term to binary data file */
+
+   md = swdfld();
+
+   sprintf(scnfg, "%s/dp-m-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
+   if(my_rank == 0)
+   {
+	   fout1 = fopen(scnfg, "wb");
+	   for(ix = 0; ix < 2 * VOLUME; ix++, md++)
+	   {
+	      fwrite((double*) md, sizeof(double), 36, fout1);
+	   }
+	   fclose(fout1);
+   }
+
+   m = swfld();
+   sprintf(scnfg, "%s/sp-m-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
+   if(my_rank == 0)
+   {
+	   fout1 = fopen(scnfg, "wb");
+	   for(ix = 0; ix < 2 * VOLUME; ix++, m++)
+	   {
+	      fwrite((float*) m, sizeof(float), 36, fout1);
+	   }
+	   fclose(fout1);
+   }
+
 
   if (my_rank == 0) {
     fclose(flog);
