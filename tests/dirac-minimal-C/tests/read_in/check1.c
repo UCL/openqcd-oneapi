@@ -27,6 +27,7 @@ int main(int argc, char** argv)
   char cnfg_dir[128];
 
   FILE * flog;
+  FILE * fout;
 
   int devcount;
   float dev;
@@ -104,6 +105,21 @@ int main(int argc, char** argv)
    }
 
    printf("devcount = %d out of %d\n", devcount, 24 * VOLUME);
+
+  /* Check diagonal part only */
+
+  Dw_diag(0.0f, s, rtest, u, m, piup, pidn, VOLUME);
+
+  sprintf(cnfg, "%s/sp-rdiag-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
+
+  fout = fopen(cnfg, "wb");
+
+  for(ix = 0; ix < VOLUME; ix++, rtest++)
+  {
+    fwrite((float*) rtest, sizeof(float), 24, fout);
+  }
+
+  fclose(fout);
 
   /* Clean up */
 

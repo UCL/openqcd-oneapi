@@ -372,3 +372,24 @@ void Dw(float mu, spinor *s, spinor *r, su3* u, pauli *m, int * piup, int * pidn
 
    }
 }
+
+void Dw_diag(float mu, spinor *s, spinor *r, pauli *m, int vol)
+{
+
+   pauli *mm;
+   spin_t *so,*ro;
+
+   apply_sw(vol / 2, mu, m, s, r);
+
+   so=(spin_t*)(s+(vol / 2));
+   ro=(spin_t*)(r+(vol / 2));
+
+   m += vol;
+   mm = m + vol;
+
+   for (; m < mm; m += 2, so+=1, ro+=1)
+   {
+      mul_pauli2(mu, m, &((*so).s), &((*ro).s));
+   }
+
+}
