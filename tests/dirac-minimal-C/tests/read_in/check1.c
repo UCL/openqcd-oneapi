@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 
   /* Check diagonal part only */
 
-  Dw_diag(0.0f, s, rtest, u, m, piup, pidn, VOLUME);
+  Dw_diag(0.0f, s, rtest, m, VOLUME);
 
   sprintf(cnfg, "%s/sp-rdiag-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
 
