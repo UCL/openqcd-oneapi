@@ -40,11 +40,6 @@ typedef union
 
 typedef struct
 {
-    su3_vector c1, c2;
-} halfspinor;
-
-typedef struct
-{
     float *re;
     float *im;
 } complex_soa;

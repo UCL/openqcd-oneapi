@@ -203,7 +203,7 @@ static void mul_pauli(int idx, int sidx, int halfvol, float mu,
                       float const *m1, float const *m2)
 {
     float u[36];
-    halfspinor sloc;
+    weyl sloc;
 
     sloc.c1.c1.re = (*s).c1.c1.re[sidx];
     sloc.c1.c1.im = (*s).c1.c1.im[sidx];
@@ -218,6 +218,7 @@ static void mul_pauli(int idx, int sidx, int halfvol, float mu,
     sloc.c2.c3.re = (*s).c2.c3.re[sidx];
     sloc.c2.c3.im = (*s).c2.c3.im[sidx];
 
+    #pragma unroll
     for (int i = 0; i < halfvol; ++i) {
         u[i] = m1[i*halfvol + idx]
     }
@@ -308,9 +309,12 @@ static void mul_pauli(int idx, int sidx, int halfvol, float mu,
       sloc.c2.c3.re = (*s).c4.c3.re[sidx];
       sloc.c2.c3.im = (*s).c4.c3.im[sidx];
 
+      #pragma unroll
       for (int i = 0; i < halfvol; ++i) {
           u[i] = m2[i*halfvol + idx]
       }
+
+      mu = -mu;
 
       (*r).c3.c1.re[sidx] =
         u[0]  * sloc.c1.c1.re - mu    * sloc.c1.c1.im + u[6]  * sloc.c1.c2.re -
