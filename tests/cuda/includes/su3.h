@@ -37,4 +37,31 @@ typedef union
   weyl w[2];
 } spin_t;
 
+
+
+
+
+typedef struct
+{
+    float *re;
+    float *im;
+} complex_soa;
+
+typedef struct
+{
+    complex_soa c1, c2, c3;
+} su3_vector_soa;
+
+typedef struct
+{
+    su3_vector_soa c1, c2, c3, c4;
+} spinor_soa;
+
+typedef struct
+{
+    float *r1;
+    float *r2;
+} pauli_soa;
+
+
 #endif
