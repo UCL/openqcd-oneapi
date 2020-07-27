@@ -9,7 +9,7 @@ CUDALFLAGS=-lcuda -lcudart -lm -lstdc++
 INCLUDES=-Iincludes
 
 OBJECTS=main.o
-CUDAOBJECTS=dw_cuda.o dw_cuda_soa.o
+CUDAOBJECTS=dw_cuda.o
 
 all: main
 

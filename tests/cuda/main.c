@@ -1,5 +1,4 @@
 #include "dw_cuda.h"
-#include "dw_cuda_soa.h"
 #include "su3.h"
 #include "macros.h"
 #include <stdio.h>
@@ -532,10 +531,6 @@ int main(int argc, char *argv[])
     // Call Dw_cuda()
     printf("\n---------------------CUDA---------------------\n");
     Dw_cuda(r, argv[1]);
-
-    // Call Dw_cuda_SoA()
-    printf("\n------------CUDA (SoA) Unfinished-------------\n");
-    Dw_cuda_SoA(r, argv[1]);
 
     return 0;
 }
