@@ -38,8 +38,10 @@ typedef union
 } spin_t;
 
 
-
-
+typedef struct
+{
+    su3_vector c1, c2;
+} halfspinor;
 
 typedef struct
 {
@@ -59,9 +61,10 @@ typedef struct
 
 typedef struct
 {
+    float *l1;
+    float *l2;
     float *r1;
     float *r2;
 } pauli_soa;
-
 
 #endif
