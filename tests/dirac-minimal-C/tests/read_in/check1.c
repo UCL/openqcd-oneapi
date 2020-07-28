@@ -123,7 +123,7 @@ int main(int argc, char** argv)
 
   /* diagonal term and doe */
 
-  Dw_upto_doe(0.0f, s, rtest, m, VOLUME);
+  Dw_upto_doe(0.0f, s, rtest, u, m, piup, pidn, VOLUME);
 
   sprintf(cnfg, "%s/sp-rdoe-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
 
