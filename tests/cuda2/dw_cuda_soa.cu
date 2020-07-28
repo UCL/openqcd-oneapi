@@ -84,6 +84,54 @@ void copySpinorHost2Device(spinor_soa d_s, spinor_soa *s, int vol)
     cudaMemcpy(d_s.c4.c3.im, (*s).c4.c3.im, vol * sizeof(float), cudaMemcpyHostToDevice);
 }
 
+su3_soa allocSu32Device(int vol)
+{
+    su3_soa d_u;
+
+    cudaMalloc((void **)&(d_u.c11.re), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c11.im), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c12.re), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c12.im), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c13.re), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c13.im), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c21.re), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c21.im), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c22.re), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c22.im), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c23.re), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c23.im), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c31.re), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c31.im), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c32.re), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c32.im), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c33.re), 4 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_u.c33.im), 4 * vol * sizeof(float));
+
+    return d_u;
+}
+
+void copySu3Host2Device(su3_soa d_u, su3_soa *u, int vol)
+{
+    cudaMemcpy(d_u.c11.re, (*u).c11.re, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c11.im, (*u).c11.im, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c12.re, (*u).c12.re, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c12.im, (*u).c12.im, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c13.re, (*u).c13.re, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c13.im, (*u).c13.im, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c21.re, (*u).c21.re, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c21.im, (*u).c21.im, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c22.re, (*u).c22.re, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c22.im, (*u).c22.im, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c23.re, (*u).c23.re, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c23.im, (*u).c23.im, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c31.re, (*u).c31.re, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c31.im, (*u).c31.im, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c32.re, (*u).c32.re, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c32.im, (*u).c32.im, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c33.re, (*u).c33.re, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_u.c33.im, (*u).c33.im, 4 * vol * sizeof(float), cudaMemcpyHostToDevice);
+}
+
 pauli_soa* create_pauli_soa(int vol)
 {
     pauli_soa* obj = (pauli_soa*) malloc(sizeof(pauli_soa));
@@ -164,7 +212,57 @@ void destroy_spinor_soa(spinor_soa* obj)
     free(obj);
 }
 
-void copy_pauli_aos2soa(pauli* m, pauli_soa* m_soa, int vol)
+su3_soa* create_su3_soa(int vol)
+{
+    su3_soa* obj = (su3_soa*) malloc(sizeof(su3_soa));
+
+    (*obj).c11.re = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c11.im = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c12.re = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c12.im = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c13.re = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c13.im = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c21.re = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c21.im = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c22.re = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c22.im = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c23.re = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c23.im = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c31.re = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c31.im = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c32.re = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c32.im = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c33.re = (float*) malloc(4 * vol * sizeof(float));
+    (*obj).c33.im = (float*) malloc(4 * vol * sizeof(float));
+
+    return obj;
+}
+
+void destroy_su3_soa(su3_soa* obj)
+{
+    free((*obj).c11.re);
+    free((*obj).c11.im);
+    free((*obj).c12.re);
+    free((*obj).c12.im);
+    free((*obj).c13.re);
+    free((*obj).c13.im);
+    free((*obj).c21.re);
+    free((*obj).c21.im);
+    free((*obj).c22.re);
+    free((*obj).c22.im);
+    free((*obj).c23.re);
+    free((*obj).c23.im);
+    free((*obj).c31.re);
+    free((*obj).c31.im);
+    free((*obj).c32.re);
+    free((*obj).c32.im);
+    free((*obj).c33.re);
+    free((*obj).c33.im);
+
+    free(obj);
+}
+
+void copy_pauli_aos2soa(pauli_soa* m_soa, pauli* m, int vol)
 {
     int i, j, idx;
 
@@ -185,28 +283,28 @@ void copy_pauli_aos2soa(pauli* m, pauli_soa* m_soa, int vol)
     }
 }
 
-void copy_pauli_soa2aos(pauli_soa* m_soa, pauli* m, int vol)
-{
-    int i, j, idx;
+// void copy_pauli_soa2aos(pauli* m, pauli_soa* m_soa, int vol)
+// {
+//     int i, j, idx;
+//
+//     idx = 0;
+//     for (i = 0; i < 2*vol; i += 2) {
+//         for (j = 0; j < 36; ++j) {
+//             (*(m+i)).u[j] = (*m_soa).m1[j*vol + idx];
+//         }
+//         idx++;
+//     }
+//
+//     idx = 0;
+//     for (i = 1; i < 2*vol; i += 2) {
+//         for (j = 0; j < 36; ++j) {
+//             (*(m+i)).u[j] = (*m_soa).m2[j*vol + idx];
+//         }
+//         idx++;
+//     }
+// }
 
-    idx = 0;
-    for (i = 0; i < 2*vol; i += 2) {
-        for (j = 0; j < 36; ++j) {
-            (*(m+i)).u[j] = (*m_soa).m1[j*vol + idx];
-        }
-        idx++;
-    }
-
-    idx = 0;
-    for (i = 1; i < 2*vol; i += 2) {
-        for (j = 0; j < 36; ++j) {
-            (*(m+i)).u[j] = (*m_soa).m2[j*vol + idx];
-        }
-        idx++;
-    }
-}
-
-void copy_spinor_aos2soa(spinor* s, spinor_soa* s_soa, int vol)
+void copy_spinor_aos2soa(spinor_soa* s_soa, spinor* s, int vol)
 {
     for (int i = 0; i < vol; ++i) {
         (*s_soa).c1.c1.re[i] = (*(s+i)).c1.c1.re;
@@ -236,7 +334,7 @@ void copy_spinor_aos2soa(spinor* s, spinor_soa* s_soa, int vol)
     }
 }
 
-void copy_spinor_soa2aos(spinor_soa* s_soa, spinor* s, int vol)
+void copy_spinor_soa2aos(spinor* s, spinor_soa* s_soa, int vol)
 {
     for (int i = 0; i < vol; ++i) {
         (*(s+i)).c1.c1.re = (*s_soa).c1.c1.re[i];
@@ -266,6 +364,29 @@ void copy_spinor_soa2aos(spinor_soa* s_soa, spinor* s, int vol)
     }
 }
 
+void copy_su3_aos2soa(su3_soa* u_soa, su3* u, int vol)
+{
+    for (int i = 0; i < 4*vol; ++i) {
+        (*u_soa).c11.re[i] = (*(u+i)).c11.re;
+        (*u_soa).c11.im[i] = (*(u+i)).c11.im;
+        (*u_soa).c12.re[i] = (*(u+i)).c12.re;
+        (*u_soa).c12.im[i] = (*(u+i)).c12.im;
+        (*u_soa).c13.re[i] = (*(u+i)).c13.re;
+        (*u_soa).c13.im[i] = (*(u+i)).c13.im;
+        (*u_soa).c21.re[i] = (*(u+i)).c21.re;
+        (*u_soa).c21.im[i] = (*(u+i)).c21.im;
+        (*u_soa).c22.re[i] = (*(u+i)).c22.re;
+        (*u_soa).c22.im[i] = (*(u+i)).c22.im;
+        (*u_soa).c23.re[i] = (*(u+i)).c23.re;
+        (*u_soa).c23.im[i] = (*(u+i)).c23.im;
+        (*u_soa).c31.re[i] = (*(u+i)).c31.re;
+        (*u_soa).c31.im[i] = (*(u+i)).c31.im;
+        (*u_soa).c32.re[i] = (*(u+i)).c32.re;
+        (*u_soa).c32.im[i] = (*(u+i)).c32.im;
+        (*u_soa).c33.re[i] = (*(u+i)).c33.re;
+        (*u_soa).c33.im[i] = (*(u+i)).c33.im;
+    }
+}
 
 extern "C" __global__
 void mulpauli_kernel(int vol, float mu, spinor_soa s, spinor_soa r, pauli_soa m)
@@ -479,20 +600,23 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
     pauli_soa *m_soa = create_pauli_soa(VOLUME);
     spinor_soa *s_soa = create_spinor_soa(VOLUME);
     spinor_soa *r_soa = create_spinor_soa(VOLUME);
+    su3_soa *u_soa = create_su3_soa(VOLUME);
 
     // Copy data from AoS to SoA
-    copy_pauli_aos2soa(m, m_soa, VOLUME);
-    copy_spinor_aos2soa(s, s_soa, VOLUME);
-    // copy_spinor_aos2soa(r, r_soa, VOLUME);
+    copy_pauli_aos2soa(m_soa, m, VOLUME);
+    copy_spinor_aos2soa(s_soa, s, VOLUME);
+    copy_su3_aos2soa(u_soa, u, VOLUME);
 
     // Allocate memory on device
     pauli_soa d_m_soa = allocPauli2Device(VOLUME);
     spinor_soa d_s_soa = allocSpinor2Device(VOLUME);
     spinor_soa d_r_soa = allocSpinor2Device(VOLUME);
+    su3_soa d_u_soa = allocSu32Device(VOLUME);
 
     // Copy from host to device
     copyPauliHost2Device(d_m_soa, m_soa, VOLUME);
     copySpinorHost2Device(d_s_soa, s_soa, VOLUME);
+    copySu3Host2Device(d_u_soa, u_soa, VOLUME);
 
     int block_size, grid_size;
     // Launch kernel on GPU
@@ -533,12 +657,11 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
 
 
     // Convert from SoA to AoS
-    copy_spinor_soa2aos(r_soa, r, VOLUME);
+    copy_spinor_soa2aos(r, r_soa, VOLUME);
 
     // Free SoA
     destroy_pauli_soa(m_soa);
     destroy_spinor_soa(s_soa);
     destroy_spinor_soa(r_soa);
-
-
+    destroy_su3_soa(u_soa);
 }
