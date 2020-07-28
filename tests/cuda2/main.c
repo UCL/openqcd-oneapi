@@ -8,6 +8,27 @@
 #include <math.h>
 
 
+long my_memcmp(const void *Ptr1, const void *Ptr2, size_t Count)
+{
+    float *p1 = (float *)Ptr1;
+    float *p2 = (float *)Ptr2;
+
+    while (Count > 0)
+    {
+        int res = memcmp(p1, p2, sizeof(float));
+        if (res != 0) {
+            if (fabs(*p1 - *p2) > 0.001) {
+                return 1;
+            }
+        }
+        p1++;
+        p2++;
+        Count--;
+    }
+
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     int L0, L1, L2, L3;
@@ -63,28 +84,23 @@ int main(int argc, char *argv[])
     sprintf(cnfg, "%s/sp-rdiag-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
     read_sp_spinor_from_file(cnfg, rdiag, VOLUME);
 
+
     Dw_cuda_SoA(VOLUME, u, s, r, m, piup, pidn);
 
-    // Compare
-    float dev;
-    int devcount;
-    float *fpr, *fprdiag;
-    fpr = (float*) r;
-    fprdiag = (float*) rdiag;
-
-    devcount = 0;
-    for(int ix = 0; ix < 24 * VOLUME; ix++, fpr++, fprdiag++)
-    {
-      dev = fabs((*fpr) - (*fprdiag));
-      if(dev > 1.0e-6)
-      {
-          devcount++;
-          printf("dev = %.8e\n", dev);
-      }
-
+    int ret;
+    int count = 0;
+    for (int i = 0; i < VOLUME; ++i) {
+        ret = my_memcmp(r+i, rdiag+i, sizeof(spinor)/sizeof(float));
+        if (ret == 0) {
+            count++;
+        }
+        else {
+            printf("Values in spinor r are incorrect at: %d\n", i);
+        }
     }
-
-    printf("devcount = %d out of %d\n", devcount, 24 * VOLUME);
+    if (count == VOLUME) {
+        printf("Values in spinor r are correct\n");
+    }
 
     return 0;
 }

@@ -6,6 +6,87 @@
 #include <string.h>
 #include <math.h>
 
+pauli_soa allocPauli2Device(int vol)
+{
+    pauli_soa d_m;
+
+    // Allocate memory on device
+    cudaMalloc((void **)&(d_m.l1), 36 * (vol/2) * sizeof(float));
+    cudaMalloc((void **)&(d_m.l2), 36 * (vol/2) * sizeof(float));
+    cudaMalloc((void **)&(d_m.r1), 36 * (vol/2) * sizeof(float));
+    cudaMalloc((void **)&(d_m.r2), 36 * (vol/2) * sizeof(float));
+
+    return d_m;
+}
+
+void copyPauliHost2Device(pauli_soa d_m, pauli_soa *m, int vol)
+{
+    // Copy data from host to device
+    cudaMemcpy(d_m.l1, (*m).l1, 36 * (vol/2) * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_m.l2, (*m).l2, 36 * (vol/2) * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_m.r1, (*m).r1, 36 * (vol/2) * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_m.r2, (*m).r2, 36 * (vol/2) * sizeof(float), cudaMemcpyHostToDevice);
+}
+
+spinor_soa allocSpinor2Device(int vol)
+{
+    spinor_soa d_s;
+
+    cudaMalloc((void **)&(d_s.c1.c1.re), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c1.c1.im), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c1.c2.re), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c1.c2.im), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c1.c3.re), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c1.c3.im), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c2.c1.re), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c2.c1.im), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c2.c2.re), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c2.c2.im), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c2.c3.re), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c2.c3.im), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c3.c1.re), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c3.c1.im), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c3.c2.re), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c3.c2.im), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c3.c3.re), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c3.c3.im), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c4.c1.re), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c4.c1.im), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c4.c2.re), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c4.c2.im), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c4.c3.re), vol * sizeof(float));
+    cudaMalloc((void **)&(d_s.c4.c3.im), vol * sizeof(float));
+
+    return d_s;
+}
+
+void copySpinorHost2Device(spinor_soa d_s, spinor_soa *s, int vol)
+{
+    cudaMemcpy(d_s.c1.c1.re, (*s).c1.c1.re, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c1.c1.im, (*s).c1.c1.im, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c1.c2.re, (*s).c1.c2.re, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c1.c2.im, (*s).c1.c2.im, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c1.c3.re, (*s).c1.c3.re, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c1.c3.im, (*s).c1.c3.im, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c2.c1.re, (*s).c2.c1.re, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c2.c1.im, (*s).c2.c1.im, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c2.c2.re, (*s).c2.c2.re, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c2.c2.im, (*s).c2.c2.im, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c2.c3.re, (*s).c2.c3.re, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c2.c3.im, (*s).c2.c3.im, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c3.c1.re, (*s).c3.c1.re, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c3.c1.im, (*s).c3.c1.im, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c3.c2.re, (*s).c3.c2.re, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c3.c2.im, (*s).c3.c2.im, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c3.c3.re, (*s).c3.c3.re, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c3.c3.im, (*s).c3.c3.im, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c4.c1.re, (*s).c4.c1.re, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c4.c1.im, (*s).c4.c1.im, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c4.c2.re, (*s).c4.c2.re, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c4.c2.im, (*s).c4.c2.im, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c4.c3.re, (*s).c4.c3.re, vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_s.c4.c3.im, (*s).c4.c3.im, vol * sizeof(float), cudaMemcpyHostToDevice);
+}
 
 pauli_soa* create_pauli_soa(int vol)
 {
@@ -199,190 +280,192 @@ void copy_spinor_soa2aos(spinor_soa* s_soa, spinor* s, int vol)
 
 __device__
 static void mul_pauli(int idx, int sidx, int halfvol, float mu,
-                      spinor_soa const *s, spinor_soa *r,
+                      spinor_soa const s, spinor_soa r,
                       float const *m1, float const *m2)
 {
     float u[36];
     weyl sloc;
 
-    sloc.c1.c1.re = (*s).c1.c1.re[sidx];
-    sloc.c1.c1.im = (*s).c1.c1.im[sidx];
-    sloc.c1.c2.re = (*s).c1.c2.re[sidx];
-    sloc.c1.c2.im = (*s).c1.c2.im[sidx];
-    sloc.c1.c3.re = (*s).c1.c3.re[sidx];
-    sloc.c1.c3.im = (*s).c1.c3.im[sidx];
-    sloc.c2.c1.re = (*s).c2.c1.re[sidx];
-    sloc.c2.c1.im = (*s).c2.c1.im[sidx];
-    sloc.c2.c2.re = (*s).c2.c2.re[sidx];
-    sloc.c2.c2.im = (*s).c2.c2.im[sidx];
-    sloc.c2.c3.re = (*s).c2.c3.re[sidx];
-    sloc.c2.c3.im = (*s).c2.c3.im[sidx];
+    // A+
+    sloc.c1.c1.re = s.c1.c1.re[sidx];
+    sloc.c1.c1.im = s.c1.c1.im[sidx];
+    sloc.c1.c2.re = s.c1.c2.re[sidx];
+    sloc.c1.c2.im = s.c1.c2.im[sidx];
+    sloc.c1.c3.re = s.c1.c3.re[sidx];
+    sloc.c1.c3.im = s.c1.c3.im[sidx];
+    sloc.c2.c1.re = s.c2.c1.re[sidx];
+    sloc.c2.c1.im = s.c2.c1.im[sidx];
+    sloc.c2.c2.re = s.c2.c2.re[sidx];
+    sloc.c2.c2.im = s.c2.c2.im[sidx];
+    sloc.c2.c3.re = s.c2.c3.re[sidx];
+    sloc.c2.c3.im = s.c2.c3.im[sidx];
 
     #pragma unroll
-    for (int i = 0; i < halfvol; ++i) {
+    for (int i = 0; i < 36; ++i) {
         u[i] = m1[i*halfvol + idx];
     }
 
-    (*r).c1.c1.re[sidx] =
+    r.c1.c1.re[sidx] =
       u[0]  * sloc.c1.c1.re - mu    * sloc.c1.c1.im + u[6]  * sloc.c1.c2.re -
       u[7]  * sloc.c1.c2.im + u[8]  * sloc.c1.c3.re - u[9]  * sloc.c1.c3.im +
       u[10] * sloc.c2.c1.re - u[11] * sloc.c2.c1.im + u[12] * sloc.c2.c2.re -
       u[13] * sloc.c2.c2.im + u[14] * sloc.c2.c3.re - u[15] * sloc.c2.c3.im;
 
-    (*r).c1.c1.im[sidx] =
+    r.c1.c1.im[sidx] =
       u[0]  * sloc.c1.c1.im + mu    * sloc.c1.c1.re + u[6]  * sloc.c1.c2.im +
       u[7]  * sloc.c1.c2.re + u[8]  * sloc.c1.c3.im + u[9]  * sloc.c1.c3.re +
       u[10] * sloc.c2.c1.im + u[11] * sloc.c2.c1.re + u[12] * sloc.c2.c2.im +
       u[13] * sloc.c2.c2.re + u[14] * sloc.c2.c3.im + u[15] * sloc.c2.c3.re;
 
-    (*r).c1.c2.re[sidx] =
+    r.c1.c2.re[sidx] =
       u[6]  * sloc.c1.c1.re + u[7]  * sloc.c1.c1.im + u[1]  * sloc.c1.c2.re -
       mu    * sloc.c1.c2.im + u[16] * sloc.c1.c3.re - u[17] * sloc.c1.c3.im +
       u[18] * sloc.c2.c1.re - u[19] * sloc.c2.c1.im + u[20] * sloc.c2.c2.re -
       u[21] * sloc.c2.c2.im + u[22] * sloc.c2.c3.re - u[23] * sloc.c2.c3.im;
 
-    (*r).c1.c2.im[sidx] =
+    r.c1.c2.im[sidx] =
       u[6]  * sloc.c1.c1.im - u[7]  * sloc.c1.c1.re + u[1]  * sloc.c1.c2.im +
       mu    * sloc.c1.c2.re + u[16] * sloc.c1.c3.im + u[17] * sloc.c1.c3.re +
       u[18] * sloc.c2.c1.im + u[19] * sloc.c2.c1.re + u[20] * sloc.c2.c2.im +
       u[21] * sloc.c2.c2.re + u[22] * sloc.c2.c3.im + u[23] * sloc.c2.c3.re;
 
-    (*r).c1.c3.re[sidx] =
+    r.c1.c3.re[sidx] =
       u[8]  * sloc.c1.c1.re + u[9]  * sloc.c1.c1.im + u[16] * sloc.c1.c2.re +
       u[17] * sloc.c1.c2.im + u[2]  * sloc.c1.c3.re - mu    * sloc.c1.c3.im +
       u[24] * sloc.c2.c1.re - u[25] * sloc.c2.c1.im + u[26] * sloc.c2.c2.re -
       u[27] * sloc.c2.c2.im + u[28] * sloc.c2.c3.re - u[29] * sloc.c2.c3.im;
 
-    (*r).c1.c3.im[sidx] =
+    r.c1.c3.im[sidx] =
       u[8]  * sloc.c1.c1.im - u[9]  * sloc.c1.c1.re + u[16] * sloc.c1.c2.im -
       u[17] * sloc.c1.c2.re + u[2]  * sloc.c1.c3.im + mu    * sloc.c1.c3.re +
       u[24] * sloc.c2.c1.im + u[25] * sloc.c2.c1.re + u[26] * sloc.c2.c2.im +
       u[27] * sloc.c2.c2.re + u[28] * sloc.c2.c3.im + u[29] * sloc.c2.c3.re;
 
-    (*r).c2.c1.re[sidx] =
+    r.c2.c1.re[sidx] =
       u[10] * sloc.c1.c1.re + u[11] * sloc.c1.c1.im + u[18] * sloc.c1.c2.re +
       u[19] * sloc.c1.c2.im + u[24] * sloc.c1.c3.re + u[25] * sloc.c1.c3.im +
       u[3]  * sloc.c2.c1.re - mu * sloc.c2.c1.im    + u[30] * sloc.c2.c2.re -
       u[31] * sloc.c2.c2.im + u[32] * sloc.c2.c3.re - u[33] * sloc.c2.c3.im;
 
-    (*r).c2.c1.im[sidx] =
+    r.c2.c1.im[sidx] =
       u[10] * sloc.c1.c1.im - u[11] * sloc.c1.c1.re + u[18] * sloc.c1.c2.im -
       u[19] * sloc.c1.c2.re + u[24] * sloc.c1.c3.im - u[25] * sloc.c1.c3.re +
       u[3]  * sloc.c2.c1.im + mu    * sloc.c2.c1.re + u[30] * sloc.c2.c2.im +
       u[31] * sloc.c2.c2.re + u[32] * sloc.c2.c3.im + u[33] * sloc.c2.c3.re;
 
-    (*r).c2.c2.re[sidx] =
+    r.c2.c2.re[sidx] =
       u[12] * sloc.c1.c1.re + u[13] * sloc.c1.c1.im + u[20] * sloc.c1.c2.re +
       u[21] * sloc.c1.c2.im + u[26] * sloc.c1.c3.re + u[27] * sloc.c1.c3.im +
       u[30] * sloc.c2.c1.re + u[31] * sloc.c2.c1.im + u[4]  * sloc.c2.c2.re -
       mu    * sloc.c2.c2.im + u[34] * sloc.c2.c3.re - u[35] * sloc.c2.c3.im;
 
-    (*r).c2.c2.im[sidx] =
+    r.c2.c2.im[sidx] =
       u[12] * sloc.c1.c1.im - u[13] * sloc.c1.c1.re + u[20] * sloc.c1.c2.im -
       u[21] * sloc.c1.c2.re + u[26] * sloc.c1.c3.im - u[27] * sloc.c1.c3.re +
       u[30] * sloc.c2.c1.im - u[31] * sloc.c2.c1.re + u[4]  * sloc.c2.c2.im +
       mu    * sloc.c2.c2.re + u[34] * sloc.c2.c3.im + u[35] * sloc.c2.c3.re;
 
-    (*r).c2.c3.re[sidx] =
+    r.c2.c3.re[sidx] =
       u[14] * sloc.c1.c1.re + u[15] * sloc.c1.c1.im + u[22] * sloc.c1.c2.re +
       u[23] * sloc.c1.c2.im + u[28] * sloc.c1.c3.re + u[29] * sloc.c1.c3.im +
       u[32] * sloc.c2.c1.re + u[33] * sloc.c2.c1.im + u[34] * sloc.c2.c2.re +
       u[35] * sloc.c2.c2.im + u[5]  * sloc.c2.c3.re - mu    * sloc.c2.c3.im;
 
-    (*r).c2.c3.im[sidx] =
+    r.c2.c3.im[sidx] =
       u[14] * sloc.c1.c1.im - u[15] * sloc.c1.c1.re + u[22] * sloc.c1.c2.im -
       u[23] * sloc.c1.c2.re + u[28] * sloc.c1.c3.im - u[29] * sloc.c1.c3.re +
       u[32] * sloc.c2.c1.im - u[33] * sloc.c2.c1.re + u[34] * sloc.c2.c2.im -
       u[35] * sloc.c2.c2.re + u[5]  * sloc.c2.c3.im + mu    * sloc.c2.c3.re;
 
 
-      sloc.c1.c1.re = (*s).c3.c1.re[sidx];
-      sloc.c1.c1.im = (*s).c3.c1.im[sidx];
-      sloc.c1.c2.re = (*s).c3.c2.re[sidx];
-      sloc.c1.c2.im = (*s).c3.c2.im[sidx];
-      sloc.c1.c3.re = (*s).c3.c3.re[sidx];
-      sloc.c1.c3.im = (*s).c3.c3.im[sidx];
-      sloc.c2.c1.re = (*s).c4.c1.re[sidx];
-      sloc.c2.c1.im = (*s).c4.c1.im[sidx];
-      sloc.c2.c2.re = (*s).c4.c2.re[sidx];
-      sloc.c2.c2.im = (*s).c4.c2.im[sidx];
-      sloc.c2.c3.re = (*s).c4.c3.re[sidx];
-      sloc.c2.c3.im = (*s).c4.c3.im[sidx];
+      // A-
+      sloc.c1.c1.re = s.c3.c1.re[sidx];
+      sloc.c1.c1.im = s.c3.c1.im[sidx];
+      sloc.c1.c2.re = s.c3.c2.re[sidx];
+      sloc.c1.c2.im = s.c3.c2.im[sidx];
+      sloc.c1.c3.re = s.c3.c3.re[sidx];
+      sloc.c1.c3.im = s.c3.c3.im[sidx];
+      sloc.c2.c1.re = s.c4.c1.re[sidx];
+      sloc.c2.c1.im = s.c4.c1.im[sidx];
+      sloc.c2.c2.re = s.c4.c2.re[sidx];
+      sloc.c2.c2.im = s.c4.c2.im[sidx];
+      sloc.c2.c3.re = s.c4.c3.re[sidx];
+      sloc.c2.c3.im = s.c4.c3.im[sidx];
 
       #pragma unroll
-      for (int i = 0; i < halfvol; ++i) {
+      for (int i = 0; i < 36; ++i) {
           u[i] = m2[i*halfvol + idx];
       }
 
       mu = -mu;
 
-      (*r).c3.c1.re[sidx] =
+      r.c3.c1.re[sidx] =
         u[0]  * sloc.c1.c1.re - mu    * sloc.c1.c1.im + u[6]  * sloc.c1.c2.re -
         u[7]  * sloc.c1.c2.im + u[8]  * sloc.c1.c3.re - u[9]  * sloc.c1.c3.im +
         u[10] * sloc.c2.c1.re - u[11] * sloc.c2.c1.im + u[12] * sloc.c2.c2.re -
         u[13] * sloc.c2.c2.im + u[14] * sloc.c2.c3.re - u[15] * sloc.c2.c3.im;
 
-      (*r).c3.c1.im[sidx] =
+      r.c3.c1.im[sidx] =
         u[0]  * sloc.c1.c1.im + mu    * sloc.c1.c1.re + u[6]  * sloc.c1.c2.im +
         u[7]  * sloc.c1.c2.re + u[8]  * sloc.c1.c3.im + u[9]  * sloc.c1.c3.re +
         u[10] * sloc.c2.c1.im + u[11] * sloc.c2.c1.re + u[12] * sloc.c2.c2.im +
         u[13] * sloc.c2.c2.re + u[14] * sloc.c2.c3.im + u[15] * sloc.c2.c3.re;
 
-      (*r).c3.c2.re[sidx] =
+      r.c3.c2.re[sidx] =
         u[6]  * sloc.c1.c1.re + u[7]  * sloc.c1.c1.im + u[1]  * sloc.c1.c2.re -
         mu    * sloc.c1.c2.im + u[16] * sloc.c1.c3.re - u[17] * sloc.c1.c3.im +
         u[18] * sloc.c2.c1.re - u[19] * sloc.c2.c1.im + u[20] * sloc.c2.c2.re -
         u[21] * sloc.c2.c2.im + u[22] * sloc.c2.c3.re - u[23] * sloc.c2.c3.im;
 
-      (*r).c3.c2.im[sidx] =
+      r.c3.c2.im[sidx] =
         u[6]  * sloc.c1.c1.im - u[7]  * sloc.c1.c1.re + u[1]  * sloc.c1.c2.im +
         mu    * sloc.c1.c2.re + u[16] * sloc.c1.c3.im + u[17] * sloc.c1.c3.re +
         u[18] * sloc.c2.c1.im + u[19] * sloc.c2.c1.re + u[20] * sloc.c2.c2.im +
         u[21] * sloc.c2.c2.re + u[22] * sloc.c2.c3.im + u[23] * sloc.c2.c3.re;
 
-      (*r).c3.c3.re[sidx] =
+      r.c3.c3.re[sidx] =
         u[8]  * sloc.c1.c1.re + u[9]  * sloc.c1.c1.im + u[16] * sloc.c1.c2.re +
         u[17] * sloc.c1.c2.im + u[2]  * sloc.c1.c3.re - mu    * sloc.c1.c3.im +
         u[24] * sloc.c2.c1.re - u[25] * sloc.c2.c1.im + u[26] * sloc.c2.c2.re -
         u[27] * sloc.c2.c2.im + u[28] * sloc.c2.c3.re - u[29] * sloc.c2.c3.im;
 
-      (*r).c3.c3.im[sidx] =
+      r.c3.c3.im[sidx] =
         u[8]  * sloc.c1.c1.im - u[9]  * sloc.c1.c1.re + u[16] * sloc.c1.c2.im -
         u[17] * sloc.c1.c2.re + u[2]  * sloc.c1.c3.im + mu    * sloc.c1.c3.re +
         u[24] * sloc.c2.c1.im + u[25] * sloc.c2.c1.re + u[26] * sloc.c2.c2.im +
         u[27] * sloc.c2.c2.re + u[28] * sloc.c2.c3.im + u[29] * sloc.c2.c3.re;
 
-      (*r).c4.c1.re[sidx] =
+      r.c4.c1.re[sidx] =
         u[10] * sloc.c1.c1.re + u[11] * sloc.c1.c1.im + u[18] * sloc.c1.c2.re +
         u[19] * sloc.c1.c2.im + u[24] * sloc.c1.c3.re + u[25] * sloc.c1.c3.im +
         u[3]  * sloc.c2.c1.re - mu * sloc.c2.c1.im    + u[30] * sloc.c2.c2.re -
         u[31] * sloc.c2.c2.im + u[32] * sloc.c2.c3.re - u[33] * sloc.c2.c3.im;
 
-      (*r).c4.c1.im[sidx] =
+      r.c4.c1.im[sidx] =
         u[10] * sloc.c1.c1.im - u[11] * sloc.c1.c1.re + u[18] * sloc.c1.c2.im -
         u[19] * sloc.c1.c2.re + u[24] * sloc.c1.c3.im - u[25] * sloc.c1.c3.re +
         u[3]  * sloc.c2.c1.im + mu    * sloc.c2.c1.re + u[30] * sloc.c2.c2.im +
         u[31] * sloc.c2.c2.re + u[32] * sloc.c2.c3.im + u[33] * sloc.c2.c3.re;
 
-      (*r).c4.c2.re[sidx] =
+      r.c4.c2.re[sidx] =
         u[12] * sloc.c1.c1.re + u[13] * sloc.c1.c1.im + u[20] * sloc.c1.c2.re +
         u[21] * sloc.c1.c2.im + u[26] * sloc.c1.c3.re + u[27] * sloc.c1.c3.im +
         u[30] * sloc.c2.c1.re + u[31] * sloc.c2.c1.im + u[4]  * sloc.c2.c2.re -
         mu    * sloc.c2.c2.im + u[34] * sloc.c2.c3.re - u[35] * sloc.c2.c3.im;
 
-      (*r).c4.c2.im[sidx] =
+      r.c4.c2.im[sidx] =
         u[12] * sloc.c1.c1.im - u[13] * sloc.c1.c1.re + u[20] * sloc.c1.c2.im -
         u[21] * sloc.c1.c2.re + u[26] * sloc.c1.c3.im - u[27] * sloc.c1.c3.re +
         u[30] * sloc.c2.c1.im - u[31] * sloc.c2.c1.re + u[4]  * sloc.c2.c2.im +
         mu    * sloc.c2.c2.re + u[34] * sloc.c2.c3.im + u[35] * sloc.c2.c3.re;
 
-      (*r).c4.c3.re[sidx] =
+      r.c4.c3.re[sidx] =
         u[14] * sloc.c1.c1.re + u[15] * sloc.c1.c1.im + u[22] * sloc.c1.c2.re +
         u[23] * sloc.c1.c2.im + u[28] * sloc.c1.c3.re + u[29] * sloc.c1.c3.im +
         u[32] * sloc.c2.c1.re + u[33] * sloc.c2.c1.im + u[34] * sloc.c2.c2.re +
         u[35] * sloc.c2.c2.im + u[5]  * sloc.c2.c3.re - mu    * sloc.c2.c3.im;
 
-      (*r).c4.c3.im[sidx] =
+      r.c4.c3.im[sidx] =
         u[14] * sloc.c1.c1.im - u[15] * sloc.c1.c1.re + u[22] * sloc.c1.c2.im -
         u[23] * sloc.c1.c2.re + u[28] * sloc.c1.c3.im - u[29] * sloc.c1.c3.re +
         u[32] * sloc.c2.c1.im - u[33] * sloc.c2.c1.re + u[34] * sloc.c2.c2.im -
@@ -390,7 +473,7 @@ static void mul_pauli(int idx, int sidx, int halfvol, float mu,
 }
 
 extern "C" __global__
-void mulpauli_kernel(int VOLUME, float mu, spinor_soa *s, spinor_soa *r, pauli_soa *m)
+void mulpauli_kernel(int VOLUME, float mu, spinor_soa s, spinor_soa r, pauli_soa m)
 {
     int idx = blockIdx.x*blockDim.x + threadIdx.x;
     if (idx >= VOLUME/2) return;
@@ -399,10 +482,10 @@ void mulpauli_kernel(int VOLUME, float mu, spinor_soa *s, spinor_soa *r, pauli_s
     int halfvol = VOLUME/2;
 
     sidx = idx;
-    mul_pauli(idx, sidx, halfvol, mu, s, r, (*m).l1, (*m).l2);
+    mul_pauli(idx, sidx, halfvol, mu, s, r, m.l1, m.l2);
 
     sidx = halfvol + idx;
-    mul_pauli(idx, sidx, halfvol, mu, s, r, (*m).r1, (*m).r2);
+    mul_pauli(idx, sidx, halfvol, mu, s, r, m.r1, m.r2);
 }
 
 extern "C"
@@ -418,7 +501,6 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
     gamma_f = 1.0f;
     one_over_gammaf = 1.0f;
 
-
     // Create structure of arrays
     pauli_soa *m_soa = create_pauli_soa(VOLUME);
     spinor_soa *s_soa = create_spinor_soa(VOLUME);
@@ -429,103 +511,14 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
     copy_spinor_aos2soa(s, s_soa, VOLUME);
     // copy_spinor_aos2soa(r, r_soa, VOLUME);
 
-    // Allocate memory space on device
-    pauli_soa *d_m_soa;
-    spinor_soa *d_s_soa, *d_r_soa;
+    // Allocate memory on device
+    pauli_soa d_m_soa = allocPauli2Device(VOLUME);
+    spinor_soa d_s_soa = allocSpinor2Device(VOLUME);
+    spinor_soa d_r_soa = allocSpinor2Device(VOLUME);
 
-    printf("Before cudaMalloc\n");
-    cudaMalloc((void **)&d_m_soa, sizeof(*d_m_soa));
-    printf("Before cudaMalloc m interior\n");
-    cudaMalloc((void **)&((*d_m_soa).l1), 36 * (VOLUME/2) * sizeof(float));
-    cudaMalloc((void **)&((*d_m_soa).l2), 36 * (VOLUME/2) * sizeof(float));
-    cudaMalloc((void **)&((*d_m_soa).r1), 36 * (VOLUME/2) * sizeof(float));
-    cudaMalloc((void **)&((*d_m_soa).r2), 36 * (VOLUME/2) * sizeof(float));
-
-    printf("Before cudaMalloc for spinors\n");
-    cudaMalloc((void **)&d_s_soa, sizeof(*d_s_soa));
-    cudaMalloc((void **)&((*d_s_soa).c1.c1.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c1.c1.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c1.c2.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c1.c2.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c1.c3.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c1.c3.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c2.c1.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c2.c1.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c2.c2.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c2.c2.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c2.c3.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c2.c3.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c3.c1.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c3.c1.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c3.c2.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c3.c2.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c3.c3.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c3.c3.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c4.c1.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c4.c1.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c4.c2.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c4.c2.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c4.c3.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_s_soa).c4.c3.im), VOLUME * sizeof(float));
-
-    cudaMalloc((void **)&d_r_soa, sizeof(*d_r_soa));
-    cudaMalloc((void **)&((*d_r_soa).c1.c1.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c1.c1.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c1.c2.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c1.c2.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c1.c3.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c1.c3.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c2.c1.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c2.c1.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c2.c2.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c2.c2.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c2.c3.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c2.c3.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c3.c1.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c3.c1.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c3.c2.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c3.c2.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c3.c3.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c3.c3.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c4.c1.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c4.c1.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c4.c2.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c4.c2.im), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c4.c3.re), VOLUME * sizeof(float));
-    cudaMalloc((void **)&((*d_r_soa).c4.c3.im), VOLUME * sizeof(float));
-
-
-    printf("Before cudaMemcpyHostToDevice\n");
-    // Copy data from host to device
-    cudaMemcpy((*d_m_soa).l1, (*m_soa).l1, 36 * (VOLUME/2) * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_m_soa).l2, (*m_soa).l2, 36 * (VOLUME/2) * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_m_soa).r1, (*m_soa).r1, 36 * (VOLUME/2) * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_m_soa).r2, (*m_soa).r2, 36 * (VOLUME/2) * sizeof(float), cudaMemcpyHostToDevice);
-
-    cudaMemcpy((*d_s_soa).c1.c1.re, (*s_soa).c1.c1.re, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c1.c1.im, (*s_soa).c1.c1.im, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c1.c2.re, (*s_soa).c1.c2.re, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c1.c2.im, (*s_soa).c1.c2.im, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c1.c3.re, (*s_soa).c1.c3.re, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c1.c3.im, (*s_soa).c1.c3.im, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c2.c1.re, (*s_soa).c2.c1.re, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c2.c1.im, (*s_soa).c2.c1.im, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c2.c2.re, (*s_soa).c2.c2.re, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c2.c2.im, (*s_soa).c2.c2.im, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c2.c3.re, (*s_soa).c2.c3.re, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c2.c3.im, (*s_soa).c2.c3.im, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c3.c1.re, (*s_soa).c3.c1.re, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c3.c1.im, (*s_soa).c3.c1.im, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c3.c2.re, (*s_soa).c3.c2.re, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c3.c2.im, (*s_soa).c3.c2.im, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c3.c3.re, (*s_soa).c3.c3.re, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c3.c3.im, (*s_soa).c3.c3.im, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c4.c1.re, (*s_soa).c4.c1.re, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c4.c1.im, (*s_soa).c4.c1.im, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c4.c2.re, (*s_soa).c4.c2.re, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c4.c2.im, (*s_soa).c4.c2.im, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c4.c3.re, (*s_soa).c4.c3.re, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy((*d_s_soa).c4.c3.im, (*s_soa).c4.c3.im, VOLUME * sizeof(float), cudaMemcpyHostToDevice);
+    // Copy from host to device
+    copyPauliHost2Device(d_m_soa, m_soa, VOLUME);
+    copySpinorHost2Device(d_s_soa, s_soa, VOLUME);
 
 
     // Launch kernel on GPU
@@ -534,38 +527,37 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
     mulpauli_kernel<<<grid_size, block_size>>>(VOLUME, mu, d_s_soa, d_r_soa, d_m_soa);
 
 
-    printf("Before cudaMemcpyDeviceToHost\n");
     // Copy data from device to host
-    cudaMemcpy((*r_soa).c1.c1.re, (*d_r_soa).c1.c1.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c1.c1.im, (*d_r_soa).c1.c1.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c1.c2.re, (*d_r_soa).c1.c2.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c1.c2.im, (*d_r_soa).c1.c2.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c1.c3.re, (*d_r_soa).c1.c3.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c1.c3.im, (*d_r_soa).c1.c3.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c2.c1.re, (*d_r_soa).c2.c1.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c2.c1.im, (*d_r_soa).c2.c1.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c2.c2.re, (*d_r_soa).c2.c2.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c2.c2.im, (*d_r_soa).c2.c2.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c2.c3.re, (*d_r_soa).c2.c3.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c2.c3.im, (*d_r_soa).c2.c3.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c3.c1.re, (*d_r_soa).c3.c1.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c3.c1.im, (*d_r_soa).c3.c1.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c3.c2.re, (*d_r_soa).c3.c2.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c3.c2.im, (*d_r_soa).c3.c2.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c3.c3.re, (*d_r_soa).c3.c3.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c3.c3.im, (*d_r_soa).c3.c3.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c4.c1.re, (*d_r_soa).c4.c1.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c4.c1.im, (*d_r_soa).c4.c1.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c4.c2.re, (*d_r_soa).c4.c2.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c4.c2.im, (*d_r_soa).c4.c2.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c4.c3.re, (*d_r_soa).c4.c3.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
-    cudaMemcpy((*r_soa).c4.c3.im, (*d_r_soa).c4.c3.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c1.c1.re, d_r_soa.c1.c1.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c1.c1.im, d_r_soa.c1.c1.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c1.c2.re, d_r_soa.c1.c2.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c1.c2.im, d_r_soa.c1.c2.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c1.c3.re, d_r_soa.c1.c3.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c1.c3.im, d_r_soa.c1.c3.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c2.c1.re, d_r_soa.c2.c1.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c2.c1.im, d_r_soa.c2.c1.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c2.c2.re, d_r_soa.c2.c2.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c2.c2.im, d_r_soa.c2.c2.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c2.c3.re, d_r_soa.c2.c3.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c2.c3.im, d_r_soa.c2.c3.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c3.c1.re, d_r_soa.c3.c1.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c3.c1.im, d_r_soa.c3.c1.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c3.c2.re, d_r_soa.c3.c2.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c3.c2.im, d_r_soa.c3.c2.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c3.c3.re, d_r_soa.c3.c3.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c3.c3.im, d_r_soa.c3.c3.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c4.c1.re, d_r_soa.c4.c1.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c4.c1.im, d_r_soa.c4.c1.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c4.c2.re, d_r_soa.c4.c2.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c4.c2.im, d_r_soa.c4.c2.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c4.c3.re, d_r_soa.c4.c3.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy((*r_soa).c4.c3.im, d_r_soa.c4.c3.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
 
 
     // Free GPU memory
-    // Do that at some point
+    // Create destroy functions
 
-    printf("Before Convert from SoA to AoS\n");
+
     // Convert from SoA to AoS
     copy_spinor_soa2aos(r_soa, r, VOLUME);
 
