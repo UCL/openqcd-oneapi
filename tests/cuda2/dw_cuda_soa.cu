@@ -11,10 +11,8 @@ pauli_soa allocPauli2Device(int vol)
     pauli_soa d_m;
 
     // Allocate memory on device
-    cudaMalloc((void **)&(d_m.l1), 36 * (vol/2) * sizeof(float));
-    cudaMalloc((void **)&(d_m.l2), 36 * (vol/2) * sizeof(float));
-    cudaMalloc((void **)&(d_m.r1), 36 * (vol/2) * sizeof(float));
-    cudaMalloc((void **)&(d_m.r2), 36 * (vol/2) * sizeof(float));
+    cudaMalloc((void **)&(d_m.m1), 36 * vol * sizeof(float));
+    cudaMalloc((void **)&(d_m.m2), 36 * vol * sizeof(float));
 
     return d_m;
 }
@@ -22,10 +20,8 @@ pauli_soa allocPauli2Device(int vol)
 void copyPauliHost2Device(pauli_soa d_m, pauli_soa *m, int vol)
 {
     // Copy data from host to device
-    cudaMemcpy(d_m.l1, (*m).l1, 36 * (vol/2) * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_m.l2, (*m).l2, 36 * (vol/2) * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_m.r1, (*m).r1, 36 * (vol/2) * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_m.r2, (*m).r2, 36 * (vol/2) * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_m.m1, (*m).m1, 36 * vol * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_m.m2, (*m).m2, 36 * vol * sizeof(float), cudaMemcpyHostToDevice);
 }
 
 spinor_soa allocSpinor2Device(int vol)
@@ -92,20 +88,16 @@ pauli_soa* create_pauli_soa(int vol)
 {
     pauli_soa* obj = (pauli_soa*) malloc(sizeof(pauli_soa));
 
-    (*obj).l1 = (float*) malloc(36 * (vol/2) * sizeof(float));
-    (*obj).l2 = (float*) malloc(36 * (vol/2) * sizeof(float));
-    (*obj).r1 = (float*) malloc(36 * (vol/2) * sizeof(float));
-    (*obj).r2 = (float*) malloc(36 * (vol/2) * sizeof(float));
+    (*obj).m1 = (float*) malloc(36 * vol * sizeof(float));
+    (*obj).m2 = (float*) malloc(36 * vol * sizeof(float));
 
     return obj;
 }
 
 void destroy_pauli_soa(pauli_soa* obj)
 {
-    free((*obj).l1);
-    free((*obj).l2);
-    free((*obj).r1);
-    free((*obj).r2);
+    free((*obj).m1);
+    free((*obj).m2);
 
     free(obj);
 }
@@ -177,19 +169,17 @@ void copy_pauli_aos2soa(pauli* m, pauli_soa* m_soa, int vol)
     int i, j, idx;
 
     idx = 0;
-    for (i = 0; i < vol; i += 2) {
+    for (i = 0; i < 2*vol; i += 2) {
         for (j = 0; j < 36; ++j) {
-            (*m_soa).l1[j*(vol/2) + idx] = (*(m+i)).u[j];
-            (*m_soa).r1[j*(vol/2) + idx] = (*(m+vol+i)).u[j];
+            (*m_soa).m1[j*vol + idx] = (*(m+i)).u[j];
         }
         idx++;
     }
 
     idx = 0;
-    for (i = 1; i < vol; i += 2) {
+    for (i = 1; i < 2*vol; i += 2) {
         for (j = 0; j < 36; ++j) {
-            (*m_soa).l2[j*(vol/2) + idx] = (*(m+i)).u[j];
-            (*m_soa).r2[j*(vol/2) + idx] = (*(m+vol+i)).u[j];
+            (*m_soa).m2[j*vol + idx] = (*(m+i)).u[j];
         }
         idx++;
     }
@@ -200,19 +190,17 @@ void copy_pauli_soa2aos(pauli_soa* m_soa, pauli* m, int vol)
     int i, j, idx;
 
     idx = 0;
-    for (i = 0; i < vol; i += 2) {
+    for (i = 0; i < 2*vol; i += 2) {
         for (j = 0; j < 36; ++j) {
-            (*(m+i)).u[j]     = (*m_soa).l1[j*(vol/2) + idx];
-            (*(m+vol+i)).u[j] = (*m_soa).r1[j*(vol/2) + idx];
+            (*(m+i)).u[j] = (*m_soa).m1[j*vol + idx];
         }
         idx++;
     }
 
     idx = 0;
-    for (i = 1; i < vol; i += 2) {
+    for (i = 1; i < 2*vol; i += 2) {
         for (j = 0; j < 36; ++j) {
-            (*(m+i)).u[j]     = (*m_soa).l2[j*(vol/2) + idx];
-            (*(m+vol+i)).u[j] = (*m_soa).r2[j*(vol/2) + idx];
+            (*(m+i)).u[j] = (*m_soa).m2[j*vol + idx];
         }
         idx++;
     }
@@ -278,100 +266,102 @@ void copy_spinor_soa2aos(spinor_soa* s_soa, spinor* s, int vol)
     }
 }
 
-__device__
-static void mul_pauli(int idx, int sidx, int halfvol, float mu,
-                      spinor_soa const s, spinor_soa r,
-                      float const *m1, float const *m2)
+
+extern "C" __global__
+void mulpauli_kernel(int vol, float mu, spinor_soa s, spinor_soa r, pauli_soa m)
 {
+    int idx = blockIdx.x*blockDim.x + threadIdx.x;
+    if (idx >= vol) return;
+
     float u[36];
     weyl sloc;
 
     // A+
-    sloc.c1.c1.re = s.c1.c1.re[sidx];
-    sloc.c1.c1.im = s.c1.c1.im[sidx];
-    sloc.c1.c2.re = s.c1.c2.re[sidx];
-    sloc.c1.c2.im = s.c1.c2.im[sidx];
-    sloc.c1.c3.re = s.c1.c3.re[sidx];
-    sloc.c1.c3.im = s.c1.c3.im[sidx];
-    sloc.c2.c1.re = s.c2.c1.re[sidx];
-    sloc.c2.c1.im = s.c2.c1.im[sidx];
-    sloc.c2.c2.re = s.c2.c2.re[sidx];
-    sloc.c2.c2.im = s.c2.c2.im[sidx];
-    sloc.c2.c3.re = s.c2.c3.re[sidx];
-    sloc.c2.c3.im = s.c2.c3.im[sidx];
+    sloc.c1.c1.re = s.c1.c1.re[idx];
+    sloc.c1.c1.im = s.c1.c1.im[idx];
+    sloc.c1.c2.re = s.c1.c2.re[idx];
+    sloc.c1.c2.im = s.c1.c2.im[idx];
+    sloc.c1.c3.re = s.c1.c3.re[idx];
+    sloc.c1.c3.im = s.c1.c3.im[idx];
+    sloc.c2.c1.re = s.c2.c1.re[idx];
+    sloc.c2.c1.im = s.c2.c1.im[idx];
+    sloc.c2.c2.re = s.c2.c2.re[idx];
+    sloc.c2.c2.im = s.c2.c2.im[idx];
+    sloc.c2.c3.re = s.c2.c3.re[idx];
+    sloc.c2.c3.im = s.c2.c3.im[idx];
 
     #pragma unroll
     for (int i = 0; i < 36; ++i) {
-        u[i] = m1[i*halfvol + idx];
+        u[i] = m.m1[i*vol + idx];
     }
 
-    r.c1.c1.re[sidx] =
+    r.c1.c1.re[idx] =
       u[0]  * sloc.c1.c1.re - mu    * sloc.c1.c1.im + u[6]  * sloc.c1.c2.re -
       u[7]  * sloc.c1.c2.im + u[8]  * sloc.c1.c3.re - u[9]  * sloc.c1.c3.im +
       u[10] * sloc.c2.c1.re - u[11] * sloc.c2.c1.im + u[12] * sloc.c2.c2.re -
       u[13] * sloc.c2.c2.im + u[14] * sloc.c2.c3.re - u[15] * sloc.c2.c3.im;
 
-    r.c1.c1.im[sidx] =
+    r.c1.c1.im[idx] =
       u[0]  * sloc.c1.c1.im + mu    * sloc.c1.c1.re + u[6]  * sloc.c1.c2.im +
       u[7]  * sloc.c1.c2.re + u[8]  * sloc.c1.c3.im + u[9]  * sloc.c1.c3.re +
       u[10] * sloc.c2.c1.im + u[11] * sloc.c2.c1.re + u[12] * sloc.c2.c2.im +
       u[13] * sloc.c2.c2.re + u[14] * sloc.c2.c3.im + u[15] * sloc.c2.c3.re;
 
-    r.c1.c2.re[sidx] =
+    r.c1.c2.re[idx] =
       u[6]  * sloc.c1.c1.re + u[7]  * sloc.c1.c1.im + u[1]  * sloc.c1.c2.re -
       mu    * sloc.c1.c2.im + u[16] * sloc.c1.c3.re - u[17] * sloc.c1.c3.im +
       u[18] * sloc.c2.c1.re - u[19] * sloc.c2.c1.im + u[20] * sloc.c2.c2.re -
       u[21] * sloc.c2.c2.im + u[22] * sloc.c2.c3.re - u[23] * sloc.c2.c3.im;
 
-    r.c1.c2.im[sidx] =
+    r.c1.c2.im[idx] =
       u[6]  * sloc.c1.c1.im - u[7]  * sloc.c1.c1.re + u[1]  * sloc.c1.c2.im +
       mu    * sloc.c1.c2.re + u[16] * sloc.c1.c3.im + u[17] * sloc.c1.c3.re +
       u[18] * sloc.c2.c1.im + u[19] * sloc.c2.c1.re + u[20] * sloc.c2.c2.im +
       u[21] * sloc.c2.c2.re + u[22] * sloc.c2.c3.im + u[23] * sloc.c2.c3.re;
 
-    r.c1.c3.re[sidx] =
+    r.c1.c3.re[idx] =
       u[8]  * sloc.c1.c1.re + u[9]  * sloc.c1.c1.im + u[16] * sloc.c1.c2.re +
       u[17] * sloc.c1.c2.im + u[2]  * sloc.c1.c3.re - mu    * sloc.c1.c3.im +
       u[24] * sloc.c2.c1.re - u[25] * sloc.c2.c1.im + u[26] * sloc.c2.c2.re -
       u[27] * sloc.c2.c2.im + u[28] * sloc.c2.c3.re - u[29] * sloc.c2.c3.im;
 
-    r.c1.c3.im[sidx] =
+    r.c1.c3.im[idx] =
       u[8]  * sloc.c1.c1.im - u[9]  * sloc.c1.c1.re + u[16] * sloc.c1.c2.im -
       u[17] * sloc.c1.c2.re + u[2]  * sloc.c1.c3.im + mu    * sloc.c1.c3.re +
       u[24] * sloc.c2.c1.im + u[25] * sloc.c2.c1.re + u[26] * sloc.c2.c2.im +
       u[27] * sloc.c2.c2.re + u[28] * sloc.c2.c3.im + u[29] * sloc.c2.c3.re;
 
-    r.c2.c1.re[sidx] =
+    r.c2.c1.re[idx] =
       u[10] * sloc.c1.c1.re + u[11] * sloc.c1.c1.im + u[18] * sloc.c1.c2.re +
       u[19] * sloc.c1.c2.im + u[24] * sloc.c1.c3.re + u[25] * sloc.c1.c3.im +
       u[3]  * sloc.c2.c1.re - mu * sloc.c2.c1.im    + u[30] * sloc.c2.c2.re -
       u[31] * sloc.c2.c2.im + u[32] * sloc.c2.c3.re - u[33] * sloc.c2.c3.im;
 
-    r.c2.c1.im[sidx] =
+    r.c2.c1.im[idx] =
       u[10] * sloc.c1.c1.im - u[11] * sloc.c1.c1.re + u[18] * sloc.c1.c2.im -
       u[19] * sloc.c1.c2.re + u[24] * sloc.c1.c3.im - u[25] * sloc.c1.c3.re +
       u[3]  * sloc.c2.c1.im + mu    * sloc.c2.c1.re + u[30] * sloc.c2.c2.im +
       u[31] * sloc.c2.c2.re + u[32] * sloc.c2.c3.im + u[33] * sloc.c2.c3.re;
 
-    r.c2.c2.re[sidx] =
+    r.c2.c2.re[idx] =
       u[12] * sloc.c1.c1.re + u[13] * sloc.c1.c1.im + u[20] * sloc.c1.c2.re +
       u[21] * sloc.c1.c2.im + u[26] * sloc.c1.c3.re + u[27] * sloc.c1.c3.im +
       u[30] * sloc.c2.c1.re + u[31] * sloc.c2.c1.im + u[4]  * sloc.c2.c2.re -
       mu    * sloc.c2.c2.im + u[34] * sloc.c2.c3.re - u[35] * sloc.c2.c3.im;
 
-    r.c2.c2.im[sidx] =
+    r.c2.c2.im[idx] =
       u[12] * sloc.c1.c1.im - u[13] * sloc.c1.c1.re + u[20] * sloc.c1.c2.im -
       u[21] * sloc.c1.c2.re + u[26] * sloc.c1.c3.im - u[27] * sloc.c1.c3.re +
       u[30] * sloc.c2.c1.im - u[31] * sloc.c2.c1.re + u[4]  * sloc.c2.c2.im +
       mu    * sloc.c2.c2.re + u[34] * sloc.c2.c3.im + u[35] * sloc.c2.c3.re;
 
-    r.c2.c3.re[sidx] =
+    r.c2.c3.re[idx] =
       u[14] * sloc.c1.c1.re + u[15] * sloc.c1.c1.im + u[22] * sloc.c1.c2.re +
       u[23] * sloc.c1.c2.im + u[28] * sloc.c1.c3.re + u[29] * sloc.c1.c3.im +
       u[32] * sloc.c2.c1.re + u[33] * sloc.c2.c1.im + u[34] * sloc.c2.c2.re +
       u[35] * sloc.c2.c2.im + u[5]  * sloc.c2.c3.re - mu    * sloc.c2.c3.im;
 
-    r.c2.c3.im[sidx] =
+    r.c2.c3.im[idx] =
       u[14] * sloc.c1.c1.im - u[15] * sloc.c1.c1.re + u[22] * sloc.c1.c2.im -
       u[23] * sloc.c1.c2.re + u[28] * sloc.c1.c3.im - u[29] * sloc.c1.c3.re +
       u[32] * sloc.c2.c1.im - u[33] * sloc.c2.c1.re + u[34] * sloc.c2.c2.im -
@@ -379,113 +369,97 @@ static void mul_pauli(int idx, int sidx, int halfvol, float mu,
 
 
       // A-
-      sloc.c1.c1.re = s.c3.c1.re[sidx];
-      sloc.c1.c1.im = s.c3.c1.im[sidx];
-      sloc.c1.c2.re = s.c3.c2.re[sidx];
-      sloc.c1.c2.im = s.c3.c2.im[sidx];
-      sloc.c1.c3.re = s.c3.c3.re[sidx];
-      sloc.c1.c3.im = s.c3.c3.im[sidx];
-      sloc.c2.c1.re = s.c4.c1.re[sidx];
-      sloc.c2.c1.im = s.c4.c1.im[sidx];
-      sloc.c2.c2.re = s.c4.c2.re[sidx];
-      sloc.c2.c2.im = s.c4.c2.im[sidx];
-      sloc.c2.c3.re = s.c4.c3.re[sidx];
-      sloc.c2.c3.im = s.c4.c3.im[sidx];
+      sloc.c1.c1.re = s.c3.c1.re[idx];
+      sloc.c1.c1.im = s.c3.c1.im[idx];
+      sloc.c1.c2.re = s.c3.c2.re[idx];
+      sloc.c1.c2.im = s.c3.c2.im[idx];
+      sloc.c1.c3.re = s.c3.c3.re[idx];
+      sloc.c1.c3.im = s.c3.c3.im[idx];
+      sloc.c2.c1.re = s.c4.c1.re[idx];
+      sloc.c2.c1.im = s.c4.c1.im[idx];
+      sloc.c2.c2.re = s.c4.c2.re[idx];
+      sloc.c2.c2.im = s.c4.c2.im[idx];
+      sloc.c2.c3.re = s.c4.c3.re[idx];
+      sloc.c2.c3.im = s.c4.c3.im[idx];
 
       #pragma unroll
       for (int i = 0; i < 36; ++i) {
-          u[i] = m2[i*halfvol + idx];
+          u[i] = m.m2[i*vol + idx];
       }
 
       mu = -mu;
 
-      r.c3.c1.re[sidx] =
+      r.c3.c1.re[idx] =
         u[0]  * sloc.c1.c1.re - mu    * sloc.c1.c1.im + u[6]  * sloc.c1.c2.re -
         u[7]  * sloc.c1.c2.im + u[8]  * sloc.c1.c3.re - u[9]  * sloc.c1.c3.im +
         u[10] * sloc.c2.c1.re - u[11] * sloc.c2.c1.im + u[12] * sloc.c2.c2.re -
         u[13] * sloc.c2.c2.im + u[14] * sloc.c2.c3.re - u[15] * sloc.c2.c3.im;
 
-      r.c3.c1.im[sidx] =
+      r.c3.c1.im[idx] =
         u[0]  * sloc.c1.c1.im + mu    * sloc.c1.c1.re + u[6]  * sloc.c1.c2.im +
         u[7]  * sloc.c1.c2.re + u[8]  * sloc.c1.c3.im + u[9]  * sloc.c1.c3.re +
         u[10] * sloc.c2.c1.im + u[11] * sloc.c2.c1.re + u[12] * sloc.c2.c2.im +
         u[13] * sloc.c2.c2.re + u[14] * sloc.c2.c3.im + u[15] * sloc.c2.c3.re;
 
-      r.c3.c2.re[sidx] =
+      r.c3.c2.re[idx] =
         u[6]  * sloc.c1.c1.re + u[7]  * sloc.c1.c1.im + u[1]  * sloc.c1.c2.re -
         mu    * sloc.c1.c2.im + u[16] * sloc.c1.c3.re - u[17] * sloc.c1.c3.im +
         u[18] * sloc.c2.c1.re - u[19] * sloc.c2.c1.im + u[20] * sloc.c2.c2.re -
         u[21] * sloc.c2.c2.im + u[22] * sloc.c2.c3.re - u[23] * sloc.c2.c3.im;
 
-      r.c3.c2.im[sidx] =
+      r.c3.c2.im[idx] =
         u[6]  * sloc.c1.c1.im - u[7]  * sloc.c1.c1.re + u[1]  * sloc.c1.c2.im +
         mu    * sloc.c1.c2.re + u[16] * sloc.c1.c3.im + u[17] * sloc.c1.c3.re +
         u[18] * sloc.c2.c1.im + u[19] * sloc.c2.c1.re + u[20] * sloc.c2.c2.im +
         u[21] * sloc.c2.c2.re + u[22] * sloc.c2.c3.im + u[23] * sloc.c2.c3.re;
 
-      r.c3.c3.re[sidx] =
+      r.c3.c3.re[idx] =
         u[8]  * sloc.c1.c1.re + u[9]  * sloc.c1.c1.im + u[16] * sloc.c1.c2.re +
         u[17] * sloc.c1.c2.im + u[2]  * sloc.c1.c3.re - mu    * sloc.c1.c3.im +
         u[24] * sloc.c2.c1.re - u[25] * sloc.c2.c1.im + u[26] * sloc.c2.c2.re -
         u[27] * sloc.c2.c2.im + u[28] * sloc.c2.c3.re - u[29] * sloc.c2.c3.im;
 
-      r.c3.c3.im[sidx] =
+      r.c3.c3.im[idx] =
         u[8]  * sloc.c1.c1.im - u[9]  * sloc.c1.c1.re + u[16] * sloc.c1.c2.im -
         u[17] * sloc.c1.c2.re + u[2]  * sloc.c1.c3.im + mu    * sloc.c1.c3.re +
         u[24] * sloc.c2.c1.im + u[25] * sloc.c2.c1.re + u[26] * sloc.c2.c2.im +
         u[27] * sloc.c2.c2.re + u[28] * sloc.c2.c3.im + u[29] * sloc.c2.c3.re;
 
-      r.c4.c1.re[sidx] =
+      r.c4.c1.re[idx] =
         u[10] * sloc.c1.c1.re + u[11] * sloc.c1.c1.im + u[18] * sloc.c1.c2.re +
         u[19] * sloc.c1.c2.im + u[24] * sloc.c1.c3.re + u[25] * sloc.c1.c3.im +
         u[3]  * sloc.c2.c1.re - mu * sloc.c2.c1.im    + u[30] * sloc.c2.c2.re -
         u[31] * sloc.c2.c2.im + u[32] * sloc.c2.c3.re - u[33] * sloc.c2.c3.im;
 
-      r.c4.c1.im[sidx] =
+      r.c4.c1.im[idx] =
         u[10] * sloc.c1.c1.im - u[11] * sloc.c1.c1.re + u[18] * sloc.c1.c2.im -
         u[19] * sloc.c1.c2.re + u[24] * sloc.c1.c3.im - u[25] * sloc.c1.c3.re +
         u[3]  * sloc.c2.c1.im + mu    * sloc.c2.c1.re + u[30] * sloc.c2.c2.im +
         u[31] * sloc.c2.c2.re + u[32] * sloc.c2.c3.im + u[33] * sloc.c2.c3.re;
 
-      r.c4.c2.re[sidx] =
+      r.c4.c2.re[idx] =
         u[12] * sloc.c1.c1.re + u[13] * sloc.c1.c1.im + u[20] * sloc.c1.c2.re +
         u[21] * sloc.c1.c2.im + u[26] * sloc.c1.c3.re + u[27] * sloc.c1.c3.im +
         u[30] * sloc.c2.c1.re + u[31] * sloc.c2.c1.im + u[4]  * sloc.c2.c2.re -
         mu    * sloc.c2.c2.im + u[34] * sloc.c2.c3.re - u[35] * sloc.c2.c3.im;
 
-      r.c4.c2.im[sidx] =
+      r.c4.c2.im[idx] =
         u[12] * sloc.c1.c1.im - u[13] * sloc.c1.c1.re + u[20] * sloc.c1.c2.im -
         u[21] * sloc.c1.c2.re + u[26] * sloc.c1.c3.im - u[27] * sloc.c1.c3.re +
         u[30] * sloc.c2.c1.im - u[31] * sloc.c2.c1.re + u[4]  * sloc.c2.c2.im +
         mu    * sloc.c2.c2.re + u[34] * sloc.c2.c3.im + u[35] * sloc.c2.c3.re;
 
-      r.c4.c3.re[sidx] =
+      r.c4.c3.re[idx] =
         u[14] * sloc.c1.c1.re + u[15] * sloc.c1.c1.im + u[22] * sloc.c1.c2.re +
         u[23] * sloc.c1.c2.im + u[28] * sloc.c1.c3.re + u[29] * sloc.c1.c3.im +
         u[32] * sloc.c2.c1.re + u[33] * sloc.c2.c1.im + u[34] * sloc.c2.c2.re +
         u[35] * sloc.c2.c2.im + u[5]  * sloc.c2.c3.re - mu    * sloc.c2.c3.im;
 
-      r.c4.c3.im[sidx] =
+      r.c4.c3.im[idx] =
         u[14] * sloc.c1.c1.im - u[15] * sloc.c1.c1.re + u[22] * sloc.c1.c2.im -
         u[23] * sloc.c1.c2.re + u[28] * sloc.c1.c3.im - u[29] * sloc.c1.c3.re +
         u[32] * sloc.c2.c1.im - u[33] * sloc.c2.c1.re + u[34] * sloc.c2.c2.im -
         u[35] * sloc.c2.c2.re + u[5]  * sloc.c2.c3.im + mu    * sloc.c2.c3.re;
-}
-
-extern "C" __global__
-void mulpauli_kernel(int VOLUME, float mu, spinor_soa s, spinor_soa r, pauli_soa m)
-{
-    int idx = blockIdx.x*blockDim.x + threadIdx.x;
-    if (idx >= VOLUME/2) return;
-
-    int sidx;
-    int halfvol = VOLUME/2;
-
-    sidx = idx;
-    mul_pauli(idx, sidx, halfvol, mu, s, r, m.l1, m.l2);
-
-    sidx = halfvol + idx;
-    mul_pauli(idx, sidx, halfvol, mu, s, r, m.r1, m.r2);
 }
 
 extern "C"
@@ -520,10 +494,10 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
     copyPauliHost2Device(d_m_soa, m_soa, VOLUME);
     copySpinorHost2Device(d_s_soa, s_soa, VOLUME);
 
-
+    int block_size, grid_size;
     // Launch kernel on GPU
-    int block_size = 128;
-    int grid_size = ceil((VOLUME/2.0)/(float)block_size);
+    block_size = 128;
+    grid_size = ceil(VOLUME/(float)block_size);
     mulpauli_kernel<<<grid_size, block_size>>>(VOLUME, mu, d_s_soa, d_r_soa, d_m_soa);
 
 

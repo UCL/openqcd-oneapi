@@ -56,10 +56,8 @@ typedef struct
 
 typedef struct
 {
-    float *l1;
-    float *l2;
-    float *r1;
-    float *r2;
+    float *m1;  // For A+
+    float *m2;  // For A-
 } pauli_soa;
 
 #endif
