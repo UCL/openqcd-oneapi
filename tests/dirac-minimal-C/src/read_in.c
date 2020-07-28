@@ -14,8 +14,6 @@ void read_sp_u_from_file(char * cnfg, su3 * u, int vol)
 
   fclose(fin);
 
-  /* u -= (4 * vol); */
-
 }
 
 void read_sp_m_from_file(char * cnfg, pauli * m, int vol)
@@ -31,10 +29,6 @@ void read_sp_m_from_file(char * cnfg, pauli * m, int vol)
   }
 
   fclose(fin);
-
-  /* move pointer back */
-
-  /*m -= (2 * vol);*/
 
 }
 
@@ -52,8 +46,6 @@ void read_sp_spinor_from_file(char * cnfg, spinor * s, int vol)
 
   fclose(fin);
 
-  /* s -= vol; */
-
 }
 
 void read_lt_from_file(char * cnfg, int * piud, int vol)
@@ -69,7 +61,5 @@ void read_lt_from_file(char * cnfg, int * piud, int vol)
   }
 
   fclose(fin);
-
-  /* piud -= (2 * vol); */
 
 }
