@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     su3 *u;
     pauli *m;
-    spinor *s, *r, *rdiag;
+    spinor *s, *r, *rdiag, *rdoe;
     int *piup, *pidn;
 
     char cnfg[256];
@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
     s = (spinor *) malloc(VOLUME * sizeof(*s));
     r = (spinor *) malloc(VOLUME * sizeof(*r));
     rdiag = (spinor *) malloc(VOLUME * sizeof(*rdiag));
+    rdoe = (spinor *) malloc(VOLUME * sizeof(*rdoe));
 
     sprintf(cnfg, "%s/sp-u-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
     read_sp_u_from_file(cnfg, u, VOLUME);
@@ -83,13 +84,17 @@ int main(int argc, char *argv[])
     sprintf(cnfg, "%s/sp-rdiag-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
     read_sp_spinor_from_file(cnfg, rdiag, VOLUME);
 
+    sprintf(cnfg, "%s/sp-rdoe-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
+    read_sp_spinor_from_file(cnfg, rdoe, VOLUME);
+
 
     Dw_cuda_SoA(VOLUME, u, s, r, m, piup, pidn);
 
+    // Compare spinors r
     int ret;
     int count = 0;
     for (int i = 0; i < VOLUME; ++i) {
-        ret = my_memcmp(r+i, rdiag+i, sizeof(spinor)/sizeof(float));
+        ret = my_memcmp(r+i, rdoe+i, sizeof(spinor)/sizeof(float));
         if (ret == 0) {
             count++;
         }

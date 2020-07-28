@@ -588,6 +588,176 @@ void mulpauli_kernel(int vol, float mu, spinor_soa s, spinor_soa r, pauli_soa m)
         u[35] * sloc.c2.c2.re + u[5]  * sloc.c2.c3.im + mu    * sloc.c2.c3.re;
 }
 
+extern "C" __global__
+void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
+                int4 *piup, int4 *pidn, float coe,
+                float gamma_f, float one_over_gammaf)
+{
+    int idx = blockIdx.x*blockDim.x + threadIdx.x;
+    if (idx >= vol/2) return;
+
+    su3 uloc;
+    spinor sloc, rloc;
+    su3_vector psi, chi;
+    int4 piuploc = piup[idx];
+    int4 pidnloc = pidn[idx];
+    int sidx, uidx;
+
+    /***************************** direction +0 *******************************/
+
+    sidx = vol/2 + piuploc.x;
+    uidx = 0*(vol/2) + idx;
+    _spinor_copy2struct(sloc, s, sidx);
+    _su3_copy2struct(uloc, u, uidx);
+
+    _vector_add(psi, sloc.c1, sloc.c3);
+    _su3_multiply(rloc.c1, uloc, psi);
+    rloc.c3 = rloc.c1;
+
+    _vector_add(psi, sloc.c2, sloc.c4);
+    _su3_multiply(rloc.c2, uloc, psi);
+    rloc.c4 = rloc.c2;
+
+    /***************************** direction -0 *******************************/
+
+    sidx = vol/2 + pidnloc.x;
+    uidx = 1*(vol/2) + idx;
+    _spinor_copy2struct(sloc, s, sidx);
+    _su3_copy2struct(uloc, u, uidx);
+
+    _vector_sub(psi, sloc.c1, sloc.c3);
+    _su3_inverse_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c1, chi);
+    _vector_sub_assign(rloc.c3, chi);
+
+    _vector_sub(psi, sloc.c2, sloc.c4);
+    _su3_inverse_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c2, chi);
+    _vector_sub_assign(rloc.c4, chi);
+
+    _vector_mul_assign(rloc.c1, gamma_f);
+    _vector_mul_assign(rloc.c2, gamma_f);
+    _vector_mul_assign(rloc.c3, gamma_f);
+    _vector_mul_assign(rloc.c4, gamma_f);
+
+    /***************************** direction +1 *******************************/
+
+    sidx = vol/2 + piuploc.y;
+    uidx = 2*(vol/2) + idx;
+    _spinor_copy2struct(sloc, s, sidx);
+    _su3_copy2struct(uloc, u, uidx);
+
+    _vector_i_add(psi, sloc.c1, sloc.c4);
+    _su3_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c1, chi);
+    _vector_i_sub_assign(rloc.c4, chi);
+
+    _vector_i_add(psi, sloc.c2, sloc.c3);
+    _su3_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c2, chi);
+    _vector_i_sub_assign(rloc.c3, chi);
+
+    /***************************** direction -1 *******************************/
+
+    sidx = vol/2 + pidnloc.y;
+    uidx = 3*(vol/2) + idx;
+    _spinor_copy2struct(sloc, s, sidx);
+    _su3_copy2struct(uloc, u, uidx);
+
+    _vector_i_sub(psi, sloc.c1, sloc.c4);
+    _su3_inverse_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c1, chi);
+    _vector_i_add_assign(rloc.c4, chi);
+
+    _vector_i_sub(psi, sloc.c2, sloc.c3);
+    _su3_inverse_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c2, chi);
+    _vector_i_add_assign(rloc.c3, chi);
+
+    /***************************** direction +2 *******************************/
+
+    sidx = vol/2 + piuploc.z;
+    uidx = 4*(vol/2) + idx;
+    _spinor_copy2struct(sloc, s, sidx);
+    _su3_copy2struct(uloc, u, uidx);
+
+    _vector_add(psi, sloc.c1, sloc.c4);
+    _su3_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c1, chi);
+    _vector_add_assign(rloc.c4, chi);
+
+    _vector_sub(psi, sloc.c2, sloc.c3);
+    _su3_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c2, chi);
+    _vector_sub_assign(rloc.c3, chi);
+
+    /***************************** direction -2 *******************************/
+
+    sidx = vol/2 + pidnloc.z;
+    uidx = 5*(vol/2) + idx;
+    _spinor_copy2struct(sloc, s, sidx);
+    _su3_copy2struct(uloc, u, uidx);
+
+    _vector_sub(psi, sloc.c1, sloc.c4);
+    _su3_inverse_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c1, chi);
+    _vector_sub_assign(rloc.c4, chi);
+
+    _vector_add(psi, sloc.c2, sloc.c3);
+    _su3_inverse_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c2, chi);
+    _vector_add_assign(rloc.c3, chi);
+
+    /***************************** direction +3 *******************************/
+
+    sidx = vol/2 + piuploc.w;
+    uidx = 6*(vol/2) + idx;
+    _spinor_copy2struct(sloc, s, sidx);
+    _su3_copy2struct(uloc, u, uidx);
+
+    _vector_i_add(psi, sloc.c1, sloc.c3);
+    _su3_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c1, chi);
+    _vector_i_sub_assign(rloc.c3, chi);
+
+    _vector_i_sub(psi, sloc.c2, sloc.c4);
+    _su3_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c2, chi);
+    _vector_i_add_assign(rloc.c4, chi);
+
+    /***************************** direction -3 *******************************/
+
+    sidx = vol/2 + pidnloc.w;
+    uidx = 7*(vol/2) + idx;
+    _spinor_copy2struct(sloc, s, sidx);
+    _su3_copy2struct(uloc, u, uidx);
+
+    _vector_i_sub(psi, sloc.c1, sloc.c3);
+    _su3_inverse_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c1, chi);
+    _vector_i_add_assign(rloc.c3, chi);
+
+    _vector_i_add(psi, sloc.c2, sloc.c4);
+    _su3_inverse_multiply(chi, uloc, psi);
+    _vector_add_assign(rloc.c2, chi);
+    _vector_i_sub_assign(rloc.c4, chi);
+
+    _vector_mul_assign(rloc.c1, coe);
+    _vector_mul_assign(rloc.c2, coe);
+    _vector_mul_assign(rloc.c3, coe);
+    _vector_mul_assign(rloc.c4, coe);
+
+    _vector_mul_assign(rloc.c1, one_over_gammaf);
+    _vector_mul_assign(rloc.c2, one_over_gammaf);
+    _vector_mul_assign(rloc.c3, one_over_gammaf);
+    _vector_mul_assign(rloc.c4, one_over_gammaf);
+
+    // Copy from registers to global memory
+    sidx = vol/2 + idx;
+    _spinor_copy2arrays(r, rloc, sidx);
+}
+
+
 extern "C"
 void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, int *pidn)
 {
@@ -613,12 +783,17 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
     copy_su3_aos2soa(u_soa, u, VOLUME);
 
     // Allocate memory on device
+    int4 *d_piup, *d_pidn;
+    cudaMalloc((void **)&d_piup, 2 * VOLUME * sizeof(int));
+    cudaMalloc((void **)&d_pidn, 2 * VOLUME * sizeof(int));
     pauli_soa d_m_soa = allocPauli2Device(VOLUME);
     spinor_soa d_s_soa = allocSpinor2Device(VOLUME);
     spinor_soa d_r_soa = allocSpinor2Device(VOLUME);
     su3_soa d_u_soa = allocSu32Device(VOLUME);
 
     // Copy from host to device
+    cudaMemcpy(d_piup, piup, 2 * VOLUME * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_pidn, pidn, 2 * VOLUME * sizeof(int), cudaMemcpyHostToDevice);
     copyPauliHost2Device(d_m_soa, m_soa, VOLUME);
     copySpinorHost2Device(d_s_soa, s_soa, VOLUME);
     copySu3Host2Device(d_u_soa, u_soa, VOLUME);
@@ -628,6 +803,11 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
     block_size = 128;
     grid_size = ceil(VOLUME/(float)block_size);
     mulpauli_kernel<<<grid_size, block_size>>>(VOLUME, mu, d_s_soa, d_r_soa, d_m_soa);
+
+    block_size = 128;
+    grid_size = ceil((VOLUME/2.0)/(float)block_size);
+    doe_kernel<<<grid_size, block_size>>>(VOLUME, d_s_soa, d_r_soa, d_u_soa,
+                                          d_piup, d_pidn, coe, gamma_f, one_over_gammaf);
 
 
     // Copy data from device to host
@@ -659,6 +839,7 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
 
     // Free GPU memory
     // Create destroy functions
+    // d_piup, d_pidn, d_m_soa, d_s_soa, d_r_soa, d_u_soa
 
 
     // Convert from SoA to AoS

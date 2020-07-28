@@ -113,4 +113,76 @@
                 (u).c23.re * (s).c2.im - (u).c23.im * (s).c2.re +                \
                 (u).c33.re * (s).c3.im - (u).c33.im * (s).c3.re
 
+#define _su3_copy2struct(dst, src, id)                                           \
+    (dst).c11.re = (src).c11.re[id];                                             \
+    (dst).c11.im = (src).c11.im[id];                                             \
+    (dst).c12.re = (src).c12.re[id];                                             \
+    (dst).c12.im = (src).c12.im[id];                                             \
+    (dst).c13.re = (src).c13.re[id];                                             \
+    (dst).c13.im = (src).c13.im[id];                                             \
+    (dst).c21.re = (src).c21.re[id];                                             \
+    (dst).c21.im = (src).c21.im[id];                                             \
+    (dst).c22.re = (src).c22.re[id];                                             \
+    (dst).c22.im = (src).c22.im[id];                                             \
+    (dst).c23.re = (src).c23.re[id];                                             \
+    (dst).c23.im = (src).c23.im[id];                                             \
+    (dst).c31.re = (src).c31.re[id];                                             \
+    (dst).c31.im = (src).c31.im[id];                                             \
+    (dst).c32.re = (src).c32.re[id];                                             \
+    (dst).c32.im = (src).c32.im[id];                                             \
+    (dst).c33.re = (src).c33.re[id];                                             \
+    (dst).c33.im = (src).c33.im[id]
+
+#define _spinor_copy2struct(dst, src, id)                                        \
+    (dst).c1.c1.re = (src).c1.c1.re[id];                                         \
+    (dst).c1.c1.im = (src).c1.c1.im[id];                                         \
+    (dst).c1.c2.re = (src).c1.c2.re[id];                                         \
+    (dst).c1.c2.im = (src).c1.c2.im[id];                                         \
+    (dst).c1.c3.re = (src).c1.c3.re[id];                                         \
+    (dst).c1.c3.im = (src).c1.c3.im[id];                                         \
+    (dst).c2.c1.re = (src).c2.c1.re[id];                                         \
+    (dst).c2.c1.im = (src).c2.c1.im[id];                                         \
+    (dst).c2.c2.re = (src).c2.c2.re[id];                                         \
+    (dst).c2.c2.im = (src).c2.c2.im[id];                                         \
+    (dst).c2.c3.re = (src).c2.c3.re[id];                                         \
+    (dst).c2.c3.im = (src).c2.c3.im[id];                                         \
+    (dst).c3.c1.re = (src).c3.c1.re[id];                                         \
+    (dst).c3.c1.im = (src).c3.c1.im[id];                                         \
+    (dst).c3.c2.re = (src).c3.c2.re[id];                                         \
+    (dst).c3.c2.im = (src).c3.c2.im[id];                                         \
+    (dst).c3.c3.re = (src).c3.c3.re[id];                                         \
+    (dst).c3.c3.im = (src).c3.c3.im[id];                                         \
+    (dst).c4.c1.re = (src).c4.c1.re[id];                                         \
+    (dst).c4.c1.im = (src).c4.c1.im[id];                                         \
+    (dst).c4.c2.re = (src).c4.c2.re[id];                                         \
+    (dst).c4.c2.im = (src).c4.c2.im[id];                                         \
+    (dst).c4.c3.re = (src).c4.c3.re[id];                                         \
+    (dst).c4.c3.im = (src).c4.c3.im[id]
+
+#define _spinor_copy2arrays(dst, src, id)                                        \
+    (dst).c1.c1.re[id] = (src).c1.c1.re;                                         \
+    (dst).c1.c1.im[id] = (src).c1.c1.im;                                         \
+    (dst).c1.c2.re[id] = (src).c1.c2.re;                                         \
+    (dst).c1.c2.im[id] = (src).c1.c2.im;                                         \
+    (dst).c1.c3.re[id] = (src).c1.c3.re;                                         \
+    (dst).c1.c3.im[id] = (src).c1.c3.im;                                         \
+    (dst).c2.c1.re[id] = (src).c2.c1.re;                                         \
+    (dst).c2.c1.im[id] = (src).c2.c1.im;                                         \
+    (dst).c2.c2.re[id] = (src).c2.c2.re;                                         \
+    (dst).c2.c2.im[id] = (src).c2.c2.im;                                         \
+    (dst).c2.c3.re[id] = (src).c2.c3.re;                                         \
+    (dst).c2.c3.im[id] = (src).c2.c3.im;                                         \
+    (dst).c3.c1.re[id] = (src).c3.c1.re;                                         \
+    (dst).c3.c1.im[id] = (src).c3.c1.im;                                         \
+    (dst).c3.c2.re[id] = (src).c3.c2.re;                                         \
+    (dst).c3.c2.im[id] = (src).c3.c2.im;                                         \
+    (dst).c3.c3.re[id] = (src).c3.c3.re;                                         \
+    (dst).c3.c3.im[id] = (src).c3.c3.im;                                         \
+    (dst).c4.c1.re[id] = (src).c4.c1.re;                                         \
+    (dst).c4.c1.im[id] = (src).c4.c1.im;                                         \
+    (dst).c4.c2.re[id] = (src).c4.c2.re;                                         \
+    (dst).c4.c2.im[id] = (src).c4.c2.im;                                         \
+    (dst).c4.c3.re[id] = (src).c4.c3.re;                                         \
+    (dst).c4.c3.im[id] = (src).c4.c3.im
+
 #endif
