@@ -366,25 +366,30 @@ void copy_spinor_soa2aos(spinor* s, spinor_soa* s_soa, int vol)
 
 void copy_su3_aos2soa(su3_soa* u_soa, su3* u, int vol)
 {
-    for (int i = 0; i < 4*vol; ++i) {
-        (*u_soa).c11.re[i] = (*(u+i)).c11.re;
-        (*u_soa).c11.im[i] = (*(u+i)).c11.im;
-        (*u_soa).c12.re[i] = (*(u+i)).c12.re;
-        (*u_soa).c12.im[i] = (*(u+i)).c12.im;
-        (*u_soa).c13.re[i] = (*(u+i)).c13.re;
-        (*u_soa).c13.im[i] = (*(u+i)).c13.im;
-        (*u_soa).c21.re[i] = (*(u+i)).c21.re;
-        (*u_soa).c21.im[i] = (*(u+i)).c21.im;
-        (*u_soa).c22.re[i] = (*(u+i)).c22.re;
-        (*u_soa).c22.im[i] = (*(u+i)).c22.im;
-        (*u_soa).c23.re[i] = (*(u+i)).c23.re;
-        (*u_soa).c23.im[i] = (*(u+i)).c23.im;
-        (*u_soa).c31.re[i] = (*(u+i)).c31.re;
-        (*u_soa).c31.im[i] = (*(u+i)).c31.im;
-        (*u_soa).c32.re[i] = (*(u+i)).c32.re;
-        (*u_soa).c32.im[i] = (*(u+i)).c32.im;
-        (*u_soa).c33.re[i] = (*(u+i)).c33.re;
-        (*u_soa).c33.im[i] = (*(u+i)).c33.im;
+    int idSoA, idAoS;
+    for (int i = 0; i < vol/2; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            idSoA = 8*i+j;
+            idAoS = 8*j+i;
+            (*u_soa).c11.re[idSoA] = (*(u+idAoS)).c11.re;
+            (*u_soa).c11.im[idSoA] = (*(u+idAoS)).c11.im;
+            (*u_soa).c12.re[idSoA] = (*(u+idAoS)).c12.re;
+            (*u_soa).c12.im[idSoA] = (*(u+idAoS)).c12.im;
+            (*u_soa).c13.re[idSoA] = (*(u+idAoS)).c13.re;
+            (*u_soa).c13.im[idSoA] = (*(u+idAoS)).c13.im;
+            (*u_soa).c21.re[idSoA] = (*(u+idAoS)).c21.re;
+            (*u_soa).c21.im[idSoA] = (*(u+idAoS)).c21.im;
+            (*u_soa).c22.re[idSoA] = (*(u+idAoS)).c22.re;
+            (*u_soa).c22.im[idSoA] = (*(u+idAoS)).c22.im;
+            (*u_soa).c23.re[idSoA] = (*(u+idAoS)).c23.re;
+            (*u_soa).c23.im[idSoA] = (*(u+idAoS)).c23.im;
+            (*u_soa).c31.re[idSoA] = (*(u+idAoS)).c31.re;
+            (*u_soa).c31.im[idSoA] = (*(u+idAoS)).c31.im;
+            (*u_soa).c32.re[idSoA] = (*(u+idAoS)).c32.re;
+            (*u_soa).c32.im[idSoA] = (*(u+idAoS)).c32.im;
+            (*u_soa).c33.re[idSoA] = (*(u+idAoS)).c33.re;
+            (*u_soa).c33.im[idSoA] = (*(u+idAoS)).c33.im;
+        }
     }
 }
 

@@ -1,7 +1,6 @@
 #include "dw_cuda_soa.h"
 #include "read_in.h"
 #include "su3.h"
-#include "macros.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
