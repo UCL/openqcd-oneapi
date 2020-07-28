@@ -393,3 +393,41 @@ void Dw_diag(float mu, spinor *s, spinor *r, pauli *m, int vol)
    }
 
 }
+
+void Dw_upto_doe(float mu, spinor *s, spinor *r, su3* u, pauli *m, int * piup, int * pidn, int vol)
+{
+
+   su3 *um;
+   spin_t *so,*ro;
+
+   apply_sw(vol / 2, mu, m, s, r);
+
+   coe=-0.5f;
+   ceo=-0.5f;
+
+   so=(spin_t*)(s+(vol / 2));
+   ro=(spin_t*)(r+(vol / 2));
+
+   m += vol;
+
+   um = u + 4 * vol;
+
+   for (; u < um; u += 8, piup+=4, pidn+=4, so+=1, ro+=1, m+=2)
+   {
+
+      doe(piup,pidn,u,s);
+
+      mul_pauli2(mu, m, &((*so).s), &((*ro).s));
+
+      _vector_add_assign((*ro).s.c1,rs.s.c1);
+      _vector_add_assign((*ro).s.c2,rs.s.c2);
+      _vector_add_assign((*ro).s.c3,rs.s.c3);
+      _vector_add_assign((*ro).s.c4,rs.s.c4);
+
+/*
+      rs=(*so);
+
+      deo(piup,pidn,u,r);
+*/
+   }
+}

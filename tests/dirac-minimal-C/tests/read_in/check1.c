@@ -121,6 +121,21 @@ int main(int argc, char** argv)
 
   fclose(fout);
 
+  /* diagonal term and doe */
+
+  Dw_upto_doe(0.0f, s, rtest, m, VOLUME);
+
+  sprintf(cnfg, "%s/sp-rdoe-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
+
+  fout = fopen(cnfg, "wb");
+
+  for(ix = 0; ix < VOLUME; ix++, rtest++)
+  {
+    fwrite((float*) rtest, sizeof(float), 24, fout);
+  }
+
+  fclose(fout);
+
   /* Clean up */
 
   fclose(flog);
