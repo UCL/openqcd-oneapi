@@ -12,8 +12,8 @@
 static void doe(int piup_soa, int pidn_soa, su3_soa u, spinor_soa s, spinor_soa r)
 {
 
-   spinor_loc_soa sp;
-   su3_vector_loc psi, chi;
+   spinor sp;
+   su3_vector psi, chi;
 
    /* define thread index idx */
    int idx = ...;
@@ -41,9 +41,10 @@ static void doe(int piup_soa, int pidn_soa, su3_soa u, spinor_soa s, spinor_soa 
    psi.c3.re = sp.c1.c3.re + sp.c3.c3.re;
    psi.c3.im = sp.c1.c3.re + sp.c3.c3.im;
 
-   /* multiply with link */
+   /* multiply with link su3 times su3_vector */
    /* _su3_multiply(rs.s.c1,*u,psi); */
-   chi.c1.re = u.c11.re[idx] * psi.c1.re + ...;
+   chi.c1.re = u.c11.re[idx] * psi.c1.re - u.c11.im[idx] * psi.c1.im + u.c12.re[idx] * psi.c2.re + ...;
+
    /* ... and so on */
 
    /* add_assignment of the result to r */
