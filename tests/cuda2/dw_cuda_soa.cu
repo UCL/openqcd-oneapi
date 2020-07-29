@@ -369,8 +369,8 @@ void copy_su3_aos2soa(su3_soa* u_soa, su3* u, int vol)
     int idSoA, idAoS;
     for (int i = 0; i < vol/2; ++i) {
         for (int j = 0; j < 8; ++j) {
-            idSoA = 8*i+j;
-            idAoS = 8*j+i;
+            idSoA = (vol/2)*j+i;
+            idAoS = 8*i+j;
             (*u_soa).c11.re[idSoA] = (*(u+idAoS)).c11.re;
             (*u_soa).c11.im[idSoA] = (*(u+idAoS)).c11.im;
             (*u_soa).c12.re[idSoA] = (*(u+idAoS)).c12.re;
@@ -605,7 +605,7 @@ void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 
     /***************************** direction +0 *******************************/
 
-    sidx = vol/2 + piuploc.x;
+    sidx = piuploc.x;
     uidx = 0*(vol/2) + idx;
     _spinor_copy2struct(sloc, s, sidx);
     _su3_copy2struct(uloc, u, uidx);
@@ -620,7 +620,7 @@ void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 
     /***************************** direction -0 *******************************/
 
-    sidx = vol/2 + pidnloc.x;
+    sidx = pidnloc.x;
     uidx = 1*(vol/2) + idx;
     _spinor_copy2struct(sloc, s, sidx);
     _su3_copy2struct(uloc, u, uidx);
@@ -642,7 +642,7 @@ void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 
     /***************************** direction +1 *******************************/
 
-    sidx = vol/2 + piuploc.y;
+    sidx = piuploc.y;
     uidx = 2*(vol/2) + idx;
     _spinor_copy2struct(sloc, s, sidx);
     _su3_copy2struct(uloc, u, uidx);
@@ -659,7 +659,7 @@ void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 
     /***************************** direction -1 *******************************/
 
-    sidx = vol/2 + pidnloc.y;
+    sidx = pidnloc.y;
     uidx = 3*(vol/2) + idx;
     _spinor_copy2struct(sloc, s, sidx);
     _su3_copy2struct(uloc, u, uidx);
@@ -676,7 +676,7 @@ void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 
     /***************************** direction +2 *******************************/
 
-    sidx = vol/2 + piuploc.z;
+    sidx = piuploc.z;
     uidx = 4*(vol/2) + idx;
     _spinor_copy2struct(sloc, s, sidx);
     _su3_copy2struct(uloc, u, uidx);
@@ -693,7 +693,7 @@ void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 
     /***************************** direction -2 *******************************/
 
-    sidx = vol/2 + pidnloc.z;
+    sidx = pidnloc.z;
     uidx = 5*(vol/2) + idx;
     _spinor_copy2struct(sloc, s, sidx);
     _su3_copy2struct(uloc, u, uidx);
@@ -710,7 +710,7 @@ void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 
     /***************************** direction +3 *******************************/
 
-    sidx = vol/2 + piuploc.w;
+    sidx = piuploc.w;
     uidx = 6*(vol/2) + idx;
     _spinor_copy2struct(sloc, s, sidx);
     _su3_copy2struct(uloc, u, uidx);
@@ -727,7 +727,7 @@ void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 
     /***************************** direction -3 *******************************/
 
-    sidx = vol/2 + pidnloc.w;
+    sidx = pidnloc.w;
     uidx = 7*(vol/2) + idx;
     _spinor_copy2struct(sloc, s, sidx);
     _su3_copy2struct(uloc, u, uidx);
@@ -754,7 +754,7 @@ void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 
     // Copy from registers to global memory
     sidx = vol/2 + idx;
-    _spinor_copy2arrays(r, rloc, sidx);
+    _spinor_add2arrays(r, rloc, sidx);
 }
 
 
