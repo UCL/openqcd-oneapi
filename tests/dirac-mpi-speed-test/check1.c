@@ -33,19 +33,22 @@ int main(int argc, char *argv[])
 
   int my_rank, bc;
   double phi[2], phi_prime[2], theta[3];
-
+  char name[128];
   FILE *flog = NULL;
 
   /* single precision pointers */
 
+  spinor_dble **psd;
   spinor ** ps;
   double wt1, wt2, wdt;
 
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
+  sprintf(name, "check1-%d-%d-%d-%d.log", L0, L1, L2, L3);
+   
   if (my_rank == 0) {
-    flog = freopen("check1.log", "w", stdout);
+    flog = freopen(name, "w", stdout);
 
     printf("\n");
     printf("Speedtest Dw in openQCD\n");
@@ -96,7 +99,7 @@ int main(int argc, char *argv[])
    alloc_wsd(1);
    alloc_ws(2);
 
-   psd = release_wsd(1);
+   psd = reserve_wsd(1);
    ps = reserve_ws(2);
 
    random_sd(VOLUME, psd[0], 1.0);

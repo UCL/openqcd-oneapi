@@ -146,7 +146,7 @@ main_programs := $(patsubst $(source_main_dir)/%.c,%,$(main_sources))
 # Collect all the tests
 test_module_names := archive block dfl dirac field_com flags forces lattice linalg little\
                      random ratfcts sap sflds stout_smearing su3fcts sw_term\
-                     tcharge uflds update utils vflds wflow data_structure
+                     tcharge uflds update utils vflds wflow data_structure dirac-mpi-speed-test
 
 test_module_dirs  := $(patsubst %,$(target_tests_dir)/%,$(test_module_names))
 
