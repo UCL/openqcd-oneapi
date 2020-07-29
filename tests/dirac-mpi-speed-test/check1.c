@@ -31,7 +31,7 @@ static lat_parms_t my_lat_parms;
 int main(int argc, char *argv[])
 {
 
-  int my_rank, bc;
+  int my_rank, bc, i;
   double phi[2], phi_prime[2], theta[3];
   char name[128];
   FILE *flog = NULL;
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-  sprintf(name, "check1-%d-%d-%d-%d.log", L0, L1, L2, L3);
+  sprintf(name, "/mnt/shared/sheff_fastsum/speed-test-dirac-C/check1-%d-%d-%d-%d.log", L0, L1, L2, L3);
    
   if (my_rank == 0) {
     flog = freopen(name, "w", stdout);
@@ -112,7 +112,10 @@ int main(int argc, char *argv[])
    MPI_Barrier(MPI_COMM_WORLD);
    wt1 = MPI_Wtime();
 
-   Dw(0.0f, ps[0], ps[1]);
+   for(i = 0; i < 100; i++)
+   {
+   	Dw(0.0f, ps[0], ps[1]);
+   }	   
 
    MPI_Barrier(MPI_COMM_WORLD);
    wt2 = MPI_Wtime();
@@ -128,7 +131,10 @@ int main(int argc, char *argv[])
    MPI_Barrier(MPI_COMM_WORLD);
    wt1 = MPI_Wtime();
 
-   Dwoe(ps[0], ps[1]);
+   for(i = 0; i < 100; i++)
+   {
+   	Dwoe(ps[0], ps[1]);
+   }	   
 
    MPI_Barrier(MPI_COMM_WORLD);
    wt2 = MPI_Wtime();
@@ -144,7 +150,10 @@ int main(int argc, char *argv[])
    MPI_Barrier(MPI_COMM_WORLD);
    wt1 = MPI_Wtime();
 
-   Dweo(ps[0], ps[1]);
+   for(i = 0; i < 100; i++)
+   {
+   	Dweo(ps[0], ps[1]);
+   }	   
 
    MPI_Barrier(MPI_COMM_WORLD);
    wt2 = MPI_Wtime();
