@@ -45,7 +45,8 @@ int main(int argc, char *argv[])
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-  sprintf(name, "/mnt/shared/sheff_fastsum/speed-test-dirac-C/check1-%d-%d-%d-%d.log", L0, L1, L2, L3);
+  /*sprintf(name, "/mnt/shared/sheff_fastsum/speed-test-dirac-C/check1-%d-%d-%d-%d.log", L0, L1, L2, L3);*/
+  sprintf(name, "/mnt/shared/sheff_fastsum/speed-test-dirac-C/mpi-check1-%d-%d-%d-%d.log", L0, L1, L2, L3);
    
   if (my_rank == 0) {
     flog = freopen(name, "w", stdout);

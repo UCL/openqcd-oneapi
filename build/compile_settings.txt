@@ -4,15 +4,15 @@ MPI_INCLUDE /mnt/shared/sw-hackathons/spack-0.15.1/opt/spack/linux-ubuntu18.04-b
 CFLAGS -std=c89 -O2 -DAVX -DFMA3 -Werror -Wall
 LDFLAGS
 
-NPROC0_TOT   1
-NPROC1_TOT   1
-NPROC2_TOT   1
-NPROC3_TOT   1
+NPROC0_TOT   2
+NPROC1_TOT   2
+NPROC2_TOT   2
+NPROC3_TOT   2
 
-L0 8
-L1 8
-L2 8
-L3 8
+L0 24
+L1 24
+L2 24
+L3 24
 
 NPROC0_BLK 1
 NPROC1_BLK 1
