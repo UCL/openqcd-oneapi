@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     su3 *u;
     pauli *m;
-    spinor *s, *r, *rdiag, *rdoe;
+    spinor *s, *r, *rdiag, *rdoe, *rfinal;
     int *piup, *pidn;
 
     char cnfg[256];
@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
     r = (spinor *) malloc(VOLUME * sizeof(*r));
     rdiag = (spinor *) malloc(VOLUME * sizeof(*rdiag));
     rdoe = (spinor *) malloc(VOLUME * sizeof(*rdoe));
+    rfinal = (spinor *) malloc(VOLUME * sizeof(*rfinal));
 
     sprintf(cnfg, "%s/sp-u-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
     read_sp_u_from_file(cnfg, u, VOLUME);
@@ -78,8 +79,8 @@ int main(int argc, char *argv[])
     sprintf(cnfg, "%s/sp-s-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
     read_sp_spinor_from_file(cnfg, s, VOLUME);
 
-    // sprintf(cnfg, "%s/sp-r-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
-    // read_sp_spinor_from_file(cnfg, r, VOLUME);
+    sprintf(cnfg, "%s/sp-r-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
+    read_sp_spinor_from_file(cnfg, rfinal, VOLUME);
 
     sprintf(cnfg, "%s/sp-rdiag-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
     read_sp_spinor_from_file(cnfg, rdiag, VOLUME);
@@ -94,7 +95,7 @@ int main(int argc, char *argv[])
     int ret;
     int count = 0;
     for (int i = 0; i < VOLUME; ++i) {
-        ret = my_memcmp(r+i, rdoe+i, sizeof(spinor)/sizeof(float));
+        ret = my_memcmp(r+i, rfinal+i, sizeof(spinor)/sizeof(float));
         if (ret == 0) {
             count++;
         }
