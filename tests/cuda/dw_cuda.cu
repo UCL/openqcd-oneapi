@@ -7,28 +7,6 @@
 #include <math.h>
 
 
-long my_memcmp(const void *Ptr1, const void *Ptr2, size_t Count)
-{
-    float *p1 = (float *)Ptr1;
-    float *p2 = (float *)Ptr2;
-
-    while (Count > 0)
-    {
-        int res = memcmp(p1, p2, sizeof(float));
-        if (res != 0) {
-            if (fabs(*p1 - *p2) > 0.001) {
-                return 1;
-            }
-        }
-        p1++;
-        p2++;
-        Count--;
-    }
-
-    return 0;
-}
-
-
 __device__
 spin_t doe_cuda(int *piup, int *pidn, su3 *u, spinor *pk,
                      float coe, float gamma_f, float one_over_gammaf, spin_t rs)
@@ -169,145 +147,6 @@ spin_t doe_cuda(int *piup, int *pidn, su3 *u, spinor *pk,
     _vector_mul_assign(rs.s.c4, one_over_gammaf);
 
     return rs;
-
-
-}
-
-__device__
-static void deo_cuda(int *piup, int *pidn, su3 *u, spinor *pl,
-                     float ceo, float one_over_gammaf, spin_t rs)
-{
-    spinor *sp, *sm;
-    su3_vector psi, chi;
-
-    _vector_mul_assign(rs.s.c1, ceo);
-    _vector_mul_assign(rs.s.c2, ceo);
-    _vector_mul_assign(rs.s.c3, ceo);
-    _vector_mul_assign(rs.s.c4, ceo);
-
-    /***************************** direction +0 *******************************/
-
-    sp = pl + (*(piup++));
-
-    _vector_sub(psi, rs.s.c1, rs.s.c3);
-    _su3_inverse_multiply(chi, *u, psi);
-    _vector_add_assign((*sp).c1, chi);
-    _vector_sub_assign((*sp).c3, chi);
-
-    _vector_sub(psi, rs.s.c2, rs.s.c4);
-    _su3_inverse_multiply(chi, *u, psi);
-    _vector_add_assign((*sp).c2, chi);
-    _vector_sub_assign((*sp).c4, chi);
-
-    /***************************** direction -0 *******************************/
-
-    sm = pl + (*(pidn++));
-    u += 1;
-
-    _vector_add(psi, rs.s.c1, rs.s.c3);
-    _su3_multiply(chi, *u, psi);
-    _vector_add_assign((*sm).c1, chi);
-    _vector_add_assign((*sm).c3, chi);
-
-    _vector_add(psi, rs.s.c2, rs.s.c4);
-    _su3_multiply(chi, *u, psi);
-    _vector_add_assign((*sm).c2, chi);
-    _vector_add_assign((*sm).c4, chi);
-
-    /***************************** direction +1 *******************************/
-
-    _vector_mul_assign(rs.s.c1, one_over_gammaf);
-    _vector_mul_assign(rs.s.c2, one_over_gammaf);
-    _vector_mul_assign(rs.s.c3, one_over_gammaf);
-    _vector_mul_assign(rs.s.c4, one_over_gammaf);
-
-    sp = pl + (*(piup++));
-    u += 1;
-
-    _vector_i_sub(psi, rs.s.c1, rs.s.c4);
-    _su3_inverse_multiply(chi, *u, psi);
-    _vector_add_assign((*sp).c1, chi);
-    _vector_i_add_assign((*sp).c4, chi);
-
-    _vector_i_sub(psi, rs.s.c2, rs.s.c3);
-    _su3_inverse_multiply(chi, *u, psi);
-    _vector_add_assign((*sp).c2, chi);
-    _vector_i_add_assign((*sp).c3, chi);
-
-    /***************************** direction -1 *******************************/
-
-    sm = pl + (*(pidn++));
-    u += 1;
-
-    _vector_i_add(psi, rs.s.c1, rs.s.c4);
-    _su3_multiply(chi, *u, psi);
-    _vector_add_assign((*sm).c1, chi);
-    _vector_i_sub_assign((*sm).c4, chi);
-
-    _vector_i_add(psi, rs.s.c2, rs.s.c3);
-    _su3_multiply(chi, *u, psi);
-    _vector_add_assign((*sm).c2, chi);
-    _vector_i_sub_assign((*sm).c3, chi);
-
-    /***************************** direction +2 *******************************/
-
-    sp = pl + (*(piup++));
-    u += 1;
-
-    _vector_sub(psi, rs.s.c1, rs.s.c4);
-    _su3_inverse_multiply(chi, *u, psi);
-    _vector_add_assign((*sp).c1, chi);
-    _vector_sub_assign((*sp).c4, chi);
-
-    _vector_add(psi, rs.s.c2, rs.s.c3);
-    _su3_inverse_multiply(chi, *u, psi);
-    _vector_add_assign((*sp).c2, chi);
-    _vector_add_assign((*sp).c3, chi);
-
-    /***************************** direction -2 *******************************/
-
-    sm = pl + (*(pidn++));
-    u += 1;
-
-    _vector_add(psi, rs.s.c1, rs.s.c4);
-    _su3_multiply(chi, *u, psi);
-    _vector_add_assign((*sm).c1, chi);
-    _vector_add_assign((*sm).c4, chi);
-
-    _vector_sub(psi, rs.s.c2, rs.s.c3);
-    _su3_multiply(chi, *u, psi);
-    _vector_add_assign((*sm).c2, chi);
-    _vector_sub_assign((*sm).c3, chi);
-
-    /***************************** direction +3 *******************************/
-
-    sp = pl + (*(piup));
-    u += 1;
-
-    _vector_i_sub(psi, rs.s.c1, rs.s.c3);
-    _su3_inverse_multiply(chi, *u, psi);
-    _vector_add_assign((*sp).c1, chi);
-    _vector_i_add_assign((*sp).c3, chi);
-
-    _vector_i_add(psi, rs.s.c2, rs.s.c4);
-    _su3_inverse_multiply(chi, *u, psi);
-    _vector_add_assign((*sp).c2, chi);
-    _vector_i_sub_assign((*sp).c4, chi);
-
-    /***************************** direction -3 *******************************/
-
-    sm = pl + (*(pidn));
-    u += 1;
-
-    _vector_i_add(psi, rs.s.c1, rs.s.c3);
-    _su3_multiply(chi, *u, psi);
-    _vector_add_assign((*sm).c1, chi);
-    _vector_i_sub_assign((*sm).c3, chi);
-
-    _vector_i_sub(psi, rs.s.c2, rs.s.c4);
-    _su3_multiply(chi, *u, psi);
-    _vector_add_assign((*sm).c2, chi);
-    _vector_i_add_assign((*sm).c4, chi);
 }
 
 __device__
@@ -613,84 +452,62 @@ void mul_pauli2_cuda(float mu, pauli const *m, spinor const *s, spinor *r, weyl 
 }
 
 extern "C" __global__
-void Dw_cuda_kernel(int VOLUME, float mu, spinor *s, spinor *r,
-                    int *piup, int *pidn, su3 *u, pauli *m,
-                    float coe, float ceo, float gamma_f, float one_over_gammaf)
+void mulpauli_kernel(int vol, float mu, spinor *s, spinor *r, pauli *m)
 {
     int idx = blockIdx.x*blockDim.x + threadIdx.x;
-    if (idx >= VOLUME/2) return;
+    if (idx >= vol) return;
 
     weyl rt;
-    spin_t rs;
 
     spin_t *so, *ro;
-    so = (spin_t *)(s + (VOLUME / 2));
-    ro = (spin_t *)(r + (VOLUME / 2));
+    so = (spin_t *)(s + 0);
+    ro = (spin_t *)(r + 0);
 
-    u += (idx)*8;
-    piup += (idx)*4;
-    pidn += (idx)*4;
     so += (idx)*1;
     ro += (idx)*1;
     m += (idx)*2;
 
-    rs = doe_cuda(piup, pidn, u, s, coe, gamma_f, one_over_gammaf, rs);
-
     mul_pauli2_cuda(mu, m, &((*so).s), &((*ro).s), rt);
+}
+
+extern "C" __global__
+void doe_kernel(int vol, spinor *s, spinor *r, su3 *u,
+                int *piup, int *pidn, float coe,
+                float gamma_f, float one_over_gammaf)
+{
+    int idx = blockIdx.x*blockDim.x + threadIdx.x;
+    if (idx >= vol/2) return;
+
+    spin_t rs;
+
+    spin_t *ro;
+    ro = (spin_t *)(r + (vol / 2));
+
+    u += (idx)*8;
+    piup += (idx)*4;
+    pidn += (idx)*4;
+    ro += (idx)*1;
+
+    rs = doe_cuda(piup, pidn, u, s, coe, gamma_f, one_over_gammaf, rs);
 
     _vector_add_assign((*ro).s.c1, rs.s.c1);
     _vector_add_assign((*ro).s.c2, rs.s.c2);
     _vector_add_assign((*ro).s.c3, rs.s.c3);
     _vector_add_assign((*ro).s.c4, rs.s.c4);
-
-    // __syncthreads();
-
-    // rs = (*so);
-    // deo_cuda(piup, pidn, u, r, ceo, one_over_gammaf, rs); // This needs rework (Cannot be parallelized this way)
 }
 
-// // This kernel runs in 1 thread in the gpu, with a for loop to simulate
-// // the original code and produce the correct results.
-// // Of course it is garbage in terms of performance.
-// extern "C" __global__
-// void Dw_cuda_kernel2(int VOLUME, float mu, spinor *s, spinor *r,
-//                      int *piup, int *pidn, su3 *u, pauli *m,
-//                      float coe, float ceo, float gamma_f, float one_over_gammaf)
-// {
-//     int idx = blockIdx.x*blockDim.x + threadIdx.x;
-//     if (idx >= 1) return;  // Only for tests and to produce the correct results
-//
-//     su3 *um;
-//     um = u + 4 * VOLUME;
-//
-//     spin_t rs;
-//
-//     spin_t *so, *ro;
-//     so = (spin_t *)(s + (VOLUME / 2));
-//
-//     for (; u < um; u += 8) {
-//         rs = (*so);
-//         deo_cuda(piup, pidn, u, r, ceo, one_over_gammaf, rs);
-//
-//         piup += 4;
-//         pidn += 4;
-//         so += 1;
-//     }
-// }
-
-
 extern "C" __global__
-void Dw_cuda_kernel_deo(int VOLUME, float mu, spinor *s, spinor *r,
-                        int *piup, int *pidn, su3 *u, pauli *m,
-                        float coe, float ceo, float gamma_f, float one_over_gammaf)
+void deo_kernel(int vol, spinor *s, spinor *r, su3 *u,
+                int *piup, int *pidn, float ceo,
+                float one_over_gammaf)
 {
     int idx = blockIdx.x*blockDim.x + threadIdx.x;
-    if (idx >= VOLUME/2) return;
+    if (idx >= vol/2) return;
 
     spin_t rs;
 
     spin_t *so;
-    so = (spin_t *)(s + (VOLUME / 2));
+    so = (spin_t *)(s + (vol / 2));
 
     u    += idx*8;
     piup += idx*4;
@@ -703,96 +520,17 @@ void Dw_cuda_kernel_deo(int VOLUME, float mu, spinor *s, spinor *r,
 }
 
 extern "C"
-void Dw_cuda(spinor *r_cpu, char *SIZE)
+void Dw_cuda_AoS(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, int *pidn)
 {
-    char buffer[100];
-    size_t result;
-    FILE *ptr;
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    float milliseconds;
 
-    // Read again everyting before calling the cuda kernel
-    // Read VOLUME
-    int VOLUME;
-    buffer[0] = '\0';
-    strcat(buffer, SIZE);
-    strcat(buffer, "/dataBefore/VOLUME.bin");
-    ptr = fopen(buffer, "rb");
-    result = fread(&VOLUME, sizeof(int), 1, ptr);
-    fclose(ptr);
-
-    // Read mu
-    float mu;
-    buffer[0] = '\0';
-    strcat(buffer, SIZE);
-    strcat(buffer, "/dataBefore/mu.bin");
-    ptr = fopen(buffer, "rb");
-    result = fread(&mu, sizeof(float), 1, ptr);
-    fclose(ptr);
-
-    // Read s
-    spinor *s;
-    s = (spinor*) malloc(VOLUME * sizeof(spinor));
-    buffer[0] = '\0';
-    strcat(buffer, SIZE);
-    strcat(buffer, "/dataBefore/s.bin");
-    ptr = fopen(buffer, "rb");
-    result = fread(s, sizeof(spinor), VOLUME, ptr);
-    fclose(ptr);
-
-    // Read r
-    spinor *r;
-    r = (spinor*) malloc(VOLUME * sizeof(spinor));
-    buffer[0] = '\0';
-    strcat(buffer, SIZE);
-    strcat(buffer, "/dataBefore/r.bin");
-    ptr = fopen(buffer, "rb");
-    result = fread(r, sizeof(spinor), VOLUME, ptr);
-    fclose(ptr);
-
-    float coe, ceo;
+    float mu, coe, ceo;
     float gamma_f, one_over_gammaf;
 
-
-    // Read piup
-    int *piup;
-    piup = (int*) malloc(2 * VOLUME * sizeof(int));
-    buffer[0] = '\0';
-    strcat(buffer, SIZE);
-    strcat(buffer, "/dataBefore/piup.bin");
-    ptr = fopen(buffer, "rb");
-    result = fread(piup, sizeof(int), 2 * VOLUME, ptr);
-    fclose(ptr);
-
-    // Read pidn
-    int *pidn;
-    pidn = (int*) malloc(2 * VOLUME * sizeof(int));
-    buffer[0] = '\0';
-    strcat(buffer, SIZE);
-    strcat(buffer, "/dataBefore/pidn.bin");
-    ptr = fopen(buffer, "rb");
-    result = fread(pidn, sizeof(int), 2 * VOLUME, ptr);
-    fclose(ptr);
-
-    // Read u
-    su3 *u;
-    u = (su3*) malloc(4 * VOLUME * sizeof(su3));
-    buffer[0] = '\0';
-    strcat(buffer, SIZE);
-    strcat(buffer, "/dataBefore/u.bin");
-    ptr = fopen(buffer, "rb");
-    result = fread(u, sizeof(su3), 4 * VOLUME, ptr);
-    fclose(ptr);
-
-    // Read m
-    pauli *m;
-    m = (pauli*) malloc(VOLUME * sizeof(pauli));
-    buffer[0] = '\0';
-    strcat(buffer, SIZE);
-    strcat(buffer, "/dataBefore/m.bin");
-    ptr = fopen(buffer, "rb");
-    result = fread(m, sizeof(pauli), VOLUME, ptr);
-    fclose(ptr);
-
-
+    mu = 0.0f;
     coe = -0.5f;
     ceo = -0.5f;
 
@@ -811,32 +549,65 @@ void Dw_cuda(spinor *r_cpu, char *SIZE)
     cudaMalloc((void **)&d_piup, 2 * VOLUME * sizeof(int));
     cudaMalloc((void **)&d_pidn, 2 * VOLUME * sizeof(int));
     cudaMalloc((void **)&d_u, 4 * VOLUME * sizeof(su3));
-    cudaMalloc((void **)&d_m, VOLUME * sizeof(pauli));
+    cudaMalloc((void **)&d_m, 2 * VOLUME * sizeof(pauli));
 
     // Copy data from host to device
+    cudaEventRecord(start);
     cudaMemcpy(d_s, s, VOLUME * sizeof(spinor), cudaMemcpyHostToDevice);
     cudaMemcpy(d_r, r, VOLUME * sizeof(spinor), cudaMemcpyHostToDevice);
     cudaMemcpy(d_piup, piup, 2 * VOLUME * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_pidn, pidn, 2 * VOLUME * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_u, u, 4 * VOLUME * sizeof(su3), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_m, m, VOLUME * sizeof(pauli), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_m, m, 2 * VOLUME * sizeof(pauli), cudaMemcpyHostToDevice);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time for cudaMemcpy H2D (ms): %.2f\n", milliseconds);
 
-    // Launch kernel on GPU
-    int block_size = 128;
-    int grid_size = ceil((VOLUME/2.0)/(float)block_size);
-    Dw_cuda_kernel<<<grid_size, block_size>>>(VOLUME, mu, d_s, d_r,
-                                              d_piup, d_pidn, d_u, d_m,
-                                              coe, ceo, gamma_f, one_over_gammaf);
+    int block_size, grid_size;
 
-    // Dw_cuda_kernel2<<<grid_size, block_size>>>(VOLUME, mu, d_s, d_r,
-    //                                            d_piup, d_pidn, d_u, d_m,
-    //                                            coe, ceo, gamma_f, one_over_gammaf);
-    Dw_cuda_kernel_deo<<<grid_size, block_size>>>(VOLUME, mu, d_s, d_r,
-                                                  d_piup, d_pidn, d_u, d_m,
-                                                  coe, ceo, gamma_f, one_over_gammaf);
+    // Launch kernels on GPU
+    block_size = 128;
+    grid_size = ceil(VOLUME/(float)block_size);
+    cudaEventRecord(start);
+    mulpauli_kernel<<<grid_size, block_size>>>(VOLUME, mu, d_s, d_r, d_m);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time for kernel mul_pauli (ms): %.2f\n", milliseconds);
+
+
+    block_size = 128;
+    grid_size = ceil((VOLUME/2.0)/(float)block_size);
+    cudaEventRecord(start);
+    doe_kernel<<<grid_size, block_size>>>(VOLUME, d_s, d_r, d_u,
+                                          d_piup, d_pidn, coe,
+                                          gamma_f, one_over_gammaf);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time for kernel doe (ms): %.2f\n", milliseconds);
+
+
+    block_size = 128;
+    grid_size = ceil((VOLUME/2.0)/(float)block_size);
+    cudaEventRecord(start);
+    deo_kernel<<<grid_size, block_size>>>(VOLUME, d_s, d_r, d_u,
+                                          d_piup, d_pidn, ceo,
+                                          one_over_gammaf);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time for kernel deo (ms): %.2f\n", milliseconds);
+
 
     // Copy result back to the host
+    cudaEventRecord(start);
     cudaMemcpy(r, d_r, VOLUME * sizeof(spinor), cudaMemcpyDeviceToHost);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time for cudaMemcpy D2H (ms): %.2f\n", milliseconds);
 
     // Cleanup
     cudaFree(d_s);
@@ -846,45 +617,13 @@ void Dw_cuda(spinor *r_cpu, char *SIZE)
     cudaFree(d_u);
     cudaFree(d_m);
 
-    // Read r after from disk
-    spinor *r_after;
-    r_after = (spinor*) malloc(VOLUME * sizeof(spinor));
-    buffer[0] = '\0';
-    strcat(buffer, SIZE);
-    strcat(buffer, "/dataAfter/r.bin");
-    ptr = fopen(buffer, "rb");
-    result = fread(r_after, sizeof(spinor), VOLUME, ptr);
-    fclose(ptr);
-
-    int ret;
-
-    // // Compare value from disk with r in memory after execution of Dw_cuda()
-    // ret = memcmp(r, r_after, VOLUME * sizeof(spinor));
-    // if (ret == 0) {
-    //     printf("Values in spinor r are correct after calling Dw_cuda()\n");
-    // }
-    // else {
-    //     printf("Values in spinor r are incorrect after calling Dw_cuda()\n");
-    // }
-
-    // Compare value from cpu computations with r from gpu after execution of Dw_cuda()
-    int count = 0;
-    for (int i = 0; i < VOLUME; ++i) {
-        ret = my_memcmp(r+i, r_cpu+i, sizeof(spinor)/sizeof(float));
-        if (ret == 0) {
-            count++;
-        }
-        else {
-            printf("Values in spinor r are different between cpu and gpu: %d\n", i);
-        }
-    }
-    if (count == VOLUME) {
-        printf("Values in spinor r are the same between cpu and gpu\n");
-    }
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
 
     // // Write to disk
+    // FILE *ptr;
     // ptr = fopen("r_after_cuda.bin", "w");
-    // fwrite (r, sizeof(spinor), VOLUME, ptr);
-    // fclose (ptr);
+    // fwrite(r, sizeof(spinor), VOLUME, ptr);
+    // fclose(ptr);
 
 }
