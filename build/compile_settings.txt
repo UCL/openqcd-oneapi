@@ -1,21 +1,20 @@
 CODELOC ..
-COMPILER /mnt/shared/sw-hackathons/spack-0.15.1/opt/spack/linux-ubuntu18.04-broadwell/gcc-8.4.0/openmpi-3.1.6-zmsiyxwvqz2kst6tzx6hw5cxghqjimwa/bin/mpicc
-MPI_INCLUDE /mnt/shared/sw-hackathons/spack-0.15.1/opt/spack/linux-ubuntu18.04-broadwell/gcc-8.4.0/openmpi-3.1.6-zmsiyxwvqz2kst6tzx6hw5cxghqjimwa/include/
-CFLAGS -std=c89 -O2 -DAVX -DFMA3 -Werror -Wall
+COMPILER mpicc
+MPI_INCLUDE ./
+CFLAGS -std=c99 -O2 -DAVX -DFMA3 -Werror -Wall
 LDFLAGS
 
-NPROC0_TOT   2
-NPROC1_TOT   2
-NPROC2_TOT   2
-NPROC3_TOT   2
+NPROC0_TOT   1
+NPROC1_TOT   1
+NPROC2_TOT   1
+NPROC3_TOT   1
 
-L0 24
-L1 24
-L2 24
-L3 24
+L0 16
+L1 16
+L2 16
+L3 16
 
 NPROC0_BLK 1
 NPROC1_BLK 1
 NPROC2_BLK 1
 NPROC3_BLK 1
-
