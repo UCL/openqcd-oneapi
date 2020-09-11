@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     su3 *u;
     pauli *m;
-    spinor *s, *r, *rdiag, *rdoe, *rfinal;
+    spinor *s, *r, *rfinal;
     int *piup, *pidn;
 
     char cnfg[256];
@@ -60,8 +60,6 @@ int main(int argc, char *argv[])
     pidn = (int *) malloc((2 * VOLUME) * sizeof(*pidn));
     s = (spinor *) malloc(VOLUME * sizeof(*s));
     r = (spinor *) malloc(VOLUME * sizeof(*r));
-    rdiag = (spinor *) malloc(VOLUME * sizeof(*rdiag));
-    rdoe = (spinor *) malloc(VOLUME * sizeof(*rdoe));
     rfinal = (spinor *) malloc(VOLUME * sizeof(*rfinal));
 
     sprintf(cnfg, "%s/sp-u-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
@@ -82,13 +80,8 @@ int main(int argc, char *argv[])
     sprintf(cnfg, "%s/sp-r-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
     read_sp_spinor_from_file(cnfg, rfinal, VOLUME);
 
-    sprintf(cnfg, "%s/sp-rdiag-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
-    read_sp_spinor_from_file(cnfg, rdiag, VOLUME);
 
-    sprintf(cnfg, "%s/sp-rdoe-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
-    read_sp_spinor_from_file(cnfg, rdoe, VOLUME);
-
-
+    // Call CUDA version of Dw() with Structures of Arrays
     Dw_cuda_SoA(VOLUME, u, s, r, m, piup, pidn);
 
     // Compare spinors r

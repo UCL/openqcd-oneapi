@@ -966,6 +966,11 @@ void deo_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 extern "C"
 void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, int *pidn)
 {
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    float milliseconds;
+
     float mu, coe, ceo;
     float gamma_f, one_over_gammaf;
 
@@ -983,9 +988,14 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
     su3_soa *u_soa = create_su3_soa(VOLUME);
 
     // Copy data from AoS to SoA
+    cudaEventRecord(start);
     copy_pauli_aos2soa(m_soa, m, VOLUME);
     copy_spinor_aos2soa(s_soa, s, VOLUME);
     copy_su3_aos2soa(u_soa, u, VOLUME);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time for AoS to SoA (CPU) (ms): %.2f\n", milliseconds);
 
     // Allocate memory on device
     int4 *d_piup, *d_pidn;
@@ -997,30 +1007,53 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
     su3_soa d_u_soa = allocSu32Device(VOLUME);
 
     // Copy from host to device
+    cudaEventRecord(start);
     cudaMemcpy(d_piup, piup, 2 * VOLUME * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_pidn, pidn, 2 * VOLUME * sizeof(int), cudaMemcpyHostToDevice);
     copyPauliHost2Device(d_m_soa, m_soa, VOLUME);
     copySpinorHost2Device(d_s_soa, s_soa, VOLUME);
     copySu3Host2Device(d_u_soa, u_soa, VOLUME);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time for cudaMemcpy H2D (ms): %.2f\n", milliseconds);
 
     int block_size, grid_size;
     // Launch kernel on GPU
     block_size = 128;
     grid_size = ceil(VOLUME/(float)block_size);
+    cudaEventRecord(start);
     mulpauli_kernel<<<grid_size, block_size>>>(VOLUME, mu, d_s_soa, d_r_soa, d_m_soa);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time for kernel mul_pauli (ms): %.2f\n", milliseconds);
+
 
     block_size = 128;
     grid_size = ceil((VOLUME/2.0)/(float)block_size);
+    cudaEventRecord(start);
     doe_kernel<<<grid_size, block_size>>>(VOLUME, d_s_soa, d_r_soa, d_u_soa,
                                           d_piup, d_pidn, coe, gamma_f, one_over_gammaf);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time for kernel doe (ms): %.2f\n", milliseconds);
+
 
     block_size = 128;
     grid_size = ceil((VOLUME/2.0)/(float)block_size);
+    cudaEventRecord(start);
     deo_kernel<<<grid_size, block_size>>>(VOLUME, d_s_soa, d_r_soa, d_u_soa,
                                           d_piup, d_pidn, ceo, gamma_f, one_over_gammaf);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time for kernel deo (ms): %.2f\n", milliseconds);
 
 
     // Copy data from device to host
+    cudaEventRecord(start);
     cudaMemcpy((*r_soa).c1.c1.re, d_r_soa.c1.c1.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
     cudaMemcpy((*r_soa).c1.c1.im, d_r_soa.c1.c1.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
     cudaMemcpy((*r_soa).c1.c2.re, d_r_soa.c1.c2.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
@@ -1045,6 +1078,10 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
     cudaMemcpy((*r_soa).c4.c2.im, d_r_soa.c4.c2.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
     cudaMemcpy((*r_soa).c4.c3.re, d_r_soa.c4.c3.re, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
     cudaMemcpy((*r_soa).c4.c3.im, d_r_soa.c4.c3.im, VOLUME * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time for cudaMemcpy D2H (ms): %.2f\n", milliseconds);
 
 
     // Free GPU memory
@@ -1053,11 +1090,19 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
 
 
     // Convert from SoA to AoS
+    cudaEventRecord(start);
     copy_spinor_soa2aos(r, r_soa, VOLUME);
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Time for SoA to AoS (CPU) (ms): %.2f\n", milliseconds);
 
     // Free SoA
     destroy_pauli_soa(m_soa);
     destroy_spinor_soa(s_soa);
     destroy_spinor_soa(r_soa);
     destroy_su3_soa(u_soa);
+
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
 }

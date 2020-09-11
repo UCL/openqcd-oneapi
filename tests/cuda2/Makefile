@@ -1,9 +1,9 @@
 CC=gcc
-CFLAGS=-c -std=c99 -Wall -gdwarf-2 -g3 -Og
-LDFLAGS=-g
+CFLAGS=-c -std=c99 -O2 -Wall
+LDFLAGS=
 
 CUDAC=nvcc
-CUDACFLAGS=-c -arch=sm_20 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__ -g# -std=c++11
+CUDACFLAGS=-c -arch=sm_70 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES -D__STRICT_ANSI__
 CUDALFLAGS=-lcuda -lcudart -lm -lstdc++
 
 INCLUDES=-Iincludes
