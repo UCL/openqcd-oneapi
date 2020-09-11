@@ -805,7 +805,7 @@ void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 extern "C" __global__
 void deo_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
                 int4 *piup, int4 *pidn, float ceo,
-                float gamma_f, float one_over_gammaf)
+                float one_over_gammaf)
 {
     int idx = blockIdx.x*blockDim.x + threadIdx.x;
     if (idx >= vol/2) return;
@@ -1045,7 +1045,7 @@ void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
     grid_size = ceil((VOLUME/2.0)/(float)block_size);
     cudaEventRecord(start);
     deo_kernel<<<grid_size, block_size>>>(VOLUME, d_s_soa, d_r_soa, d_u_soa,
-                                          d_piup, d_pidn, ceo, gamma_f, one_over_gammaf);
+                                          d_piup, d_pidn, ceo, one_over_gammaf);
     cudaEventRecord(stop);
     cudaEventSynchronize(stop);
     cudaEventElapsedTime(&milliseconds, start, stop);
