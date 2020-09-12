@@ -554,7 +554,6 @@ void Dw_cuda_AoS(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, 
     // Copy data from host to device
     cudaEventRecord(start);
     cudaMemcpy(d_s, s, VOLUME * sizeof(spinor), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_r, r, VOLUME * sizeof(spinor), cudaMemcpyHostToDevice);
     cudaMemcpy(d_piup, piup, 2 * VOLUME * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_pidn, pidn, 2 * VOLUME * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_u, u, 4 * VOLUME * sizeof(su3), cudaMemcpyHostToDevice);
