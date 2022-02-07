@@ -28,49 +28,39 @@
 #include "sw_term.h"
 #include "uflds.h"
 
-void write_spinor(char* filename, spinor** ps)
+void write_spinor(hid_t file, char* dsetname, spinor** ps, int nflds)
 {
 
-  char* dsetname = "complex";
-
-  hid_t file, filetype, memtype, strtype, space, dset;
-  hsize_t dims[1] = {2};
+  hid_t filetype, memtype, strtype, group, space, dset,
+    complex_type, su3_vector_type, spinor_type;
+  hsize_t dims[1] = {nflds};
   int status;
-  complex num[2];
-  num[0].re = 5.3;
-  num[0].im = 1.0;
-  num[1].re = 1.9;
-  num[1].im = 2.0;
-
-  /* Open new HDF5 file, overwrite existing, default file creation and file access property lists */
-  file = H5Fcreate (filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
   /* Create compound datatype for memory */
-  memtype = H5Tcreate (H5T_COMPOUND, sizeof (complex));
-
+  complex_type = H5Tcreate (H5T_COMPOUND, sizeof (complex));
   /*
-   * Add fields to compound datatype. The C library provides a macro for calculating the offset
+   * Add fields to compound datatype. The C library provides a HOFFSET macro for calculating the offset
    * http://davis.lbl.gov/Manuals/HDF5-1.8.7/UG/11_Datatypes.html
-   * HOFFSET(s,m)
-   * This macro computes the offset of member m within a struct s
-   * offsetof(s,m)
-   * This macro defined in stddef.h does exactly the same thing as the HOFFSET() macro.
    */
-  status = H5Tinsert (memtype, "re", HOFFSET (complex, re), H5T_NATIVE_FLOAT);
-  status = H5Tinsert (memtype, "im", HOFFSET (complex, im), H5T_NATIVE_FLOAT);
+  status = H5Tinsert (complex_type, "re", HOFFSET (complex, re), H5T_NATIVE_FLOAT);
+  status = H5Tinsert (complex_type, "im", HOFFSET (complex, im), H5T_NATIVE_FLOAT);
 
-  /* Create compound datatype for the file. */
-  filetype = H5Tcreate(H5T_COMPOUND, 2 * sizeof(float));
-  status = H5Tinsert (filetype, "re", 0, H5T_NATIVE_FLOAT);
-  status = H5Tinsert (filetype, "im", sizeof(float), H5T_NATIVE_FLOAT);
+  su3_vector_type = H5Tcreate (H5T_COMPOUND, sizeof (su3_vector));
+  status = H5Tinsert (su3_vector_type, "c1", HOFFSET (su3_vector, c1), complex_type);
+  status = H5Tinsert (su3_vector_type, "c2", HOFFSET (su3_vector, c2), complex_type);
+  status = H5Tinsert (su3_vector_type, "c3", HOFFSET (su3_vector, c3), complex_type);
 
-  space = H5Screate_simple (1, dims, NULL);
+  spinor_type = H5Tcreate (H5T_COMPOUND, sizeof (spinor));
+  status = H5Tinsert (spinor_type, "c1", HOFFSET (spinor, c1), su3_vector_type);
+  status = H5Tinsert (spinor_type, "c2", HOFFSET (spinor, c2), su3_vector_type);
+  status = H5Tinsert (spinor_type, "c3", HOFFSET (spinor, c3), su3_vector_type);
+  status = H5Tinsert (spinor_type, "c4", HOFFSET (spinor, c4), su3_vector_type);
+
   /* Create dataset on file */
-  dset = H5Dcreate (file, dsetname, filetype, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  space = H5Screate_simple (1, dims, NULL);
+  dset = H5Dcreate (file, dsetname, spinor_type, space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   /* Write data to dataset */
-  status = H5Dwrite (dset, memtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, num);
-
-  H5Fclose (file);
+  status = H5Dwrite (dset, spinor_type, H5S_ALL, H5S_ALL, H5P_DEFAULT, ps);
 
 }
 
@@ -83,6 +73,7 @@ int main(int argc, char *argv[])
   double wt1, wt2, wdt;
   spinor **ps;
   FILE *flog = NULL;
+  hid_t file;
 
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
@@ -199,8 +190,15 @@ int main(int argc, char *argv[])
   }
   wdt = 0.0;
 
-  write_spinor("test.h5",ps);
-
+  /* 
+   * Open new HDF5 file, overwrite existing, default file creation and file access property lists 
+   * TODO: Move into a function
+   */
+  file = H5Fcreate ("time1.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  
+  printf("writing %d spinors into hdf5 file\n", (int)(nflds));  
+  write_spinor(file, "spinor1", ps, nflds);
+  
   while (wdt < 5.0) {
     MPI_Barrier(MPI_COMM_WORLD);
     wt1 = MPI_Wtime();
@@ -216,6 +214,13 @@ int main(int argc, char *argv[])
     nt *= 2;
   }
 
+  write_spinor(file, "spinor2", ps, nflds);
+
+  /*
+   * Close the file TODO: Move into a function
+   */
+  H5Fclose(file);
+  
   wdt = 4.0e6 * wdt / ((double)(nt) * (double)(nflds * VOLUME));
   if (my_rank == 0) {
     printf("Time per lattice point for Dw():\n");
