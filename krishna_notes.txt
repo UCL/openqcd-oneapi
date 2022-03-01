@@ -1,0 +1,15 @@
+module purge
+module load cuda/11.4
+module load openmpi/3.1.4-gcc-7.2.0
+module load libevent-2.0.21-gcc-7.2.0-s6crwp2
+
+cd build/
+# check that input.in.txt is present in build/
+# edit the relevant lines in compile_settings.txt to have the following content:
+# CFLAGS -std=c99 -Werror -Wall -g -Og
+# LDFLAGS -g
+# DYNAMIC_SIZES 1
+
+mkdir log dat cnfg 2>/dev/null
+rm log/* dat/* cnfg/* 2>/dev/null
+make all

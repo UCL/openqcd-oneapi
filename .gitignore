@@ -6,8 +6,9 @@ data/*
 
 # Build files
 build/*
-!build/Makefile
-!build/compile_settings.txt
+!./build/Makefile
+!./build/compile_settings.txt
+!./build/input.in.txt
 
 # Language servers
 .ccls-cache/*
