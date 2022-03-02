@@ -1,0 +1,82 @@
+[Run name]
+name   Run0
+
+[Lattice sizes]
+number_of_processes 1 1 1 1
+local_lattice_sizes 4 4 4 4
+number_of_blocks    1 1 1 1
+
+[Directories]
+log_dir   ./log
+dat_dir   ./dat
+loc_dir   ./cnfg
+cnfg_dir   ./cnfg
+
+[Lattice parameters]
+beta  5.2
+c0    1.0
+kappa 0.13580
+csw   0.0
+
+[Boundary conditions]
+type   3
+
+[Random number generator]
+level   0
+seed    13
+
+[HMC parameters]
+actions   0 1
+npf   2
+mu    0.0
+nlv   2
+tau   1.0
+
+[MD trajectories]
+nth   0
+ntr   1
+dtr_log   1
+dtr_ms    1
+dtr_cnfg  1
+
+[Level 0]
+integrator   OMF4
+nstep   1
+forces    0
+
+[Level 1]
+integrator   OMF2
+lambda   0.1666667
+nstep    5
+forces   1
+
+[Action 0]
+action   ACG
+
+[Action 1]
+action   ACF_TM1
+ipf   0
+im0   0
+imu   0
+isp   0
+
+[Force 0]
+force   FRG
+
+[Force 1]
+force   FRF_TM1
+isp   0
+ncr   4
+
+[Solver 0]
+solver   CGNE
+nmx   1024
+res   1.0e-11
+
+[Wilson flow]
+integrator   RK3
+eps   1.0e-2
+nstep   400
+dnms   5
+
+
