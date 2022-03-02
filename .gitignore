@@ -14,3 +14,8 @@ build/*
 .ccls-cache/*
 .clangd/*
 compile_commands.json
+
+run/cnfg/*
+run/log/*
+run/dat/*
+run/processed/*
