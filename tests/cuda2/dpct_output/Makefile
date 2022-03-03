@@ -4,13 +4,13 @@ LDFLAGS=
 
 INCLUDES=-Iincludes
 
-OBJECTS=main.o read_in.o
-SYCLOBJECTS=dw_cuda_soa.dp.o
-
 all: main
 
 main: main.c dw_cuda_soa.dp.cpp read_in.c
-	$(CC) $(INCLUDES) $(CFLAGS) main.c dw_cuda_soa.dp.cpp read_in.c -o $@
+	$(CC) $(INCLUDES) $(CFLAGS) $^ -o $@
+
+# OBJECTS=main.o read_in.o
+# SYCLOBJECTS=dw_cuda_soa.dp.o
 
 # main: main.c dw_cuda_soa.dp.cpp read_in.c
 # 	$(CC) $(INCLUDES) $(CFLAGS) $< -o $@
