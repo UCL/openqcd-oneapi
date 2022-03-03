@@ -1,5 +1,5 @@
 CC=dpcpp
-CFLAGS=-c -O2 -Wall
+CFLAGS=-O2 -Wall
 LDFLAGS=
 
 INCLUDES=-Iincludes
@@ -9,14 +9,20 @@ SYCLOBJECTS=dw_cuda_soa.dp.o
 
 all: main
 
-main: $(OBJECTS) $(SYCLOBJECTS)
-	$(CC) -o $@ $^ $(LDFLAGS)
+main: main.c dw_cuda_soa.dp.cpp read_in.c
+	$(CC) $(INCLUDES) $(CFLAGS) main.c dw_cuda_soa.dp.cpp read_in.c -o $@
 
-%.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
+# main: main.c dw_cuda_soa.dp.cpp read_in.c
+# 	$(CC) $(INCLUDES) $(CFLAGS) $< -o $@
 
-%.o: %.cpp
-	$(CC) $(CCFLAGS) $(INCLUDES) $< -o $@
+# main: $(OBJECTS) $(SYCLOBJECTS)
+# 	$(CC) -o $@ $^ $(LDFLAGS)
+#
+# %.o: %.c
+# 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
+#
+# %.o: %.cpp
+# 	$(CC) $(CCFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	rm -f *.o main
+	rm -f *.o main a.out 2>/dev/null

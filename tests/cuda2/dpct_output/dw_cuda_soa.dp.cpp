@@ -192,7 +192,7 @@ void destroy_spinor_soa(spinor_soa obj)
 
 
 // Kernel to convert pauli from AoS to SoA in GPU
-extern "C" 
+// extern "C" 
 void pauli_AoS2SoA(int vol, pauli_soa mout, pauli *min,
                    sycl::nd_item<3> item_ct1)
 {

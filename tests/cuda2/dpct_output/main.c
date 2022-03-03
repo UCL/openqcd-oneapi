@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     read_sp_spinor_from_file(cnfg, rfinal, VOLUME);
 
 
-    // Call CUDA version of Dw() with Structures of Arrays
+    // Call DPCPP version of Dw() with Structures of Arrays
     Dw_cuda_SoA(VOLUME, u, s, r, m, piup, pidn);
 
     // Compare spinors r
