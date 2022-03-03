@@ -19,3 +19,5 @@ run/cnfg/*
 run/log/*
 run/dat/*
 run/processed/*
+machine.*
+slurm*
