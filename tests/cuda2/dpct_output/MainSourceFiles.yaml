@@ -1,0 +1,2951 @@
+---
+MainSourceFile:  MainSrcFiles_placehold
+Replacements:
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          28
+    Length:          0
+    ReplacementText: "#include <CL/sycl.hpp>\n#include <dpct/dpct.hpp>\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          141
+    Length:          0
+    ReplacementText: "\n#include <chrono>\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          144
+    Length:          10
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          225
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          267
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          309
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          351
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          393
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          435
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          476
+    Length:          10
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          557
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          599
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          641
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          683
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          725
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          767
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          808
+    Length:          10
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          891
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          933
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          975
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1017
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1059
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1101
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1142
+    Length:          10
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1225
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1267
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1309
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1351
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1393
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1435
+    Length:          9
+    ReplacementText: 'dpct::atomic_fetch_add'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1514
+    Length:          0
+    ReplacementText: "\n    dpct::device_ext &dev_ct1 = dpct::get_current_device();\n    sycl::queue &q_ct1 = dev_ct1.default_queue();"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1572
+    Length:          56
+    ReplacementText: 'd_m.m1 = sycl::malloc_device<float>(36 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1634
+    Length:          56
+    ReplacementText: 'd_m.m2 = sycl::malloc_device<float>(36 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1746
+    Length:          0
+    ReplacementText: "\n    dpct::device_ext &dev_ct1 = dpct::get_current_device();\n    sycl::queue &q_ct1 = dev_ct1.default_queue();"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1769
+    Length:          59
+    ReplacementText: 'd_u.c11.re = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1834
+    Length:          59
+    ReplacementText: 'd_u.c11.im = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1899
+    Length:          59
+    ReplacementText: 'd_u.c12.re = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          1964
+    Length:          59
+    ReplacementText: 'd_u.c12.im = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2029
+    Length:          59
+    ReplacementText: 'd_u.c13.re = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2094
+    Length:          59
+    ReplacementText: 'd_u.c13.im = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2159
+    Length:          59
+    ReplacementText: 'd_u.c21.re = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2224
+    Length:          59
+    ReplacementText: 'd_u.c21.im = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2289
+    Length:          59
+    ReplacementText: 'd_u.c22.re = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2354
+    Length:          59
+    ReplacementText: 'd_u.c22.im = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2419
+    Length:          59
+    ReplacementText: 'd_u.c23.re = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2484
+    Length:          59
+    ReplacementText: 'd_u.c23.im = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2549
+    Length:          59
+    ReplacementText: 'd_u.c31.re = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2614
+    Length:          59
+    ReplacementText: 'd_u.c31.im = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2679
+    Length:          59
+    ReplacementText: 'd_u.c32.re = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2744
+    Length:          59
+    ReplacementText: 'd_u.c32.im = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2809
+    Length:          59
+    ReplacementText: 'd_u.c33.re = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2874
+    Length:          59
+    ReplacementText: 'd_u.c33.im = sycl::malloc_device<float>(4 * vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          2995
+    Length:          0
+    ReplacementText: "\n    dpct::device_ext &dev_ct1 = dpct::get_current_device();\n    sycl::queue &q_ct1 = dev_ct1.default_queue();"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3021
+    Length:          57
+    ReplacementText: 'd_s.c1.c1.re = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3084
+    Length:          57
+    ReplacementText: 'd_s.c1.c1.im = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3147
+    Length:          57
+    ReplacementText: 'd_s.c1.c2.re = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3210
+    Length:          57
+    ReplacementText: 'd_s.c1.c2.im = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3273
+    Length:          57
+    ReplacementText: 'd_s.c1.c3.re = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3336
+    Length:          57
+    ReplacementText: 'd_s.c1.c3.im = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3399
+    Length:          57
+    ReplacementText: 'd_s.c2.c1.re = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3462
+    Length:          57
+    ReplacementText: 'd_s.c2.c1.im = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3525
+    Length:          57
+    ReplacementText: 'd_s.c2.c2.re = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3588
+    Length:          57
+    ReplacementText: 'd_s.c2.c2.im = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3651
+    Length:          57
+    ReplacementText: 'd_s.c2.c3.re = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3714
+    Length:          57
+    ReplacementText: 'd_s.c2.c3.im = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3777
+    Length:          57
+    ReplacementText: 'd_s.c3.c1.re = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3840
+    Length:          57
+    ReplacementText: 'd_s.c3.c1.im = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3903
+    Length:          57
+    ReplacementText: 'd_s.c3.c2.re = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          3966
+    Length:          57
+    ReplacementText: 'd_s.c3.c2.im = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4029
+    Length:          57
+    ReplacementText: 'd_s.c3.c3.re = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4092
+    Length:          57
+    ReplacementText: 'd_s.c3.c3.im = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4155
+    Length:          57
+    ReplacementText: 'd_s.c4.c1.re = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4218
+    Length:          57
+    ReplacementText: 'd_s.c4.c1.im = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4281
+    Length:          57
+    ReplacementText: 'd_s.c4.c2.re = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4344
+    Length:          57
+    ReplacementText: 'd_s.c4.c2.im = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4407
+    Length:          57
+    ReplacementText: 'd_s.c4.c3.re = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4470
+    Length:          57
+    ReplacementText: 'd_s.c4.c3.im = sycl::malloc_device<float>(vol, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4589
+    Length:          0
+    ReplacementText: "\n    dpct::device_ext &dev_ct1 = dpct::get_current_device();\n    sycl::queue &q_ct1 = dev_ct1.default_queue();"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4594
+    Length:          16
+    ReplacementText: 'sycl::free(obj.m1, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4616
+    Length:          16
+    ReplacementText: 'sycl::free(obj.m2, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4672
+    Length:          0
+    ReplacementText: "\n    dpct::device_ext &dev_ct1 = dpct::get_current_device();\n    sycl::queue &q_ct1 = dev_ct1.default_queue();"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4677
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c11.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4703
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c11.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4729
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c12.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4755
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c12.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4781
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c13.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4807
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c13.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4833
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c21.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4859
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c21.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4885
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c22.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4911
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c22.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4937
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c23.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4963
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c23.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          4989
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c31.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5015
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c31.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5041
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c32.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5067
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c32.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5093
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c33.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5119
+    Length:          20
+    ReplacementText: 'sycl::free(obj.c33.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5185
+    Length:          0
+    ReplacementText: "\n    dpct::device_ext &dev_ct1 = dpct::get_current_device();\n    sycl::queue &q_ct1 = dev_ct1.default_queue();"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5190
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c1.c1.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5218
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c1.c1.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5246
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c1.c2.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5274
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c1.c2.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5302
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c1.c3.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5330
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c1.c3.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5358
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c2.c1.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5386
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c2.c1.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5414
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c2.c2.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5442
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c2.c2.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5470
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c2.c3.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5498
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c2.c3.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5526
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c3.c1.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5554
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c3.c1.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5582
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c3.c2.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5610
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c3.c2.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5638
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c3.c3.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5666
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c3.c3.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5694
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c4.c1.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5722
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c4.c1.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5750
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c4.c2.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5778
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c4.c2.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5806
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c4.c3.re, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5834
+    Length:          22
+    ReplacementText: 'sycl::free(obj.c4.c3.im, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5923
+    Length:          10
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          5988
+    Length:          0
+    ReplacementText: ",\n                   sycl::nd_item<3> item_ct1"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          6006
+    Length:          10
+    ReplacementText: 'item_ct1.get_group(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          6017
+    Length:          10
+    ReplacementText: 'item_ct1.get_local_range().get(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          6030
+    Length:          11
+    ReplacementText: 'item_ct1.get_local_id(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          6349
+    Length:          10
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          6408
+    Length:          0
+    ReplacementText: ', sycl::nd_item<3> item_ct1'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          6426
+    Length:          10
+    ReplacementText: 'item_ct1.get_group(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          6437
+    Length:          10
+    ReplacementText: 'item_ct1.get_local_range().get(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          6450
+    Length:          11
+    ReplacementText: 'item_ct1.get_local_id(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          7618
+    Length:          10
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          7686
+    Length:          0
+    ReplacementText: ",\n                    sycl::nd_item<3> item_ct1"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          7704
+    Length:          10
+    ReplacementText: 'item_ct1.get_group(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          7715
+    Length:          10
+    ReplacementText: 'item_ct1.get_local_range().get(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          7728
+    Length:          11
+    ReplacementText: 'item_ct1.get_local_id(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          8987
+    Length:          10
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          9055
+    Length:          0
+    ReplacementText: ",\n                    sycl::nd_item<3> item_ct1"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          9073
+    Length:          10
+    ReplacementText: 'item_ct1.get_group(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          9084
+    Length:          10
+    ReplacementText: 'item_ct1.get_local_range().get(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          9097
+    Length:          11
+    ReplacementText: 'item_ct1.get_local_id(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          10387
+    Length:          10
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          10477
+    Length:          0
+    ReplacementText: ",\n                     sycl::nd_item<3> item_ct1"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          10495
+    Length:          10
+    ReplacementText: 'item_ct1.get_group(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          10506
+    Length:          10
+    ReplacementText: 'item_ct1.get_local_range().get(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          10519
+    Length:          11
+    ReplacementText: 'item_ct1.get_local_id(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          20058
+    Length:          10
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          20149
+    Length:          4
+    ReplacementText: 'sycl::int4'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          20161
+    Length:          4
+    ReplacementText: 'sycl::int4'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          20236
+    Length:          0
+    ReplacementText: ', sycl::nd_item<3> item_ct1'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          20254
+    Length:          10
+    ReplacementText: 'item_ct1.get_group(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          20265
+    Length:          10
+    ReplacementText: 'item_ct1.get_local_range().get(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          20278
+    Length:          11
+    ReplacementText: 'item_ct1.get_local_id(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          20388
+    Length:          4
+    ReplacementText: 'sycl::int4'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          20418
+    Length:          4
+    ReplacementText: 'sycl::int4'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          20566
+    Length:          1
+    ReplacementText: 'x()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          20982
+    Length:          1
+    ReplacementText: 'x()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          21681
+    Length:          1
+    ReplacementText: 'y()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          22203
+    Length:          1
+    ReplacementText: 'y()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          22741
+    Length:          1
+    ReplacementText: 'z()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          23255
+    Length:          1
+    ReplacementText: 'z()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          23785
+    Length:          1
+    ReplacementText: 'w()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          24307
+    Length:          1
+    ReplacementText: 'w()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          25382
+    Length:          10
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          25473
+    Length:          4
+    ReplacementText: 'sycl::int4'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          25485
+    Length:          4
+    ReplacementText: 'sycl::int4'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          25545
+    Length:          0
+    ReplacementText: ', sycl::nd_item<3> item_ct1'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          25563
+    Length:          10
+    ReplacementText: 'item_ct1.get_group(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          25574
+    Length:          10
+    ReplacementText: 'item_ct1.get_local_range().get(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          25587
+    Length:          11
+    ReplacementText: 'item_ct1.get_local_id(2)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          25691
+    Length:          4
+    ReplacementText: 'sycl::int4'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          25721
+    Length:          4
+    ReplacementText: 'sycl::int4'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          26088
+    Length:          1
+    ReplacementText: 'x()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          26586
+    Length:          1
+    ReplacementText: 'x()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          27269
+    Length:          1
+    ReplacementText: 'y()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          27775
+    Length:          1
+    ReplacementText: 'y()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          28265
+    Length:          1
+    ReplacementText: 'z()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          28763
+    Length:          1
+    ReplacementText: 'z()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          29245
+    Length:          1
+    ReplacementText: 'w()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          29751
+    Length:          1
+    ReplacementText: 'w()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          30329
+    Length:          0
+    ReplacementText: "\n    dpct::device_ext &dev_ct1 = dpct::get_current_device();\n    sycl::queue &q_ct1 = dev_ct1.default_queue();"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          30334
+    Length:          11
+    ReplacementText: 'sycl::event'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          30358
+    Length:          0
+    ReplacementText: "\n    std::chrono::time_point<std::chrono::steady_clock> start_ct1;\n    std::chrono::time_point<std::chrono::steady_clock> stop_ct1;"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          30359
+    Length:          29
+    ReplacementText: "    /*\n    DPCT1026:0: The call to cudaEventCreate was removed because this call is redundant in DPC++.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          30388
+    Length:          28
+    ReplacementText: "    /*\n    DPCT1026:1: The call to cudaEventCreate was removed because this call is redundant in DPC++.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          30839
+    Length:          57
+    ReplacementText: 'd_m_aos = sycl::malloc_device<pauli>(2 * VOLUME, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          30941
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:2: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          30945
+    Length:          22
+    ReplacementText: 'start_ct1 = std::chrono::steady_clock::now()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31044
+    Length:          10
+    ReplacementText: q_ct1.memcpy
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31093
+    Length:          24
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31118
+    Length:          0
+    ReplacementText: '.wait()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31210
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1049:4: The workgroup size passed to the SYCL kernel may exceed the limit. To get the device limit, query info::device::max_work_group_size. Adjust the workgroup size if needed.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31214
+    Length:          66
+    ReplacementText: "stop = q_ct1.parallel_for(\n      sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) * sycl::range<3>(1, 1, block_size), sycl::range<3>(1, 1, block_size)), \n      [=](sycl::nd_item<3> item_ct1) {\n        pauli_AoS2SoA(VOLUME, d_m_soa, d_m_aos, item_ct1);\n      });"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: true
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31280
+    Length:          1
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31282
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:3: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31286
+    Length:          21
+    ReplacementText: "stop.wait();\n    stop_ct1 = std::chrono::steady_clock::now()"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31380
+    Length:          32
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31416
+    Length:          48
+    ReplacementText: 'milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31555
+    Length:          17
+    ReplacementText: 'sycl::free(d_m_aos, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31853
+    Length:          55
+    ReplacementText: 'd_u_aos = sycl::malloc_device<su3>(4 * VOLUME, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31955
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:5: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          31959
+    Length:          22
+    ReplacementText: 'start_ct1 = std::chrono::steady_clock::now()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32058
+    Length:          10
+    ReplacementText: q_ct1.memcpy
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32105
+    Length:          24
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32130
+    Length:          0
+    ReplacementText: '.wait()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32230
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1049:7: The workgroup size passed to the SYCL kernel may exceed the limit. To get the device limit, query info::device::max_work_group_size. Adjust the workgroup size if needed.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32234
+    Length:          64
+    ReplacementText: "stop = q_ct1.parallel_for(\n      sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) * sycl::range<3>(1, 1, block_size), sycl::range<3>(1, 1, block_size)), \n      [=](sycl::nd_item<3> item_ct1) {\n        su3_AoS2SoA(VOLUME, d_u_soa, d_u_aos, item_ct1);\n      });"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: true
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32298
+    Length:          1
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32300
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:6: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32304
+    Length:          21
+    ReplacementText: "stop.wait();\n    stop_ct1 = std::chrono::steady_clock::now()"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32398
+    Length:          32
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32434
+    Length:          48
+    ReplacementText: 'milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32571
+    Length:          17
+    ReplacementText: 'sycl::free(d_u_aos, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32875
+    Length:          54
+    ReplacementText: 'd_s_aos = sycl::malloc_device<spinor>(VOLUME, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32977
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:8: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          32981
+    Length:          22
+    ReplacementText: 'start_ct1 = std::chrono::steady_clock::now()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33080
+    Length:          10
+    ReplacementText: q_ct1.memcpy
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33126
+    Length:          24
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33151
+    Length:          0
+    ReplacementText: '.wait()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33246
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1049:10: The workgroup size passed to the SYCL kernel may exceed the limit. To get the device limit, query info::device::max_work_group_size. Adjust the workgroup size if needed.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33250
+    Length:          67
+    ReplacementText: "stop = q_ct1.parallel_for(\n      sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) * sycl::range<3>(1, 1, block_size), sycl::range<3>(1, 1, block_size)), \n      [=](sycl::nd_item<3> item_ct1) {\n        spinor_AoS2SoA(VOLUME, d_s_soa, d_s_aos, item_ct1);\n      });"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: true
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33317
+    Length:          1
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33319
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:9: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33323
+    Length:          21
+    ReplacementText: "stop.wait();\n    stop_ct1 = std::chrono::steady_clock::now()"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33417
+    Length:          32
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33453
+    Length:          48
+    ReplacementText: 'milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33593
+    Length:          17
+    ReplacementText: 'sycl::free(d_s_aos, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33682
+    Length:          4
+    ReplacementText: 'sycl::int4'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33709
+    Length:          54
+    ReplacementText: 'd_piup = (sycl::int4 *)sycl::malloc_device(2 * VOLUME * sizeof(int), q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33769
+    Length:          54
+    ReplacementText: 'd_pidn = (sycl::int4 *)sycl::malloc_device(2 * VOLUME * sizeof(int), q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33925
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:11: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33929
+    Length:          22
+    ReplacementText: 'start_ct1 = std::chrono::steady_clock::now()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          33957
+    Length:          10
+    ReplacementText: q_ct1.memcpy
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34006
+    Length:          24
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34037
+    Length:          10
+    ReplacementText: q_ct1.memcpy
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34086
+    Length:          24
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34111
+    Length:          0
+    ReplacementText: '.wait()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34113
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:12: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34117
+    Length:          21
+    ReplacementText: 'stop_ct1 = std::chrono::steady_clock::now()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34140
+    Length:          32
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34176
+    Length:          48
+    ReplacementText: 'milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34410
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:13: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34414
+    Length:          22
+    ReplacementText: 'start_ct1 = std::chrono::steady_clock::now()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34438
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1049:15: The workgroup size passed to the SYCL kernel may exceed the limit. To get the device limit, query info::device::max_work_group_size. Adjust the workgroup size if needed.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34442
+    Length:          81
+    ReplacementText: "stop = q_ct1.parallel_for(\n      sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) * sycl::range<3>(1, 1, block_size), sycl::range<3>(1, 1, block_size)), \n      [=](sycl::nd_item<3> item_ct1) {\n        mulpauli_kernel(VOLUME, mu, d_s_soa, d_r_soa, d_m_soa, item_ct1);\n      });"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: true
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34523
+    Length:          1
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34525
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:14: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34529
+    Length:          21
+    ReplacementText: "stop.wait();\n    stop_ct1 = std::chrono::steady_clock::now()"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34552
+    Length:          32
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34588
+    Length:          48
+    ReplacementText: 'milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34784
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:16: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34788
+    Length:          22
+    ReplacementText: 'start_ct1 = std::chrono::steady_clock::now()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34812
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1049:18: The workgroup size passed to the SYCL kernel may exceed the limit. To get the device limit, query info::device::max_work_group_size. Adjust the workgroup size if needed.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34816
+    Length:          161
+    ReplacementText: "stop = q_ct1.parallel_for(\n      sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) * sycl::range<3>(1, 1, block_size), sycl::range<3>(1, 1, block_size)), \n      [=](sycl::nd_item<3> item_ct1) {\n        doe_kernel(VOLUME, d_s_soa, d_r_soa, d_u_soa, d_piup, d_pidn, coe, gamma_f, one_over_gammaf, item_ct1);\n      });"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: true
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34977
+    Length:          1
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34979
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:17: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          34983
+    Length:          21
+    ReplacementText: "stop.wait();\n    stop_ct1 = std::chrono::steady_clock::now()"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35006
+    Length:          32
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35042
+    Length:          48
+    ReplacementText: 'milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35232
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:19: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35236
+    Length:          22
+    ReplacementText: 'start_ct1 = std::chrono::steady_clock::now()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35260
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1049:21: The workgroup size passed to the SYCL kernel may exceed the limit. To get the device limit, query info::device::max_work_group_size. Adjust the workgroup size if needed.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35264
+    Length:          152
+    ReplacementText: "stop = q_ct1.parallel_for(\n      sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) * sycl::range<3>(1, 1, block_size), sycl::range<3>(1, 1, block_size)), \n      [=](sycl::nd_item<3> item_ct1) {\n        deo_kernel(VOLUME, d_s_soa, d_r_soa, d_u_soa, d_piup, d_pidn, ceo, one_over_gammaf, item_ct1);\n      });"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: true
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35416
+    Length:          1
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35418
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:20: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35422
+    Length:          21
+    ReplacementText: "stop.wait();\n    stop_ct1 = std::chrono::steady_clock::now()"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35445
+    Length:          32
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35481
+    Length:          48
+    ReplacementText: 'milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35658
+    Length:          54
+    ReplacementText: 'd_r_aos = sycl::malloc_device<spinor>(VOLUME, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35784
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:22: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35788
+    Length:          22
+    ReplacementText: 'start_ct1 = std::chrono::steady_clock::now()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35812
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1049:24: The workgroup size passed to the SYCL kernel may exceed the limit. To get the device limit, query info::device::max_work_group_size. Adjust the workgroup size if needed.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35816
+    Length:          67
+    ReplacementText: "stop = q_ct1.parallel_for(\n      sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) * sycl::range<3>(1, 1, block_size), sycl::range<3>(1, 1, block_size)), \n      [=](sycl::nd_item<3> item_ct1) {\n        spinor_SoA2AoS(VOLUME, d_r_aos, d_r_soa, item_ct1);\n      });"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: true
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35883
+    Length:          1
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35885
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:23: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35889
+    Length:          21
+    ReplacementText: "stop.wait();\n    stop_ct1 = std::chrono::steady_clock::now()"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35912
+    Length:          32
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          35948
+    Length:          48
+    ReplacementText: 'milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36104
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:25: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36108
+    Length:          22
+    ReplacementText: 'start_ct1 = std::chrono::steady_clock::now()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36136
+    Length:          10
+    ReplacementText: q_ct1.memcpy
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36182
+    Length:          24
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36207
+    Length:          0
+    ReplacementText: '.wait()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36209
+    Length:          0
+    ReplacementText: "    /*\n    DPCT1012:26: Detected kernel execution time measurement pattern and generated an initial code for time measurements in SYCL. You can change the way time is measured depending on your goals.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36213
+    Length:          21
+    ReplacementText: 'stop_ct1 = std::chrono::steady_clock::now()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36236
+    Length:          32
+    ReplacementText: ''
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36272
+    Length:          48
+    ReplacementText: 'milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count()'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36546
+    Length:          16
+    ReplacementText: 'sycl::free(d_piup, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36568
+    Length:          16
+    ReplacementText: 'sycl::free(d_pidn, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36590
+    Length:          17
+    ReplacementText: 'sycl::free(d_r_aos, q_ct1)'
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36611
+    Length:          29
+    ReplacementText: "    /*\n    DPCT1026:27: The call to cudaEventDestroy was removed because this call is redundant in DPC++.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+  - FilePath:        '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Offset:          36640
+    Length:          28
+    ReplacementText: "    /*\n    DPCT1026:28: The call to cudaEventDestroy was removed because this call is redundant in DPC++.\n    */\n"
+    ConstantFlag:    ''
+    ConstantOffset:  0
+    InitStr:         ''
+    NewHostVarName:  ''
+    BlockLevelFormatFlag: false
+MainSourceFilesDigest:
+  - MainSourceFile:  '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+    Digest:          b0dba0b77ad4def0dc783eaad32f7450
+DpctVersion:     2022.0.0
+MainHelperFileName: dpct
+USMLevel:        ''
+FeatureMap:
+  atomic.hpp:
+    atomic_fetch_add:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     atomic_fetch_add
+      SubFeatureMap:   {}
+  device.hpp:
+    dev_mgr:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     dev_mgr
+      SubFeatureMap:
+        dev_mgr_1:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     dev_mgr
+          SubFeatureMap:   {}
+        dev_mgr_2:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     dev_mgr
+          SubFeatureMap:   {}
+        dev_mgr_3:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     dev_mgr
+          SubFeatureMap:   {}
+        dev_mgr_4:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     dev_mgr
+          SubFeatureMap:   {}
+        dev_mgr_check_id:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     'dev_mgr::check_id'
+          SubFeatureMap:   {}
+        dev_mgr_current_device:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     'dev_mgr::current_device'
+          SubFeatureMap:   {}
+        dev_mgr_current_device_id:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     'dev_mgr::current_device_id'
+          SubFeatureMap:   {}
+    device_ext:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     device_ext
+      SubFeatureMap:
+        device_ext_1:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     device_ext
+          SubFeatureMap:   {}
+        device_ext_2:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     device_ext
+          SubFeatureMap:   {}
+        device_ext_default_queue:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     'device_ext::default_queue'
+          SubFeatureMap:   {}
+    exception_handler:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     exception_handler
+      SubFeatureMap:   {}
+    get_current_device:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     get_current_device
+      SubFeatureMap:   {}
+    get_default_queue:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     get_default_queue
+      SubFeatureMap:   {}
+    get_tid:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     get_tid
+      SubFeatureMap:   {}
+  dpct.hpp:
+    non_local_include_dependency:
+      IsCalled:        true
+      CallerSrcFiles:
+        - ''
+      FeatureName:     ''
+      SubFeatureMap:   {}
+  memory.hpp:
+    dpct_memcpy:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     dpct_memcpy
+      SubFeatureMap:   {}
+    dpct_memcpy_2d:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     dpct_memcpy
+      SubFeatureMap:   {}
+    dpct_memcpy_2d_3d_pitch_detail:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     dpct_memcpy
+      SubFeatureMap:   {}
+    dpct_memcpy_2d_pitch_detail:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     dpct_memcpy
+      SubFeatureMap:   {}
+    dpct_memcpy_3d:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     dpct_memcpy
+      SubFeatureMap:   {}
+    dpct_memcpy_3d_detail:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     dpct_memcpy
+      SubFeatureMap:   {}
+    dpct_memcpy_detail:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     dpct_memcpy
+      SubFeatureMap:   {}
+    mem_mgr:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     mem_mgr
+      SubFeatureMap:
+        mem_mgr_1:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     mem_mgr
+          SubFeatureMap:   {}
+        mem_mgr_2:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     mem_mgr
+          SubFeatureMap:   {}
+        mem_mgr_get_map_iterator:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     'mem_mgr::get_map_iterator'
+          SubFeatureMap:   {}
+        mem_mgr_is_device_ptr:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     'mem_mgr::is_device_ptr'
+          SubFeatureMap:   {}
+        mem_mgr_translate_ptr:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     'mem_mgr::translate_ptr'
+          SubFeatureMap:   {}
+    memcpy_direction:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     memcpy_direction
+      SubFeatureMap:   {}
+    pitched_data:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     pitched_data
+      SubFeatureMap:
+        pitched_data_get_data_ptr:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     'pitched_data::get_data_ptr'
+          SubFeatureMap:   {}
+        pitched_data_get_pitch:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     'pitched_data::get_pitch'
+          SubFeatureMap:   {}
+        pitched_data_get_y:
+          IsCalled:        true
+          CallerSrcFiles:
+            - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+          FeatureName:     'pitched_data::get_y'
+          SubFeatureMap:   {}
+    pitched_data_1:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     pitched_data
+      SubFeatureMap:   {}
+    typedef_buffer_t:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     buffer_t
+      SubFeatureMap:   {}
+    typedef_byte_t:
+      IsCalled:        true
+      CallerSrcFiles:
+        - '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2/dw_cuda_soa.cu'
+      FeatureName:     byte_t
+      SubFeatureMap:   {}
+CompileTargets:  {}
+OptionMap:
+  AsyncHandler:
+    Value:           'false'
+    Specified:       false
+  CommentsEnabled:
+    Value:           'false'
+    Specified:       false
+  CompilationsDir:
+    Value:           '/home/dc-gopa1/Documents/openqcd-fastsum/tests/cuda2'
+    Specified:       true
+  CtadEnabled:
+    Value:           'false'
+    Specified:       false
+  CustomHelperFileName:
+    Value:           dpct
+    Specified:       false
+  ExperimentalFlag:
+    Value:           '0'
+    Specified:       false
+  ExplicitClNamespace:
+    Value:           'false'
+    Specified:       false
+  ExplicitNamespace:
+    Value:           '20'
+    Specified:       false
+  ExtensionFlag:
+    Value:           '4294967295'
+    Specified:       false
+  NDRangeDim:
+    Value:           '3'
+    Specified:       false
+  NoDRYPattern:
+    Value:           'false'
+    Specified:       false
+  OptimizeMigration:
+    Value:           'false'
+    Specified:       false
+  ProcessAll:
+    Value:           'false'
+    Specified:       false
+  SyclNamedLambda:
+    Value:           'false'
+    Specified:       false
+  UsmLevel:
+    Value:           '1'
+    Specified:       false
+...
