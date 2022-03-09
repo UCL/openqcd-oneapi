@@ -8,7 +8,7 @@ data/*
 build/*
 !./build/Makefile
 !./build/compile_settings.txt
-!./build/input.in.txt
+!./build/input.in*
 
 # Language servers
 .ccls-cache/*
@@ -21,3 +21,4 @@ run/dat/*
 run/processed/*
 machine.*
 slurm*
+./tests/cuda2/dpct_output/logs_of_job_output_and_error/machine.*
