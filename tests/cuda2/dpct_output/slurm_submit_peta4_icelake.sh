@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -J cpu_dpct_output
+#SBATCH -J cpu_sycl_job_openqcd
 #SBATCH -A DIRAC-DR004-CPU
 #SBATCH -p icelake
 #SBATCH --nodes=1
