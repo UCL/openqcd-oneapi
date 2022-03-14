@@ -6,10 +6,19 @@ data/*
 
 # Build files
 build/*
-!build/Makefile
-!build/compile_settings.txt
+!./build/Makefile
+!./build/compile_settings.txt
+!./build/input.in*
 
 # Language servers
 .ccls-cache/*
 .clangd/*
 compile_commands.json
+
+run/cnfg/*
+run/log/*
+run/dat/*
+run/processed/*
+machine.*
+slurm*
+./tests/cuda2/dpct_output/logs_of_job_output_and_error/machine.*
