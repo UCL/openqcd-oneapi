@@ -17,7 +17,6 @@ mpi_tasks_per_node=$(echo "$SLURM_TASKS_PER_NODE" | sed -e  's/^\([0-9][0-9]*\).
 #! (note that SLURM reproduces the environment at submission irrespective of ~/.bashrc):
 . /etc/profile.d/modules.sh                    # Leave this line (enables the module command)
 module purge                                   # Removes all modules still loaded
-# module load rhel8/default-icl >/dev/null 2>&1  # REQUIRED - loads the basic environment
 module load rhel8/slurm
 
 #! Insert additional module load commands after this line if needed:
