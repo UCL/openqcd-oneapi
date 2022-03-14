@@ -1,13 +1,20 @@
 CC=dpcpp
 CFLAGS=-O2 -Wall
 LDFLAGS=
-
 INCLUDES=-Iincludes
 
-all: main
+intel: CC = dpcpp
 
-main: main.c dw_cuda_soa.dp.cpp read_in.c
-	$(CC) $(INCLUDES) $(CFLAGS) $^ -o $@
+nvidia: CC = clang++
+nvidia: CFLAGS += -fsycl -fsycl-targets=nvptx64-nvidia-cuda
+
+all: intel nvidia
+
+intel: main.c dw_cuda_soa.dp.cpp read_in.c
+	$(CC) $(INCLUDES) $(CFLAGS) $^ -o main
+	
+nvidia: main.c dw_cuda_soa.dp.cpp read_in.c
+	$(CC) $(INCLUDES) $(CFLAGS) $^ -o main	
 
 
 clean:
