@@ -39,28 +39,7 @@ export OMP_NUM_THREADS=1
 #! Number of MPI tasks to be started by the application per node and in total (do not change):
 np=$[${numnodes}*${mpi_tasks_per_node}]
 
-#! The following variables define a sensible pinning strategy for Intel MPI tasks -
-#! this should be suitable for both pure MPI and hybrid MPI/OpenMP jobs:
-export I_MPI_PIN_DOMAIN=omp:compact # Domains are $OMP_NUM_THREADS cores in size
-export I_MPI_PIN_ORDER=scatter # Adjacent domains have minimal sharing of caches/sockets
-#! Notes:
-#! 1. These variables influence Intel MPI only.
-#! 2. Domains are non-overlapping sets of cores which map 1-1 to MPI tasks.
-#! 3. I_MPI_PIN_PROCESSOR_LIST is ignored if I_MPI_PIN_DOMAIN is set.
-#! 4. If MPI tasks perform better when sharing caches/sockets, try I_MPI_PIN_ORDER=compact.
-
-
-#! Uncomment one choice for CMD below (add mpirun/mpiexec options if necessary):
-
-#! Choose this for a MPI code (possibly using OpenMP) using Intel MPI.
-#CMD="mpirun -ppn $mpi_tasks_per_node -np $np $application $options"
-
-#! Choose this for a pure shared-memory OpenMP parallel program on a single node:
-#! (OMP_NUM_THREADS threads will be created):
 CMD="$application $options"
-
-#! Choose this for a MPI code (possibly using OpenMP) using OpenMPI:
-#CMD="mpirun -npernode $mpi_tasks_per_node -np $np $application $options"
 
 ###############################################################
 ### You should not have to change anything below this line ####
