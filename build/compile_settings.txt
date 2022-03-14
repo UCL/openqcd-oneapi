@@ -1,8 +1,8 @@
 CODELOC ..
 COMPILER mpicc
 MPI_INCLUDE ./
-CFLAGS -std=c99 -Werror -Wall -g -Og
-LDFLAGS -g
+CFLAGS -std=c99 -O2 -DAVX -DFMA3 -Werror -Wall
+LDFLAGS
 
 NPROC0_TOT   1
 NPROC1_TOT   1
