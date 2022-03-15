@@ -22,10 +22,10 @@ mpi_tasks_per_node=$(echo "$SLURM_TASKS_PER_NODE" | sed -e  's/^\([0-9][0-9]*\).
 #! (note that SLURM reproduces the environment at submission irrespective of ~/.bashrc):
 . /etc/profile.d/modules.sh                    # Leave this line (enables the module command)
 module purge                                   # Removes all modules still loaded
+source /usr/local/software/intel/oneapi/2022.1/setvars.sh >/dev/null 2>&1
 module use /usr/local/software/spack/spack-modules/dpcpp-cuda-20220220/linux-centos8-x86_64_v3/
 module load dpcpp
 module load gcc/11.2.0
-source /usr/local/software/intel/oneapi/2022.1/setvars.sh
 
 #! Full path to application executable: 
 application="./main"

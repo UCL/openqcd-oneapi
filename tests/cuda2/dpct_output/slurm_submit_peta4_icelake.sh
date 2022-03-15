@@ -26,7 +26,7 @@ source /usr/local/software/intel/oneapi/2022.1/setvars.sh >/dev/null 2>&1
 application="./main"
 
 #! Run options for the application:
-options="4 4 4 4 ."
+options="16 16 16 16 ./run/"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
