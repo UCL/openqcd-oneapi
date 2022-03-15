@@ -22,19 +22,16 @@ mpi_tasks_per_node=$(echo "$SLURM_TASKS_PER_NODE" | sed -e  's/^\([0-9][0-9]*\).
 #! (note that SLURM reproduces the environment at submission irrespective of ~/.bashrc):
 . /etc/profile.d/modules.sh                    # Leave this line (enables the module command)
 module purge                                   # Removes all modules still loaded
-# module load rhel8/default-icl >/dev/null 2>&1  # REQUIRED - loads the basic environment
-module load rhel8/slurm
-module load cuda
-module list
-
-#! Insert additional module load commands after this line if needed:
-source /usr/local/software/intel/oneapi/2022.1/setvars.sh >/dev/null 2>&1
+module use /usr/local/software/spack/spack-modules/dpcpp-cuda-20220220/linux-centos8-x86_64_v3/
+module load dpcpp
+module load gcc/11.2.0
+source /usr/local/software/intel/oneapi/2022.1/setvars.sh
 
 #! Full path to application executable: 
 application="./main"
 
 #! Run options for the application:
-options="4 4 4 4"
+options="64 64 64 64 ./run/"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
@@ -50,9 +47,6 @@ np=$[${numnodes}*${mpi_tasks_per_node}]
 #! Choose this for a pure shared-memory OpenMP parallel program on a single node:
 #! (OMP_NUM_THREADS threads will be created):
 CMD="$application $options"
-
-#! Choose this for a MPI code using OpenMPI:
-#CMD="mpirun -npernode $mpi_tasks_per_node -np $np $application $options"
 
 ###############################################################
 ### You should not have to change anything below this line ####
@@ -84,6 +78,6 @@ mv slurm*.out $log_dir/ 2>/dev/null
 
 echo -e "\nExecuting command:\n==================\n$CMD\n"
 
-eval $CMD 
+eval $CMD
 
 mv machine.file* $log_dir/ 2>/dev/null
