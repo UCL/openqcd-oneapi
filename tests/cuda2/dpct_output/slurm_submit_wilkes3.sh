@@ -28,7 +28,7 @@ module load dpcpp
 module load gcc/11.2.0
 
 #! Full path to application executable: 
-application="./main"
+application="./main.nvidia_gpu"
 
 #! Run options for the application:
 options="64 64 64 64 ./run/"

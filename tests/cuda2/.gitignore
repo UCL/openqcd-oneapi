@@ -1,1 +1,5 @@
 !Makefile
+!Makefile.csd3
+main.*_?pu
+dpct_output/logs_of_job_output_and_error/
+

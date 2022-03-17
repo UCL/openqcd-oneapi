@@ -1,1 +1,0 @@
-../dw_soa_sycl.cpp

@@ -23,7 +23,7 @@ module load rhel8/slurm
 source /usr/local/software/intel/oneapi/2022.1/setvars.sh >/dev/null 2>&1
 
 #! Full path to application executable: 
-application="./main"
+application="./main.intel_cpu"
 
 #! Run options for the application:
 options="16 16 16 16 ./run/"
