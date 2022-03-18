@@ -190,10 +190,10 @@ void destroy_spinor_soa(spinor_soa obj)
 // Kernel to convert pauli from AoS to SoA in GPU
 // extern "C"
 void pauli_AoS2SoA(int vol, pauli_soa mout, pauli *min,
-                   sycl::nd_item<3> item_ct1)
+                   sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(2) * item_ct1.get_local_range().get(2) +
-            item_ct1.get_local_id(2);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
+            item_ct1.get_local_id(0);
   if (idx >= vol)
     return;
 
@@ -212,10 +212,10 @@ void pauli_AoS2SoA(int vol, pauli_soa mout, pauli *min,
 
 // Kernel to convert su3 from AoS to SoA in GPU
 extern "C" void su3_AoS2SoA(int vol, su3_soa uout, su3 *uin,
-                            sycl::nd_item<3> item_ct1)
+                            sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(2) * item_ct1.get_local_range().get(2) +
-            item_ct1.get_local_id(2);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
+            item_ct1.get_local_id(0);
   if (idx >= vol / 2)
     return;
 
@@ -247,10 +247,10 @@ extern "C" void su3_AoS2SoA(int vol, su3_soa uout, su3 *uin,
 
 // Kernel to convert spinor from AoS to SoA in GPU
 extern "C" void spinor_AoS2SoA(int vol, spinor_soa rout, spinor *rin,
-                               sycl::nd_item<3> item_ct1)
+                               sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(2) * item_ct1.get_local_range().get(2) +
-            item_ct1.get_local_id(2);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
+            item_ct1.get_local_id(0);
   if (idx >= vol)
     return;
 
@@ -282,10 +282,10 @@ extern "C" void spinor_AoS2SoA(int vol, spinor_soa rout, spinor *rin,
 
 // Kernel to convert spinor from SoA to AoS in GPU
 extern "C" void spinor_SoA2AoS(int vol, spinor *rout, spinor_soa rin,
-                               sycl::nd_item<3> item_ct1)
+                               sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(2) * item_ct1.get_local_range().get(2) +
-            item_ct1.get_local_id(2);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
+            item_ct1.get_local_id(0);
   if (idx >= vol)
     return;
 
@@ -317,10 +317,10 @@ extern "C" void spinor_SoA2AoS(int vol, spinor *rout, spinor_soa rin,
 
 // ---------------------------------------------------------------------------//
 extern "C" void mulpauli_kernel(int vol, float mu, spinor_soa s, spinor_soa r,
-                                pauli_soa m, sycl::nd_item<3> item_ct1)
+                                pauli_soa m, sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(2) * item_ct1.get_local_range().get(2) +
-            item_ct1.get_local_id(2);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
+            item_ct1.get_local_id(0);
   if (idx >= vol)
     return;
 
@@ -517,10 +517,10 @@ extern "C" void mulpauli_kernel(int vol, float mu, spinor_soa s, spinor_soa r,
 extern "C" void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
                            sycl::int4 *piup, sycl::int4 *pidn, float coe,
                            float gamma_f, float one_over_gammaf,
-                           sycl::nd_item<3> item_ct1)
+                           sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(2) * item_ct1.get_local_range().get(2) +
-            item_ct1.get_local_id(2);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
+            item_ct1.get_local_id(0);
   if (idx >= vol / 2)
     return;
 
@@ -689,10 +689,10 @@ extern "C" void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 // ---------------------------------------------------------------------------//
 extern "C" void deo_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
                            sycl::int4 *piup, sycl::int4 *pidn, float ceo,
-                           float one_over_gammaf, sycl::nd_item<3> item_ct1)
+                           float one_over_gammaf, sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(2) * item_ct1.get_local_range().get(2) +
-            item_ct1.get_local_id(2);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
+            item_ct1.get_local_id(0);
   if (idx >= vol / 2)
     return;
 
@@ -897,10 +897,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop =
-      q_ct1.parallel_for(sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) *
-                                               sycl::range<3>(1, 1, block_size),
-                                           sycl::range<3>(1, 1, block_size)),
-                         [=](sycl::nd_item<3> item_ct1) {
+      q_ct1.parallel_for(sycl::nd_range<1>(sycl::range<1>(grid_size) *
+                                               sycl::range<1>(block_size),
+                                           sycl::range<1>(block_size)),
+                         [=](sycl::nd_item<1> item_ct1) {
                            pauli_AoS2SoA(VOLUME, d_m_soa, d_m_aos, item_ct1);
                          });
   /*
@@ -936,10 +936,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop =
-      q_ct1.parallel_for(sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) *
-                                               sycl::range<3>(1, 1, block_size),
-                                           sycl::range<3>(1, 1, block_size)),
-                         [=](sycl::nd_item<3> item_ct1) {
+      q_ct1.parallel_for(sycl::nd_range<1>(sycl::range<1>(grid_size) *
+                                               sycl::range<1>(block_size),
+                                           sycl::range<1>(block_size)),
+                         [=](sycl::nd_item<1> item_ct1) {
                            su3_AoS2SoA(VOLUME, d_u_soa, d_u_aos, item_ct1);
                          });
   /*
@@ -974,10 +974,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop =
-      q_ct1.parallel_for(sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) *
-                                               sycl::range<3>(1, 1, block_size),
-                                           sycl::range<3>(1, 1, block_size)),
-                         [=](sycl::nd_item<3> item_ct1) {
+      q_ct1.parallel_for(sycl::nd_range<1>(sycl::range<1>(grid_size) *
+                                               sycl::range<1>(block_size),
+                                           sycl::range<1>(block_size)),
+                         [=](sycl::nd_item<1> item_ct1) {
                            spinor_AoS2SoA(VOLUME, d_s_soa, d_s_aos, item_ct1);
                          });
   /*
@@ -1033,10 +1033,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop = q_ct1.parallel_for(
-      sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) *
-                            sycl::range<3>(1, 1, block_size),
-                        sycl::range<3>(1, 1, block_size)),
-      [=](sycl::nd_item<3> item_ct1) {
+      sycl::nd_range<1>(sycl::range<1>(grid_size) *
+                            sycl::range<1>(block_size),
+                        sycl::range<1>(block_size)),
+      [=](sycl::nd_item<1> item_ct1) {
         mulpauli_kernel(VOLUME, mu, d_s_soa, d_r_soa, d_m_soa, item_ct1);
       });
   /*
@@ -1064,10 +1064,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop = q_ct1.parallel_for(
-      sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) *
-                            sycl::range<3>(1, 1, block_size),
-                        sycl::range<3>(1, 1, block_size)),
-      [=](sycl::nd_item<3> item_ct1) {
+      sycl::nd_range<1>(sycl::range<1>(grid_size) *
+                            sycl::range<1>(block_size),
+                        sycl::range<1>(block_size)),
+      [=](sycl::nd_item<1> item_ct1) {
         doe_kernel(VOLUME, d_s_soa, d_r_soa, d_u_soa, d_piup, d_pidn, coe,
                    gamma_f, one_over_gammaf, item_ct1);
       });
@@ -1096,10 +1096,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop =
-      q_ct1.parallel_for(sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) *
-                                               sycl::range<3>(1, 1, block_size),
-                                           sycl::range<3>(1, 1, block_size)),
-                         [=](sycl::nd_item<3> item_ct1) {
+      q_ct1.parallel_for(sycl::nd_range<1>(sycl::range<1>(grid_size) *
+                                               sycl::range<1>(block_size),
+                                           sycl::range<1>(block_size)),
+                         [=](sycl::nd_item<1> item_ct1) {
                            deo_kernel(VOLUME, d_s_soa, d_r_soa, d_u_soa, d_piup,
                                       d_pidn, ceo, one_over_gammaf, item_ct1);
                          });
@@ -1131,10 +1131,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop =
-      q_ct1.parallel_for(sycl::nd_range<3>(sycl::range<3>(1, 1, grid_size) *
-                                               sycl::range<3>(1, 1, block_size),
-                                           sycl::range<3>(1, 1, block_size)),
-                         [=](sycl::nd_item<3> item_ct1) {
+      q_ct1.parallel_for(sycl::nd_range<1>(sycl::range<1>(grid_size) *
+                                               sycl::range<1>(block_size),
+                                           sycl::range<1>(block_size)),
+                         [=](sycl::nd_item<1> item_ct1) {
                            spinor_SoA2AoS(VOLUME, d_r_aos, d_r_soa, item_ct1);
                          });
   /*
