@@ -4,7 +4,6 @@
 #include "sycl_openqcd.h"
 #include <CL/sycl.hpp>
 #include <chrono>
-#include <dpct/dpct.hpp>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,10 +49,8 @@ void vector_i_sub_assign(su3_vector_soa r, su3_vector s, int idx)
   sycl_openqcd::atomic_fetch_add(&(r.c3.im[idx]), -s.c3.re);
 }
 
-pauli_soa allocPauli2Device(int vol)
-{
-  dpct::device_ext &dev_ct1 = dpct::get_current_device();
-  sycl::queue &q_ct1 = dev_ct1.default_queue();
+pauli_soa allocPauli2Device(int vol, sycl::queue &q_ct1)
+{  
   pauli_soa d_m;
 
   // Allocate memory on device
@@ -63,10 +60,8 @@ pauli_soa allocPauli2Device(int vol)
   return d_m;
 }
 
-su3_soa allocSu32Device(int vol)
+su3_soa allocSu32Device(int vol, sycl::queue &q_ct1)
 {
-  dpct::device_ext &dev_ct1 = dpct::get_current_device();
-  sycl::queue &q_ct1 = dev_ct1.default_queue();
   su3_soa d_u;
 
   d_u.c11.re = sycl::malloc_device<float>(4 * vol, q_ct1);
@@ -91,10 +86,8 @@ su3_soa allocSu32Device(int vol)
   return d_u;
 }
 
-spinor_soa allocSpinor2Device(int vol)
+spinor_soa allocSpinor2Device(int vol, sycl::queue &q_ct1)
 {
-  dpct::device_ext &dev_ct1 = dpct::get_current_device();
-  sycl::queue &q_ct1 = dev_ct1.default_queue();
   spinor_soa d_s;
 
   d_s.c1.c1.re = sycl::malloc_device<float>(vol, q_ct1);
@@ -125,18 +118,14 @@ spinor_soa allocSpinor2Device(int vol)
   return d_s;
 }
 
-void destroy_pauli_soa(pauli_soa obj)
+void destroy_pauli_soa(sycl::queue &q_ct1, pauli_soa obj)
 {
-  dpct::device_ext &dev_ct1 = dpct::get_current_device();
-  sycl::queue &q_ct1 = dev_ct1.default_queue();
   sycl::free(obj.m1, q_ct1);
   sycl::free(obj.m2, q_ct1);
 }
 
-void destroy_su3_soa(su3_soa obj)
+void destroy_su3_soa(sycl::queue &q_ct1, su3_soa obj)
 {
-  dpct::device_ext &dev_ct1 = dpct::get_current_device();
-  sycl::queue &q_ct1 = dev_ct1.default_queue();
   sycl::free(obj.c11.re, q_ct1);
   sycl::free(obj.c11.im, q_ct1);
   sycl::free(obj.c12.re, q_ct1);
@@ -157,10 +146,8 @@ void destroy_su3_soa(su3_soa obj)
   sycl::free(obj.c33.im, q_ct1);
 }
 
-void destroy_spinor_soa(spinor_soa obj)
+void destroy_spinor_soa(sycl::queue &q_ct1, spinor_soa obj)
 {
-  dpct::device_ext &dev_ct1 = dpct::get_current_device();
-  sycl::queue &q_ct1 = dev_ct1.default_queue();
   sycl::free(obj.c1.c1.re, q_ct1);
   sycl::free(obj.c1.c1.im, q_ct1);
   sycl::free(obj.c1.c2.re, q_ct1);
@@ -849,8 +836,24 @@ extern "C" void deo_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
                             int *piup, int *pidn)
 {
-  dpct::device_ext &dev_ct1 = dpct::get_current_device();
-  sycl::queue &q_ct1 = dev_ct1.default_queue();
+
+  auto platformlist = sycl::platform::get_platforms();
+
+  std::cout << "List of detected devices:" << "\n";
+  
+  for (auto p : platformlist) {
+    auto devicelist = p.get_devices(sycl::info::device_type::all);
+    for(auto d : devicelist)
+      {
+	std::string device_vendor = d.get_info<sycl::info::device::vendor>();
+	std::cout<<d.get_info<sycl::info::device::name>()<<"\n";
+      }
+  }
+  
+  sycl::queue q_ct1{ sycl::default_selector{} };
+  
+  std::cout << "Selected device: " << q_ct1.get_device().get_info<sycl::info::device::name>() << "\n";
+  
   sycl::event start, stop;
   std::chrono::time_point<std::chrono::steady_clock> start_ct1;
   std::chrono::time_point<std::chrono::steady_clock> stop_ct1;
@@ -877,7 +880,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   one_over_gammaf = 1.0f;
 
   // Copy pauli m from host to device and convert from Aos to SoA in GPU
-  pauli_soa d_m_soa = allocPauli2Device(VOLUME); // Allocate SoA in device
+  pauli_soa d_m_soa = allocPauli2Device(VOLUME, q_ct1); // Allocate SoA in device
   pauli *d_m_aos;
   d_m_aos =
       sycl::malloc_device<pauli>(2 * VOLUME, q_ct1); // Allocate AoS in device
@@ -917,7 +920,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   sycl::free(d_m_aos, q_ct1); // Free AoS in GPU
 
   // Copy su3 u from host to device and convert from Aos to SoA in GPU
-  su3_soa d_u_soa = allocSu32Device(VOLUME); // Allocate SoA in device
+  su3_soa d_u_soa = allocSu32Device(VOLUME, q_ct1); // Allocate SoA in device
   su3 *d_u_aos;
   d_u_aos =
       sycl::malloc_device<su3>(4 * VOLUME, q_ct1); // Allocate AoS in device
@@ -955,7 +958,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   sycl::free(d_u_aos, q_ct1); // Free AoS in GPU
 
   // Copy spinor s from host to device and convert from Aos to SoA in GPU
-  spinor_soa d_s_soa = allocSpinor2Device(VOLUME); // Allocate SoA in device
+  spinor_soa d_s_soa = allocSpinor2Device(VOLUME, q_ct1); // Allocate SoA in device
   spinor *d_s_aos;
   d_s_aos =
       sycl::malloc_device<spinor>(VOLUME, q_ct1); // Allocate AoS in device
@@ -997,7 +1000,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   sycl::int4 *d_piup, *d_pidn;
   d_piup = (sycl::int4 *)sycl::malloc_device(2 * VOLUME * sizeof(int), q_ct1);
   d_pidn = (sycl::int4 *)sycl::malloc_device(2 * VOLUME * sizeof(int), q_ct1);
-  spinor_soa d_r_soa = allocSpinor2Device(VOLUME);
+  spinor_soa d_r_soa = allocSpinor2Device(VOLUME, q_ct1);
 
   // Copy lookup tables from host to device
   /*
@@ -1033,8 +1036,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop = q_ct1.parallel_for(
-      sycl::nd_range<1>(sycl::range<1>(grid_size) *
-                            sycl::range<1>(block_size),
+      sycl::nd_range<1>(sycl::range<1>(grid_size) * sycl::range<1>(block_size),
                         sycl::range<1>(block_size)),
       [=](sycl::nd_item<1> item_ct1) {
         mulpauli_kernel(VOLUME, mu, d_s_soa, d_r_soa, d_m_soa, item_ct1);
@@ -1167,10 +1169,11 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   printf("Time for cudaMemcpy D2H (ms): %.2f\n", milliseconds);
 
   // Free GPU memory
-  destroy_pauli_soa(d_m_soa);
-  destroy_su3_soa(d_u_soa);
-  destroy_spinor_soa(d_s_soa);
-  destroy_spinor_soa(d_r_soa);
+  destroy_pauli_soa(q_ct1, d_m_soa);
+  destroy_su3_soa(q_ct1, d_u_soa);
+  destroy_spinor_soa(q_ct1, d_s_soa);
+  destroy_spinor_soa(q_ct1, d_r_soa);
+  
   sycl::free(d_piup, q_ct1);
   sycl::free(d_pidn, q_ct1);
   sycl::free(d_r_aos, q_ct1);
