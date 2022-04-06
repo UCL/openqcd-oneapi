@@ -10,14 +10,36 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      CC: dpcpp
+      CXX: dpcpp
 
     steps:
     - uses: actions/checkout@v3
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+
+    - name: Setup
+      run: |
+        # Following the instructions in
+        # https://www.intel.com/content/www/us/en/develop/documentation/installation-guide-for-intel-oneapi-toolkits-linux/top/installation/install-using-package-managers/apt.html#apt
+        # download the key to system keyring
+        wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+        # add signed entry to apt sources and configure the APT client to use Intel repository:
+        echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+        sudo apt install intel-basekit
+
+        sudo apt update
+        sudo apt -y install cmake pkg-config build-essential
+
+        . /opt/intel/oneapi/setvars.sh
+
+    - name: Make
+      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      run: make intel_cpu
+
+    - name: Test-16
+      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      run: ./main 16 16 16 16 ${{github.workspace}}/data
+
+    - name: Test-32
+      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      run: ./main 32 32 32 32 ${{github.workspace}}/data
