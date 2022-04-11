@@ -27,13 +27,14 @@ jobs:
 
         # add signed entry to apt sources and configure the APT client to use Intel repository:
         echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+        sudo apt -y update
 
     - name: Install
       # Following the instructions in
       # https://neelravi.com/post/oneapi-github-workflow/
       run: |
-        sudo apt-get install -y intel-oneapi-common-vars
-        sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp
+        sudo apt install -y intel-oneapi-common-vars
+        sudo apt install -y intel-oneapi-compiler-dpcpp-cpp
 
     - name: Make
       working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
