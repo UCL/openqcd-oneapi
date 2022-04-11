@@ -2,7 +2,6 @@
 *.d
 *.o
 *.log
-data/*
 
 # Build files
 build/*
