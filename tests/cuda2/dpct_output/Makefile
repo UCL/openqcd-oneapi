@@ -4,10 +4,10 @@ CFLAGS=-O2 -Wall
 LDFLAGS=
 INCLUDES=-Iincludes
 
-intel: CC = dpcpp
+intel_cpu: CC = dpcpp
 
-nvidia: CC = clang++
-nvidia: CFLAGS += -fsycl -fsycl-targets=nvptx64-nvidia-cuda
+nvidia_gpu: CC = clang++
+nvidia_gpu: CFLAGS += -fsycl -fsycl-targets=nvptx64-nvidia-cuda
 
 all: intel_cpu nvidia_gpu
 
