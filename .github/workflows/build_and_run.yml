@@ -13,6 +13,7 @@ jobs:
     env:
       CC: dpcpp
       CXX: dpcpp
+      GIT_LFS_SKIP_DOWNLOAD_ERRORS: 1
 
     steps:
     - uses: actions/checkout@v3
