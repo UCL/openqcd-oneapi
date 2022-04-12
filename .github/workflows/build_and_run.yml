@@ -1,0 +1,57 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ arc_dev ]
+  pull_request:
+    branches: [ arc_dev ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      CC: dpcpp
+      CXX: dpcpp
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Checkout LFS objects
+      run: |
+        git lfs pull --include=data/* --exclude=tests/stout_smearing/configurations/*
+
+    - name: Setup
+      run: |
+        # Following the instructions in
+        # https://www.intel.com/content/www/us/en/develop/documentation/installation-guide-for-intel-oneapi-toolkits-linux/top/installation/install-using-package-managers/apt.html#apt
+        # download the key to system keyring
+        wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
+        | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+
+        # add signed entry to apt sources and configure the APT client to use Intel repository:
+        echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+        sudo apt -y update
+
+    - name: Install
+      # Following the instructions in
+      # https://neelravi.com/post/oneapi-github-workflow/
+      run: |
+        sudo apt install -y intel-oneapi-common-vars
+        sudo apt install -y intel-oneapi-compiler-dpcpp-cpp
+
+    - name: Make
+      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      run: |
+        . /opt/intel/oneapi/setvars.sh
+        make intel_cpu
+
+    - name: Test-16
+      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      run: |
+        . /opt/intel/oneapi/setvars.sh
+        ./main.intel_cpu 16 16 16 16 ${{github.workspace}}/data
+
+    # - name: Test-32
+    #   working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+    #   run: ./main 32 32 32 32 ${{github.workspace}}/data
