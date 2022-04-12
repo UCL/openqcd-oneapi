@@ -118,13 +118,13 @@ spinor_soa allocSpinor2Device(int vol, sycl::queue &q_ct1)
   return d_s;
 }
 
-void destroy_pauli_soa(sycl::queue &q_ct1, pauli_soa obj)
+void destroy_pauli_soa(pauli_soa obj, sycl::queue &q_ct1)
 {
   sycl::free(obj.m1, q_ct1);
   sycl::free(obj.m2, q_ct1);
 }
 
-void destroy_su3_soa(sycl::queue &q_ct1, su3_soa obj)
+void destroy_su3_soa(su3_soa obj, sycl::queue &q_ct1)
 {
   sycl::free(obj.c11.re, q_ct1);
   sycl::free(obj.c11.im, q_ct1);
@@ -146,7 +146,7 @@ void destroy_su3_soa(sycl::queue &q_ct1, su3_soa obj)
   sycl::free(obj.c33.im, q_ct1);
 }
 
-void destroy_spinor_soa(sycl::queue &q_ct1, spinor_soa obj)
+void destroy_spinor_soa(spinor_soa obj, sycl::queue &q_ct1)
 {
   sycl::free(obj.c1.c1.re, q_ct1);
   sycl::free(obj.c1.c1.im, q_ct1);
@@ -1169,10 +1169,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   printf("Time for cudaMemcpy D2H (ms): %.2f\n", milliseconds);
 
   // Free GPU memory
-  destroy_pauli_soa(q_ct1, d_m_soa);
-  destroy_su3_soa(q_ct1, d_u_soa);
-  destroy_spinor_soa(q_ct1, d_s_soa);
-  destroy_spinor_soa(q_ct1, d_r_soa);
+  destroy_pauli_soa(d_m_soa, q_ct1);
+  destroy_su3_soa(d_u_soa, q_ct1);
+  destroy_spinor_soa(d_s_soa, q_ct1);
+  destroy_spinor_soa(d_r_soa, q_ct1);
   
   sycl::free(d_piup, q_ct1);
   sycl::free(d_pidn, q_ct1);
