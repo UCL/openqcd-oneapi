@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
   pauli *m;
   spinor *s, *r, *rfinal;
   int *piup, *pidn;
+  int err;
 
   char cnfg[256];
   char cnfg_dir[128];
@@ -44,7 +45,7 @@ int main(int argc, char *argv[])
   L2 = atoi(argv[3]);
   L3 = atoi(argv[4]);
   VOLUME = L0 * L1 * L2 * L3;
-  sprintf(cnfg_dir, argv[5]);
+  sprintf(cnfg_dir, "%s", argv[5]);
 
   /***************************************************************************
    *
@@ -60,23 +61,27 @@ int main(int argc, char *argv[])
   r = (spinor *)malloc(VOLUME * sizeof(*r));
   rfinal = (spinor *)malloc(VOLUME * sizeof(*rfinal));
 
+  err = 0;
+
   sprintf(cnfg, "%s/sp-u-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
-  read_sp_u_from_file(cnfg, u, VOLUME);
+  if(read_sp_u_from_file(cnfg, u, VOLUME) != 0) err = 1;
 
   sprintf(cnfg, "%s/sp-m-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
-  read_sp_m_from_file(cnfg, m, VOLUME);
+  if(read_sp_m_from_file(cnfg, m, VOLUME) != 0) err = 1;
 
   sprintf(cnfg, "%s/piup-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
-  read_lt_from_file(cnfg, piup, VOLUME);
+  if(read_lt_from_file(cnfg, piup, VOLUME) != 0) err = 1;
 
   sprintf(cnfg, "%s/pidn-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
-  read_lt_from_file(cnfg, pidn, VOLUME);
+  if(read_lt_from_file(cnfg, pidn, VOLUME) != 0) err = 1;
 
   sprintf(cnfg, "%s/sp-s-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
-  read_sp_spinor_from_file(cnfg, s, VOLUME);
+  if(read_sp_spinor_from_file(cnfg, s, VOLUME) != 0) err = 1;
 
   sprintf(cnfg, "%s/sp-r-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
-  read_sp_spinor_from_file(cnfg, rfinal, VOLUME);
+  if(read_sp_spinor_from_file(cnfg, rfinal, VOLUME) != 0) err = 1;
+
+  if( err != 0 ) exit(1);
 
   // Call DPCPP version of Dw() with Structures of Arrays
   Dw_cuda_SoA(VOLUME, u, s, r, m, piup, pidn);
