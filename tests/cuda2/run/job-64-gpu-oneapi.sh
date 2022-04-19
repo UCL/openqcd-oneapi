@@ -48,10 +48,10 @@ module load dpcpp
 module load gcc/11.2.0
 
 #! Full path to application executable: 
-application="./main.nvidia"
+application="./main.oneapi_nvidia_gpu"
 
 #! Run options for the application:
-options="16 16 16 16 ."
+options="64 64 64 64 ."
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
