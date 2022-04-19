@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+using namespace cl;
+
 void vector_add_assign(su3_vector_soa r, su3_vector s, int idx)
 {
   sycl_openqcd::atomic_fetch_add(&(r.c1.re[idx]), s.c1.re);
