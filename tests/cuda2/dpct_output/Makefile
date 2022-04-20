@@ -10,10 +10,10 @@ oneapi_cuda_gpu: CC = clang++
 oneapi_cuda_gpu: CFLAGS += -fsycl -fsycl-targets=nvptx64-cuda-cuda
 
 hip_omp_cpu: CC = syclcc
-hip_omp_cpu: CFLAGS += --hipsycl-targets=omp
+#hip_omp_cpu: CFLAGS += --hipsycl-targets=omp
 
 hip_cuda_gpu: CC = syclcc
-hip_cuda_gpu: CFLAGS += --hipsycl-targets=cuda:sm_80
+#hip_cuda_gpu: CFLAGS += --hipsycl-targets=cuda:sm_80
 
 all: oneapi_intel_cpu oneapi_cuda_gpu hip_intel_cpu hip_intel_gpu
 

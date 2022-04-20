@@ -1,0 +1,48 @@
+name: hipSYCL nightly
+
+on:
+  push:
+    branches: [ arc_dev ]
+  pull_request:
+    branches: [ arc_dev ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      HIPSYCL_PLATFORM: cpu
+      CC: syclcc
+      CXX: syclcc
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Checkout LFS objects
+      run: |
+        git lfs pull --include=data/* --exclude=tests/stout_smearing/configurations/*
+
+    - name: Setup hipSYCL
+      # Following the instructions in
+      # https://github.com/illuhad/hipSYCL/blob/develop/install/scripts/README.md#installing-from-repositories
+      run: |
+        export DEBIAN_FRONTEND=noninteractive
+        echo "deb http://repo.urz.uni-heidelberg.de/sycl$1/deb/ ./focal main" | sudo tee /etc/apt/sources.list.d/hipsycl.list
+        wget -q -O - http://repo.urz.uni-heidelberg.de/sycl/hipsycl.asc | sudo apt-key add -
+        sudo apt -y update
+
+    - name: Install hipSYCL
+      run: |
+        sudo apt -y install libtinfo5
+        sudo apt -y install hipsycl-nightly
+        echo "/opt/hipSYCL/bin" >> $GITHUB_PATH
+        
+    - name: Make
+      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      run: |
+        make hip_omp_cpu
+
+    - name: Test 16-16-16-16
+      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      run: |
+        ./main.hip_omp_cpu 16 16 16 16 ${{github.workspace}}/data
