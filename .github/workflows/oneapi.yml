@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: OneAPI latest
 
 on:
   push:
@@ -10,6 +10,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      CC: dpcpp
+      CXX: dpcpp
 
     steps:
     - uses: actions/checkout@v3
@@ -36,52 +39,15 @@ jobs:
       run: |
         sudo apt install -y intel-oneapi-common-vars
         sudo apt install -y intel-oneapi-compiler-dpcpp-cpp
-
-    - name: Setup hipSYCL
-      # Following the instructions in
-      # https://github.com/illuhad/hipSYCL/blob/develop/install/scripts/README.md#installing-from-repositories
-      run: |
-        export DEBIAN_FRONTEND=noninteractive
-        echo "deb http://repo.urz.uni-heidelberg.de/sycl$1/deb/ ./focal main" | sudo tee /etc/apt/sources.list.d/hipsycl.list
-        wget -q -O - http://repo.urz.uni-heidelberg.de/sycl/hipsycl.asc | sudo apt-key add -
-        sudo apt -y update
-
-    - name: Install hipSYCL
-      run: |
-        sudo apt -y install libtinfo5
-        sudo apt -y install hipsycl-nightly
-        echo "/opt/hipSYCL/bin" >> $GITHUB_PATH
         
-    - name: Make OneAPI
+    - name: Make
       working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
       run: |
         . /opt/intel/oneapi/setvars.sh
         make oneapi_intel_cpu
-      env:
-        CC: dpcpp
-        CXX: dpcpp
         
-    - name: Make hipSYCL
-      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
-      run: |
-        make hip_omp_cpu
-      env:
-        HIPSYCL_PLATFORM: cpu
-        CC: syclcc
-        CXX: syclcc
-
-    - name: Test-16 OneAPI
+    - name: Test 16-16-16-16
       working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
       run: |
         . /opt/intel/oneapi/setvars.sh
         ./main.oneapi_intel_cpu 16 16 16 16 ${{github.workspace}}/data
-
-    - name: Test-16 hipSYCL
-      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
-      run: |
-        ./main.hip_omp_cpu 16 16 16 16 ${{github.workspace}}/data
-
-
-    # - name: Test-32
-    #   working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
-    #   run: ./main 32 32 32 32 ${{github.workspace}}/data
