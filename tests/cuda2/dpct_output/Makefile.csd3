@@ -34,14 +34,14 @@ oneapi_cuda_gpu: $(SRC)
 
 hip_omp_cpu: $(SRC)
 	module purge; \
-	module load load rhel8/default-amp; \
+	module load rhel8/default-amp; \
 	module load hipsycl/0.9.2/gcc-9.4.0-jg2gfgh; \
 	module load gcc/9.4.0; \
 	$(CC) $(INCLUDES) $(CFLAGS) $^ -o main.hip_omp_cpu
 
 hip_cuda_gpu: $(SRC)
 	module purge; \
-	module load load rhel8/default-amp; \
+	module load rhel8/default-amp; \
 	module load hipsycl/0.9.2/gcc-9.4.0-jg2gfgh; \
 	module load gcc/9.4.0; \
 	$(CC) $(INCLUDES) $(CFLAGS) $^ -o main.hip_cuda_gpu
