@@ -14,7 +14,7 @@
 #SBATCH -A DIRAC-DR004-CPU
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=6760
+#SBATCH --mem=108160
 #SBATCH --time=00:10:00
 #SBATCH --mail-type=NONE
 #SBATCH -p icelake-himem
@@ -47,10 +47,10 @@ module load rhel8/default-icl            # REQUIRED - loads the basic environmen
 #! Insert additional module load commands after this line if needed:
 
 #! Full path to application executable: 
-application="main.intel"
+application="./main.oneapi_intel_cpu"
 
 #! Run options for the application:
-options="32 32 32 32 ."
+options="64 64 64 64 ."
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory

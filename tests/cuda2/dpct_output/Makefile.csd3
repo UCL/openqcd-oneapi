@@ -1,28 +1,50 @@
 SHELL:=/bin/bash
 CC=dpcpp
-CFLAGS=-O2 -Wall
+CFLAGS=-O2
 LDFLAGS=
 INCLUDES=-Iincludes
 
-intel_cpu: CC = dpcpp
+SRC=main.c dw_soa_sycl.cpp read_in.c
 
-nvidia_gpu: CC = clang++
-nvidia_gpu: CFLAGS += -fsycl -fsycl-targets=nvptx64-nvidia-cuda
+oneapi_intel_cpu: CC = dpcpp
 
-all: intel_cpu nvidia_gpu
+oneapi_cuda_gpu: CC = clang++
+oneapi_cuda_gpu: CFLAGS += -fsycl -fsycl-targets=nvptx64-nvidia-cuda
 
-intel_cpu: main.c dw_soa_sycl.cpp read_in.c
+hip_omp_cpu: CC = syclcc
+hip_omp_cpu: CFLAGS += --hipsycl-targets=omp
+
+hip_cuda_gpu: CC = syclcc
+hip_cuda_gpu: CFLAGS += --hipsycl-targets=cuda:sm_80
+
+all: oneapi_intel_cpu oneapi_cuda_gpu hip_omp_cpu hip_cuda_gpu
+
+oneapi_intel_cpu: $(SRC)
 	module purge;                                                                                     \
 	source /usr/local/software/intel/oneapi/2022.1/setvars.sh >/dev/null 2>&1;                        \
-    $(CC) $(INCLUDES) $(CFLAGS) $^ -o main.intel_cpu
+	$(CC) $(INCLUDES) $(CFLAGS) $^ -o main.oneapi_intel_cpu
 
-nvidia_gpu: main.c dw_soa_sycl.cpp read_in.c
+oneapi_cuda_gpu: $(SRC)
 	module purge;                                                                                     \
-    source /usr/local/software/intel/oneapi/2022.1/setvars.sh >/dev/null 2>&1;                        \
-    module use /usr/local/software/spack/spack-modules/dpcpp-cuda-20220220/linux-centos8-x86_64_v3/;  \
-    module load dpcpp;                                                                                \
-    module load gcc/11.2.0;                                                                           \
-    $(CC) $(INCLUDES) $(CFLAGS) $^ -o main.nvidia_gpu
+	source /usr/local/software/intel/oneapi/2022.1/setvars.sh >/dev/null 2>&1;                        \
+	module use /usr/local/software/spack/spack-modules/dpcpp-cuda-20220220/linux-centos8-x86_64_v3/;  \
+	module load dpcpp;                                                                                \
+	module load gcc/11.2.0;                                                                           \
+	$(CC) $(INCLUDES) $(CFLAGS) $^ -o main.oneapi_cuda_gpu
+
+hip_omp_cpu: $(SRC)
+	module purge; \
+	module load rhel8/default-amp; \
+	module load hipsycl/0.9.2/gcc-9.4.0-jg2gfgh; \
+	module load gcc/9.4.0; \
+	$(CC) $(INCLUDES) $(CFLAGS) $^ -o main.hip_omp_cpu
+
+hip_cuda_gpu: $(SRC)
+	module purge; \
+	module load rhel8/default-amp; \
+	module load hipsycl/0.9.2/gcc-9.4.0-jg2gfgh; \
+	module load gcc/9.4.0; \
+	$(CC) $(INCLUDES) $(CFLAGS) $^ -o main.hip_cuda_gpu
 
 clean:
 	rm -f *.o a.out 2>/dev/null main.*_?pu

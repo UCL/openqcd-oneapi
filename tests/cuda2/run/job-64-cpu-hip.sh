@@ -47,7 +47,7 @@ module load rhel8/default-icl            # REQUIRED - loads the basic environmen
 #! Insert additional module load commands after this line if needed:
 
 #! Full path to application executable: 
-application="vtune -collect performance-snapshot main.intel"
+application="./main.hip_omp_cpu"
 
 #! Run options for the application:
 options="64 64 64 64 ."
