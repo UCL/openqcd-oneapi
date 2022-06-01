@@ -51,3 +51,15 @@ jobs:
       run: |
         . /opt/intel/oneapi/setvars.sh
         ./main.oneapi_intel_cpu 16 16 16 16 ${{github.workspace}}/data
+
+    - name: Test incorrect 8-8-8-8
+      id: incorrect
+      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      continue-on-error: true
+      run: |
+        . /opt/intel/oneapi/setvars.sh
+        ./main.oneapi_intel_cpu 8 8 8 8 ${{github.workspace}}/data/incorrect
+
+    - name: Fails with incorrect spinor values
+      if: ${{ failure() && steps.incorrect.conclusion == 'failure' }}
+        
