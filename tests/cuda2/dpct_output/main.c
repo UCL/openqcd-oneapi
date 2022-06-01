@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
       count++;
     } else {
       printf("Values in spinor r are incorrect at: %d\n", i);
+      return 1;
     }
   }
   if (count == VOLUME) {
