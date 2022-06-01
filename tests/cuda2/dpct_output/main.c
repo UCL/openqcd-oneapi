@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     if (ret == 0) {
       count++;
     } else {
-      printf("Values in spinor r are incorrect at: %d\n", i);
+      fprintf(stderr, "Values in spinor r are incorrect at: %d\n", i);
       return 1;
     }
   }
