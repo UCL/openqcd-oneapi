@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
   sprintf(cnfg, "%s/sp-r-%d-%d-%d-%d", cnfg_dir, L0, L1, L2, L3);
   if(read_sp_spinor_from_file(cnfg, rfinal, VOLUME) != 0) err = 1;
 
-  if( err != 0 ) exit(1);
+  if( err != 0 ) exit(-1);
 
   // Call DPCPP version of Dw() with Structures of Arrays
   Dw_cuda_SoA(VOLUME, u, s, r, m, piup, pidn);
@@ -95,12 +95,10 @@ int main(int argc, char *argv[])
       count++;
     } else {
       fprintf(stderr, "Values in spinor r are incorrect at: %d\n", i);
-      return 1;
+      exit(-2);
     }
   }
   if (count == VOLUME) {
     printf("Values in spinor r are correct\n");
   }
-
-  return 0;
 }
