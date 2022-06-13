@@ -36,7 +36,7 @@ jobs:
         sudo apt -y install libtinfo5
         sudo apt -y install hipsycl-nightly
         echo "/opt/hipSYCL/bin" >> $GITHUB_PATH
-        
+
     - name: Make
       working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
       run: |
@@ -46,3 +46,19 @@ jobs:
       working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
       run: |
         ./main.hip_omp_cpu 16 16 16 16 ${{github.workspace}}/data
+
+    - name: Run on incorrect 8-8-8-8 data
+      id: incorrect
+      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      continue-on-error: true
+      run: |
+        . /opt/intel/oneapi/setvars.sh
+        ./main.oneapi_intel_cpu 8 8 8 8 ${{github.workspace}}/data/incorrect
+
+    - name: Test previous for success
+      if: steps.incorrect.outcome == 'success'
+      run: exit 1
+
+    - name: Test previous for failure
+      if: steps.incorrect.outcome == 'failure'
+      run: exit 0

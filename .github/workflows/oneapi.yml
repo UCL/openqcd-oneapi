@@ -39,15 +39,31 @@ jobs:
       run: |
         sudo apt install -y intel-oneapi-common-vars
         sudo apt install -y intel-oneapi-compiler-dpcpp-cpp
-        
+
     - name: Make
       working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
       run: |
         . /opt/intel/oneapi/setvars.sh
         make oneapi_intel_cpu
-        
-    - name: Test 16-16-16-16
+
+    - name: Run on correct 16-16-16-16 data
       working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
       run: |
         . /opt/intel/oneapi/setvars.sh
         ./main.oneapi_intel_cpu 16 16 16 16 ${{github.workspace}}/data
+
+    - name: Run on incorrect 8-8-8-8 data
+      id: incorrect
+      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      continue-on-error: true
+      run: |
+        . /opt/intel/oneapi/setvars.sh
+        ./main.oneapi_intel_cpu 8 8 8 8 ${{github.workspace}}/data/incorrect
+
+    - name: Test previous for success
+      if: steps.incorrect.outcome == 'success'
+      run: exit 1
+
+    - name: Test previous for failure
+      if: steps.incorrect.outcome == 'failure'
+      run: exit 0

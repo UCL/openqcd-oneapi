@@ -902,7 +902,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop =
-      q_ct1.parallel_for(sycl::nd_range<1>(sycl::range<1>(grid_size) *
+      q_ct1.parallel_for<class pauli_AoS2SoA_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size) *
                                                sycl::range<1>(block_size),
                                            sycl::range<1>(block_size)),
                          [=](sycl::nd_item<1> item_ct1) {
@@ -941,7 +941,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop =
-      q_ct1.parallel_for(sycl::nd_range<1>(sycl::range<1>(grid_size) *
+      q_ct1.parallel_for<class su3_AoS2SoA_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size) *
                                                sycl::range<1>(block_size),
                                            sycl::range<1>(block_size)),
                          [=](sycl::nd_item<1> item_ct1) {
@@ -979,7 +979,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop =
-      q_ct1.parallel_for(sycl::nd_range<1>(sycl::range<1>(grid_size) *
+      q_ct1.parallel_for<class spinor_AoS2SoA_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size) *
                                                sycl::range<1>(block_size),
                                            sycl::range<1>(block_size)),
                          [=](sycl::nd_item<1> item_ct1) {
@@ -1037,7 +1037,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   limit. To get the device limit, query info::device::max_work_group_size.
   Adjust the workgroup size if needed.
   */
-  stop = q_ct1.parallel_for(
+  stop = q_ct1.parallel_for<class my_mulpauli_kernel>(
       sycl::nd_range<1>(sycl::range<1>(grid_size) * sycl::range<1>(block_size),
                         sycl::range<1>(block_size)),
       [=](sycl::nd_item<1> item_ct1) {
@@ -1067,7 +1067,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   limit. To get the device limit, query info::device::max_work_group_size.
   Adjust the workgroup size if needed.
   */
-  stop = q_ct1.parallel_for(
+  stop = q_ct1.parallel_for<class my_doe_kernel>(
       sycl::nd_range<1>(sycl::range<1>(grid_size) *
                             sycl::range<1>(block_size),
                         sycl::range<1>(block_size)),
@@ -1100,7 +1100,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop =
-      q_ct1.parallel_for(sycl::nd_range<1>(sycl::range<1>(grid_size) *
+      q_ct1.parallel_for<class my_deo_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size) *
                                                sycl::range<1>(block_size),
                                            sycl::range<1>(block_size)),
                          [=](sycl::nd_item<1> item_ct1) {
@@ -1135,7 +1135,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   Adjust the workgroup size if needed.
   */
   stop =
-      q_ct1.parallel_for(sycl::nd_range<1>(sycl::range<1>(grid_size) *
+      q_ct1.parallel_for<class spinor_SoA2AoS_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size) *
                                                sycl::range<1>(block_size),
                                            sycl::range<1>(block_size)),
                          [=](sycl::nd_item<1> item_ct1) {
