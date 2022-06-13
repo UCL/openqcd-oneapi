@@ -38,18 +38,18 @@ jobs:
         echo "/opt/hipSYCL/bin" >> $GITHUB_PATH
 
     - name: Make
-      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      working-directory: ${{github.workspace}}/tests/sycl
       run: |
         make hip_omp_cpu
 
     - name: Test 16-16-16-16
-      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      working-directory: ${{github.workspace}}/tests/sycl
       run: |
         ./main.hip_omp_cpu 16 16 16 16 ${{github.workspace}}/data
 
     - name: Run on incorrect 8-8-8-8 data
       id: incorrect
-      working-directory: ${{github.workspace}}/tests/cuda2/dpct_output
+      working-directory: ${{github.workspace}}/tests/sycl
       continue-on-error: true
       run: |
         . /opt/intel/oneapi/setvars.sh
