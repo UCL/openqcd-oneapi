@@ -52,7 +52,7 @@ void vector_i_sub_assign(su3_vector_soa r, su3_vector s, int idx)
 }
 
 pauli_soa allocPauli2Device(int vol, sycl::queue &q_ct1)
-{  
+{
   pauli_soa d_m;
 
   // Allocate memory on device
@@ -178,11 +178,9 @@ void destroy_spinor_soa(spinor_soa obj, sycl::queue &q_ct1)
 
 // Kernel to convert pauli from AoS to SoA in GPU
 // extern "C"
-void pauli_AoS2SoA(int vol, pauli_soa mout, pauli *min,
-                   sycl::nd_item<1> item_ct1)
+void pauli_AoS2SoA(int vol, pauli_soa mout, pauli *min, sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
-            item_ct1.get_local_id(0);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) + item_ct1.get_local_id(0);
   if (idx >= vol)
     return;
 
@@ -200,11 +198,9 @@ void pauli_AoS2SoA(int vol, pauli_soa mout, pauli *min,
 }
 
 // Kernel to convert su3 from AoS to SoA in GPU
-extern "C" void su3_AoS2SoA(int vol, su3_soa uout, su3 *uin,
-                            sycl::nd_item<1> item_ct1)
+extern "C" void su3_AoS2SoA(int vol, su3_soa uout, su3 *uin, sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
-            item_ct1.get_local_id(0);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) + item_ct1.get_local_id(0);
   if (idx >= vol / 2)
     return;
 
@@ -235,11 +231,9 @@ extern "C" void su3_AoS2SoA(int vol, su3_soa uout, su3 *uin,
 }
 
 // Kernel to convert spinor from AoS to SoA in GPU
-extern "C" void spinor_AoS2SoA(int vol, spinor_soa rout, spinor *rin,
-                               sycl::nd_item<1> item_ct1)
+extern "C" void spinor_AoS2SoA(int vol, spinor_soa rout, spinor *rin, sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
-            item_ct1.get_local_id(0);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) + item_ct1.get_local_id(0);
   if (idx >= vol)
     return;
 
@@ -270,11 +264,9 @@ extern "C" void spinor_AoS2SoA(int vol, spinor_soa rout, spinor *rin,
 }
 
 // Kernel to convert spinor from SoA to AoS in GPU
-extern "C" void spinor_SoA2AoS(int vol, spinor *rout, spinor_soa rin,
-                               sycl::nd_item<1> item_ct1)
+extern "C" void spinor_SoA2AoS(int vol, spinor *rout, spinor_soa rin, sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
-            item_ct1.get_local_id(0);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) + item_ct1.get_local_id(0);
   if (idx >= vol)
     return;
 
@@ -308,8 +300,7 @@ extern "C" void spinor_SoA2AoS(int vol, spinor *rout, spinor_soa rin,
 extern "C" void mulpauli_kernel(int vol, float mu, spinor_soa s, spinor_soa r,
                                 pauli_soa m, sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
-            item_ct1.get_local_id(0);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) + item_ct1.get_local_id(0);
   if (idx >= vol)
     return;
 
@@ -508,8 +499,7 @@ extern "C" void doe_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
                            float gamma_f, float one_over_gammaf,
                            sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
-            item_ct1.get_local_id(0);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) + item_ct1.get_local_id(0);
   if (idx >= vol / 2)
     return;
 
@@ -680,8 +670,7 @@ extern "C" void deo_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
                            sycl::int4 *piup, sycl::int4 *pidn, float ceo,
                            float one_over_gammaf, sycl::nd_item<1> item_ct1)
 {
-  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) +
-            item_ct1.get_local_id(0);
+  int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) + item_ct1.get_local_id(0);
   if (idx >= vol / 2)
     return;
 
@@ -835,38 +824,31 @@ extern "C" void deo_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 }
 // ---------------------------------------------------------------------------//
 
-extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
-                            int *piup, int *pidn)
+extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, int *pidn)
 {
 
   auto platformlist = sycl::platform::get_platforms();
 
   std::cout << "List of detected devices:" << "\n";
-  
-  for (auto p : platformlist) {
+
+  for (auto p : platformlist)
+  {
     auto devicelist = p.get_devices(sycl::info::device_type::all);
     for(auto d : devicelist)
       {
-	std::string device_vendor = d.get_info<sycl::info::device::vendor>();
-	std::cout<<d.get_info<sycl::info::device::name>()<<"\n";
+        std::string device_vendor = d.get_info<sycl::info::device::vendor>();
+        std::cout<<d.get_info<sycl::info::device::name>()<<"\n";
       }
   }
-  
+
   sycl::queue q_ct1{ sycl::default_selector{} };
-  
+
   std::cout << "Selected device: " << q_ct1.get_device().get_info<sycl::info::device::name>() << "\n";
-  
+
   sycl::event start, stop;
   std::chrono::time_point<std::chrono::steady_clock> start_ct1;
   std::chrono::time_point<std::chrono::steady_clock> stop_ct1;
-  /*
-  DPCT1026:0: The call to cudaEventCreate was removed because this call is
-  redundant in DPC++.
-  */
-  /*
-  DPCT1026:1: The call to cudaEventCreate was removed because this call is
-  redundant in DPC++.
-  */
+
   float milliseconds;
 
   int block_size, grid_size;
@@ -884,16 +866,14 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   // Copy pauli m from host to device and convert from Aos to SoA in GPU
   pauli_soa d_m_soa = allocPauli2Device(VOLUME, q_ct1); // Allocate SoA in device
   pauli *d_m_aos;
-  d_m_aos =
-      sycl::malloc_device<pauli>(2 * VOLUME, q_ct1); // Allocate AoS in device
+  d_m_aos = sycl::malloc_device<pauli>(2 * VOLUME, q_ct1); // Allocate AoS in device
   /*
   DPCT1012:2: Detected kernel execution time measurement pattern and generated
   an initial code for time measurements in SYCL. You can change the way time
   is measured depending on your goals.
   */
   start_ct1 = std::chrono::steady_clock::now(); // Start the timer
-  q_ct1.memcpy(d_m_aos, m, 2 * VOLUME * sizeof(pauli))
-      .wait(); // Mem copy AoS H2D
+  q_ct1.memcpy(d_m_aos, m, 2 * VOLUME * sizeof(pauli)).wait(); // Mem copy AoS H2D
   block_size = 128;
   grid_size = ceil(VOLUME / static_cast<float>(block_size));
   /*
@@ -901,13 +881,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   limit. To get the device limit, query info::device::max_work_group_size.
   Adjust the workgroup size if needed.
   */
-  stop =
-      q_ct1.parallel_for<class pauli_AoS2SoA_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size) *
-                                               sycl::range<1>(block_size),
-                                           sycl::range<1>(block_size)),
-                         [=](sycl::nd_item<1> item_ct1) {
-                           pauli_AoS2SoA(VOLUME, d_m_soa, d_m_aos, item_ct1);
-                         });
+  stop = q_ct1.parallel_for<class pauli_AoS2SoA_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size)
+                                                        * sycl::range<1>(block_size), sycl::range<1>(block_size)),
+                                                        [=](sycl::nd_item<1> item_ct1)
+                                                        { pauli_AoS2SoA(VOLUME, d_m_soa, d_m_aos, item_ct1); });
   /*
   DPCT1012:3: Detected kernel execution time measurement pattern and generated
   an initial code for time measurements in SYCL. You can change the way time
@@ -915,17 +892,14 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   */
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now(); // Stop the timer
-  milliseconds =
-      std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for AoS to SoA for pauli m +H2D (GPU) (ms): %.2f\n",
-         milliseconds);
+  milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
+  printf("Time for AoS to SoA for pauli m +H2D (GPU) (ms): %.2f\n", milliseconds);
   sycl::free(d_m_aos, q_ct1); // Free AoS in GPU
 
   // Copy su3 u from host to device and convert from Aos to SoA in GPU
   su3_soa d_u_soa = allocSu32Device(VOLUME, q_ct1); // Allocate SoA in device
   su3 *d_u_aos;
-  d_u_aos =
-      sycl::malloc_device<su3>(4 * VOLUME, q_ct1); // Allocate AoS in device
+  d_u_aos = sycl::malloc_device<su3>(4 * VOLUME, q_ct1); // Allocate AoS in device
   /*
   DPCT1012:5: Detected kernel execution time measurement pattern and generated
   an initial code for time measurements in SYCL. You can change the way time
@@ -940,13 +914,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   limit. To get the device limit, query info::device::max_work_group_size.
   Adjust the workgroup size if needed.
   */
-  stop =
-      q_ct1.parallel_for<class su3_AoS2SoA_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size) *
-                                               sycl::range<1>(block_size),
-                                           sycl::range<1>(block_size)),
-                         [=](sycl::nd_item<1> item_ct1) {
-                           su3_AoS2SoA(VOLUME, d_u_soa, d_u_aos, item_ct1);
-                         });
+  stop = q_ct1.parallel_for<class su3_AoS2SoA_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size)
+                                                      * sycl::range<1>(block_size), sycl::range<1>(block_size)),
+                                                      [=](sycl::nd_item<1> item_ct1)
+                                                      { su3_AoS2SoA(VOLUME, d_u_soa, d_u_aos, item_ct1); });
   /*
   DPCT1012:6: Detected kernel execution time measurement pattern and generated
   an initial code for time measurements in SYCL. You can change the way time
@@ -954,16 +925,14 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   */
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now(); // Stop the timer
-  milliseconds =
-      std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
+  milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
   printf("Time for AoS to SoA for su3 u +H2D (GPU) (ms): %.2f\n", milliseconds);
   sycl::free(d_u_aos, q_ct1); // Free AoS in GPU
 
   // Copy spinor s from host to device and convert from Aos to SoA in GPU
   spinor_soa d_s_soa = allocSpinor2Device(VOLUME, q_ct1); // Allocate SoA in device
   spinor *d_s_aos;
-  d_s_aos =
-      sycl::malloc_device<spinor>(VOLUME, q_ct1); // Allocate AoS in device
+  d_s_aos = sycl::malloc_device<spinor>(VOLUME, q_ct1); // Allocate AoS in device
   /*
   DPCT1012:8: Detected kernel execution time measurement pattern and generated
   an initial code for time measurements in SYCL. You can change the way time
@@ -978,13 +947,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   limit. To get the device limit, query info::device::max_work_group_size.
   Adjust the workgroup size if needed.
   */
-  stop =
-      q_ct1.parallel_for<class spinor_AoS2SoA_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size) *
-                                               sycl::range<1>(block_size),
-                                           sycl::range<1>(block_size)),
-                         [=](sycl::nd_item<1> item_ct1) {
-                           spinor_AoS2SoA(VOLUME, d_s_soa, d_s_aos, item_ct1);
-                         });
+  stop = q_ct1.parallel_for<class spinor_AoS2SoA_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size)
+                                                         * sycl::range<1>(block_size), sycl::range<1>(block_size)),
+                                                         [=](sycl::nd_item<1> item_ct1)
+                                                         { spinor_AoS2SoA(VOLUME, d_s_soa, d_s_aos, item_ct1); });
   /*
   DPCT1012:9: Detected kernel execution time measurement pattern and generated
   an initial code for time measurements in SYCL. You can change the way time
@@ -992,10 +958,8 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   */
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now(); // Stop the timer
-  milliseconds =
-      std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for AoS to SoA for spinor s +H2D (GPU) (ms): %.2f\n",
-         milliseconds);
+  milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
+  printf("Time for AoS to SoA for spinor s +H2D (GPU) (ms): %.2f\n", milliseconds);
   sycl::free(d_s_aos, q_ct1);
 
   // Allocate memory on device for lookup tables and spinor r
@@ -1019,8 +983,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   way time is measured depending on your goals.
   */
   stop_ct1 = std::chrono::steady_clock::now();
-  milliseconds =
-      std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
+  milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
   printf("Time for cudaMemcpy H2D of lookup tables (ms): %.2f\n", milliseconds);
 
   // Launch kernels on GPU
@@ -1037,12 +1000,13 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   limit. To get the device limit, query info::device::max_work_group_size.
   Adjust the workgroup size if needed.
   */
-  stop = q_ct1.parallel_for<class my_mulpauli_kernel>(
-      sycl::nd_range<1>(sycl::range<1>(grid_size) * sycl::range<1>(block_size),
-                        sycl::range<1>(block_size)),
-      [=](sycl::nd_item<1> item_ct1) {
-        mulpauli_kernel(VOLUME, mu, d_s_soa, d_r_soa, d_m_soa, item_ct1);
-      });
+  stop = q_ct1.parallel_for<class my_mulpauli_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size)
+                                                      * sycl::range<1>(block_size), sycl::range<1>(block_size)),
+                                                      [=](sycl::nd_item<1> item_ct1)
+                                                      {
+                                                        mulpauli_kernel(VOLUME, mu, d_s_soa, d_r_soa,
+                                                                        d_m_soa, item_ct1);
+                                                      });
   /*
   DPCT1012:14: Detected kernel execution time measurement pattern and
   generated an initial code for time measurements in SYCL. You can change the
@@ -1050,8 +1014,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   */
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now();
-  milliseconds =
-      std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
+  milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
   printf("Time for kernel mul_pauli (ms): %.2f\n", milliseconds);
 
   block_size = 128;
@@ -1067,14 +1030,13 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   limit. To get the device limit, query info::device::max_work_group_size.
   Adjust the workgroup size if needed.
   */
-  stop = q_ct1.parallel_for<class my_doe_kernel>(
-      sycl::nd_range<1>(sycl::range<1>(grid_size) *
-                            sycl::range<1>(block_size),
-                        sycl::range<1>(block_size)),
-      [=](sycl::nd_item<1> item_ct1) {
-        doe_kernel(VOLUME, d_s_soa, d_r_soa, d_u_soa, d_piup, d_pidn, coe,
-                   gamma_f, one_over_gammaf, item_ct1);
-      });
+  stop = q_ct1.parallel_for<class my_doe_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size)
+                                                 * sycl::range<1>(block_size), sycl::range<1>(block_size)),
+                                                 [=](sycl::nd_item<1> item_ct1)
+                                                 {
+                                                  doe_kernel(VOLUME, d_s_soa, d_r_soa, d_u_soa, d_piup, d_pidn,
+                                                             coe, gamma_f, one_over_gammaf, item_ct1);
+                                                 });
   /*
   DPCT1012:17: Detected kernel execution time measurement pattern and
   generated an initial code for time measurements in SYCL. You can change the
@@ -1082,8 +1044,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   */
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now();
-  milliseconds =
-      std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
+  milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
   printf("Time for kernel doe (ms): %.2f\n", milliseconds);
 
   block_size = 128;
@@ -1099,14 +1060,12 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   limit. To get the device limit, query info::device::max_work_group_size.
   Adjust the workgroup size if needed.
   */
-  stop =
-      q_ct1.parallel_for<class my_deo_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size) *
-                                               sycl::range<1>(block_size),
-                                           sycl::range<1>(block_size)),
-                         [=](sycl::nd_item<1> item_ct1) {
-                           deo_kernel(VOLUME, d_s_soa, d_r_soa, d_u_soa, d_piup,
-                                      d_pidn, ceo, one_over_gammaf, item_ct1);
-                         });
+  stop = q_ct1.parallel_for<class my_deo_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size) *
+                                                 sycl::range<1>(block_size), sycl::range<1>(block_size)),
+                                                 [=](sycl::nd_item<1> item_ct1)
+                                                 { deo_kernel(VOLUME, d_s_soa, d_r_soa, d_u_soa, d_piup,
+                                                              d_pidn, ceo, one_over_gammaf, item_ct1);
+                                                 });
   /*
   DPCT1012:20: Detected kernel execution time measurement pattern and
   generated an initial code for time measurements in SYCL. You can change the
@@ -1114,8 +1073,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   */
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now();
-  milliseconds =
-      std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
+  milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
   printf("Time for kernel deo (ms): %.2f\n", milliseconds);
 
   // Convert from SoA to AoS in GPU
@@ -1134,13 +1092,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   limit. To get the device limit, query info::device::max_work_group_size.
   Adjust the workgroup size if needed.
   */
-  stop =
-      q_ct1.parallel_for<class spinor_SoA2AoS_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size) *
-                                               sycl::range<1>(block_size),
-                                           sycl::range<1>(block_size)),
-                         [=](sycl::nd_item<1> item_ct1) {
-                           spinor_SoA2AoS(VOLUME, d_r_aos, d_r_soa, item_ct1);
-                         });
+  stop = q_ct1.parallel_for<class spinor_SoA2AoS_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size)
+                                                         * sycl::range<1>(block_size), sycl::range<1>(block_size)),
+                                                         [=](sycl::nd_item<1> item_ct1)
+                                                         { spinor_SoA2AoS(VOLUME, d_r_aos, d_r_soa, item_ct1); });
   /*
   DPCT1012:23: Detected kernel execution time measurement pattern and
   generated an initial code for time measurements in SYCL. You can change the
@@ -1148,8 +1103,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   */
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now();
-  milliseconds =
-      std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
+  milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
   printf("Time for SoA to AoS (GPU) (ms): %.2f\n", milliseconds);
 
   // Copy result back to the host
@@ -1166,8 +1120,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   way time is measured depending on your goals.
   */
   stop_ct1 = std::chrono::steady_clock::now();
-  milliseconds =
-      std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
+  milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
   printf("Time for cudaMemcpy D2H (ms): %.2f\n", milliseconds);
 
   // Free GPU memory
@@ -1175,17 +1128,9 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m,
   destroy_su3_soa(d_u_soa, q_ct1);
   destroy_spinor_soa(d_s_soa, q_ct1);
   destroy_spinor_soa(d_r_soa, q_ct1);
-  
+
   sycl::free(d_piup, q_ct1);
   sycl::free(d_pidn, q_ct1);
   sycl::free(d_r_aos, q_ct1);
 
-  /*
-  DPCT1026:27: The call to cudaEventDestroy was removed because this call is
-  redundant in DPC++.
-  */
-  /*
-  DPCT1026:28: The call to cudaEventDestroy was removed because this call is
-  redundant in DPC++.
-  */
 }

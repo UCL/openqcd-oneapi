@@ -15,8 +15,10 @@ hip_omp_cpu: CC = syclcc
 hip_cuda_gpu: CC = syclcc
 #hip_cuda_gpu: CFLAGS += --hipsycl-targets=cuda:sm_80
 
+# Will need the setvars.sh script (from oneapi installation) to be sourced before running this target
 all: oneapi_intel_cpu oneapi_cuda_gpu hip_intel_cpu hip_intel_gpu
 
+# Will need the setvars.sh script (from oneapi installation) to be sourced before running this target
 oneapi_intel_cpu: main.c dw_soa_sycl.cpp read_in.c
 	$(CC) $(INCLUDES) $(CFLAGS) $^ -o main.oneapi_intel_cpu
 
