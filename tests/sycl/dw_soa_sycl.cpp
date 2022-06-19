@@ -874,7 +874,6 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   is measured depending on your goals.
   */
   start_ct1 = std::chrono::steady_clock::now(); // Start the timer
-  // q_ct1.memcpy(d_m_aos, m, 2 * VOLUME * sizeof(pauli)).wait(); // Mem copy AoS H2D
   block_size = 128;
   grid_size = ceil(VOLUME / static_cast<float>(block_size));
   /*
@@ -908,7 +907,6 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   is measured depending on your goals.
   */
   start_ct1 = std::chrono::steady_clock::now();              // Start the timer
-  // q_ct1.memcpy(d_u_aos, u, 4 * VOLUME * sizeof(su3)).wait(); // Mem copy AoS H2D
   block_size = 128;
   grid_size = ceil((VOLUME / 2.0) / static_cast<float>(block_size));
   /*
@@ -941,7 +939,6 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   is measured depending on your goals.
   */
   start_ct1 = std::chrono::steady_clock::now();             // Start the timer
-  // q_ct1.memcpy(d_s_aos, s, VOLUME * sizeof(spinor)).wait(); // Mem copy AoS H2D
   block_size = 128;
   grid_size = ceil(VOLUME / static_cast<float>(block_size));
   /*
