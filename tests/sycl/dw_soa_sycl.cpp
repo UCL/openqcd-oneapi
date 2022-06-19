@@ -962,9 +962,13 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   sycl::free(s_aos_usm, q_ct1);
 
   // Allocate memory on device for lookup tables and spinor r
-  sycl::int4 *d_piup, *d_pidn;
-  d_piup = (sycl::int4 *)sycl::malloc_device(2 * VOLUME * sizeof(int), q_ct1);
-  d_pidn = (sycl::int4 *)sycl::malloc_device(2 * VOLUME * sizeof(int), q_ct1);
+  auto *piup_usm = sycl::malloc_host<sycl::int4>(2 * VOLUME * sizeof(int), q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
+  std::memcpy(piup_usm, piup, 2 * VOLUME * sizeof(int)); // in the host side, copy the data pointed to by 'piup' into 'piup_usm'
+  auto *pidn_usm = sycl::malloc_host<sycl::int4>(2 * VOLUME * sizeof(int), q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
+  std::memcpy(pidn_usm, pidn, 2 * VOLUME * sizeof(int)); // in the host side, copy the data pointed to by 'pidn' into 'pidn_usm'
+  // sycl::int4 *d_piup, *d_pidn;
+  // d_piup = (sycl::int4 *)sycl::malloc_device(2 * VOLUME * sizeof(int), q_ct1);
+  // d_pidn = (sycl::int4 *)sycl::malloc_device(2 * VOLUME * sizeof(int), q_ct1);
   spinor_soa d_r_soa = allocSpinor2Device(VOLUME, q_ct1);
 
   // Copy lookup tables from host to device
@@ -974,8 +978,8 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   way time is measured depending on your goals.
   */
   start_ct1 = std::chrono::steady_clock::now();
-  q_ct1.memcpy(d_piup, piup, 2 * VOLUME * sizeof(int));
-  q_ct1.memcpy(d_pidn, pidn, 2 * VOLUME * sizeof(int)).wait();
+  // q_ct1.memcpy(d_piup, piup, 2 * VOLUME * sizeof(int));
+  // q_ct1.memcpy(d_pidn, pidn, 2 * VOLUME * sizeof(int)).wait();
   /*
   DPCT1012:12: Detected kernel execution time measurement pattern and
   generated an initial code for time measurements in SYCL. You can change the
@@ -1033,7 +1037,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
                                                  * sycl::range<1>(block_size), sycl::range<1>(block_size)),
                                                  [=](sycl::nd_item<1> item_ct1)
                                                  {
-                                                  doe_kernel(VOLUME, d_s_soa, d_r_soa, d_u_soa, d_piup, d_pidn,
+                                                  doe_kernel(VOLUME, d_s_soa, d_r_soa, d_u_soa, piup_usm, pidn_usm,
                                                              coe, gamma_f, one_over_gammaf, item_ct1);
                                                  });
   /*
@@ -1062,8 +1066,8 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   stop = q_ct1.parallel_for<class my_deo_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size) *
                                                  sycl::range<1>(block_size), sycl::range<1>(block_size)),
                                                  [=](sycl::nd_item<1> item_ct1)
-                                                 { deo_kernel(VOLUME, d_s_soa, d_r_soa, d_u_soa, d_piup,
-                                                              d_pidn, ceo, one_over_gammaf, item_ct1);
+                                                 { deo_kernel(VOLUME, d_s_soa, d_r_soa, d_u_soa, piup_usm,
+                                                              pidn_usm, ceo, one_over_gammaf, item_ct1);
                                                  });
   /*
   DPCT1012:20: Detected kernel execution time measurement pattern and
@@ -1128,8 +1132,8 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   destroy_spinor_soa(d_s_soa, q_ct1);
   destroy_spinor_soa(d_r_soa, q_ct1);
 
-  sycl::free(d_piup, q_ct1);
-  sycl::free(d_pidn, q_ct1);
+  sycl::free(piup_usm, q_ct1);
+  sycl::free(pidn_usm, q_ct1);
   sycl::free(d_r_aos, q_ct1);
 
 }
