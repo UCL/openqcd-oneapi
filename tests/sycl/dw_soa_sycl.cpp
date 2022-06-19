@@ -961,14 +961,11 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   printf("Time for AoS to SoA for spinor s +H2D (GPU) (ms): %.2f\n", milliseconds);
   sycl::free(s_aos_usm, q_ct1);
 
-  // Allocate memory on device for lookup tables and spinor r
+  // Allocate memory for lookup tables and spinor r
   auto *piup_usm = sycl::malloc_host<sycl::int4>(2 * VOLUME * sizeof(int), q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
   std::memcpy(piup_usm, piup, 2 * VOLUME * sizeof(int)); // in the host side, copy the data pointed to by 'piup' into 'piup_usm'
   auto *pidn_usm = sycl::malloc_host<sycl::int4>(2 * VOLUME * sizeof(int), q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
   std::memcpy(pidn_usm, pidn, 2 * VOLUME * sizeof(int)); // in the host side, copy the data pointed to by 'pidn' into 'pidn_usm'
-  // sycl::int4 *d_piup, *d_pidn;
-  // d_piup = (sycl::int4 *)sycl::malloc_device(2 * VOLUME * sizeof(int), q_ct1);
-  // d_pidn = (sycl::int4 *)sycl::malloc_device(2 * VOLUME * sizeof(int), q_ct1);
   spinor_soa d_r_soa = allocSpinor2Device(VOLUME, q_ct1);
 
   // Copy lookup tables from host to device
@@ -978,8 +975,6 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   way time is measured depending on your goals.
   */
   start_ct1 = std::chrono::steady_clock::now();
-  // q_ct1.memcpy(d_piup, piup, 2 * VOLUME * sizeof(int));
-  // q_ct1.memcpy(d_pidn, pidn, 2 * VOLUME * sizeof(int)).wait();
   /*
   DPCT1012:12: Detected kernel execution time measurement pattern and
   generated an initial code for time measurements in SYCL. You can change the
