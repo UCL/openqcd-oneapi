@@ -4,6 +4,7 @@
 #include "sycl_openqcd.h"
 #include <CL/sycl.hpp>
 #include <chrono>
+#include <cstring>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -865,15 +866,17 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
 
   // Copy pauli m from host to device and convert from Aos to SoA in GPU
   pauli_soa d_m_soa = allocPauli2Device(VOLUME, q_ct1); // Allocate SoA in device
-  pauli *d_m_aos;
-  d_m_aos = sycl::malloc_device<pauli>(2 * VOLUME, q_ct1); // Allocate AoS in device
+  pauli * m_aos_usm = sycl::malloc_host<pauli>(2 * VOLUME * sizeof(pauli), q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
+  std::memcpy(m_aos_usm, m, 2*VOLUME*sizeof(pauli)); // in the host side, copy the data pointed to by 'm' into m_aos_usm
+  // pauli *d_m_aos;
+  // d_m_aos = sycl::malloc_device<pauli>(2 * VOLUME, q_ct1); // Allocate AoS in device
   /*
   DPCT1012:2: Detected kernel execution time measurement pattern and generated
   an initial code for time measurements in SYCL. You can change the way time
   is measured depending on your goals.
   */
   start_ct1 = std::chrono::steady_clock::now(); // Start the timer
-  q_ct1.memcpy(d_m_aos, m, 2 * VOLUME * sizeof(pauli)).wait(); // Mem copy AoS H2D
+  // q_ct1.memcpy(d_m_aos, m, 2 * VOLUME * sizeof(pauli)).wait(); // Mem copy AoS H2D
   block_size = 128;
   grid_size = ceil(VOLUME / static_cast<float>(block_size));
   /*
@@ -884,7 +887,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   stop = q_ct1.parallel_for<class pauli_AoS2SoA_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size)
                                                         * sycl::range<1>(block_size), sycl::range<1>(block_size)),
                                                         [=](sycl::nd_item<1> item_ct1)
-                                                        { pauli_AoS2SoA(VOLUME, d_m_soa, d_m_aos, item_ct1); });
+                                                        { pauli_AoS2SoA(VOLUME, d_m_soa, m_aos_usm, item_ct1); });
   /*
   DPCT1012:3: Detected kernel execution time measurement pattern and generated
   an initial code for time measurements in SYCL. You can change the way time
@@ -894,7 +897,8 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   stop_ct1 = std::chrono::steady_clock::now(); // Stop the timer
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
   printf("Time for AoS to SoA for pauli m +H2D (GPU) (ms): %.2f\n", milliseconds);
-  sycl::free(d_m_aos, q_ct1); // Free AoS in GPU
+  // sycl::free(d_m_aos, q_ct1); // Free AoS in GPU
+  sycl::free(m_aos_usm, q_ct1); // Free the AoS USM allocation
 
   // Copy su3 u from host to device and convert from Aos to SoA in GPU
   su3_soa d_u_soa = allocSu32Device(VOLUME, q_ct1); // Allocate SoA in device
