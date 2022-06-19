@@ -177,7 +177,7 @@ void destroy_spinor_soa(spinor_soa obj, sycl::queue &q_ct1)
   sycl::free(obj.c4.c3.im, q_ct1);
 }
 
-// Kernel to convert pauli from AoS to SoA in GPU
+// Kernel to convert pauli from AoS to SoA in device
 // extern "C"
 void pauli_AoS2SoA(int vol, pauli_soa mout, pauli *min, sycl::nd_item<1> item_ct1)
 {
@@ -198,7 +198,7 @@ void pauli_AoS2SoA(int vol, pauli_soa mout, pauli *min, sycl::nd_item<1> item_ct
   }
 }
 
-// Kernel to convert su3 from AoS to SoA in GPU
+// Kernel to convert su3 from AoS to SoA in device
 extern "C" void su3_AoS2SoA(int vol, su3_soa uout, su3 *uin, sycl::nd_item<1> item_ct1)
 {
   int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) + item_ct1.get_local_id(0);
@@ -231,7 +231,7 @@ extern "C" void su3_AoS2SoA(int vol, su3_soa uout, su3 *uin, sycl::nd_item<1> it
   }
 }
 
-// Kernel to convert spinor from AoS to SoA in GPU
+// Kernel to convert spinor from AoS to SoA in device
 extern "C" void spinor_AoS2SoA(int vol, spinor_soa rout, spinor *rin, sycl::nd_item<1> item_ct1)
 {
   int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) + item_ct1.get_local_id(0);
@@ -264,7 +264,7 @@ extern "C" void spinor_AoS2SoA(int vol, spinor_soa rout, spinor *rin, sycl::nd_i
   rout.c4.c3.im[idx] = (*(rin + idx)).c4.c3.im;
 }
 
-// Kernel to convert spinor from SoA to AoS in GPU
+// Kernel to convert spinor from SoA to AoS in device
 extern "C" void spinor_SoA2AoS(int vol, spinor *rout, spinor_soa rin, sycl::nd_item<1> item_ct1)
 {
   int idx = item_ct1.get_group(0) * item_ct1.get_local_range().get(0) + item_ct1.get_local_id(0);
@@ -864,7 +864,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   gamma_f = 1.0f;
   one_over_gammaf = 1.0f;
 
-  // Copy pauli m from host to device and convert from Aos to SoA in GPU
+  // Copy pauli m from host to device and convert from Aos to SoA in device
   pauli_soa d_m_soa = allocPauli2Device(VOLUME, q_ct1); // Allocate SoA in device
   auto *m_aos_usm = sycl::malloc_host<pauli>(2 * VOLUME, q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
   std::memcpy(m_aos_usm, m, 2 * VOLUME * sizeof(pauli)); // in the host side, copy the data pointed to by 'm' into 'm_aos_usm'
@@ -893,11 +893,11 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now(); // Stop the timer
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for AoS to SoA for pauli m +H2D (GPU) (ms): %.2f\n", milliseconds);
-  // sycl::free(d_m_aos, q_ct1); // Free AoS in GPU
+  printf("Time for AoS to SoA for pauli m +H2D (device) (ms): %.2f\n", milliseconds);
+  // sycl::free(d_m_aos, q_ct1); // Free AoS in device
   sycl::free(m_aos_usm, q_ct1); // Free the AoS USM allocation
 
-  // Copy su3 u from host to device and convert from Aos to SoA in GPU
+  // Copy su3 u from host to device and convert from Aos to SoA in device
   su3_soa d_u_soa = allocSu32Device(VOLUME, q_ct1); // Allocate SoA in device
   auto *u_aos_usm = sycl::malloc_host<su3>(4 * VOLUME, q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
   std::memcpy(u_aos_usm, u, 4 * VOLUME * sizeof(su3)); // in the host side, copy the data pointed to by 'u' into 'u_aos_usm'
@@ -926,10 +926,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now(); // Stop the timer
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for AoS to SoA for su3 u +H2D (GPU) (ms): %.2f\n", milliseconds);
+  printf("Time for AoS to SoA for su3 u +H2D (device) (ms): %.2f\n", milliseconds);
   sycl::free(u_aos_usm, q_ct1); // Free AoS
 
-  // Copy spinor s from host to device and convert from Aos to SoA in GPU
+  // Copy spinor s from host to device and convert from Aos to SoA in device
   spinor_soa d_s_soa = allocSpinor2Device(VOLUME, q_ct1); // Allocate SoA in device
   auto *s_aos_usm = sycl::malloc_host<spinor>(VOLUME, q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
   std::memcpy(s_aos_usm, s, VOLUME * sizeof(spinor)); // in the host side, copy the data pointed to by 's' into 's_aos_usm'
@@ -958,7 +958,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now(); // Stop the timer
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for AoS to SoA for spinor s +H2D (GPU) (ms): %.2f\n", milliseconds);
+  printf("Time for AoS to SoA for spinor s +H2D (device) (ms): %.2f\n", milliseconds);
   sycl::free(s_aos_usm, q_ct1);
 
   // Allocate memory for lookup tables and spinor r
@@ -984,7 +984,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
   printf("Time for cudaMemcpy H2D of lookup tables (ms): %.2f\n", milliseconds);
 
-  // Launch kernels on GPU
+  // Launch kernels on device
   block_size = 128;
   grid_size = ceil(VOLUME / static_cast<float>(block_size));
   /*
@@ -1121,7 +1121,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
   printf("Time for cudaMemcpy D2H (ms): %.2f\n", milliseconds);
 
-  // Free GPU memory
+  // Free device memory
   destroy_pauli_soa(d_m_soa, q_ct1);
   destroy_su3_soa(d_u_soa, q_ct1);
   destroy_spinor_soa(d_s_soa, q_ct1);
