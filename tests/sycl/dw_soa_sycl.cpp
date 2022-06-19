@@ -1076,8 +1076,6 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
 
   // Convert from SoA to AoS in device
   auto *r_aos_usm = sycl::malloc_shared<spinor>(VOLUME, q_ct1); // AoS_USM as shared allocation, but accessible on the device via a PCI-e link
-  // spinor *d_r_aos;
-  // d_r_aos = sycl::malloc_device<spinor>(VOLUME, q_ct1);
   block_size = 128;
   grid_size = ceil(VOLUME / static_cast<float>(block_size));
   /*
@@ -1113,7 +1111,6 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   way time is measured depending on your goals.
   */
   start_ct1 = std::chrono::steady_clock::now();
-  // q_ct1.memcpy(r, d_r_aos, VOLUME * sizeof(spinor)).wait();
   /*
   DPCT1012:26: Detected kernel execution time measurement pattern and
   generated an initial code for time measurements in SYCL. You can change the
