@@ -866,7 +866,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
 
   // Copy pauli m from host to device and convert from Aos to SoA in GPU
   pauli_soa d_m_soa = allocPauli2Device(VOLUME, q_ct1); // Allocate SoA in device
-  pauli *m_aos_usm = sycl::malloc_host<pauli>(2 * VOLUME * sizeof(pauli), q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
+  pauli *m_aos_usm = sycl::malloc_host<pauli>(2 * VOLUME, q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
   std::memcpy(m_aos_usm, m, 2 * VOLUME * sizeof(pauli)); // in the host side, copy the data pointed to by 'm' into m_aos_usm
   // pauli *d_m_aos;
   // d_m_aos = sycl::malloc_device<pauli>(2 * VOLUME, q_ct1); // Allocate AoS in device
@@ -902,7 +902,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
 
   // Copy su3 u from host to device and convert from Aos to SoA in GPU
   su3_soa d_u_soa = allocSu32Device(VOLUME, q_ct1); // Allocate SoA in device
-  su3 *u_aos_usm = sycl::malloc_host<su3>(4 * VOLUME * sizeof(su3), q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
+  su3 *u_aos_usm = sycl::malloc_host<su3>(4 * VOLUME, q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
   std::memcpy(u_aos_usm, u, 4 * VOLUME * sizeof(su3)); // in the host side, copy the data pointed to by 'u' into u_aos_usm
   // su3 *d_u_aos;
   // d_u_aos = sycl::malloc_device<su3>(4 * VOLUME, q_ct1); // Allocate AoS in device
