@@ -893,7 +893,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now(); // Stop the timer
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for AoS to SoA for pauli m +H2D (device) (ms): %.2f\n", milliseconds);
+  printf("Time for AoS to SoA for pauli m + implicit data movement H2D (ms): %.2f\n", milliseconds);
   // sycl::free(d_m_aos, q_ct1); // Free AoS in device
   sycl::free(m_aos_usm, q_ct1); // Free the AoS USM allocation
 
@@ -926,7 +926,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now(); // Stop the timer
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for AoS to SoA for su3 u +H2D (device) (ms): %.2f\n", milliseconds);
+  printf("Time for AoS to SoA for su3 u + implicit data movement H2D (ms): %.2f\n", milliseconds);
   sycl::free(u_aos_usm, q_ct1); // Free AoS
 
   // Copy spinor s from host to device and convert from Aos to SoA in device
@@ -958,7 +958,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now(); // Stop the timer
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for AoS to SoA for spinor s +H2D (device) (ms): %.2f\n", milliseconds);
+  printf("Time for AoS to SoA for spinor s + implicit data movement (ms): %.2f\n", milliseconds);
   sycl::free(s_aos_usm, q_ct1);
 
   // Allocate memory for lookup tables and spinor r
@@ -967,22 +967,6 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   auto *pidn_usm = sycl::malloc_host<sycl::int4>(2 * VOLUME * sizeof(int), q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
   std::memcpy(pidn_usm, pidn, 2 * VOLUME * sizeof(int)); // in the host side, copy the data pointed to by 'pidn' into 'pidn_usm'
   spinor_soa d_r_soa = allocSpinor2Device(VOLUME, q_ct1);
-
-  // Copy lookup tables from host to device
-  /*
-  DPCT1012:11: Detected kernel execution time measurement pattern and
-  generated an initial code for time measurements in SYCL. You can change the
-  way time is measured depending on your goals.
-  */
-  start_ct1 = std::chrono::steady_clock::now();
-  /*
-  DPCT1012:12: Detected kernel execution time measurement pattern and
-  generated an initial code for time measurements in SYCL. You can change the
-  way time is measured depending on your goals.
-  */
-  stop_ct1 = std::chrono::steady_clock::now();
-  milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for cudaMemcpy H2D of lookup tables (ms): %.2f\n", milliseconds);
 
   // Launch kernels on device
   block_size = 128;
@@ -1101,24 +1085,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now();
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  std::memcpy(r, r_aos_usm, VOLUME * sizeof(spinor)); // in the host side, copy the data pointed to by 'r_aos_usm' into 'r' for final output
-  printf("Time for SoA to AoS (device) (ms): %.2f\n", milliseconds);
+  printf("Time for SoA to AoS for r (device) (ms): %.2f\n", milliseconds);
 
-  // Copy result back to the host
-  /*
-  DPCT1012:25: Detected kernel execution time measurement pattern and
-  generated an initial code for time measurements in SYCL. You can change the
-  way time is measured depending on your goals.
-  */
-  start_ct1 = std::chrono::steady_clock::now();
-  /*
-  DPCT1012:26: Detected kernel execution time measurement pattern and
-  generated an initial code for time measurements in SYCL. You can change the
-  way time is measured depending on your goals.
-  */
-  stop_ct1 = std::chrono::steady_clock::now();
-  milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for cudaMemcpy D2H (ms): %.2f\n", milliseconds);
+  std::memcpy(r, r_aos_usm, VOLUME * sizeof(spinor)); // in the host side, copy the data pointed to by 'r_aos_usm' into 'r' for final output
+
 
   // Free device memory
   destroy_pauli_soa(d_m_soa, q_ct1);
