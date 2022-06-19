@@ -4,7 +4,7 @@
 #include "sycl_openqcd.h"
 #include <CL/sycl.hpp>
 #include <chrono>
-#include <cstring>
+#include <cstring>  // for std::memcpy (faciliatates fast memory copies within host memory. See https://en.cppreference.com/w/cpp/string/byte/memcpy)
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
