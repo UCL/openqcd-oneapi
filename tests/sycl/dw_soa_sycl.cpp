@@ -866,10 +866,8 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
 
   // Copy pauli m from host to device and convert from Aos to SoA in GPU
   pauli_soa d_m_soa = allocPauli2Device(VOLUME, q_ct1); // Allocate SoA in device
-  pauli *m_aos_usm = sycl::malloc_host<pauli>(2 * VOLUME, q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
+  auto *m_aos_usm = sycl::malloc_host<pauli>(2 * VOLUME, q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
   std::memcpy(m_aos_usm, m, 2 * VOLUME * sizeof(pauli)); // in the host side, copy the data pointed to by 'm' into m_aos_usm
-  // pauli *d_m_aos;
-  // d_m_aos = sycl::malloc_device<pauli>(2 * VOLUME, q_ct1); // Allocate AoS in device
   /*
   DPCT1012:2: Detected kernel execution time measurement pattern and generated
   an initial code for time measurements in SYCL. You can change the way time
@@ -902,10 +900,8 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
 
   // Copy su3 u from host to device and convert from Aos to SoA in GPU
   su3_soa d_u_soa = allocSu32Device(VOLUME, q_ct1); // Allocate SoA in device
-  su3 *u_aos_usm = sycl::malloc_host<su3>(4 * VOLUME, q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
+  auto *u_aos_usm = sycl::malloc_host<su3>(4 * VOLUME, q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
   std::memcpy(u_aos_usm, u, 4 * VOLUME * sizeof(su3)); // in the host side, copy the data pointed to by 'u' into u_aos_usm
-  // su3 *d_u_aos;
-  // d_u_aos = sycl::malloc_device<su3>(4 * VOLUME, q_ct1); // Allocate AoS in device
   /*
   DPCT1012:5: Detected kernel execution time measurement pattern and generated
   an initial code for time measurements in SYCL. You can change the way time
@@ -937,10 +933,8 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
 
   // Copy spinor s from host to device and convert from Aos to SoA in GPU
   spinor_soa d_s_soa = allocSpinor2Device(VOLUME, q_ct1); // Allocate SoA in device
-  spinor *s_aos_usm = sycl::malloc_host<spinor>(VOLUME, q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
+  auto *s_aos_usm = sycl::malloc_host<spinor>(VOLUME, q_ct1); // AoS_USM as host allocation, but accessible on the device via a PCI-e link
   std::memcpy(s_aos_usm, s, VOLUME * sizeof(spinor)); // in the host side, copy the data pointed to by 's' into s_aos_usm
-  // spinor *d_s_aos;
-  // d_s_aos = sycl::malloc_device<spinor>(VOLUME, q_ct1); // Allocate AoS in device
   /*
   DPCT1012:8: Detected kernel execution time measurement pattern and generated
   an initial code for time measurements in SYCL. You can change the way time
