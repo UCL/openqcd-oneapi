@@ -1,5 +1,5 @@
-#ifndef DW_CUDA_SOA_H
-#define DW_CUDA_SOA_H
+#ifndef DW_SYCL_SOA_H
+#define DW_SYCL_SOA_H
 
 #include "su3.h"
 
@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-// void Dw_cuda_SoA();
-void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, int *pidn);
+// void Dw_sycl_SoA();
+void Dw_sycl_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, int *pidn);
 
 #ifdef __cplusplus
 }

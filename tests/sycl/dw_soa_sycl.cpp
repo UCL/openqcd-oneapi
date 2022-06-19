@@ -1,4 +1,3 @@
-// #include "dw_cuda_soa.h"
 #include "macros.h"
 #include "su3.h"
 #include "sycl_openqcd.h"
@@ -824,7 +823,7 @@ extern "C" void deo_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 }
 // ---------------------------------------------------------------------------//
 
-extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, int *pidn)
+extern "C" void Dw_sycl_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, int *pidn)
 {
 
   auto platformlist = sycl::platform::get_platforms();
@@ -984,7 +983,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   */
   stop_ct1 = std::chrono::steady_clock::now();
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for cudaMemcpy H2D of lookup tables (ms): %.2f\n", milliseconds);
+  printf("Time for Memcpy H2D of lookup tables (ms): %.2f\n", milliseconds);
 
   // Launch kernels on GPU
   block_size = 128;
@@ -1121,7 +1120,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   */
   stop_ct1 = std::chrono::steady_clock::now();
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for cudaMemcpy D2H (ms): %.2f\n", milliseconds);
+  printf("Time for Memcpy D2H (ms): %.2f\n", milliseconds);
 
   // Free GPU memory
   destroy_pauli_soa(d_m_soa, q_ct1);

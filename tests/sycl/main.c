@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
   if( err != 0 ) exit(-1);
 
   // Call DPCPP version of Dw() with Structures of Arrays
-  Dw_cuda_SoA(VOLUME, u, s, r, m, piup, pidn);
+  Dw_sycl_SoA(VOLUME, u, s, r, m, piup, pidn);
 
   // Compare spinors r
   int ret;
