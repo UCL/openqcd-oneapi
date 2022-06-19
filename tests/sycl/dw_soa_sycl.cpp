@@ -1074,9 +1074,10 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
   printf("Time for kernel deo (ms): %.2f\n", milliseconds);
 
-  // Convert from SoA to AoS in GPU
-  spinor *d_r_aos;
-  d_r_aos = sycl::malloc_device<spinor>(VOLUME, q_ct1);
+  // Convert from SoA to AoS in device
+  auto *r_aos_usm = sycl::malloc_shared<spinor>(VOLUME, q_ct1); // AoS_USM as shared allocation, but accessible on the device via a PCI-e link
+  // spinor *d_r_aos;
+  // d_r_aos = sycl::malloc_device<spinor>(VOLUME, q_ct1);
   block_size = 128;
   grid_size = ceil(VOLUME / static_cast<float>(block_size));
   /*
@@ -1093,7 +1094,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   stop = q_ct1.parallel_for<class spinor_SoA2AoS_kernel>(sycl::nd_range<1>(sycl::range<1>(grid_size)
                                                          * sycl::range<1>(block_size), sycl::range<1>(block_size)),
                                                          [=](sycl::nd_item<1> item_ct1)
-                                                         { spinor_SoA2AoS(VOLUME, d_r_aos, d_r_soa, item_ct1); });
+                                                         { spinor_SoA2AoS(VOLUME, r_aos_usm, d_r_soa, item_ct1); });
   /*
   DPCT1012:23: Detected kernel execution time measurement pattern and
   generated an initial code for time measurements in SYCL. You can change the
@@ -1102,7 +1103,8 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   stop.wait();
   stop_ct1 = std::chrono::steady_clock::now();
   milliseconds = std::chrono::duration<float, std::milli>(stop_ct1 - start_ct1).count();
-  printf("Time for SoA to AoS (GPU) (ms): %.2f\n", milliseconds);
+  std::memcpy(r, r_aos_usm, VOLUME * sizeof(spinor)); // in the host side, copy the data pointed to by 'r_aos_usm' into 'r' for final output
+  printf("Time for SoA to AoS (device) (ms): %.2f\n", milliseconds);
 
   // Copy result back to the host
   /*
@@ -1111,7 +1113,7 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   way time is measured depending on your goals.
   */
   start_ct1 = std::chrono::steady_clock::now();
-  q_ct1.memcpy(r, d_r_aos, VOLUME * sizeof(spinor)).wait();
+  // q_ct1.memcpy(r, d_r_aos, VOLUME * sizeof(spinor)).wait();
   /*
   DPCT1012:26: Detected kernel execution time measurement pattern and
   generated an initial code for time measurements in SYCL. You can change the
@@ -1129,6 +1131,6 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
 
   sycl::free(piup_usm, q_ct1);
   sycl::free(pidn_usm, q_ct1);
-  sycl::free(d_r_aos, q_ct1);
+  sycl::free(r_aos_usm, q_ct1);
 
 }
