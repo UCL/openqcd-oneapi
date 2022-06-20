@@ -22,7 +22,7 @@
 #! Note that the job submission script will enforce no more than 32 cpus per GPU.
 #SBATCH --gres=gpu:1
 #! How much wallclock time will be required?
-#SBATCH --time=00:30:00
+#SBATCH --time=00:10:00
 #! What types of email messages do you wish to receive?
 #SBATCH --mail-type=NONE
 
@@ -43,15 +43,13 @@ mpi_tasks_per_node=$(echo "$SLURM_TASKS_PER_NODE" | sed -e  's/^\([0-9][0-9]*\).
 #! (note that SLURM reproduces the environment at submission irrespective of ~/.bashrc):
 . /etc/profile.d/modules.sh                # Leave this line (enables the module command)
 module purge                               # Removes all modules still loaded
-module use /usr/local/software/spack/spack-modules/dpcpp-cuda-20220220/linux-centos8-x86_64_v3/
-module load dpcpp
-module load gcc/11.2.0
+module load rhel8/default-amp
 
 #! Full path to application executable: 
-application='ncu --set=full -f -o sycl_nvidia_gpu_7 --target-processes all --kernel-name-base demangled --kernel-name regex:"instance 7" ./main.nvidia_gpu.debug'
+application='ncu --set=full -f -o cuda_filtered --target-processes all --kernel-name regex:"doe|deo|mulpauli" ../../cuda2/main'
 
 #! Run options for the application:
-options="64 64 64 64 ."
+options="64 64 64 64 /rds/project/dirac_vol2/rds-dirac-dr004/openqcd/makis-ref-data"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
@@ -74,9 +72,6 @@ CMD="$application $options"
 
 cd $workdir
 echo -e "Changed directory to `pwd`.\n"
-
-echo -e "Using ncu from"
-echo -e $(which ncu)
 
 JOBID=$SLURM_JOB_ID
 
