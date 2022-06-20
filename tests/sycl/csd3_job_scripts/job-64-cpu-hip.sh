@@ -1,7 +1,7 @@
 #!/bin/bash
 #!
-#! Example SLURM job script for Wilkes3 (AMD EPYC 7763, ConnectX-6, A100)
-#! Last updated: Fri 30 Jul 11:07:58 BST 2021
+#! Example SLURM job script for Peta4-Skylake (Skylake CPUs, OPA)
+#! Last updated: Mon 13 Nov 12:25:17 GMT 2017
 #!
 
 #!#############################################################
@@ -10,26 +10,25 @@
 
 #! sbatch directives begin here ###############################
 #! Name of the job:
-#SBATCH -J gpujob
-#! Which project should be charged (NB Wilkes2 projects end in '-GPU'):
-#SBATCH -A DIRAC-DR004-GPU
-#! How many whole nodes should be allocated?
+#SBATCH -J cpujob
+#SBATCH -A DIRAC-DR004-CPU
 #SBATCH --nodes=1
-#! How many (MPI) tasks will there be in total?
-#! Note probably this should not exceed the total number of GPUs in use.
 #SBATCH --ntasks=1
-#! Specify the number of GPUs per node (between 1 and 4; must be 4 if nodes>1).
-#! Note that the job submission script will enforce no more than 32 cpus per GPU.
-#SBATCH --gres=gpu:1
-#! How much wallclock time will be required?
+#SBATCH --mem=108160
 #SBATCH --time=00:10:00
-#! What types of email messages do you wish to receive?
 #SBATCH --mail-type=NONE
-
-#! Do not change:
-#SBATCH -p ampere
+#SBATCH -p icelake-himem
 
 #! sbatch directives end here (put any additional directives above this line)
+
+#! Notes:
+#! Charging is determined by core number*walltime.
+#! The --ntasks value refers to the number of tasks to be launched by SLURM only. This
+#! usually equates to the number of MPI tasks launched. Reduce this from nodes*32 if
+#! demanded by memory requirements, or if OMP_NUM_THREADS>1.
+#! Each task is allocated 1 core by default, and each core is allocated 5980MB (skylake)
+#! and 12030MB (skylake-himem). If this is insufficient, also specify
+#! --cpus-per-task and/or --mem (the latter specifies MB per node).
 
 #! Number of nodes and tasks per node allocated by SLURM (do not change):
 numnodes=$SLURM_JOB_NUM_NODES
@@ -43,27 +42,29 @@ mpi_tasks_per_node=$(echo "$SLURM_TASKS_PER_NODE" | sed -e  's/^\([0-9][0-9]*\).
 #! (note that SLURM reproduces the environment at submission irrespective of ~/.bashrc):
 . /etc/profile.d/modules.sh                # Leave this line (enables the module command)
 module purge                               # Removes all modules still loaded
-module load rhel8/default-icl
+module load rhel8/default-icl            # REQUIRED - loads the basic environment
+module load hipsycl/0.9.2/gcc-9.4.0-jg2gfgh
+module load gcc/9.4.0
+
+#! Insert additional module load commands after this line if needed:
 
 #! Full path to application executable: 
-application="nsys profile ./main.cuda"
+application="../main.hip_omp_cpu"
 
 #! Run options for the application:
-options="64 64 64 64 ."
+options="64 64 64 64 /rds/project/dirac_vol2/rds-dirac-dr004/openqcd/makis-ref-data"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
                              # in which sbatch is run.
 
 #! Are you using OpenMP (NB this is unrelated to OpenMPI)? If so increase this
-#! safe value to no more than 128:
+#! safe value to no more than 32:
 export OMP_NUM_THREADS=1
 
 #! Number of MPI tasks to be started by the application per node and in total (do not change):
 np=$[${numnodes}*${mpi_tasks_per_node}]
 
-#! Choose this for a pure shared-memory OpenMP parallel program on a single node:
-#! (OMP_NUM_THREADS threads will be created):
 CMD="$application $options"
 
 ###############################################################
