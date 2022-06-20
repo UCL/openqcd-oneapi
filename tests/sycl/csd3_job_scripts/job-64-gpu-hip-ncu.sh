@@ -43,13 +43,15 @@ mpi_tasks_per_node=$(echo "$SLURM_TASKS_PER_NODE" | sed -e  's/^\([0-9][0-9]*\).
 #! (note that SLURM reproduces the environment at submission irrespective of ~/.bashrc):
 . /etc/profile.d/modules.sh                # Leave this line (enables the module command)
 module purge                               # Removes all modules still loaded
-module load rhel8/default-icl
+module load rhel8/default-amp
+module load hipsycl/0.9.2/gcc-9.4.0-jg2gfgh
+module load gcc/9.4.0
 
 #! Full path to application executable: 
-application='ncu --set=full -f -o hip_nvidia_gpu_filtered --target-processes all --kernel-name regex:"doe|deo|mulpauli" ../main.hip_cuda_gpu'
+application='ncu --set=full -f -o hip_filtered --target-processes all --kernel-name regex:"doe|deo|mulpauli" ../main.hip_cuda_gpu'
 
 #! Run options for the application:
-options="64 64 64 64 ../../../data"
+options="64 64 64 64 /rds/project/dirac_vol2/rds-dirac-dr004/openqcd/makis-ref-data"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory

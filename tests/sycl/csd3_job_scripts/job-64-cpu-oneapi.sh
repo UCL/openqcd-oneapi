@@ -50,7 +50,7 @@ module load rhel8/default-icl            # REQUIRED - loads the basic environmen
 application="../main.oneapi_intel_cpu"
 
 #! Run options for the application:
-options="64 64 64 64 ../../../data"
+options="64 64 64 64 /rds/project/dirac_vol2/rds-dirac-dr004/openqcd/makis-ref-data"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory

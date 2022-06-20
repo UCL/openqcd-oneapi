@@ -49,10 +49,10 @@ module load gcc/11.2.0
 #module load rhel8/default-icl
 
 #! Full path to application executable: 
-application='ncu --set=full -f -o oneapi_nvidia_gpu_filtered --target-processes all --kernel-name regex:"doe|deo|mulpauli" ../main.oneapi_cuda_gpu'
+application='ncu --set=full -f -o oneapi_filtered --target-processes all --kernel-name regex:"doe|deo|mulpauli" ../main.oneapi_cuda_gpu'
 
 #! Run options for the application:
-options="64 64 64 64 ../../../data"
+options="64 64 64 64 /rds/project/dirac_vol2/rds-dirac-dr004/openqcd/makis-ref-data"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
