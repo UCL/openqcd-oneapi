@@ -1,4 +1,3 @@
-// #include "dw_cuda_soa.h"
 #include "macros.h"
 #include "su3.h"
 #include "sycl_openqcd.h"
@@ -825,7 +824,7 @@ extern "C" void deo_kernel(int vol, spinor_soa s, spinor_soa r, su3_soa u,
 }
 // ---------------------------------------------------------------------------//
 
-extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, int *pidn)
+extern "C" void Dw_sycl_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, int *piup, int *pidn)
 {
 
   auto platformlist = sycl::platform::get_platforms();
@@ -1088,7 +1087,6 @@ extern "C" void Dw_cuda_SoA(int VOLUME, su3 *u, spinor *s, spinor *r, pauli *m, 
   printf("Time for SoA to AoS for r (device) (ms): %.2f\n", milliseconds);
 
   std::memcpy(r, r_aos_usm, VOLUME * sizeof(spinor)); // in the host side, copy the data pointed to by 'r_aos_usm' into 'r' for final output
-
 
   // Free device memory
   destroy_pauli_soa(d_m_soa, q_ct1);
