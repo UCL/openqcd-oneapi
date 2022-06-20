@@ -26,6 +26,7 @@ oneapi_targets: oneapi_intel_cpu oneapi_cuda_gpu
 .PHONY: hip_targets
 hip_targets: hip_omp_cpu hip_cuda_gpu
 
+# Ensure the compiler is in $PATH and correctly set up before compiling, for example:
 # source setvars.sh script (from oneapi installation) before making the 'oneapi_intel_cpu' target
 oneapi_intel_cpu oneapi_cuda_gpu hip_omp_cpu hip_cuda_gpu: $(SRC_FILES)
 	$(CC) $(INCLUDES) $(CFLAGS) $^ -o $(EXEC_BASENAME).$@
